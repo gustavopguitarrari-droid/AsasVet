@@ -7,18 +7,18 @@ import {
   CalendarDays,
   FileText,
   Stethoscope,
-  DollarSign,
-  Bed,
-  UserCog,
+  DollarSign, // Novo ícone para Financeiro/Caixa
+  Bed, // Novo ícone para Internação
+  UserCog, // Novo ícone para Veterinários
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import ThemeToggle from "@/components/ThemeToggle";
+import ThemeToggle from "@/components/ThemeToggle"; // Importa o ThemeToggle
 
 interface SidebarProps {
   isCollapsed: boolean;
-  onToggleCollapse: () => void;
+  onToggleCollapse: () => void; // Mantemos a prop, mas não a usamos diretamente aqui
 }
 
 const navItems = [
@@ -90,26 +90,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 asChild
                 variant="ghost"
                 className={cn(
-                  "text-xl text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  // Estilos quando NÃO recolhido
-                  !isCollapsed && "w-full justify-start",
-                  // Estilos quando RECOLHIDO: torna o botão redondo e centralizado
-                  isCollapsed && "h-9 w-9 rounded-full mx-auto p-0",
+                  "w-full justify-start text-xl text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  isCollapsed && "justify-center",
                   location.pathname === item.path &&
                     "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
                 )}
               >
-                <Link
-                  to={item.path}
-                  className={cn(
-                    "flex items-center",
-                    isCollapsed && "justify-center w-full h-full" // Centraliza o conteúdo do link quando recolhido
-                  )}
-                >
+                <Link to={item.path} className="flex items-center">
                   <div
                     className={cn(
                       "flex items-center justify-center rounded-full",
-                      "w-9 h-9", // Tamanho fixo para o círculo (ajustado para h-9 w-9)
+                      "w-10 h-10", // Tamanho fixo para o círculo
                       !isCollapsed && "mr-3", // Margem à direita quando não recolhido
                       location.pathname === item.path
                         ? "bg-sidebar-primary" // Cor do círculo quando ativo
@@ -131,6 +122,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       <div className={cn("mt-auto pt-4", isCollapsed ? "flex justify-center" : "flex justify-start")}>
         <ThemeToggle isCollapsed={isCollapsed} />
       </div>
+
+      {/* O botão de recolher/expandir foi movido para o componente Layout.tsx */}
     </div>
   );
 };
