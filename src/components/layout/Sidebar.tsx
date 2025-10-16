@@ -80,7 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         )}
       >
         {!isCollapsed && "AsasVet"}{" "}
-        <Stethoscope className={cn("h-9 w-9", !isCollapsed && "ml-2")} />
+        <Stethoscope className={cn("h-9 w-9", !isCollapsed && "ml-2")} strokeWidth={2.5} />
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
@@ -109,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                         : "bg-sidebar-accent")
                     )}
                   >
-                    <item.icon className="h-6 w-6" />
+                    <item.icon className="h-6 w-6" strokeWidth={2.5} />
                   </div>
                   {!isCollapsed && item.name}
                 </Link>
