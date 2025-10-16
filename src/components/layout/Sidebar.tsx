@@ -131,7 +131,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         onClick={onToggleCollapse}
         className={cn(
           "absolute bottom-4",
-          isCollapsed ? "left-1/2 -translate-x-1/2" : "right-4",
+          isCollapsed ? "left-0 right-0 mx-auto" : "right-4",
         )}
       >
         {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
