@@ -3,22 +3,22 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
-  PawPrint,
+  PawPrint, // Importando PawPrint
   CalendarDays,
   FileText,
-  Stethoscope,
-  DollarSign, // Novo ícone para Financeiro/Caixa
-  Bed, // Novo ícone para Internação
-  UserCog, // Novo ícone para Veterinários
+  // Stethoscope, // Removendo Stethoscope
+  DollarSign,
+  Bed,
+  UserCog,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import ThemeToggle from "@/components/ThemeToggle"; // Importa o ThemeToggle
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface SidebarProps {
   isCollapsed: boolean;
-  onToggleCollapse: () => void; // Mantemos a prop, mas não a usamos diretamente aqui
+  onToggleCollapse: () => void;
 }
 
 const navItems = [
@@ -80,7 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         )}
       >
         {!isCollapsed && "AsasVet"}{" "}
-        <Stethoscope className={cn("h-9 w-9", !isCollapsed && "ml-2")} strokeWidth={2.5} />
+        <PawPrint className={cn("h-9 w-9", !isCollapsed && "ml-2")} strokeWidth={2.5} /> {/* Usando PawPrint aqui */}
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
@@ -90,22 +90,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 asChild
                 variant="ghost"
                 className={cn(
-                  "text-sidebar-foreground", // Cor do texto padrão
+                  "text-sidebar-foreground",
                   location.pathname === item.path
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground" // Fundo e texto para item ativo
-                    : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", // Fundo e texto para hover
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                    : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   isCollapsed
-                    ? "h-10 w-10 rounded-full flex items-center justify-center" // Quando recolhido: botão redondo e centralizado
-                    : "w-full justify-start text-xl" // Quando expandido: largura total, alinhado à esquerda, texto maior
+                    ? "h-10 w-10 rounded-full flex items-center justify-center"
+                    : "w-full justify-start text-xl"
                 )}
               >
                 <Link to={item.path} className="flex items-center">
                   <div
                     className={cn(
                       "flex items-center justify-center",
-                      !isCollapsed && "w-10 h-10 rounded-full mr-3", // Apenas aplica tamanho, forma e margem quando expandido
+                      !isCollapsed && "w-10 h-10 rounded-full mr-3",
                       !isCollapsed && (location.pathname === item.path
-                        ? "bg-sidebar-primary" // Aplica fundo ao div interno apenas quando expandido
+                        ? "bg-sidebar-primary"
                         : "bg-sidebar-accent")
                     )}
                   >
@@ -120,12 +120,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         ))}
       </nav>
 
-      {/* Theme Toggle no canto inferior esquerdo */}
       <div className={cn("mt-auto pt-4", isCollapsed ? "flex justify-center" : "flex justify-start")}>
         <ThemeToggle isCollapsed={isCollapsed} />
       </div>
-
-      {/* O botão de recolher/expandir foi movido para o componente Layout.tsx */}
     </div>
   );
 };
