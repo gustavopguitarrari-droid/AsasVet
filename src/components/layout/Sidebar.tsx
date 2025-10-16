@@ -10,7 +10,7 @@ import {
   UserPlus,
   ChevronLeft,
   ChevronRight,
-  Stethoscope, // Importado Stethoscope
+  Stethoscope,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -69,11 +69,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
     <div className="relative flex h-full flex-col overflow-y-auto border-r bg-sidebar-background p-4 text-sidebar-foreground shadow-sm">
       <div
         className={cn(
-          "mb-6 flex items-center justify-center text-2xl font-bold text-sidebar-primary",
+          "mb-6 flex items-center justify-center text-3xl font-bold text-sidebar-primary", // Alterado para text-3xl
           isCollapsed && "hidden",
         )}
       >
-        AsasVet <Stethoscope className="h-7 w-7 ml-2" /> {/* Ícone de estetoscópio adicionado à direita */}
+        AsasVet <Stethoscope className="h-8 w-8 ml-2" /> {/* Alterado para h-8 w-8 */}
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
