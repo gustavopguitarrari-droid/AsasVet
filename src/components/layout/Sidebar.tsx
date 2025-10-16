@@ -6,8 +6,6 @@ import {
   PawPrint,
   CalendarDays,
   FileText,
-  LogIn,
-  UserPlus,
   ChevronLeft,
   ChevronRight,
   Stethoscope,
@@ -49,18 +47,7 @@ const navItems = [
   },
 ];
 
-const authItems = [
-  {
-    name: "Login",
-    icon: LogIn,
-    path: "/login",
-  },
-  {
-    name: "Registrar",
-    icon: UserPlus,
-    path: "/register",
-  },
-];
+// Os itens de autenticação foram removidos
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
@@ -70,7 +57,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       <div
         className={cn(
           "mb-6 flex items-center justify-center text-3xl font-bold text-sidebar-primary",
-          // Removido: isCollapsed && "hidden", // Não esconde mais o div inteiro
         )}
       >
         {!isCollapsed && "AsasVet"}{" "}
@@ -100,33 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
           </Tooltip>
         ))}
       </nav>
-      <div className="mt-auto space-y-2 border-t pt-4">
-        {!isCollapsed && (
-          <p className="text-base text-muted-foreground">Autenticação</p>
-        )}
-        {authItems.map((item) => (
-          <Tooltip key={item.name} delayDuration={0}>
-            <TooltipTrigger asChild>
-              <Button
-                asChild
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start text-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  isCollapsed && "justify-center",
-                  location.pathname === item.path &&
-                    "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
-                )}
-              >
-                <Link to={item.path} className="flex items-center">
-                  <item.icon className={cn("h-7 w-7", !isCollapsed && "mr-3")} />
-                  {!isCollapsed && item.name}
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            {isCollapsed && <TooltipContent side="right">{item.name}</TooltipContent>}
-          </Tooltip>
-        ))}
-      </div>
+      {/* A seção de autenticação foi removida */}
       <Button
         variant="default"
         size="icon"

@@ -3,14 +3,13 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./components/layout/Layout"; // Importar o novo Layout
+import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
 import Pets from "./pages/Pets";
 import Appointments from "./pages/Appointments";
 import MedicalRecords from "./pages/MedicalRecords";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+// Login e Register não são mais importados
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,8 +21,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+          {/* Rotas de Login e Register foram removidas */}
           <Route
             path="/"
             element={
