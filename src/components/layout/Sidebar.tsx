@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import ThemeToggle from "@/components/ThemeToggle"; // Importa o ThemeToggle
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -46,8 +47,6 @@ const navItems = [
     path: "/medical-records",
   },
 ];
-
-// Os itens de autenticação foram removidos
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
@@ -86,7 +85,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
           </Tooltip>
         ))}
       </nav>
-      {/* A seção de autenticação foi removida */}
+
+      {/* Theme Toggle no canto inferior esquerdo */}
+      <div className={cn("mt-auto pt-4", isCollapsed ? "flex justify-center" : "flex justify-start")}>
+        <ThemeToggle isCollapsed={isCollapsed} />
+      </div>
+
+      {/* Botão de recolher/expandir a sidebar */}
       <Button
         variant="default"
         size="icon"
