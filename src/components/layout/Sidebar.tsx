@@ -8,9 +8,17 @@ import {
   FileText,
   LogIn,
   UserPlus,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+
+interface SidebarProps {
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+}
 
 const navItems = [
   {
@@ -53,53 +61,81 @@ const authItems = [
   },
 ];
 
-const Sidebar = () => {
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto border-r bg-sidebar-background p-4 text-sidebar-foreground shadow-sm">
-      <div className="mb-6 text-center text-2xl font-bold text-sidebar-primary">
+    <div className="relative flex h-full flex-col overflow-y-auto border-r bg-sidebar-background p-4 text-sidebar-foreground shadow-sm">
+      <div
+        className={cn(
+          "mb-6 text-center text-2xl font-bold text-sidebar-primary",
+          isCollapsed && "hidden",
+        )}
+      >
         Simples Vet
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
-          <Button
-            key={item.name}
-            asChild
-            variant="ghost"
-            className={cn(
-              "w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              location.pathname === item.path &&
-                "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
-            )}
-          >
-            <Link to={item.path}>
-              <item.icon className="mr-3 h-5 w-5" />
-              {item.name}
-            </Link>
-          </Button>
+          <Tooltip key={item.name} delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Button
+                asChild
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  isCollapsed && "justify-center",
+                  location.pathname === item.path &&
+                    "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
+                )}
+              >
+                <Link to={item.path} className="flex items-center">
+                  <item.icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
+                  {!isCollapsed && item.name}
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            {isCollapsed && <TooltipContent side="right">{item.name}</TooltipContent>}
+          </Tooltip>
         ))}
       </nav>
       <div className="mt-auto space-y-2 border-t pt-4">
-        <p className="text-sm text-muted-foreground">Autenticação</p>
+        {!isCollapsed && (
+          <p className="text-sm text-muted-foreground">Autenticação</p>
+        )}
         {authItems.map((item) => (
-          <Button
-            key={item.name}
-            asChild
-            variant="ghost"
-            className={cn(
-              "w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              location.pathname === item.path &&
-                "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
-            )}
-          >
-            <Link to={item.path}>
-              <item.icon className="mr-3 h-5 w-5" />
-              {item.name}
-            </Link>
-          </Button>
+          <Tooltip key={item.name} delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Button
+                asChild
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  isCollapsed && "justify-center",
+                  location.pathname === item.path &&
+                    "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
+                )}
+              >
+                <Link to={item.path} className="flex items-center">
+                  <item.icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
+                  {!isCollapsed && item.name}
+                </Link>
+              </Button>
+            </TooltipTrigger>
+            {isCollapsed && <TooltipContent side="right">{item.name}</TooltipContent>}
+          </Tooltip>
         ))}
       </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onToggleCollapse}
+        className={cn(
+          "absolute bottom-4",
+          isCollapsed ? "left-1/2 -translate-x-1/2" : "right-4",
+        )}
+      >
+        {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+      </Button>
     </div>
   );
 };

@@ -13,11 +13,22 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(!isSidebarCollapsed);
+  };
+
   return (
     <div className="flex h-screen w-screen overflow-hidden">
       <ResizablePanelGroup direction="horizontal">
-        <ResizablePanel defaultSize={18} minSize={15} maxSize={25}>
-          <Sidebar />
+        <ResizablePanel
+          defaultSize={isSidebarCollapsed ? 5 : 18}
+          minSize={isSidebarCollapsed ? 4 : 15}
+          maxSize={isSidebarCollapsed ? 7 : 25}
+          className="transition-all duration-300 ease-in-out"
+        >
+          <Sidebar isCollapsed={isSidebarCollapsed} onToggleCollapse={toggleSidebar} />
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={82}>
