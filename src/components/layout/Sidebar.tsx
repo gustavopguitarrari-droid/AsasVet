@@ -103,9 +103,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                   isCollapsed
                     ? "h-10 w-10 rounded-full flex items-center justify-center" // Estilo do botão quando recolhido
                     : "w-full justify-start text-xl", // Estilo do botão quando expandido
-                  isCollapsed && location.pathname === item.path && item.activeBgClass, // Botão recolhido e ativo: o próprio botão recebe a cor de fundo
-                  isCollapsed && location.pathname === item.path && "text-sidebar-primary-foreground", // Botão recolhido e ativo: cor do texto
-                  !isCollapsed && location.pathname === item.path && "text-sidebar-primary-foreground" // Expandido e ativo: cor do texto
+                  // Quando recolhido, sempre aplica a cor de fundo do item e a cor de texto primária
+                  isCollapsed && item.activeBgClass,
+                  isCollapsed && "text-sidebar-primary-foreground",
+                  // Quando expandido e ativo, aplica a cor de texto primária
+                  !isCollapsed && location.pathname === item.path && "text-sidebar-primary-foreground"
                 )}
               >
                 <Link to={item.path} className="flex items-center">
@@ -113,7 +115,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                     className={cn(
                       "flex items-center justify-center",
                       !isCollapsed && "w-10 h-10 rounded-full mr-3", // Tamanho e forma do div interno quando expandido
-                      !isCollapsed && item.activeBgClass // SEMPRE aplica a cor de fundo específica quando expandido
+                      // Quando expandido, sempre aplica a cor de fundo específica
+                      !isCollapsed && item.activeBgClass
                     )}
                   >
                     <item.icon className="h-6 w-6" strokeWidth={2.5} />
