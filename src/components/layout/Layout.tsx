@@ -45,7 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             className={cn(
               "absolute top-1/2 -translate-y-1/2 rounded-full z-20",
               "right-[-20px]",
-              "bg-indigo-500 text-white hover:bg-indigo-600",
+              "bg-indigo-500 text-white hover:bg-indigo-600", // Adicionado text-white aqui
               "border border-border shadow-md"
             )}
           >
