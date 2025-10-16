@@ -7,7 +7,7 @@ const Header = () => {
   const getTitle = () => {
     switch (location.pathname) {
       case "/dashboard":
-        return "Painel"; // Alterado de "Dashboard" para "Painel"
+        return "Painel";
       case "/clients":
         return "Clientes";
       case "/pets":
@@ -16,6 +16,14 @@ const Header = () => {
         return "Consultas";
       case "/medical-records":
         return "Prontuários Médicos";
+      case "/financeiro":
+        return "Financeiro";
+      case "/caixa":
+        return "Caixa";
+      case "/internacao":
+        return "Internação";
+      case "/veterinarios":
+        return "Veterinários";
       default:
         return "Simples Vet";
     }
@@ -24,7 +32,7 @@ const Header = () => {
   return (
     <header className="flex items-center justify-between border-b bg-background p-4 shadow-sm">
       <h1 className="text-2xl font-semibold">{getTitle()}</h1>
-      <UserProfile /> {/* Adicionando o componente UserProfile aqui */}
+      <UserProfile />
     </header>
   );
 };

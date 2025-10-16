@@ -9,6 +9,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Stethoscope,
+  DollarSign, // Novo ícone para Financeiro/Caixa
+  Bed, // Novo ícone para Internação
+  UserCog, // Novo ícone para Veterinários
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -22,7 +25,7 @@ interface SidebarProps {
 
 const navItems = [
   {
-    name: "Painel", // Alterado de "Dashboard" para "Painel"
+    name: "Painel",
     icon: LayoutDashboard,
     path: "/dashboard",
   },
@@ -46,6 +49,26 @@ const navItems = [
     icon: FileText,
     path: "/medical-records",
   },
+  {
+    name: "Financeiro",
+    icon: DollarSign,
+    path: "/financeiro",
+  },
+  {
+    name: "Caixa",
+    icon: DollarSign, // Reutilizando DollarSign, ou podemos usar um diferente se preferir
+    path: "/caixa",
+  },
+  {
+    name: "Internação",
+    icon: Bed,
+    path: "/internacao",
+  },
+  {
+    name: "Veterinários",
+    icon: UserCog, // Usando UserCog para veterinários
+    path: "/veterinarios",
+  },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
@@ -55,11 +78,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
     <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
       <div
         className={cn(
-          "mb-6 flex items-center justify-center text-4xl font-bold text-sidebar-primary", // Aumentado para text-4xl
+          "mb-6 flex items-center justify-center text-4xl font-bold text-sidebar-primary",
         )}
       >
         {!isCollapsed && "AsasVet"}{" "}
-        <Stethoscope className={cn("h-9 w-9", !isCollapsed && "ml-2")} /> {/* Aumentado para h-9 w-9 */}
+        <Stethoscope className={cn("h-9 w-9", !isCollapsed && "ml-2")} />
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
@@ -69,14 +92,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 asChild
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-xl text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", // Aumentado para text-xl
+                  "w-full justify-start text-xl text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   isCollapsed && "justify-center",
                   location.pathname === item.path &&
                     "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
                 )}
               >
                 <Link to={item.path} className="flex items-center">
-                  <item.icon className={cn("h-8 w-8", !isCollapsed && "mr-3")} /> {/* Aumentado para h-8 w-8 */}
+                  <item.icon className={cn("h-8 w-8", !isCollapsed && "mr-3")} />
                   {!isCollapsed && item.name}
                 </Link>
               </Button>

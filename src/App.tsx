@@ -9,7 +9,10 @@ import Clients from "./pages/Clients";
 import Pets from "./pages/Pets";
 import Appointments from "./pages/Appointments";
 import MedicalRecords from "./pages/MedicalRecords";
-// Login e Register não são mais importados
+import Financeiro from "./pages/Financeiro"; // Nova importação
+import Caixa from "./pages/Caixa"; // Nova importação
+import Internacao from "./pages/Internacao"; // Nova importação
+import Veterinarios from "./pages/Veterinarios"; // Nova importação
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,7 +24,6 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Rotas de Login e Register foram removidas */}
           <Route
             path="/"
             element={
@@ -67,6 +69,38 @@ const App = () => (
             element={
               <Layout>
                 <MedicalRecords />
+              </Layout>
+            }
+          />
+          <Route
+            path="/financeiro"
+            element={
+              <Layout>
+                <Financeiro />
+              </Layout>
+            }
+          />
+          <Route
+            path="/caixa"
+            element={
+              <Layout>
+                <Caixa />
+              </Layout>
+            }
+          />
+          <Route
+            path="/internacao"
+            element={
+              <Layout>
+                <Internacao />
+              </Layout>
+            }
+          />
+          <Route
+            path="/veterinarios"
+            element={
+              <Layout>
+                <Veterinarios />
               </Layout>
             }
           />
