@@ -35,14 +35,17 @@
     --radius: 0.5rem;
 
     /* Novas cores para o sidebar (modo claro) */
-    --sidebar-background: 210 20% 98%; /* Fundo levemente azulado */
-    --sidebar-foreground: 210 10% 20%; /* Texto escuro */
-    --sidebar-primary: 210 90% 50%; /* Azul vibrante para item ativo */
-    --sidebar-primary-foreground: 0 0% 100%; /* Texto branco no item ativo */
-    --sidebar-accent: 210 40% 90%; /* Azul claro para hover */
-    --sidebar-accent-foreground: 210 10% 20%; /* Texto escuro no hover */
-    --sidebar-border: 210 20% 90%; /* Borda sutil */
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-foreground: 0 0% 100%; /* Texto branco para contraste */
+    --sidebar-primary: 280 80% 70%; /* Roxo vibrante para item ativo */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 50% 35%; /* Roxo mais claro para hover */
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 250 60% 20%;
+    --sidebar-ring: 280 80% 70%;
+
+    /* Cores do degradê do sidebar (modo claro) */
+    --sidebar-gradient-start: 250 60% 15%; /* Roxo escuro */
+    --sidebar-gradient-end: 270 70% 25%; /* Roxo ligeiramente mais claro */
   }
 
   .dark {
@@ -75,15 +78,23 @@
     --ring: 212.7 26.8% 83.9%;
 
     /* Novas cores para o sidebar (modo escuro) */
-    --sidebar-background: 210 10% 15%; /* Fundo escuro levemente azulado */
-    --sidebar-foreground: 210 20% 80%; /* Texto claro */
-    --sidebar-primary: 210 90% 60%; /* Azul vibrante para item ativo */
-    --sidebar-primary-foreground: 0 0% 100%; /* Texto branco no item ativo */
-    --sidebar-accent: 210 20% 25%; /* Azul escuro sutil para hover */
-    --sidebar-accent-foreground: 210 20% 80%; /* Texto claro no hover */
-    --sidebar-border: 210 10% 20%; /* Borda sutil */
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-foreground: 0 0% 100%; /* Texto branco para contraste */
+    --sidebar-primary: 280 80% 70%; /* Roxo vibrante para item ativo */
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 260 50% 30%; /* Roxo mais claro para hover */
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 250 60% 15%;
+    --sidebar-ring: 280 80% 70%;
+
+    /* Cores do degradê do sidebar (modo escuro) */
+    --sidebar-gradient-start: 250 60% 10%; /* Roxo ainda mais escuro */
+    --sidebar-gradient-end: 270 70% 20%; /* Roxo ligeiramente mais claro */
   }
+}
+
+/* Classe personalizada para o fundo do sidebar com degradê */
+.sidebar-gradient-bg {
+  background: linear-gradient(to bottom right, hsl(var(--sidebar-gradient-start)), hsl(var(--sidebar-gradient-end)));
 }
 
 @layer base {

@@ -52,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
 
   return (
-    <div className="relative flex h-full flex-col overflow-y-auto border-r bg-sidebar-background p-4 text-sidebar-foreground shadow-sm">
+    <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
       <div
         className={cn(
           "mb-6 flex items-center justify-center text-3xl font-bold text-sidebar-primary",
