@@ -22,7 +22,7 @@ interface SidebarProps {
 
 const navItems = [
   {
-    name: "Dashboard",
+    name: "Painel", // Alterado de "Dashboard" para "Painel"
     icon: LayoutDashboard,
     path: "/dashboard",
   },

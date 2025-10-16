@@ -7,7 +7,7 @@ const Header = () => {
   const getTitle = () => {
     switch (location.pathname) {
       case "/dashboard":
-        return "Dashboard";
+        return "Painel"; // Alterado de "Dashboard" para "Painel"
       case "/clients":
         return "Clientes";
       case "/pets":
