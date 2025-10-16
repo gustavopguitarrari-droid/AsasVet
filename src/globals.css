@@ -46,6 +46,17 @@
     /* Cores do degradê do sidebar (modo claro) */
     --sidebar-gradient-start: 250 60% 15%; /* Roxo escuro */
     --sidebar-gradient-end: 270 70% 25%; /* Roxo ligeiramente mais claro */
+
+    /* Cores de fundo para os itens do sidebar (modo claro) */
+    --sidebar-item-bg-1: 220 80% 60%; /* Azul */
+    --sidebar-item-bg-2: 140 70% 60%; /* Verde */
+    --sidebar-item-bg-3: 30 90% 60%;  /* Laranja */
+    --sidebar-item-bg-4: 330 80% 70%; /* Rosa */
+    --sidebar-item-bg-5: 180 70% 50%; /* Ciano/Verde-água */
+    --sidebar-item-bg-6: 0 80% 60%;   /* Vermelho */
+    --sidebar-item-bg-7: 50 90% 60%;  /* Amarelo */
+    --sidebar-item-bg-8: 270 70% 60%; /* Roxo */
+    --sidebar-item-bg-9: 40 40% 50%;  /* Marrom */
   }
 
   .dark {
@@ -89,6 +100,17 @@
     /* Cores do degradê do sidebar (modo escuro) - AGORA MAIS CLARAS */
     --sidebar-gradient-start: 250 60% 25%; /* Roxo mais claro */
     --sidebar-gradient-end: 270 70% 35%; /* Roxo ligeiramente mais claro */
+
+    /* Cores de fundo para os itens do sidebar (modo escuro) */
+    --sidebar-item-bg-1: 220 80% 70%;
+    --sidebar-item-bg-2: 140 70% 70%;
+    --sidebar-item-bg-3: 30 90% 70%;
+    --sidebar-item-bg-4: 330 80% 80%;
+    --sidebar-item-bg-5: 180 70% 60%;
+    --sidebar-item-bg-6: 0 80% 70%;
+    --sidebar-item-bg-7: 50 90% 70%;
+    --sidebar-item-bg-8: 270 70% 70%;
+    --sidebar-item-bg-9: 40 40% 60%;
   }
 }
 

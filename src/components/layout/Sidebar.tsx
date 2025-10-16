@@ -3,10 +3,9 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
-  PawPrint, // Importando PawPrint
+  PawPrint,
   CalendarDays,
   FileText,
-  // Stethoscope, // Removendo Stethoscope
   DollarSign,
   Bed,
   UserCog,
@@ -26,46 +25,55 @@ const navItems = [
     name: "Painel",
     icon: LayoutDashboard,
     path: "/dashboard",
+    activeBgClass: "bg-sidebar-item-bg-1",
   },
   {
     name: "Clientes",
     icon: Users,
     path: "/clients",
+    activeBgClass: "bg-sidebar-item-bg-2",
   },
   {
     name: "Animais",
     icon: PawPrint,
     path: "/pets",
+    activeBgClass: "bg-sidebar-item-bg-3",
   },
   {
     name: "Consultas",
     icon: CalendarDays,
     path: "/appointments",
+    activeBgClass: "bg-sidebar-item-bg-4",
   },
   {
     name: "Prontuários",
     icon: FileText,
     path: "/medical-records",
+    activeBgClass: "bg-sidebar-item-bg-5",
   },
   {
     name: "Financeiro",
     icon: DollarSign,
     path: "/financeiro",
+    activeBgClass: "bg-sidebar-item-bg-6",
   },
   {
     name: "Caixa",
     icon: DollarSign,
     path: "/caixa",
+    activeBgClass: "bg-sidebar-item-bg-7",
   },
   {
     name: "Internação",
     icon: Bed,
     path: "/internacao",
+    activeBgClass: "bg-sidebar-item-bg-8",
   },
   {
     name: "Veterinários",
     icon: UserCog,
     path: "/veterinarios",
+    activeBgClass: "bg-sidebar-item-bg-9",
   },
 ];
 
@@ -80,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         )}
       >
         {!isCollapsed && "AsasVet"}{" "}
-        <PawPrint className={cn("h-9 w-9", !isCollapsed && "ml-2")} strokeWidth={2.5} /> {/* Usando PawPrint aqui */}
+        <PawPrint className={cn("h-9 w-9", !isCollapsed && "ml-2")} strokeWidth={2.5} />
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
@@ -90,28 +98,32 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 asChild
                 variant="ghost"
                 className={cn(
-                  "text-sidebar-foreground",
-                  location.pathname === item.path
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  "text-sidebar-foreground", // Cor do texto padrão
+                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", // Estado de hover para o botão
                   isCollapsed
-                    ? "h-10 w-10 rounded-full flex items-center justify-center"
-                    : "w-full justify-start text-xl"
+                    ? "h-10 w-10 rounded-full flex items-center justify-center" // Estilo do botão quando recolhido
+                    : "w-full justify-start text-xl", // Estilo do botão quando expandido
+                  isCollapsed && location.pathname === item.path && item.activeBgClass, // Botão recolhido e ativo: o próprio botão recebe a cor de fundo
+                  isCollapsed && location.pathname === item.path && "text-sidebar-primary-foreground" // Botão recolhido e ativo: cor do texto
                 )}
               >
                 <Link to={item.path} className="flex items-center">
                   <div
                     className={cn(
                       "flex items-center justify-center",
-                      !isCollapsed && "w-10 h-10 rounded-full mr-3",
-                      !isCollapsed && (location.pathname === item.path
-                        ? "bg-sidebar-primary"
-                        : "bg-sidebar-accent")
+                      !isCollapsed && "w-10 h-10 rounded-full mr-3", // Tamanho e forma do div interno quando expandido
+                      !isCollapsed && location.pathname === item.path
+                        ? item.activeBgClass // Expandido e ativo: o div interno recebe a cor de fundo específica
+                        : "bg-transparent" // Expandido e não ativo: o div interno é transparente
                     )}
                   >
                     <item.icon className="h-6 w-6" strokeWidth={2.5} />
                   </div>
-                  {!isCollapsed && item.name}
+                  {!isCollapsed && (
+                    <span className={cn(location.pathname === item.path && "text-sidebar-primary-foreground")}>
+                      {item.name}
+                    </span>
+                  )}
                 </Link>
               </Button>
             </TooltipTrigger>

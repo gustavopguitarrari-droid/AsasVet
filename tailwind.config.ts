@@ -61,6 +61,16 @@ export default {
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
+          // Novas cores para os itens do sidebar
+          "item-bg-1": "hsl(var(--sidebar-item-bg-1))",
+          "item-bg-2": "hsl(var(--sidebar-item-bg-2))",
+          "item-bg-3": "hsl(var(--sidebar-item-bg-3))",
+          "item-bg-4": "hsl(var(--sidebar-item-bg-4))",
+          "item-bg-5": "hsl(var(--sidebar-item-bg-5))",
+          "item-bg-6": "hsl(var(--sidebar-item-bg-6))",
+          "item-bg-7": "hsl(var(--sidebar-item-bg-7))",
+          "item-bg-8": "hsl(var(--sidebar-item-bg-8))",
+          "item-bg-9": "hsl(var(--sidebar-item-bg-9))",
         },
       },
       borderRadius: {
