@@ -44,8 +44,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             onClick={toggleSidebar}
             className={cn(
               "absolute top-1/2 -translate-y-1/2 rounded-full z-20",
-              "right-[-20px]",
-              "bg-indigo-500 text-white hover:bg-indigo-600", // Adicionado text-white aqui
+              "right-2", // Alterado de right-[-20px] para right-2
+              "bg-indigo-500 text-white hover:bg-indigo-600",
               "border border-border shadow-md"
             )}
           >
