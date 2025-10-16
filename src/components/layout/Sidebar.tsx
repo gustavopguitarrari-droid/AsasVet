@@ -82,14 +82,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 asChild
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  "w-full justify-start text-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", // Adicionado text-lg
                   isCollapsed && "justify-center",
                   location.pathname === item.path &&
                     "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
                 )}
               >
                 <Link to={item.path} className="flex items-center">
-                  <item.icon className={cn("h-7 w-7", !isCollapsed && "mr-3")} /> {/* Alterado para h-7 w-7 */}
+                  <item.icon className={cn("h-7 w-7", !isCollapsed && "mr-3")} />
                   {!isCollapsed && item.name}
                 </Link>
               </Button>
@@ -100,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       </nav>
       <div className="mt-auto space-y-2 border-t pt-4">
         {!isCollapsed && (
-          <p className="text-sm text-muted-foreground">Autenticação</p>
+          <p className="text-base text-muted-foreground">Autenticação</p> // Alterado para text-base
         )}
         {authItems.map((item) => (
           <Tooltip key={item.name} delayDuration={0}>
@@ -109,14 +109,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 asChild
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  "w-full justify-start text-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", // Adicionado text-lg
                   isCollapsed && "justify-center",
                   location.pathname === item.path &&
                     "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
                 )}
               >
                 <Link to={item.path} className="flex items-center">
-                  <item.icon className={cn("h-7 w-7", !isCollapsed && "mr-3")} /> {/* Alterado para h-7 w-7 */}
+                  <item.icon className={cn("h-7 w-7", !isCollapsed && "mr-3")} />
                   {!isCollapsed && item.name}
                 </Link>
               </Button>
