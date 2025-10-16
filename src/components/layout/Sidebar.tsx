@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
-  PawPrint,
+  PawPrint, // Importado PawPrint para o logo
   CalendarDays,
   FileText,
   LogIn,
@@ -68,11 +68,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
     <div className="relative flex h-full flex-col overflow-y-auto border-r bg-sidebar-background p-4 text-sidebar-foreground shadow-sm">
       <div
         className={cn(
-          "mb-6 text-center text-2xl font-bold text-sidebar-primary",
+          "mb-6 flex items-center justify-center text-2xl font-bold text-sidebar-primary", // Adicionado flex e items-center
           isCollapsed && "hidden",
         )}
       >
-        Simples Vet
+        <PawPrint className="h-7 w-7 mr-2" /> {/* Ícone de animal adicionado */}
+        AsasVet {/* Texto do logo alterado */}
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
@@ -82,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 asChild
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", // Adicionado text-lg
+                  "w-full justify-start text-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   isCollapsed && "justify-center",
                   location.pathname === item.path &&
                     "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
@@ -100,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       </nav>
       <div className="mt-auto space-y-2 border-t pt-4">
         {!isCollapsed && (
-          <p className="text-base text-muted-foreground">Autenticação</p> // Alterado para text-base
+          <p className="text-base text-muted-foreground">Autenticação</p>
         )}
         {authItems.map((item) => (
           <Tooltip key={item.name} delayDuration={0}>
@@ -109,7 +110,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 asChild
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", // Adicionado text-lg
+                  "w-full justify-start text-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   isCollapsed && "justify-center",
                   location.pathname === item.path &&
                     "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
