@@ -44,12 +44,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             onClick={toggleSidebar}
             className={cn(
               "absolute top-1/2 -translate-y-1/2 rounded-full z-20",
-              "right-2", // Alterado de right-[-20px] para right-2
+              "right-2",
               "bg-indigo-500 text-white hover:bg-indigo-600",
               "border border-border shadow-md"
             )}
           >
-            {isSidebarCollapsed ? <ArrowRightToLine className="h-5 w-5" /> : <ArrowLeftToLine className="h-5 w-5" />}
+            {isSidebarCollapsed ? <ArrowRightToLine className="h-4 w-4" /> : <ArrowLeftToLine className="h-4 w-4" />}
           </Button>
         </ResizablePanel>
         <ResizablePanel defaultSize={100 - sidebarSize}>
