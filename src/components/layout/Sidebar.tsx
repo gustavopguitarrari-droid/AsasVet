@@ -90,24 +90,26 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 asChild
                 variant="ghost"
                 className={cn(
-                  "w-full justify-start text-xl text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  isCollapsed && "justify-center",
-                  location.pathname === item.path &&
-                    "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
+                  "text-sidebar-foreground", // Cor do texto padrão
+                  location.pathname === item.path
+                    ? "bg-sidebar-primary text-sidebar-primary-foreground" // Fundo e texto para item ativo
+                    : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", // Fundo e texto para hover
+                  isCollapsed
+                    ? "h-10 w-10 rounded-full flex items-center justify-center" // Quando recolhido: botão redondo e centralizado
+                    : "w-full justify-start text-xl" // Quando expandido: largura total, alinhado à esquerda, texto maior
                 )}
               >
                 <Link to={item.path} className="flex items-center">
                   <div
                     className={cn(
-                      "flex items-center justify-center rounded-full",
-                      "w-10 h-10", // Tamanho fixo para o círculo
-                      !isCollapsed && "mr-3", // Margem à direita quando não recolhido
-                      location.pathname === item.path
-                        ? "bg-sidebar-primary" // Cor do círculo quando ativo
-                        : "bg-sidebar-accent" // Cor padrão do círculo
+                      "flex items-center justify-center",
+                      !isCollapsed && "w-10 h-10 rounded-full mr-3", // Apenas aplica tamanho, forma e margem quando expandido
+                      !isCollapsed && (location.pathname === item.path
+                        ? "bg-sidebar-primary" // Aplica fundo ao div interno apenas quando expandido
+                        : "bg-sidebar-accent")
                     )}
                   >
-                    <item.icon className="h-6 w-6" /> {/* Ícone dentro do círculo */}
+                    <item.icon className="h-6 w-6" />
                   </div>
                   {!isCollapsed && item.name}
                 </Link>
