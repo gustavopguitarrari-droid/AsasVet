@@ -89,7 +89,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 )}
               >
                 <Link to={item.path} className="flex items-center">
-                  <item.icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
+                  <item.icon className={cn("h-7 w-7", !isCollapsed && "mr-3")} /> {/* Alterado para h-7 w-7 */}
                   {!isCollapsed && item.name}
                 </Link>
               </Button>
@@ -116,7 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 )}
               >
                 <Link to={item.path} className="flex items-center">
-                  <item.icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
+                  <item.icon className={cn("h-7 w-7", !isCollapsed && "mr-3")} /> {/* Alterado para h-7 w-7 */}
                   {!isCollapsed && item.name}
                 </Link>
               </Button>
