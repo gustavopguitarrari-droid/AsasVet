@@ -7,7 +7,7 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftToLine, ArrowRightToLine } from "lucide-react"; // Importar novos ícones
+import { ArrowLeftToLine, ArrowRightToLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -22,7 +22,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   // Ajusta os tamanhos do sidebar com base no estado de recolhimento
-  const sidebarSize = isSidebarCollapsed ? 5 : 18;
+  // Aumentado de 5 para 8 quando recolhido
+  const sidebarSize = isSidebarCollapsed ? 8 : 18;
   // minSize e maxSize devem ser os mesmos que defaultSize para fixar o tamanho do painel
   const sidebarMinSize = sidebarSize;
   const sidebarMaxSize = sidebarSize;
