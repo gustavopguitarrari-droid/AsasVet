@@ -19,19 +19,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
+  const sidebarSize = isSidebarCollapsed ? 5 : 18;
+
   return (
     <div className="flex h-screen w-screen overflow-hidden">
       <ResizablePanelGroup direction="horizontal">
         <ResizablePanel
-          defaultSize={isSidebarCollapsed ? 5 : 18}
-          minSize={isSidebarCollapsed ? 4 : 15}
-          maxSize={isSidebarCollapsed ? 7 : 25}
+          defaultSize={sidebarSize}
+          minSize={sidebarSize}
+          maxSize={sidebarSize}
           className="transition-all duration-300 ease-in-out"
         >
           <Sidebar isCollapsed={isSidebarCollapsed} onToggleCollapse={toggleSidebar} />
         </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={82}>
+        {/* A ResizableHandle foi removida */}
+        <ResizablePanel defaultSize={100 - sidebarSize}> {/* Ajusta o tamanho do painel de conteúdo */}
           <div className="flex h-full flex-col">
             <Header />
             <main className="flex-1 overflow-y-auto p-6">{children}</main>
