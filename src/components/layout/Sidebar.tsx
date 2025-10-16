@@ -97,7 +97,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 )}
               >
                 <Link to={item.path} className="flex items-center">
-                  <item.icon className={cn("h-8 w-8", !isCollapsed && "mr-3")} />
+                  <div
+                    className={cn(
+                      "flex items-center justify-center rounded-full",
+                      "w-10 h-10", // Tamanho fixo para o círculo
+                      !isCollapsed && "mr-3", // Margem à direita quando não recolhido
+                      location.pathname === item.path
+                        ? "bg-sidebar-primary" // Cor do círculo quando ativo
+                        : "bg-sidebar-accent" // Cor padrão do círculo
+                    )}
+                  >
+                    <item.icon className="h-6 w-6" /> {/* Ícone dentro do círculo */}
+                  </div>
                   {!isCollapsed && item.name}
                 </Link>
               </Button>
