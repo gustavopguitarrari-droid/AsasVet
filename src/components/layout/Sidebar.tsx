@@ -3,13 +3,14 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
-  PawPrint, // Importado PawPrint para o logo
+  PawPrint,
   CalendarDays,
   FileText,
   LogIn,
   UserPlus,
   ChevronLeft,
   ChevronRight,
+  Stethoscope, // Importado Stethoscope
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -68,12 +69,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
     <div className="relative flex h-full flex-col overflow-y-auto border-r bg-sidebar-background p-4 text-sidebar-foreground shadow-sm">
       <div
         className={cn(
-          "mb-6 flex items-center justify-center text-2xl font-bold text-sidebar-primary", // Adicionado flex e items-center
+          "mb-6 flex items-center justify-center text-2xl font-bold text-sidebar-primary",
           isCollapsed && "hidden",
         )}
       >
-        <PawPrint className="h-7 w-7 mr-2" /> {/* Ícone de animal adicionado */}
-        AsasVet {/* Texto do logo alterado */}
+        AsasVet <Stethoscope className="h-7 w-7 ml-2" /> {/* Ícone de estetoscópio adicionado à direita */}
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
