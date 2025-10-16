@@ -126,11 +126,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         ))}
       </div>
       <Button
-        variant="ghost"
+        variant="default"
         size="icon"
         onClick={onToggleCollapse}
         className={cn(
-          "absolute bottom-4",
+          "absolute top-1/2 -translate-y-1/2 rounded-full z-10",
           isCollapsed ? "left-0 right-0 mx-auto" : "right-4",
         )}
       >
