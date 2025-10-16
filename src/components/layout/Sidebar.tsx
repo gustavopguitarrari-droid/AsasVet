@@ -69,11 +69,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
     <div className="relative flex h-full flex-col overflow-y-auto border-r bg-sidebar-background p-4 text-sidebar-foreground shadow-sm">
       <div
         className={cn(
-          "mb-6 flex items-center justify-center text-3xl font-bold text-sidebar-primary", // Alterado para text-3xl
-          isCollapsed && "hidden",
+          "mb-6 flex items-center justify-center text-3xl font-bold text-sidebar-primary",
+          // Removido: isCollapsed && "hidden", // Não esconde mais o div inteiro
         )}
       >
-        AsasVet <Stethoscope className="h-8 w-8 ml-2" /> {/* Alterado para h-8 w-8 */}
+        {!isCollapsed && "AsasVet"}{" "}
+        <Stethoscope className={cn("h-8 w-8", !isCollapsed && "ml-2")} />
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
