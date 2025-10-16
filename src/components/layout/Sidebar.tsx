@@ -6,8 +6,6 @@ import {
   PawPrint,
   CalendarDays,
   FileText,
-  ChevronLeft,
-  ChevronRight,
   Stethoscope,
   DollarSign, // Novo ícone para Financeiro/Caixa
   Bed, // Novo ícone para Internação
@@ -20,7 +18,7 @@ import ThemeToggle from "@/components/ThemeToggle"; // Importa o ThemeToggle
 
 interface SidebarProps {
   isCollapsed: boolean;
-  onToggleCollapse: () => void;
+  onToggleCollapse: () => void; // Mantemos a prop, mas não a usamos diretamente aqui
 }
 
 const navItems = [
@@ -56,7 +54,7 @@ const navItems = [
   },
   {
     name: "Caixa",
-    icon: DollarSign, // Reutilizando DollarSign, ou podemos usar um diferente se preferir
+    icon: DollarSign,
     path: "/caixa",
   },
   {
@@ -66,7 +64,7 @@ const navItems = [
   },
   {
     name: "Veterinários",
-    icon: UserCog, // Usando UserCog para veterinários
+    icon: UserCog,
     path: "/veterinarios",
   },
 ];
@@ -114,18 +112,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         <ThemeToggle isCollapsed={isCollapsed} />
       </div>
 
-      {/* Botão de recolher/expandir a sidebar */}
-      <Button
-        variant="default"
-        size="icon"
-        onClick={onToggleCollapse}
-        className={cn(
-          "absolute top-1/2 -translate-y-1/2 rounded-full z-10",
-          isCollapsed ? "left-0 right-0 mx-auto" : "right-4",
-        )}
-      >
-        {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
-      </Button>
+      {/* O botão de recolher/expandir foi movido para o componente Layout.tsx */}
     </div>
   );
 };
