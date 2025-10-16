@@ -7,7 +7,7 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftToLine, ArrowRightToLine } from "lucide-react";
+import { PanelLeftClose, PanelRightOpen } from "lucide-react"; // Importando os novos ícones
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -45,11 +45,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             className={cn(
               "absolute top-1/2 -translate-y-1/2 rounded-full z-20",
               "right-[-20px]",
-              "bg-indigo-500 text-white hover:bg-indigo-600", // Adicionado text-white aqui
+              "bg-indigo-500 text-white hover:bg-indigo-600",
               "border border-border shadow-md"
             )}
           >
-            {isSidebarCollapsed ? <ArrowRightToLine className="h-5 w-5" /> : <ArrowLeftToLine className="h-5 w-5" />}
+            {isSidebarCollapsed ? <PanelRightOpen className="h-5 w-5" /> : <PanelLeftClose className="h-5 w-5" />}
           </Button>
         </ResizablePanel>
         <ResizablePanel defaultSize={100 - sidebarSize}>
