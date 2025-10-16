@@ -7,18 +7,18 @@ import {
   CalendarDays,
   FileText,
   Stethoscope,
-  DollarSign,
-  Bed,
-  UserCog,
+  DollarSign, // Novo ícone para Financeiro/Caixa
+  Bed, // Novo ícone para Internação
+  UserCog, // Novo ícone para Veterinários
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import ThemeToggle from "@/components/ThemeToggle";
+import ThemeToggle from "@/components/ThemeToggle"; // Importa o ThemeToggle
 
 interface SidebarProps {
   isCollapsed: boolean;
-  onToggleCollapse: () => void;
+  onToggleCollapse: () => void; // Mantemos a prop, mas não a usamos diretamente aqui
 }
 
 const navItems = [
@@ -92,27 +92,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 className={cn(
                   "w-full justify-start text-xl text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   isCollapsed && "justify-center",
-                  location.pathname === item.path && item.path === "/dashboard"
-                    ? "bg-blue-500 text-white hover:bg-blue-600 hover:text-white" // Estilo azul para o Painel ativo
-                    : location.pathname === item.path
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground" // Estilo roxo para outros itens ativos
-                      : "" // Estilo padrão para itens inativos
+                  location.pathname === item.path &&
+                    "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
                 )}
               >
                 <Link to={item.path} className="flex items-center">
                   <div
                     className={cn(
                       "flex items-center justify-center rounded-full",
-                      "w-10 h-10",
-                      !isCollapsed && "mr-3",
-                      location.pathname === item.path && item.path === "/dashboard"
-                        ? "bg-blue-600" // Círculo azul mais escuro para o Painel ativo
-                        : location.pathname === item.path
-                          ? "bg-sidebar-primary" // Círculo roxo para outros itens ativos
-                          : "bg-sidebar-accent" // Círculo roxo claro para itens inativos
+                      "w-10 h-10", // Tamanho fixo para o círculo
+                      !isCollapsed && "mr-3", // Margem à direita quando não recolhido
+                      location.pathname === item.path
+                        ? "bg-sidebar-primary" // Cor do círculo quando ativo
+                        : "bg-sidebar-accent" // Cor padrão do círculo
                     )}
                   >
-                    <item.icon className="h-6 w-6" />
+                    <item.icon className="h-6 w-6" /> {/* Ícone dentro do círculo */}
                   </div>
                   {!isCollapsed && item.name}
                 </Link>
@@ -123,9 +118,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         ))}
       </nav>
 
+      {/* Theme Toggle no canto inferior esquerdo */}
       <div className={cn("mt-auto pt-4", isCollapsed ? "flex justify-center" : "flex justify-start")}>
         <ThemeToggle isCollapsed={isCollapsed} />
       </div>
+
+      {/* O botão de recolher/expandir foi movido para o componente Layout.tsx */}
     </div>
   );
 };
