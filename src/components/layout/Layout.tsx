@@ -45,7 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             className={cn(
               "absolute top-1/2 -translate-y-1/2 rounded-full z-20", // z-index maior para garantir que fique por cima
               "right-[-20px]", // Posiciona-o metade para fora, metade para dentro da borda do painel do sidebar
-              "bg-primary text-primary-foreground hover:bg-primary/90", // Estilo para destacar o botão
+              "bg-indigo-500 text-white hover:bg-indigo-600", // Alterado para uma cor mais vibrante
               "border border-border shadow-md" // Adiciona borda e sombra para parecer um botão distinto
             )}
           >
