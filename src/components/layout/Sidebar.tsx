@@ -84,11 +84,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
     <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
       <div
         className={cn(
-          "mb-6 flex items-center justify-center text-4xl font-bold text-sidebar-primary",
+          "mb-6 flex items-center justify-center text-4xl font-bold text-white", // Alterado para text-white
         )}
       >
         {!isCollapsed && "AsasVet"}{" "}
-        <PawPrint className={cn("h-9 w-9", !isCollapsed && "ml-2")} strokeWidth={2.5} />
+        <PawPrint className={cn("h-9 w-9 text-white", !isCollapsed && "ml-2")} strokeWidth={2.5} /> {/* Alterado para text-white */}
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
