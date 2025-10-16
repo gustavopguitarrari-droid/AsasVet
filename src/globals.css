@@ -32,8 +32,6 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
-    --radius: 0.5rem;
-
     /* Novas cores para o sidebar (modo claro) */
     --sidebar-foreground: 0 0% 100%; /* Texto branco para contraste */
     --sidebar-primary: 280 80% 70%; /* Roxo vibrante para item ativo */
@@ -44,8 +42,8 @@
     --sidebar-ring: 280 80% 70%;
 
     /* Cores do degradê do sidebar (modo claro) */
-    --sidebar-gradient-start: 250 60% 15%; /* Roxo escuro */
-    --sidebar-gradient-end: 270 70% 25%; /* Roxo ligeiramente mais claro */
+    --sidebar-gradient-start: 250 60% 25%; /* Roxo escuro, agora mais claro */
+    --sidebar-gradient-end: 270 70% 35%; /* Roxo ligeiramente mais claro, agora mais claro */
 
     /* Cores de fundo para os itens do sidebar (modo claro) */
     --sidebar-item-bg-1: 220 80% 60%; /* Azul */
@@ -98,8 +96,8 @@
     --sidebar-ring: 280 80% 80%;
 
     /* Cores do degradê do sidebar (modo escuro) - AGORA MAIS CLARAS */
-    --sidebar-gradient-start: 250 60% 25%; /* Roxo mais claro */
-    --sidebar-gradient-end: 270 70% 35%; /* Roxo ligeiramente mais claro */
+    --sidebar-gradient-start: 250 60% 35%; /* Roxo mais claro */
+    --sidebar-gradient-end: 270 70% 45%; /* Roxo ligeiramente mais claro */
 
     /* Cores de fundo para os itens do sidebar (modo escuro) */
     --sidebar-item-bg-1: 220 80% 70%;
