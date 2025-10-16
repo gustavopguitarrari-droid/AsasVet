@@ -77,18 +77,18 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
 
-    /* Novas cores para o sidebar (modo escuro) */
-    --sidebar-foreground: 0 0% 100%; /* Texto branco para contraste */
-    --sidebar-primary: 280 80% 70%; /* Roxo vibrante para item ativo */
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 260 50% 30%; /* Roxo mais claro para hover */
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 250 60% 15%;
-    --sidebar-ring: 280 80% 70%;
+    /* Novas cores para o sidebar (modo escuro) - AGORA MAIS CLARAS */
+    --sidebar-foreground: 210 40% 98%; /* Texto claro */
+    --sidebar-primary: 280 80% 80%; /* Roxo vibrante mais claro para item ativo */
+    --sidebar-primary-foreground: 222.2 47.4% 11.2%; /* Texto escuro no item ativo */
+    --sidebar-accent: 260 50% 50%; /* Roxo médio para hover */
+    --sidebar-accent-foreground: 210 40% 98%; /* Texto claro no hover */
+    --sidebar-border: 250 60% 30%;
+    --sidebar-ring: 280 80% 80%;
 
-    /* Cores do degradê do sidebar (modo escuro) */
-    --sidebar-gradient-start: 250 60% 10%; /* Roxo ainda mais escuro */
-    --sidebar-gradient-end: 270 70% 20%; /* Roxo ligeiramente mais claro */
+    /* Cores do degradê do sidebar (modo escuro) - AGORA MAIS CLARAS */
+    --sidebar-gradient-start: 250 60% 25%; /* Roxo mais claro */
+    --sidebar-gradient-end: 270 70% 35%; /* Roxo ligeiramente mais claro */
   }
 }
 
