@@ -40,12 +40,22 @@ const Dashboard = () => {
     initialDashboardConfig
   );
 
+  React.useEffect(() => {
+    // Carregar configuração do localStorage ao montar o componente
+    const savedConfig = localStorage.getItem("dashboardConfig");
+    if (savedConfig) {
+      setDashboardConfig(JSON.parse(savedConfig));
+    }
+  }, []);
+
   const handleSaveConfig = (newConfig: DashboardItemConfig[]) => {
     setDashboardConfig(newConfig);
+    // Salvar configuração no localStorage
+    localStorage.setItem("dashboardConfig", JSON.stringify(newConfig));
   };
 
   const getCardComponent = (item: DashboardItemConfig) => {
-    const baseCardClasses = "text-white shadow-lg"; // Classes base para todos os cards coloridos
+    const baseCardClasses = "text-white shadow-md"; // Alterado para shadow-md
     const iconClasses = "h-4 w-4 text-white"; // Classes para os ícones
     const textMutedClasses = "text-white/80"; // Texto secundário mais claro
 
@@ -91,7 +101,7 @@ const Dashboard = () => {
         );
       case "recentActivity":
         return (
-          <Card key={item.id} className="bg-muted text-foreground shadow-lg"> {/* Alterado para bg-muted */}
+          <Card key={item.id} className="bg-muted text-foreground shadow-md"> {/* Alterado para shadow-md */}
             <CardHeader>
               <CardTitle>Atividade Recente</CardTitle>
             </CardHeader>
