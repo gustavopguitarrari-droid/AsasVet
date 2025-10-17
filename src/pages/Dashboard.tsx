@@ -4,6 +4,7 @@ import { Users, PawPrint, CalendarDays, Settings, DollarSign, Bed, Stethoscope, 
 import { Button } from "@/components/ui/button";
 import DashboardConfigurator from "@/components/DashboardConfigurator";
 import { cn } from "@/lib/utils"; // Importar cn para combinar classes
+import { useUser } from "@/context/UserContext"; // Importa o hook useUser
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -40,11 +41,7 @@ const Dashboard = () => {
     initialDashboardConfig
   );
 
-  // Dados de usuário mock para demonstração
-  const currentUser = {
-    name: "João", // Nome do usuário
-    gender: "masculino", // ou "feminino"
-  };
+  const { user } = useUser(); // Obtém o usuário do contexto
 
   React.useEffect(() => {
     // Carregar configuração do localStorage ao montar o componente
@@ -196,8 +193,11 @@ const Dashboard = () => {
   };
 
   const getGreeting = () => {
-    const prefix = currentUser.gender === "feminino" ? "Dra." : "Dr.";
-    return `Bem-vindo(a) ${prefix} ${currentUser.name}!`;
+    if (!user) {
+      return "Bem-vindo(a) ao Simples Vet!"; // Mensagem padrão se não houver usuário
+    }
+    const prefix = user.gender === "feminino" ? "Dra." : "Dr.";
+    return `Bem-vindo(a) ${prefix} ${user.name}!`;
   };
 
   return (

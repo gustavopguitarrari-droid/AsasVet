@@ -9,20 +9,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { User } from "lucide-react";
+import { User as UserIcon } from "lucide-react"; // Renomeado para evitar conflito
+import { useUser } from "@/context/UserContext"; // Importa o hook useUser
 
 const UserProfile = () => {
-  // Dados de usuário mock para demonstração
-  const user = {
-    name: "Usuário Teste",
-    email: "usuario.teste@example.com",
-    avatarUrl: "https://github.com/shadcn.png", // Exemplo de URL de avatar
-  };
+  const { user, setUser } = useUser(); // Usa o contexto do usuário
 
   const handleLogout = () => {
     console.log("Usuário deslogado!");
-    // Lógica de logout aqui
+    setUser(null); // Limpa os dados do usuário ao deslogar
+    // Lógica de logout aqui (redirecionar para login, limpar tokens, etc.)
   };
+
+  if (!user) {
+    // Renderiza um botão de login ou um placeholder se não houver usuário
+    return (
+      <Button variant="ghost" onClick={() => console.log("Login clicked")}>
+        Login
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>
@@ -33,7 +39,7 @@ const UserProfile = () => {
               <AvatarImage src={user.avatarUrl} alt={user.name} />
             ) : (
               <AvatarFallback>
-                <User className="h-5 w-5" />
+                <UserIcon className="h-5 w-5" />
               </AvatarFallback>
             )}
           </Avatar>
