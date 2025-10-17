@@ -10,8 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
-import { GripVertical } from "lucide-react";
+import { ChevronUp, ChevronDown } from "lucide-react"; // Importando os ícones de seta
 import { Switch } from "@/components/ui/switch";
 
 interface DashboardItemConfig {
@@ -47,16 +46,17 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     );
   };
 
-  const onDragEnd = (result: DropResult) => {
-    if (!result.destination) {
-      return;
-    }
+  const moveItem = (index: number, direction: "up" | "down") => {
+    setTempConfig((prevConfig) => {
+      const newConfig = Array.from(prevConfig);
+      const newIndex = direction === "up" ? index - 1 : index + 1;
 
-    const reorderedConfig = Array.from(tempConfig);
-    const [removed] = reorderedConfig.splice(result.source.index, 1);
-    reorderedConfig.splice(result.destination.index, 0, removed);
-
-    setTempConfig(reorderedConfig);
+      if (newIndex >= 0 && newIndex < newConfig.length) {
+        const [removed] = newConfig.splice(index, 1);
+        newConfig.splice(newIndex, 0, removed);
+      }
+      return newConfig;
+    });
   };
 
   const handleSave = () => {
@@ -70,52 +70,50 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
         <DialogHeader>
           <DialogTitle>Configurar Painel</DialogTitle>
           <DialogDescription>
-            Selecione quais cards você deseja ver no painel e arraste para reordenar.
+            Selecione quais cards você deseja ver no painel e use as setas para reordenar.
           </DialogDescription>
         </DialogHeader>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="dashboard-items">
-            {(provided) => (
-              <div
-                className="grid gap-4 py-4 max-h-[400px] overflow-y-auto" // Adicionado max-h e overflow-y-auto
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-              >
-                {tempConfig.map((item, index) => (
-                  <Draggable key={item.id} draggableId={item.id} index={index}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        className={cn(
-                          "flex items-center justify-between space-x-2 p-2 rounded-md border",
-                          snapshot.isDragging && "bg-accent"
-                        )}
-                      >
-                        <div className="flex items-center space-x-2">
-                          <div {...provided.dragHandleProps} className="cursor-grab">
-                            <GripVertical className="h-4 w-4 text-muted-foreground" />
-                          </div>
-                          <Label htmlFor={`item-${item.id}`} className="text-base flex-1">
-                            {item.name}
-                          </Label>
-                        </div>
-                        <Switch
-                          id={`item-${item.id}`}
-                          checked={item.isVisible}
-                          onCheckedChange={(checked) =>
-                            handleSwitchChange(item.id, checked as boolean)
-                          }
-                        />
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
+        <div className="grid gap-4 py-4 max-h-[400px] overflow-y-auto">
+          {tempConfig.map((item, index) => (
+            <div
+              key={item.id}
+              className={cn(
+                "flex items-center justify-between space-x-2 p-2 rounded-md border"
+              )}
+            >
+              <div className="flex items-center space-x-2">
+                <Label htmlFor={`item-${item.id}`} className="text-base flex-1">
+                  {item.name}
+                </Label>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => moveItem(index, "up")}
+                  disabled={index === 0}
+                  className="h-8 w-8"
+                >
+                  <ChevronUp className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => moveItem(index, "down")}
+                  disabled={index === tempConfig.length - 1}
+                  className="h-8 w-8"
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
               </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+              <Switch
+                id={`item-${item.id}`}
+                checked={item.isVisible}
+                onCheckedChange={(checked) =>
+                  handleSwitchChange(item.id, checked as boolean)
+                }
+              />
+            </div>
+          ))}
+        </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
