@@ -21,16 +21,16 @@ const AgendamentosMedicos = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Agendamentos Médicos</h2>
+        <h2 className="text-3xl font-bold">Agendamentos</h2>
         <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento Médico
+          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
         </Button>
       </div>
 
       <div className="flex items-center space-x-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Buscar agendamentos médicos..." className="pl-9" />
+          <Input placeholder="Buscar agendamentos..." className="pl-9" />
         </div>
         <Button variant="outline">Filtrar</Button>
       </div>

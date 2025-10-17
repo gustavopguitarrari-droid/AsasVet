@@ -15,7 +15,7 @@ const Header = () => {
       case "/appointments":
         return "Consultas";
       case "/medical-records":
-        return "Agendamentos Médicos"; // Título atualizado
+        return "Agendamentos"; // Título atualizado
       case "/financeiro":
         return "Financeiro";
       case "/caixa":

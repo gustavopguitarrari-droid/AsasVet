@@ -55,7 +55,7 @@ const navItems = [
     activeBgClass: "bg-sidebar-item-bg-9",
   },
   {
-    name: "Agendamentos Médicos", // Nome atualizado
+    name: "Agendamentos", // Nome atualizado
     icon: FileText,
     path: "/medical-records",
     activeBgClass: "bg-sidebar-item-bg-5",

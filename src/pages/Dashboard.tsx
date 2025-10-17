@@ -29,7 +29,7 @@ const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial" },
   { id: "internmentStatus", name: "Status de Internação", isVisible: true, category: "animalHealth" },
   { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true, category: "animalHealth" },
-  { id: "medicalRecordsSummary", name: "Resumo de Agendamentos Médicos", isVisible: true, category: "animalHealth" }, // Nome atualizado
+  { id: "medicalRecordsSummary", name: "Resumo de Agendamentos", isVisible: true, category: "animalHealth" }, // Nome atualizado
   // Novos itens de gráfico
   { id: "appointmentsMonthlyChart", name: "Consultas por Mês (Gráfico)", isVisible: true, category: "animalHealth" },
   { id: "appointmentsWeeklyChart", name: "Consultas por Semana (Gráfico)", isVisible: true, category: "animalHealth" },
@@ -170,7 +170,7 @@ const Dashboard = () => {
         return (
           <Card key={item.id} className={cn("bg-sidebar-item-bg-5", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Resumo de Agendamentos Médicos</CardTitle> {/* Nome atualizado */}
+              <CardTitle className="text-sm font-medium">Resumo de Agendamentos</CardTitle> {/* Nome atualizado */}
               <FileText className={iconClasses} />
             </CardHeader>
             <CardContent>
