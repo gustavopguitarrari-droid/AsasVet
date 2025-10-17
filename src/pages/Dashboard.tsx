@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, PawPrint, CalendarDays, Settings, DollarSign, Bed, Stethoscope, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DashboardConfigurator from "@/components/DashboardConfigurator";
-import { cn } from "@/lib/utils"; // Importar cn para combinar classes
-import { useUser } from "@/context/UserContext"; // Importa o hook useUser
+import { cn } from "@/lib/utils";
+import { useUser } from "@/context/UserContext";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar componentes de Tabs
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -16,23 +17,24 @@ interface DashboardItemConfig {
   id: string;
   name: string;
   isVisible: boolean;
+  category: "overview" | "financial" | "animalHealth"; // Adicionar categoria
 }
 
 const initialDashboardConfig: DashboardItemConfig[] = [
-  { id: "totalClients", name: "Total de Clientes", isVisible: true },
-  { id: "totalPets", name: "Total de Animais", isVisible: true },
-  { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true },
-  { id: "recentActivity", name: "Atividade Recente", isVisible: true },
-  { id: "financialSummary", name: "Resumo Financeiro", isVisible: true },
-  { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true },
-  { id: "internmentStatus", name: "Status de Internação", isVisible: true },
-  { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true },
-  { id: "medicalRecordsSummary", name: "Resumo de Prontuários", isVisible: true },
+  { id: "totalClients", name: "Total de Clientes", isVisible: true, category: "overview" },
+  { id: "totalPets", name: "Total de Animais", isVisible: true, category: "overview" },
+  { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview" },
+  { id: "recentActivity", name: "Atividade Recente", isVisible: true, category: "overview" },
+  { id: "financialSummary", name: "Resumo Financeiro", isVisible: true, category: "financial" },
+  { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial" },
+  { id: "internmentStatus", name: "Status de Internação", isVisible: true, category: "animalHealth" },
+  { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true, category: "animalHealth" },
+  { id: "medicalRecordsSummary", name: "Resumo de Prontuários", isVisible: true, category: "animalHealth" },
   // Novos itens de gráfico
-  { id: "appointmentsMonthlyChart", name: "Consultas por Mês (Gráfico)", isVisible: true },
-  { id: "appointmentsWeeklyChart", name: "Consultas por Semana (Gráfico)", isVisible: true },
-  { id: "revenueMonthlyChart", name: "Receita por Mês (Gráfico)", isVisible: true },
-  { id: "petsBySpeciesChart", name: "Animais por Espécie (Gráfico)", isVisible: true },
+  { id: "appointmentsMonthlyChart", name: "Consultas por Mês (Gráfico)", isVisible: true, category: "animalHealth" },
+  { id: "appointmentsWeeklyChart", name: "Consultas por Semana (Gráfico)", isVisible: true, category: "animalHealth" },
+  { id: "revenueMonthlyChart", name: "Receita por Mês (Gráfico)", isVisible: true, category: "financial" },
+  { id: "petsBySpeciesChart", name: "Animais por Espécie (Gráfico)", isVisible: true, category: "animalHealth" },
 ];
 
 const Dashboard = () => {
@@ -40,11 +42,11 @@ const Dashboard = () => {
   const [dashboardConfig, setDashboardConfig] = React.useState<DashboardItemConfig[]>(
     initialDashboardConfig
   );
+  const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "animalHealth">("overview"); // Estado para a aba ativa
 
-  const { user } = useUser(); // Obtém o usuário do contexto
+  const { user } = useUser();
 
   React.useEffect(() => {
-    // Carregar configuração do localStorage ao montar o componente
     const savedConfig = localStorage.getItem("dashboardConfig");
     if (savedConfig) {
       setDashboardConfig(JSON.parse(savedConfig));
@@ -53,7 +55,6 @@ const Dashboard = () => {
 
   const handleSaveConfig = (newConfig: DashboardItemConfig[]) => {
     setDashboardConfig(newConfig);
-    // Salvar configuração no localStorage
     localStorage.setItem("dashboardConfig", JSON.stringify(newConfig));
   };
 
@@ -178,7 +179,6 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         );
-      // Novos casos para os gráficos
       case "appointmentsMonthlyChart":
         return <AppointmentsMonthlyChart key={item.id} />;
       case "appointmentsWeeklyChart":
@@ -194,7 +194,7 @@ const Dashboard = () => {
 
   const getGreeting = () => {
     if (!user) {
-      return "Bem-vindo(a) ao Simples Vet!"; // Mensagem padrão se não houver usuário
+      return "Bem-vindo(a) ao Simples Vet!";
     }
     const prefix = user.gender === "feminino" ? "Dra." : "Dr.";
     return `Bem-vindo(a) ${prefix} ${user.name}!`;
@@ -218,9 +218,34 @@ const Dashboard = () => {
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {dashboardConfig.filter(item => item.isVisible).map(item => getCardComponent(item))}
-      </div>
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "animalHealth")} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="financial">Financeiro</TabsTrigger>
+          <TabsTrigger value="animalHealth">Saúde Animal</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview" className="mt-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {dashboardConfig
+              .filter(item => item.isVisible && item.category === "overview")
+              .map(item => getCardComponent(item))}
+          </div>
+        </TabsContent>
+        <TabsContent value="financial" className="mt-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {dashboardConfig
+              .filter(item => item.isVisible && item.category === "financial")
+              .map(item => getCardComponent(item))}
+          </div>
+        </TabsContent>
+        <TabsContent value="animalHealth" className="mt-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {dashboardConfig
+              .filter(item => item.isVisible && item.category === "animalHealth")
+              .map(item => getCardComponent(item))}
+          </div>
+        </TabsContent>
+      </Tabs>
 
       <DashboardConfigurator
         open={isConfiguratorOpen}
