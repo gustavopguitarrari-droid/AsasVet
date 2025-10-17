@@ -91,7 +91,7 @@ const Dashboard = () => {
         );
       case "recentActivity":
         return (
-          <Card key={item.id} className="bg-card text-foreground shadow-lg"> {/* Card neutro */}
+          <Card key={item.id} className="bg-muted text-foreground shadow-lg"> {/* Alterado para bg-muted */}
             <CardHeader>
               <CardTitle>Atividade Recente</CardTitle>
             </CardHeader>
