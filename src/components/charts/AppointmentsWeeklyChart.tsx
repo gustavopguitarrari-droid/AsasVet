@@ -45,12 +45,12 @@ const AppointmentsWeeklyChart: React.FC = () => {
               y={averageConsultas}
               stroke="hsl(var(--sidebar-item-bg-3))"
               strokeDasharray="3 3"
-              strokeWidth={2} // Linha mais grossa
+              strokeWidth={2}
             />
           </LineChart>
         </ResponsiveContainer>
         <p className="text-sm text-muted-foreground mt-2">
-          Média de consultas: <span className="font-semibold text-foreground">{averageConsultas.toFixed(0)}</span>
+          Média de consultas: <span className="font-semibold text-sidebar-item-bg-3">{averageConsultas.toFixed(0)}</span>
         </p>
       </CardContent>
     </Card>
