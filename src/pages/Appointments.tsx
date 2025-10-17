@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock } from "lucide-react";
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -24,23 +24,36 @@ interface Appointment {
   time: string;
   client: string;
   pet: string;
+  species: string; // Adicionado campo de espécie
   service: string;
   veterinarian: string;
   status: "Agendada" | "Realizada" | "Cancelada";
 }
 
 const mockAppointments: Appointment[] = [
-  { id: "C001", date: "2024-10-26", time: "10:00", client: "João Silva", pet: "Rex", service: "Consulta Geral", veterinarian: "Dr. Ana Paula", status: "Agendada" },
-  { id: "C002", date: "2024-10-26", time: "14:30", client: "Maria Souza", pet: "Miau", service: "Vacinação", veterinarian: "Dr. Carlos Eduardo", status: "Realizada" },
-  { id: "C003", date: "2024-10-27", time: "09:00", client: "Pedro Santos", pet: "Pingo", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Cancelada" },
-  { id: "C004", date: "2024-10-28", time: "11:00", client: "Ana Costa", pet: "Bob", service: "Banho e Tosa", veterinarian: "Dr. Ana Paula", status: "Agendada" },
-  { id: "C005", date: "2024-10-29", time: "16:00", client: "Carlos Lima", pet: "Luna", service: "Consulta de Retorno", veterinarian: "Dr. Carlos Eduardo", status: "Agendada" },
-  { id: "C006", date: "2024-10-25", time: "13:00", client: "Fernanda Reis", pet: "Thor", service: "Cirurgia", veterinarian: "Dra. Beatriz Lima", status: "Realizada" },
+  { id: "C001", date: "2024-10-26", time: "10:00", client: "João Silva", pet: "Rex", species: "Cachorro", service: "Consulta Geral", veterinarian: "Dr. Ana Paula", status: "Agendada" },
+  { id: "C002", date: "2024-10-26", time: "14:30", client: "Maria Souza", pet: "Miau", species: "Gato", service: "Vacinação", veterinarian: "Dr. Carlos Eduardo", status: "Realizada" },
+  { id: "C003", date: "2024-10-27", time: "09:00", client: "Pedro Santos", pet: "Pingo", species: "Pássaro", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Cancelada" },
+  { id: "C004", date: "2024-10-28", time: "11:00", client: "Ana Costa", pet: "Bob", species: "Cachorro", service: "Banho e Tosa", veterinarian: "Dr. Ana Paula", status: "Agendada" },
+  { id: "C005", date: "2024-10-29", time: "16:00", client: "Carlos Lima", pet: "Luna", species: "Gato", service: "Consulta de Retorno", veterinarian: "Dr. Carlos Eduardo", status: "Agendada" },
+  { id: "C006", date: "2024-10-25", time: "13:00", client: "Fernanda Reis", pet: "Thor", species: "Cachorro", service: "Cirurgia", veterinarian: "Dra. Beatriz Lima", status: "Realizada" },
+  { id: "C007", date: "2024-10-30", time: "10:00", client: "Lucas Mendes", pet: "Nemo", species: "Peixe", service: "Consulta Geral", veterinarian: "Dr. Ana Paula", status: "Agendada" },
+  { id: "C008", date: "2024-10-31", time: "15:00", client: "Mariana Santos", pet: "Pipoca", species: "Roedor", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Agendada" },
 ];
+
+// Mapeamento de espécies para ícones
+const speciesIconMap: { [key: string]: React.ElementType } = {
+  Cachorro: Dog,
+  Gato: Cat,
+  Pássaro: Bird,
+  Roedor: Rabbit,
+  Peixe: Fish,
+  Outros: MoreHorizontal,
+};
 
 const Appointments = () => {
   const [activeTab, setActiveTab] = React.useState<string>("all");
-  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState<boolean>(false); // Renomeado para clareza
+  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState<boolean>(false);
   const [appointments, setAppointments] = React.useState<Appointment[]>(mockAppointments);
   const [searchTerm, setSearchTerm] = React.useState<string>("");
 
@@ -52,6 +65,7 @@ const Appointments = () => {
     const matchesSearch =
       appointment.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.pet.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.species.toLowerCase().includes(searchTerm.toLowerCase()) || // Incluir busca por espécie
       appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesTab && matchesSearch;
@@ -181,32 +195,32 @@ const Appointments = () => {
               <TableHead>Serviço</TableHead>
               <TableHead>Veterinário</TableHead>
               <TableHead>Status</TableHead>
-              {/* <TableHead className="text-right">Ações</TableHead> */} {/* Removido */}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredAppointments.length > 0 ? (
-              filteredAppointments.map((appointment) => (
-                <TableRow key={appointment.id} onClick={() => handleRowClick(appointment)} className="cursor-pointer hover:bg-muted/50">
-                  <TableCell className="font-medium">{appointment.pet}</TableCell>
-                  <TableCell>{appointment.client}</TableCell>
-                  <TableCell>{appointment.service}</TableCell>
-                  <TableCell>{appointment.veterinarian}</TableCell>
-                  <TableCell>
-                    <Badge className={getStatusBadgeVariant(appointment.status)}>
-                      {appointment.status}
-                    </Badge>
-                  </TableCell>
-                  {/* <TableCell className="text-right"> */} {/* Removido */}
-                  {/*   <Button variant="ghost" size="sm"> */}
-                  {/*     Ver Detalhes */}
-                  {/*   </Button> */}
-                  {/* </TableCell> */} {/* Removido */}
-                </TableRow>
-              ))
+              filteredAppointments.map((appointment) => {
+                const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
+                return (
+                  <TableRow key={appointment.id} onClick={() => handleRowClick(appointment)} className="cursor-pointer hover:bg-muted/50">
+                    <TableCell className="font-medium flex items-center">
+                      <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
+                      {appointment.pet}
+                    </TableCell>
+                    <TableCell>{appointment.client}</TableCell>
+                    <TableCell>{appointment.service}</TableCell>
+                    <TableCell>{appointment.veterinarian}</TableCell>
+                    <TableCell>
+                      <Badge className={getStatusBadgeVariant(appointment.status)}>
+                        {appointment.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center"> {/* colSpan ajustado de 6 para 5 */}
+                <TableCell colSpan={5} className="h-24 text-center">
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>

@@ -38,6 +38,9 @@ const formSchema = z.object({
   time: z.string().min(1, "A hora da consulta é obrigatória."),
   client: z.string().min(1, "O nome do cliente é obrigatório."),
   pet: z.string().min(1, "O nome do animal é obrigatório."),
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
+    required_error: "A espécie do animal é obrigatória.",
+  }),
   service: z.string().min(1, "O serviço é obrigatório."),
   veterinarian: z.string().min(1, "O veterinário é obrigatório."),
   status: z.enum(["Agendada", "Realizada", "Cancelada"], {
@@ -60,6 +63,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
       time: initialData?.time || "",
       client: initialData?.client || "",
       pet: initialData?.pet || "",
+      species: initialData?.species || "Cachorro", // Valor padrão para espécie
       service: initialData?.service || "",
       veterinarian: initialData?.veterinarian || "",
       status: initialData?.status || "Agendada",
@@ -91,6 +95,31 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
               <FormControl>
                 <Input placeholder="Nome do animal" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="species"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Espécie</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a espécie" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Cachorro">Cachorro</SelectItem>
+                  <SelectItem value="Gato">Gato</SelectItem>
+                  <SelectItem value="Pássaro">Pássaro</SelectItem>
+                  <SelectItem value="Roedor">Roedor</SelectItem>
+                  <SelectItem value="Peixe">Peixe</SelectItem>
+                  <SelectItem value="Outros">Outros</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
