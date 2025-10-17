@@ -43,7 +43,7 @@ const AppointmentsWeeklyChart: React.FC = () => {
             <Line type="monotone" dataKey="consultas" stroke="hsl(var(--sidebar-item-bg-4))" activeDot={{ r: 8 }} />
             <ReferenceLine
               y={averageConsultas}
-              stroke="hsl(var(--accent))" // Cor alterada para accent
+              stroke="hsl(var(--sidebar-item-bg-3))" // Cor alterada para laranja
               strokeDasharray="3 3"
             />
           </LineChart>
