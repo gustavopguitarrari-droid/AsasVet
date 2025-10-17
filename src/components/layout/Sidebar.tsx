@@ -58,7 +58,7 @@ const navItems = [
     name: "Financeiro",
     icon: DollarSign,
     path: "/financeiro",
-    activeBgClass: "bg-sidebar-item-bg-2", // Alterado para bg-sidebar-item-bg-2 (verde)
+    activeBgClass: "bg-sidebar-item-bg-2",
   },
   {
     name: "Caixa",
@@ -70,7 +70,7 @@ const navItems = [
     name: "Internação",
     icon: Plus,
     path: "/internacao",
-    activeBgClass: "bg-sidebar-item-bg-8",
+    activeBgClass: "bg-sidebar-item-bg-6", // Alterado para bg-sidebar-item-bg-6 (vermelho)
   },
   {
     name: "Veterinários",
