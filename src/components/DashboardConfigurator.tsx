@@ -82,9 +82,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
               )}
             >
               <div className="flex items-center space-x-2">
-                <Label htmlFor={`item-${item.id}`} className="text-base flex-1">
-                  {item.name}
-                </Label>
+                {/* Botões de seta movidos para a esquerda */}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -103,6 +101,9 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                 >
                   <ChevronDown className="h-4 w-4" />
                 </Button>
+                <Label htmlFor={`item-${item.id}`} className="text-base flex-1">
+                  {item.name}
+                </Label>
               </div>
               <Switch
                 id={`item-${item.id}`}
