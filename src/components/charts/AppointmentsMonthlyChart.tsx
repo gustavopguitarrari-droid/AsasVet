@@ -44,8 +44,9 @@ const AppointmentsMonthlyChart: React.FC = () => {
             <Bar dataKey="consultas" fill="hsl(var(--sidebar-item-bg-1))" />
             <ReferenceLine
               y={averageConsultas}
-              stroke="hsl(var(--sidebar-item-bg-3))" // Cor alterada para laranja
+              stroke="hsl(var(--sidebar-item-bg-3))"
               strokeDasharray="3 3"
+              strokeWidth={2} // Linha mais grossa
             />
           </BarChart>
         </ResponsiveContainer>
