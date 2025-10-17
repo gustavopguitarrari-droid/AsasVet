@@ -7,10 +7,10 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine, // Importar ReferenceLine
+  ReferenceLine,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTheme } from "next-themes"; // Importar useTheme
+import { useTheme } from "next-themes";
 
 const data = [
   { name: "Jan", consultas: 400 },
@@ -22,11 +22,10 @@ const data = [
 ];
 
 const AppointmentsMonthlyChart: React.FC = () => {
-  const { theme } = useTheme(); // Obter o tema atual
+  const { theme } = useTheme();
   const axisLabelColor = theme === "dark" ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))";
-  const gridLineColor = "hsl(var(--border))"; // A cor da borda já se adapta ao tema
+  const gridLineColor = "hsl(var(--border))";
 
-  // Calcular a média de consultas
   const totalConsultas = data.reduce((sum, entry) => sum + entry.consultas, 0);
   const averageConsultas = totalConsultas / data.length;
 
@@ -43,15 +42,16 @@ const AppointmentsMonthlyChart: React.FC = () => {
             <YAxis stroke={axisLabelColor} />
             <Tooltip />
             <Bar dataKey="consultas" fill="hsl(var(--sidebar-item-bg-1))" />
-            {/* Adicionar a linha de referência para a média */}
             <ReferenceLine
               y={averageConsultas}
-              stroke="hsl(var(--destructive))" // Cor vermelha para destaque
+              stroke="hsl(var(--destructive))"
               strokeDasharray="3 3"
-              label={{ value: `Média: ${averageConsultas.toFixed(0)}`, position: "right", fill: axisLabelColor }}
             />
           </BarChart>
         </ResponsiveContainer>
+        <p className="text-sm text-muted-foreground mt-2">
+          Média de consultas: <span className="font-semibold text-foreground">{averageConsultas.toFixed(0)}</span>
+        </p>
       </CardContent>
     </Card>
   );
