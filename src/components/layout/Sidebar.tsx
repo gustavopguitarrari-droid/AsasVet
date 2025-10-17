@@ -7,7 +7,7 @@ import {
   CalendarDays,
   FileText,
   DollarSign,
-  Bed,
+  Ambulance, // Ícone alterado de Bed para Ambulance
   UserCog,
   ArrowLeftToLine, // Importar ícones para o botão
   ArrowRightToLine, // Importar ícones para o botão
@@ -68,7 +68,7 @@ const navItems = [
   },
   {
     name: "Internação",
-    icon: Bed,
+    icon: Ambulance, // Ícone alterado para Ambulance
     path: "/internacao",
     activeBgClass: "bg-sidebar-item-bg-8",
   },
