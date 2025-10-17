@@ -91,7 +91,7 @@
     /* Novas cores para o sidebar (modo escuro) - AGORA MAIS CLARAS */
     --sidebar-foreground: 210 40% 98%; /* Texto claro */
     --sidebar-primary: 280 80% 80%; /* Roxo vibrante mais claro para item ativo */
-    --sidebar-primary-foreground: 222.2 47.4% 11.2%; /* Texto escuro no item ativo */
+    --sidebar-primary-foreground: hsl(var(--muted-foreground)); /* Alterado para cinza no modo escuro */
     --sidebar-accent: 260 50% 50%; /* Roxo médio para hover */
     --sidebar-accent-foreground: 210 40% 98%; /* Texto claro no hover */
     --sidebar-border: 250 60% 30%;
