@@ -111,6 +111,9 @@
     --sidebar-item-bg-7: 50 90% 70%;
     --sidebar-item-bg-8: 270 70% 70%;
     --sidebar-item-bg-9: 40 40% 60%;
+
+    /* Cor verde para o badge de sucesso no modo escuro */
+    --green-500: 142.1 76.2% 36.3%; /* Usando HSL para consistência */
   }
 }
 

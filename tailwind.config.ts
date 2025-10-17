@@ -72,6 +72,10 @@ export default {
           "item-bg-8": "hsl(var(--sidebar-item-bg-8))",
           "item-bg-9": "hsl(var(--sidebar-item-bg-9))",
         },
+        // Adicionando a cor verde para o badge de sucesso
+        green: {
+          500: "hsl(142.1 76.2% 36.3%)", // Um tom de verde para o modo claro
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
