@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import DashboardConfigurator from "@/components/DashboardConfigurator";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar componentes de Tabs
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -17,19 +17,19 @@ interface DashboardItemConfig {
   id: string;
   name: string;
   isVisible: boolean;
-  category: "overview" | "financial" | "animalHealth" | "recentActivity"; // Adicionar nova categoria
+  category: "overview" | "financial" | "animalHealth" | "recentActivity";
 }
 
 const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "totalClients", name: "Total de Clientes", isVisible: true, category: "overview" },
   { id: "totalPets", name: "Total de Animais", isVisible: true, category: "overview" },
   { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview" },
-  { id: "recentActivity", name: "Atividade Recente", isVisible: true, category: "recentActivity" }, // Mover para nova categoria
+  { id: "recentActivity", name: "Atividade Recente", isVisible: true, category: "recentActivity" },
   { id: "financialSummary", name: "Resumo Financeiro", isVisible: true, category: "financial" },
   { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial" },
   { id: "internmentStatus", name: "Status de Internação", isVisible: true, category: "animalHealth" },
   { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true, category: "animalHealth" },
-  { id: "medicalRecordsSummary", name: "Resumo de Prontuários", isVisible: true, category: "animalHealth" },
+  { id: "medicalRecordsSummary", name: "Resumo de Agendamentos Médicos", isVisible: true, category: "animalHealth" }, // Nome atualizado
   // Novos itens de gráfico
   { id: "appointmentsMonthlyChart", name: "Consultas por Mês (Gráfico)", isVisible: true, category: "animalHealth" },
   { id: "appointmentsWeeklyChart", name: "Consultas por Semana (Gráfico)", isVisible: true, category: "animalHealth" },
@@ -42,7 +42,7 @@ const Dashboard = () => {
   const [dashboardConfig, setDashboardConfig] = React.useState<DashboardItemConfig[]>(
     initialDashboardConfig
   );
-  const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "animalHealth" | "recentActivity">("recentActivity"); // Definir a primeira aba como 'Atividade Recente'
+  const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "animalHealth" | "recentActivity">("recentActivity");
 
   const { user } = useUser();
 
@@ -105,7 +105,7 @@ const Dashboard = () => {
         );
       case "recentActivity":
         return (
-          <Card key={item.id} className="bg-muted text-foreground shadow-md col-span-full"> {/* Adicionado col-span-full */}
+          <Card key={item.id} className="bg-muted text-foreground shadow-md col-span-full">
             <CardHeader>
               <CardTitle>Atividade Recente</CardTitle>
             </CardHeader>
@@ -170,7 +170,7 @@ const Dashboard = () => {
         return (
           <Card key={item.id} className={cn("bg-sidebar-item-bg-5", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Resumo de Prontuários</CardTitle>
+              <CardTitle className="text-sm font-medium">Resumo de Agendamentos Médicos</CardTitle> {/* Nome atualizado */}
               <FileText className={iconClasses} />
             </CardHeader>
             <CardContent>
@@ -219,11 +219,11 @@ const Dashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "animalHealth" | "recentActivity")} className="w-full">
-        <TabsList className="grid w-full grid-cols-4"> {/* Aumentar para 4 colunas */}
-          <TabsTrigger value="recentActivity">Atividade Recente</TabsTrigger> {/* Nova ordem */}
-          <TabsTrigger value="animalHealth">Saúde Animal</TabsTrigger> {/* Nova ordem */}
-          <TabsTrigger value="overview">Visão Geral</TabsTrigger> {/* Nova ordem */}
-          <TabsTrigger value="financial">Financeiro</TabsTrigger> {/* Nova ordem */}
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="recentActivity">Atividade Recente</TabsTrigger>
+          <TabsTrigger value="animalHealth">Saúde Animal</TabsTrigger>
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
+          <TabsTrigger value="financial">Financeiro</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -246,7 +246,7 @@ const Dashboard = () => {
               .map(item => getCardComponent(item))}
           </div>
         </TabsContent>
-        <TabsContent value="recentActivity" className="mt-4"> {/* Conteúdo para a nova aba */}
+        <TabsContent value="recentActivity" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "recentActivity")

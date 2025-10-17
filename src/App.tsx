@@ -8,11 +8,11 @@ import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
 import Pets from "./pages/Pets";
 import Appointments from "./pages/Appointments";
-import MedicalRecords from "./pages/MedicalRecords";
-import Financeiro from "./pages/Financeiro"; // Nova importação
-import Caixa from "./pages/Caixa"; // Nova importação
-import Internacao from "./pages/Internacao"; // Nova importação
-import Veterinarios from "./pages/Veterinarios"; // Nova importação
+import AgendamentosMedicos from "./pages/AgendamentosMedicos"; // Importação atualizada
+import Financeiro from "./pages/Financeiro";
+import Caixa from "./pages/Caixa";
+import Internacao from "./pages/Internacao";
+import Veterinarios from "./pages/Veterinarios";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -68,7 +68,7 @@ const App = () => (
             path="/medical-records"
             element={
               <Layout>
-                <MedicalRecords />
+                <AgendamentosMedicos /> {/* Componente atualizado */}
               </Layout>
             }
           />

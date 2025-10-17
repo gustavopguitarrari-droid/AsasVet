@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import UserProfile from "@/components/UserProfile"; // Importando o novo componente
+import UserProfile from "@/components/UserProfile";
 
 const Header = () => {
   const location = useLocation();
@@ -15,7 +15,7 @@ const Header = () => {
       case "/appointments":
         return "Consultas";
       case "/medical-records":
-        return "Prontuários Médicos";
+        return "Agendamentos Médicos"; // Título atualizado
       case "/financeiro":
         return "Financeiro";
       case "/caixa":
