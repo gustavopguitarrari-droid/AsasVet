@@ -31,10 +31,16 @@ const navItems = [
     activeBgClass: "bg-sidebar-item-bg-1",
   },
   {
-    name: "Clientes",
-    icon: Users,
-    path: "/clients",
-    activeBgClass: "bg-sidebar-item-bg-2",
+    name: "Consultas",
+    icon: CalendarDays,
+    path: "/appointments",
+    activeBgClass: "bg-sidebar-item-bg-4",
+  },
+  {
+    name: "Internação",
+    icon: Plus,
+    path: "/internacao",
+    activeBgClass: "bg-sidebar-item-bg-6",
   },
   {
     name: "Animais",
@@ -43,10 +49,10 @@ const navItems = [
     activeBgClass: "bg-sidebar-item-bg-3",
   },
   {
-    name: "Consultas",
-    icon: CalendarDays,
-    path: "/appointments",
-    activeBgClass: "bg-sidebar-item-bg-4",
+    name: "Veterinários",
+    icon: UserCog,
+    path: "/veterinarios",
+    activeBgClass: "bg-sidebar-item-bg-9",
   },
   {
     name: "Prontuários",
@@ -65,18 +71,6 @@ const navItems = [
     icon: ReceiptText,
     path: "/caixa",
     activeBgClass: "bg-sidebar-item-bg-7",
-  },
-  {
-    name: "Internação",
-    icon: Plus,
-    path: "/internacao",
-    activeBgClass: "bg-sidebar-item-bg-6", // Alterado para bg-sidebar-item-bg-6 (vermelho)
-  },
-  {
-    name: "Veterinários",
-    icon: UserCog,
-    path: "/veterinarios",
-    activeBgClass: "bg-sidebar-item-bg-9",
   },
 ];
 
