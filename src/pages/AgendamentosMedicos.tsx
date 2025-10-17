@@ -21,7 +21,7 @@ const AgendamentosMedicos = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Agendamentos</h2>
+        <h2 className="text-3xl font-bold">Agenda</h2>
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
         </Button>
