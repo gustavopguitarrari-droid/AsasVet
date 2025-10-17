@@ -133,7 +133,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         ))}
       </nav>
 
-      <div className={cn("mt-auto pt-4 flex", isCollapsed ? "justify-center" : "justify-between")}>
+      <div
+        className={cn(
+          "mt-auto pt-4 flex items-center",
+          isCollapsed ? "justify-center space-x-2" : "justify-between" // Ajustado para centralizar e espaçar quando recolhido
+        )}
+      >
         <ThemeToggle isCollapsed={isCollapsed} />
         <Button
           variant="default"
@@ -143,7 +148,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
             "rounded-full",
             "bg-indigo-500 text-white hover:bg-indigo-600",
             "border border-border shadow-md",
-            isCollapsed && "hidden" // Esconde o botão quando o sidebar está recolhido
+            isCollapsed && "ml-2" // Adiciona margem à esquerda quando recolhido para separar do ThemeToggle
           )}
         >
           {isCollapsed ? <ArrowRightToLine className="h-4 w-4" /> : <ArrowLeftToLine className="h-4 w-4" />}

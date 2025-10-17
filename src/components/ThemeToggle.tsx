@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface ThemeToggleProps {
-  isCollapsed?: boolean;
+  isCollapsed?: boolean; // Mantemos a prop, mas não a usamos para 'mx-auto' aqui
 }
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ isCollapsed = false }) => {
@@ -23,7 +23,7 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ isCollapsed = false }) => {
       variant="ghost"
       size="icon"
       onClick={toggleTheme}
-      className={cn("h-9 w-9", isCollapsed && "mx-auto")}
+      className={cn("h-9 w-9")} // Removido: isCollapsed && "mx-auto"
     >
       <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
       <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
