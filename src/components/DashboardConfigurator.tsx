@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { GripVertical } from "lucide-react";
-import { Switch } from "@/components/ui/switch"; // Importando o componente Switch
+import { Switch } from "@/components/ui/switch";
 
 interface DashboardItemConfig {
   id: string;
@@ -77,7 +77,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
           <Droppable droppableId="dashboard-items">
             {(provided) => (
               <div
-                className="grid gap-4 py-4"
+                className="grid gap-4 py-4 max-h-[400px] overflow-y-auto" // Adicionado max-h e overflow-y-auto
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
@@ -88,11 +88,11 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         className={cn(
-                          "flex items-center justify-between space-x-2 p-2 rounded-md border", // Adicionado justify-between
+                          "flex items-center justify-between space-x-2 p-2 rounded-md border",
                           snapshot.isDragging && "bg-accent"
                         )}
                       >
-                        <div className="flex items-center space-x-2"> {/* Agrupando handle e label */}
+                        <div className="flex items-center space-x-2">
                           <div {...provided.dragHandleProps} className="cursor-grab">
                             <GripVertical className="h-4 w-4 text-muted-foreground" />
                           </div>
