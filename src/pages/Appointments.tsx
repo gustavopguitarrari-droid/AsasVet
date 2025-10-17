@@ -9,11 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search } from "lucide-react";
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import AppointmentForm from "@/components/AppointmentForm"; // Importa o novo componente de formulário
+import AppointmentForm from "@/components/AppointmentForm";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 interface Appointment {
   id: string;
@@ -22,7 +24,7 @@ interface Appointment {
   client: string;
   pet: string;
   service: string;
-  veterinarian: string; // Novo campo
+  veterinarian: string;
   status: "Agendada" | "Realizada" | "Cancelada";
 }
 
@@ -47,7 +49,7 @@ const Appointments = () => {
       appointment.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.pet.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()); // Inclui veterinário na busca
+      appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesTab && matchesSearch;
   });
 
@@ -57,18 +59,22 @@ const Appointments = () => {
     setIsDialogOpen(false);
   };
 
-  const getStatusVariant = (status: Appointment["status"]) => {
+  const getStatusBadgeVariant = (status: Appointment["status"]) => {
     switch (status) {
       case "Agendada":
-        return "default"; // Azul padrão
+        return "bg-sidebar-item-bg-1 text-white"; // Azul para agendada
       case "Realizada":
-        return "secondary"; // Cinza
+        return "bg-green-500 text-white"; // Verde para realizada
       case "Cancelada":
-        return "destructive"; // Vermelho
+        return "bg-destructive text-white"; // Vermelho para cancelada
       default:
-        return "secondary";
+        return "bg-muted text-muted-foreground";
     }
   };
+
+  const totalAgendadas = appointments.filter(a => a.status === "Agendada").length;
+  const totalRealizadas = appointments.filter(a => a.status === "Realizada").length;
+  const totalCanceladas = appointments.filter(a => a.status === "Cancelada").length;
 
   return (
     <div className="space-y-6">
@@ -89,6 +95,40 @@ const Appointments = () => {
         </Dialog>
       </div>
 
+      {/* Cards de Resumo */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="bg-sidebar-item-bg-1 text-white shadow-md">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Agendadas</CardTitle>
+            <CalendarClock className="h-4 w-4 text-white" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalAgendadas}</div>
+            <p className="text-white/80 text-xs">Consultas pendentes</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-green-500 text-white shadow-md">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Realizadas</CardTitle>
+            <CalendarCheck className="h-4 w-4 text-white" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalRealizadas}</div>
+            <p className="text-white/80 text-xs">Consultas concluídas</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-destructive text-white shadow-md">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Canceladas</CardTitle>
+            <CalendarX className="h-4 w-4 text-white" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalCanceladas}</div>
+            <p className="text-white/80 text-xs">Consultas canceladas</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
         <div className="relative flex-1 w-full md:w-auto">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -100,11 +140,11 @@ const Appointments = () => {
           />
         </div>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all">Todas</TabsTrigger>
-            <TabsTrigger value="Agendada">Agendadas</TabsTrigger>
-            <TabsTrigger value="Realizada">Realizadas</TabsTrigger>
-            <TabsTrigger value="Cancelada">Canceladas</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4 bg-muted/50">
+            <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Todas</TabsTrigger>
+            <TabsTrigger value="Agendada" className="data-[state=active]:bg-sidebar-item-bg-1 data-[state=active]:text-white">Agendadas</TabsTrigger>
+            <TabsTrigger value="Realizada" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">Realizadas</TabsTrigger>
+            <TabsTrigger value="Cancelada" className="data-[state=active]:bg-destructive data-[state=active]:text-white">Canceladas</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -119,7 +159,7 @@ const Appointments = () => {
               <TableHead>Cliente</TableHead>
               <TableHead>Animal</TableHead>
               <TableHead>Serviço</TableHead>
-              <TableHead>Veterinário</TableHead> {/* Nova coluna */}
+              <TableHead>Veterinário</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -134,9 +174,9 @@ const Appointments = () => {
                   <TableCell>{appointment.client}</TableCell>
                   <TableCell>{appointment.pet}</TableCell>
                   <TableCell>{appointment.service}</TableCell>
-                  <TableCell>{appointment.veterinarian}</TableCell> {/* Exibe o veterinário */}
+                  <TableCell>{appointment.veterinarian}</TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(appointment.status)}>
+                    <Badge className={getStatusBadgeVariant(appointment.status)}>
                       {appointment.status}
                     </Badge>
                   </TableCell>
