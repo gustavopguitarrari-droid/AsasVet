@@ -7,11 +7,11 @@ import {
   CalendarDays,
   FileText,
   DollarSign,
-  Ambulance, // Ícone alterado de Bed para Ambulance
+  Hospital, // Ícone alterado de Ambulance para Hospital
   UserCog,
-  ArrowLeftToLine, // Importar ícones para o botão
-  ArrowRightToLine, // Importar ícones para o botão
-  ReceiptText, // Novo ícone para Caixa
+  ArrowLeftToLine,
+  ArrowRightToLine,
+  ReceiptText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -62,13 +62,13 @@ const navItems = [
   },
   {
     name: "Caixa",
-    icon: ReceiptText, // Ícone atualizado para ReceiptText
+    icon: ReceiptText,
     path: "/caixa",
     activeBgClass: "bg-sidebar-item-bg-7",
   },
   {
     name: "Internação",
-    icon: Ambulance, // Ícone alterado para Ambulance
+    icon: Hospital, // Ícone alterado para Hospital
     path: "/internacao",
     activeBgClass: "bg-sidebar-item-bg-8",
   },
