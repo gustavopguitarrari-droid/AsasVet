@@ -8,11 +8,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd"; // Importando DND
-import { GripVertical } from "lucide-react"; // Importando ícone de arrastar
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+import { GripVertical } from "lucide-react";
+import { Switch } from "@/components/ui/switch"; // Importando o componente Switch
 
 interface DashboardItemConfig {
   id: string;
@@ -39,7 +39,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     setTempConfig(config);
   }, [config]);
 
-  const handleCheckboxChange = (id: string, checked: boolean) => {
+  const handleSwitchChange = (id: string, checked: boolean) => {
     setTempConfig((prevConfig) =>
       prevConfig.map((item) =>
         item.id === id ? { ...item, isVisible: checked } : item
@@ -66,7 +66,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg"> {/* Alterado de sm:max-w-[425px] para sm:max-w-lg */}
+      <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Configurar Painel</DialogTitle>
           <DialogDescription>
@@ -88,23 +88,25 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         className={cn(
-                          "flex items-center space-x-2 p-2 rounded-md border",
+                          "flex items-center justify-between space-x-2 p-2 rounded-md border", // Adicionado justify-between
                           snapshot.isDragging && "bg-accent"
                         )}
                       >
-                        <div {...provided.dragHandleProps} className="cursor-grab">
-                          <GripVertical className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex items-center space-x-2"> {/* Agrupando handle e label */}
+                          <div {...provided.dragHandleProps} className="cursor-grab">
+                            <GripVertical className="h-4 w-4 text-muted-foreground" />
+                          </div>
+                          <Label htmlFor={`item-${item.id}`} className="text-base flex-1">
+                            {item.name}
+                          </Label>
                         </div>
-                        <Checkbox
+                        <Switch
                           id={`item-${item.id}`}
                           checked={item.isVisible}
                           onCheckedChange={(checked) =>
-                            handleCheckboxChange(item.id, checked as boolean)
+                            handleSwitchChange(item.id, checked as boolean)
                           }
                         />
-                        <Label htmlFor={`item-${item.id}`} className="text-base flex-1">
-                          {item.name}
-                        </Label>
                       </div>
                     )}
                   </Draggable>
