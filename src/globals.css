@@ -81,7 +81,7 @@
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 70%; /* Aumentado para 70% de luminosidade */
     --destructive-foreground: 210 40% 98%;
 
     --border: 217.2 32.6% 17.5%;
@@ -101,16 +101,16 @@
     --sidebar-gradient-start: 250 60% 25%; /* Roxo mais claro */
     --sidebar-gradient-end: 270 70% 35%; /* Roxo ligeiramente mais claro */
 
-    /* Cores de fundo para os itens do sidebar (modo escuro) */
-    --sidebar-item-bg-1: 220 80% 70%;
-    --sidebar-item-bg-2: 140 70% 70%;
-    --sidebar-item-bg-3: 30 90% 70%;
-    --sidebar-item-bg-4: 330 80% 80%;
-    --sidebar-item-bg-5: 180 70% 60%;
-    --sidebar-item-bg-6: 0 80% 70%;
-    --sidebar-item-bg-7: 50 90% 70%;
-    --sidebar-item-bg-8: 270 70% 70%;
-    --sidebar-item-bg-9: 40 40% 60%;
+    /* Cores de fundo para os itens do sidebar (modo escuro) - Aumentado para maior luminosidade */
+    --sidebar-item-bg-1: 220 80% 85%; /* Azul */
+    --sidebar-item-bg-2: 140 70% 85%; /* Verde */
+    --sidebar-item-bg-3: 30 90% 85%;  /* Laranja */
+    --sidebar-item-bg-4: 330 80% 90%; /* Rosa */
+    --sidebar-item-bg-5: 180 70% 75%; /* Ciano/Verde-água */
+    --sidebar-item-bg-6: 0 80% 85%;   /* Vermelho */
+    --sidebar-item-bg-7: 50 90% 85%;  /* Amarelo */
+    --sidebar-item-bg-8: 270 70% 85%; /* Roxo */
+    --sidebar-item-bg-9: 40 40% 75%;  /* Marrom */
   }
 }
 
