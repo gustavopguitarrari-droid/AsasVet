@@ -66,7 +66,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl"> {/* Aumenta a largura do modal */}
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Configurar Painel</DialogTitle>
           <DialogDescription>
@@ -77,7 +77,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
           <Droppable droppableId="dashboard-items">
             {(provided) => (
               <div
-                className="grid gap-4 py-4 max-h-[400px] overflow-y-auto" {/* Limita a altura e adiciona rolagem */}
+                className="grid gap-4 py-4"
                 {...provided.droppableProps}
                 ref={provided.innerRef}
               >
