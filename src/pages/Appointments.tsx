@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import AppointmentForm from "@/components/AppointmentForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog"; // Importar o novo diálogo
 
 interface Appointment {
   id: string;
@@ -39,9 +40,12 @@ const mockAppointments: Appointment[] = [
 
 const Appointments = () => {
   const [activeTab, setActiveTab] = React.useState<string>("all");
-  const [isDialogOpen, setIsDialogOpen] = React.useState<boolean>(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState<boolean>(false); // Renomeado para clareza
   const [appointments, setAppointments] = React.useState<Appointment[]>(mockAppointments);
   const [searchTerm, setSearchTerm] = React.useState<string>("");
+
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState<boolean>(false);
+  const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
 
   const filteredAppointments = appointments.filter((appointment) => {
     const matchesTab = activeTab === "all" || appointment.status === activeTab;
@@ -53,10 +57,29 @@ const Appointments = () => {
     return matchesTab && matchesSearch;
   });
 
-  const handleAddAppointment = (newAppointment: Omit<Appointment, "id">) => {
+  const handleAddAppointment = (newAppointmentData: Omit<Appointment, "id">) => {
     const newId = `C${(appointments.length + 1).toString().padStart(3, '0')}`;
-    setAppointments((prev) => [...prev, { id: newId, ...newAppointment }]);
-    setIsDialogOpen(false);
+    setAppointments((prev) => [...prev, { id: newId, ...newAppointmentData }]);
+    setIsAddDialogOpen(false);
+  };
+
+  const handleUpdateAppointment = (updatedAppointment: Appointment) => {
+    setAppointments((prev) =>
+      prev.map((app) => (app.id === updatedAppointment.id ? updatedAppointment : app))
+    );
+  };
+
+  const handleCancelAppointment = (appointmentId: string) => {
+    setAppointments((prev) =>
+      prev.map((app) =>
+        app.id === appointmentId ? { ...app, status: "Cancelada" } : app
+      )
+    );
+  };
+
+  const handleRowClick = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setIsDetailsDialogOpen(true);
   };
 
   const getStatusBadgeVariant = (status: Appointment["status"]) => {
@@ -80,7 +103,7 @@ const Appointments = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Consultas</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <PlusCircle className="mr-2 h-4 w-4" /> Agendar Consulta
@@ -164,7 +187,7 @@ const Appointments = () => {
           <TableBody>
             {filteredAppointments.length > 0 ? (
               filteredAppointments.map((appointment) => (
-                <TableRow key={appointment.id}>
+                <TableRow key={appointment.id} onClick={() => handleRowClick(appointment)} className="cursor-pointer hover:bg-muted/50">
                   <TableCell className="font-medium">{appointment.pet}</TableCell>
                   <TableCell>{appointment.client}</TableCell>
                   <TableCell>{appointment.service}</TableCell>
@@ -191,6 +214,14 @@ const Appointments = () => {
           </TableBody>
         </Table>
       </div>
+
+      <AppointmentDetailsDialog
+        appointment={selectedAppointment}
+        isOpen={isDetailsDialogOpen}
+        onClose={() => setIsDetailsDialogOpen(false)}
+        onUpdate={handleUpdateAppointment}
+        onCancelAppointment={handleCancelAppointment}
+      />
     </div>
   );
 };

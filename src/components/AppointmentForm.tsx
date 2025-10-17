@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
+import { format, parseISO } from "date-fns"; // Importar parseISO
 import { CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -39,27 +39,30 @@ const formSchema = z.object({
   client: z.string().min(1, "O nome do cliente é obrigatório."),
   pet: z.string().min(1, "O nome do animal é obrigatório."),
   service: z.string().min(1, "O serviço é obrigatório."),
-  veterinarian: z.string().min(1, "O veterinário é obrigatório."), // Novo campo
+  veterinarian: z.string().min(1, "O veterinário é obrigatório."),
   status: z.enum(["Agendada", "Realizada", "Cancelada"], {
     required_error: "O status da consulta é obrigatório.",
   }),
 });
 
+export type AppointmentFormValues = z.infer<typeof formSchema>;
+
 interface AppointmentFormProps {
-  onSubmit: (data: z.infer<typeof formSchema>) => void;
+  onSubmit: (data: AppointmentFormValues) => void;
+  initialData?: Omit<AppointmentFormValues, "date"> & { date: string }; // Para edição, a data pode vir como string
 }
 
-const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData }) => {
+  const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      date: new Date(),
-      time: "",
-      client: "",
-      pet: "",
-      service: "",
-      veterinarian: "", // Valor padrão para o novo campo
-      status: "Agendada",
+      date: initialData?.date ? parseISO(initialData.date) : new Date(), // Converte string para Date
+      time: initialData?.time || "",
+      client: initialData?.client || "",
+      pet: initialData?.pet || "",
+      service: initialData?.service || "",
+      veterinarian: initialData?.veterinarian || "",
+      status: initialData?.status || "Agendada",
     },
   });
 
@@ -234,7 +237,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
           )}
         />
         <DialogFooter>
-          <Button type="submit">Agendar</Button>
+          <Button type="submit">{initialData ? "Salvar Alterações" : "Agendar"}</Button>
         </DialogFooter>
       </form>
     </Form>
