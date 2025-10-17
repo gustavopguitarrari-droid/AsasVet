@@ -22,16 +22,17 @@ interface Appointment {
   client: string;
   pet: string;
   service: string;
+  veterinarian: string; // Novo campo
   status: "Agendada" | "Realizada" | "Cancelada";
 }
 
 const mockAppointments: Appointment[] = [
-  { id: "C001", date: "2024-10-26", time: "10:00", client: "João Silva", pet: "Rex", service: "Consulta Geral", status: "Agendada" },
-  { id: "C002", date: "2024-10-26", time: "14:30", client: "Maria Souza", pet: "Miau", service: "Vacinação", status: "Realizada" },
-  { id: "C003", date: "2024-10-27", time: "09:00", client: "Pedro Santos", pet: "Pingo", service: "Exame de Rotina", status: "Cancelada" },
-  { id: "C004", date: "2024-10-28", time: "11:00", client: "Ana Costa", pet: "Bob", service: "Banho e Tosa", status: "Agendada" },
-  { id: "C005", date: "2024-10-29", time: "16:00", client: "Carlos Lima", pet: "Luna", service: "Consulta de Retorno", status: "Agendada" },
-  { id: "C006", date: "2024-10-25", time: "13:00", client: "Fernanda Reis", pet: "Thor", service: "Cirurgia", status: "Realizada" },
+  { id: "C001", date: "2024-10-26", time: "10:00", client: "João Silva", pet: "Rex", service: "Consulta Geral", veterinarian: "Dr. Ana Paula", status: "Agendada" },
+  { id: "C002", date: "2024-10-26", time: "14:30", client: "Maria Souza", pet: "Miau", service: "Vacinação", veterinarian: "Dr. Carlos Eduardo", status: "Realizada" },
+  { id: "C003", date: "2024-10-27", time: "09:00", client: "Pedro Santos", pet: "Pingo", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Cancelada" },
+  { id: "C004", date: "2024-10-28", time: "11:00", client: "Ana Costa", pet: "Bob", service: "Banho e Tosa", veterinarian: "Dr. Ana Paula", status: "Agendada" },
+  { id: "C005", date: "2024-10-29", time: "16:00", client: "Carlos Lima", pet: "Luna", service: "Consulta de Retorno", veterinarian: "Dr. Carlos Eduardo", status: "Agendada" },
+  { id: "C006", date: "2024-10-25", time: "13:00", client: "Fernanda Reis", pet: "Thor", service: "Cirurgia", veterinarian: "Dra. Beatriz Lima", status: "Realizada" },
 ];
 
 const Appointments = () => {
@@ -45,7 +46,8 @@ const Appointments = () => {
     const matchesSearch =
       appointment.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.pet.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.service.toLowerCase().includes(searchTerm.toLowerCase());
+      appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()); // Inclui veterinário na busca
     return matchesTab && matchesSearch;
   });
 
@@ -60,7 +62,7 @@ const Appointments = () => {
       case "Agendada":
         return "default"; // Azul padrão
       case "Realizada":
-        return "success"; // Verde
+        return "secondary"; // Cinza
       case "Cancelada":
         return "destructive"; // Vermelho
       default:
@@ -117,6 +119,7 @@ const Appointments = () => {
               <TableHead>Cliente</TableHead>
               <TableHead>Animal</TableHead>
               <TableHead>Serviço</TableHead>
+              <TableHead>Veterinário</TableHead> {/* Nova coluna */}
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -131,6 +134,7 @@ const Appointments = () => {
                   <TableCell>{appointment.client}</TableCell>
                   <TableCell>{appointment.pet}</TableCell>
                   <TableCell>{appointment.service}</TableCell>
+                  <TableCell>{appointment.veterinarian}</TableCell> {/* Exibe o veterinário */}
                   <TableCell>
                     <Badge variant={getStatusVariant(appointment.status)}>
                       {appointment.status}
@@ -145,7 +149,7 @@ const Appointments = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="h-24 text-center">
+                <TableCell colSpan={9} className="h-24 text-center">
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>

@@ -24,6 +24,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DialogFooter } from "@/components/ui/dialog";
 
+// Mock de veterinários para o select
+const mockVeterinarians = [
+  { id: "V001", name: "Dr. Ana Paula" },
+  { id: "V002", name: "Dr. Carlos Eduardo" },
+  { id: "V003", name: "Dra. Beatriz Lima" },
+];
+
 const formSchema = z.object({
   date: z.date({
     required_error: "A data da consulta é obrigatória.",
@@ -32,6 +39,7 @@ const formSchema = z.object({
   client: z.string().min(1, "O nome do cliente é obrigatório."),
   pet: z.string().min(1, "O nome do animal é obrigatório."),
   service: z.string().min(1, "O serviço é obrigatório."),
+  veterinarian: z.string().min(1, "O veterinário é obrigatório."), // Novo campo
   status: z.enum(["Agendada", "Realizada", "Cancelada"], {
     required_error: "O status da consulta é obrigatório.",
   }),
@@ -50,6 +58,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
       client: "",
       pet: "",
       service: "",
+      veterinarian: "", // Valor padrão para o novo campo
       status: "Agendada",
     },
   });
@@ -102,6 +111,30 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit }) => {
                   <SelectItem value="Banho e Tosa">Banho e Tosa</SelectItem>
                   <SelectItem value="Cirurgia">Cirurgia</SelectItem>
                   <SelectItem value="Consulta de Retorno">Consulta de Retorno</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="veterinarian"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Veterinário</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um veterinário" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {mockVeterinarians.map((vet) => (
+                    <SelectItem key={vet.id} value={vet.name}>
+                      {vet.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
