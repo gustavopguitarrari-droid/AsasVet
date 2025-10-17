@@ -1,8 +1,9 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, PawPrint, CalendarDays, Settings, DollarSign, Bed, Stethoscope, FileText } from "lucide-react"; // Importando novos ícones
+import { Users, PawPrint, CalendarDays, Settings, DollarSign, Bed, Stethoscope, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DashboardConfigurator from "@/components/DashboardConfigurator";
+import { cn } from "@/lib/utils"; // Importar cn para combinar classes
 
 interface DashboardItemConfig {
   id: string;
@@ -33,49 +34,53 @@ const Dashboard = () => {
   };
 
   const getCardComponent = (item: DashboardItemConfig) => {
+    const baseCardClasses = "text-white shadow-lg"; // Classes base para todos os cards coloridos
+    const iconClasses = "h-4 w-4 text-white"; // Classes para os ícones
+    const textMutedClasses = "text-white/80"; // Texto secundário mais claro
+
     switch (item.id) {
       case "totalClients":
         return (
-          <Card key={item.id}>
+          <Card key={item.id} className={cn("bg-sidebar-item-bg-1", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Clientes</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Users className={iconClasses} />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">2,350</div>
-              <p className="text-xs text-muted-foreground">+20.1% do mês passado</p>
+              <p className={textMutedClasses}>+20.1% do mês passado</p>
             </CardContent>
           </Card>
         );
       case "totalPets":
         return (
-          <Card key={item.id}>
+          <Card key={item.id} className={cn("bg-sidebar-item-bg-2", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Animais</CardTitle>
-              <PawPrint className="h-4 w-4 text-muted-foreground" />
+              <PawPrint className={iconClasses} />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">3,120</div>
-              <p className="text-xs text-muted-foreground">+18.5% do mês passado</p>
+              <p className={textMutedClasses}>+18.5% do mês passado</p>
             </CardContent>
           </Card>
         );
       case "scheduledAppointments":
         return (
-          <Card key={item.id}>
+          <Card key={item.id} className={cn("bg-sidebar-item-bg-3", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Consultas Agendadas</CardTitle>
-              <CalendarDays className="h-4 w-4 text-muted-foreground" />
+              <CalendarDays className={iconClasses} />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">150</div>
-              <p className="text-xs text-muted-foreground">+5% do dia anterior</p>
+              <p className={textMutedClasses}>+5% do dia anterior</p>
             </CardContent>
           </Card>
         );
       case "recentActivity":
         return (
-          <Card key={item.id}>
+          <Card key={item.id} className="bg-card text-foreground shadow-lg"> {/* Card neutro */}
             <CardHeader>
               <CardTitle>Atividade Recente</CardTitle>
             </CardHeader>
@@ -86,66 +91,66 @@ const Dashboard = () => {
         );
       case "financialSummary":
         return (
-          <Card key={item.id}>
+          <Card key={item.id} className={cn("bg-sidebar-item-bg-6", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Resumo Financeiro</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <DollarSign className={iconClasses} />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">R$ 12.500,00</div>
-              <p className="text-xs text-muted-foreground">Receita do mês</p>
+              <p className={textMutedClasses}>Receita do mês</p>
             </CardContent>
           </Card>
         );
       case "cashFlow":
         return (
-          <Card key={item.id}>
+          <Card key={item.id} className={cn("bg-sidebar-item-bg-7", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Fluxo de Caixa</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <DollarSign className={iconClasses} />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">R$ 5.230,00</div>
-              <p className="text-xs text-muted-foreground">Saldo atual</p>
+              <p className={textMutedClasses}>Saldo atual</p>
             </CardContent>
           </Card>
         );
       case "internmentStatus":
         return (
-          <Card key={item.id}>
+          <Card key={item.id} className={cn("bg-sidebar-item-bg-8", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Status de Internação</CardTitle>
-              <Bed className="h-4 w-4 text-muted-foreground" />
+              <Bed className={iconClasses} />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">3 Animais</div>
-              <p className="text-xs text-muted-foreground">Atualmente internados</p>
+              <p className={textMutedClasses}>Atualmente internados</p>
             </CardContent>
           </Card>
         );
       case "veterinariansOnDuty":
         return (
-          <Card key={item.id}>
+          <Card key={item.id} className={cn("bg-sidebar-item-bg-9", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Veterinários de Plantão</CardTitle>
-              <Stethoscope className="h-4 w-4 text-muted-foreground" />
+              <Stethoscope className={iconClasses} />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">2 Veterinários</div>
-              <p className="text-xs text-muted-foreground">Disponíveis hoje</p>
+              <p className={textMutedClasses}>Disponíveis hoje</p>
             </CardContent>
           </Card>
         );
       case "medicalRecordsSummary":
         return (
-          <Card key={item.id}>
+          <Card key={item.id} className={cn("bg-sidebar-item-bg-5", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Resumo de Prontuários</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
+              <FileText className={iconClasses} />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">50 Prontuários</div>
-              <p className="text-xs text-muted-foreground">Atualizados esta semana</p>
+              <p className={textMutedClasses}>Atualizados esta semana</p>
             </CardContent>
           </Card>
         );
