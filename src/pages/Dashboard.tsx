@@ -40,6 +40,12 @@ const Dashboard = () => {
     initialDashboardConfig
   );
 
+  // Dados de usuário mock para demonstração
+  const currentUser = {
+    name: "João", // Nome do usuário
+    gender: "masculino", // ou "feminino"
+  };
+
   React.useEffect(() => {
     // Carregar configuração do localStorage ao montar o componente
     const savedConfig = localStorage.getItem("dashboardConfig");
@@ -55,9 +61,9 @@ const Dashboard = () => {
   };
 
   const getCardComponent = (item: DashboardItemConfig) => {
-    const baseCardClasses = "text-white shadow-md"; // Alterado para shadow-md
-    const iconClasses = "h-4 w-4 text-white"; // Classes para os ícones
-    const textMutedClasses = "text-white/80"; // Texto secundário mais claro
+    const baseCardClasses = "text-white shadow-md";
+    const iconClasses = "h-4 w-4 text-white";
+    const textMutedClasses = "text-white/80";
 
     switch (item.id) {
       case "totalClients":
@@ -101,7 +107,7 @@ const Dashboard = () => {
         );
       case "recentActivity":
         return (
-          <Card key={item.id} className="bg-muted text-foreground shadow-md"> {/* Alterado para shadow-md */}
+          <Card key={item.id} className="bg-muted text-foreground shadow-md">
             <CardHeader>
               <CardTitle>Atividade Recente</CardTitle>
             </CardHeader>
@@ -189,11 +195,16 @@ const Dashboard = () => {
     }
   };
 
+  const getGreeting = () => {
+    const prefix = currentUser.gender === "feminino" ? "Dra." : "Dr.";
+    return `Bem-vindo(a) ${prefix} ${currentUser.name}!`;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold">Bem-vindo ao Simples Vet!</h2>
+          <h2 className="text-3xl font-bold">{getGreeting()}</h2>
           <p className="text-muted-foreground">
             Visão geral do seu consultório veterinário.
           </p>
