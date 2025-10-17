@@ -57,6 +57,14 @@
     --sidebar-item-bg-7: 50 90% 60%;  /* Amarelo */
     --sidebar-item-bg-8: 270 70% 60%; /* Roxo */
     --sidebar-item-bg-9: 40 40% 50%;  /* Marrom */
+
+    /* Cores para eventos do calendário (modo claro) */
+    --event-color-consulta: 220 80% 60%; /* Azul */
+    --event-color-cirurgia: 0 84.2% 60.2%; /* Vermelho (destructive) */
+    --event-color-vacina: 140 70% 60%; /* Verde */
+    --event-color-exame: 30 90% 60%; /* Laranja */
+    --event-color-retorno: 270 70% 60%; /* Roxo */
+    --event-color-outros: 40 40% 50%; /* Marrom */
   }
 
   .dark {
@@ -114,6 +122,14 @@
 
     /* Cor verde para o badge de sucesso no modo escuro */
     --green-500: 142.1 76.2% 36.3%; /* Usando HSL para consistência */
+
+    /* Cores para eventos do calendário (modo escuro) */
+    --event-color-consulta: 220 80% 70%; /* Azul */
+    --event-color-cirurgia: 0 62.8% 30.6%; /* Vermelho (destructive) */
+    --event-color-vacina: 140 70% 70%; /* Verde */
+    --event-color-exame: 30 90% 70%; /* Laranja */
+    --event-color-retorno: 270 70% 70%; /* Roxo */
+    --event-color-outros: 40 40% 60%; /* Marrom */
   }
 }
 
@@ -121,6 +137,15 @@
 .sidebar-gradient-bg {
   background: linear-gradient(to bottom right, hsl(var(--sidebar-gradient-start)), hsl(var(--sidebar-gradient-end)));
 }
+
+/* Classes Tailwind para cores de eventos */
+.bg-event-consulta { background-color: hsl(var(--event-color-consulta)); }
+.bg-event-cirurgia { background-color: hsl(var(--event-color-cirurgia)); }
+.bg-event-vacina { background-color: hsl(var(--event-color-vacina)); }
+.bg-event-exame { background-color: hsl(var(--event-color-exame)); }
+.bg-event-retorno { background-color: hsl(var(--event-color-retorno)); }
+.bg-event-outros { background-color: hsl(var(--event-color-outros)); }
+
 
 @layer base {
   * {
