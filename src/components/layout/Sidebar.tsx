@@ -34,7 +34,7 @@ const navItems = [
     name: "Consultas",
     icon: CalendarDays,
     path: "/appointments",
-    activeBgClass: "bg-sidebar-item-bg-4",
+    activeBgClass: "bg-sidebar-item-bg-1", // Alterado para bg-sidebar-item-bg-1 (azul)
   },
   {
     name: "Internação",
