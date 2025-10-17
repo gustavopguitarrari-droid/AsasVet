@@ -7,7 +7,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  ReferenceLine, // Importar ReferenceLine
+  ReferenceLine,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useTheme } from "next-themes";
@@ -25,7 +25,6 @@ const AppointmentsWeeklyChart: React.FC = () => {
   const axisLabelColor = theme === "dark" ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))";
   const gridLineColor = "hsl(var(--border))";
 
-  // Calcular a média de consultas
   const totalConsultas = data.reduce((sum, entry) => sum + entry.consultas, 0);
   const averageConsultas = totalConsultas / data.length;
 
@@ -42,10 +41,9 @@ const AppointmentsWeeklyChart: React.FC = () => {
             <YAxis stroke={axisLabelColor} />
             <Tooltip />
             <Line type="monotone" dataKey="consultas" stroke="hsl(var(--sidebar-item-bg-4))" activeDot={{ r: 8 }} />
-            {/* Adicionar a linha de referência para a média */}
             <ReferenceLine
               y={averageConsultas}
-              stroke="hsl(var(--destructive))" // Cor vermelha para destaque
+              stroke="hsl(var(--accent))" // Cor alterada para accent
               strokeDasharray="3 3"
             />
           </LineChart>
