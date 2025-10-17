@@ -66,7 +66,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-lg"> {/* Alterado de sm:max-w-[425px] para sm:max-w-lg */}
         <DialogHeader>
           <DialogTitle>Configurar Painel</DialogTitle>
           <DialogDescription>
