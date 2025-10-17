@@ -5,6 +5,12 @@ import { Button } from "@/components/ui/button";
 import DashboardConfigurator from "@/components/DashboardConfigurator";
 import { cn } from "@/lib/utils"; // Importar cn para combinar classes
 
+// Importar os novos componentes de gráfico
+import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
+import AppointmentsWeeklyChart from "@/components/charts/AppointmentsWeeklyChart";
+import RevenueMonthlyChart from "@/components/charts/RevenueMonthlyChart";
+import PetsBySpeciesChart from "@/components/charts/PetsBySpeciesChart";
+
 interface DashboardItemConfig {
   id: string;
   name: string;
@@ -21,6 +27,11 @@ const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "internmentStatus", name: "Status de Internação", isVisible: true },
   { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true },
   { id: "medicalRecordsSummary", name: "Resumo de Prontuários", isVisible: true },
+  // Novos itens de gráfico
+  { id: "appointmentsMonthlyChart", name: "Consultas por Mês (Gráfico)", isVisible: true },
+  { id: "appointmentsWeeklyChart", name: "Consultas por Semana (Gráfico)", isVisible: true },
+  { id: "revenueMonthlyChart", name: "Receita por Mês (Gráfico)", isVisible: true },
+  { id: "petsBySpeciesChart", name: "Animais por Espécie (Gráfico)", isVisible: true },
 ];
 
 const Dashboard = () => {
@@ -154,6 +165,15 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         );
+      // Novos casos para os gráficos
+      case "appointmentsMonthlyChart":
+        return <AppointmentsMonthlyChart key={item.id} />;
+      case "appointmentsWeeklyChart":
+        return <AppointmentsWeeklyChart key={item.id} />;
+      case "revenueMonthlyChart":
+        return <RevenueMonthlyChart key={item.id} />;
+      case "petsBySpeciesChart":
+        return <PetsBySpeciesChart key={item.id} />;
       default:
         return null;
     }
