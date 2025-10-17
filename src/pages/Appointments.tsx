@@ -181,7 +181,7 @@ const Appointments = () => {
               <TableHead>Serviço</TableHead>
               <TableHead>Veterinário</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
+              {/* <TableHead className="text-right">Ações</TableHead> */} {/* Removido */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -197,16 +197,16 @@ const Appointments = () => {
                       {appointment.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      Ver Detalhes
-                    </Button>
-                  </TableCell>
+                  {/* <TableCell className="text-right"> */} {/* Removido */}
+                  {/*   <Button variant="ghost" size="sm"> */}
+                  {/*     Ver Detalhes */}
+                  {/*   </Button> */}
+                  {/* </TableCell> */} {/* Removido */}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center"> {/* colSpan ajustado de 6 para 5 */}
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
