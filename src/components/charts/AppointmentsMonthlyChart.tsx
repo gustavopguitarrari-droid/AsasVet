@@ -32,7 +32,7 @@ const AppointmentsMonthlyChart: React.FC = () => {
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="consultas" fill="hsl(var(--primary))" />
+            <Bar dataKey="consultas" fill="hsl(var(--sidebar-item-bg-1))" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>
