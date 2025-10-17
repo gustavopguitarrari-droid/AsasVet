@@ -6,8 +6,6 @@ import {
 import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { MadeWithDyad } from "@/components/made-with-dyad";
-import { Button } from "@/components/ui/button";
-import { ArrowLeftToLine, ArrowRightToLine } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LayoutProps {
@@ -38,19 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           className="transition-all duration-300 ease-in-out relative"
         >
           <Sidebar isCollapsed={isSidebarCollapsed} onToggleCollapse={toggleSidebar} />
-          <Button
-            variant="default"
-            size="icon"
-            onClick={toggleSidebar}
-            className={cn(
-              "absolute top-1/2 -translate-y-1/2 rounded-full z-20",
-              "right-2",
-              "bg-indigo-500 text-white hover:bg-indigo-600",
-              "border border-border shadow-md"
-            )}
-          >
-            {isSidebarCollapsed ? <ArrowRightToLine className="h-4 w-4" /> : <ArrowLeftToLine className="h-4 w-4" />}
-          </Button>
+          {/* O botão de recolher/expandir foi movido para o Sidebar.tsx */}
         </ResizablePanel>
         <ResizablePanel defaultSize={100 - sidebarSize}>
           <div className="flex h-full flex-col">

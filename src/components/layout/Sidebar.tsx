@@ -9,6 +9,8 @@ import {
   DollarSign,
   Bed,
   UserCog,
+  ArrowLeftToLine, // Importar ícones para o botão
+  ArrowRightToLine, // Importar ícones para o botão
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -84,11 +86,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
     <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
       <div
         className={cn(
-          "mb-6 flex items-center justify-center text-4xl font-bold text-white", // Alterado para text-white
+          "mb-6 flex items-center justify-center text-4xl font-bold text-white",
         )}
       >
         {!isCollapsed && "AsasVet"}{" "}
-        <PawPrint className={cn("h-9 w-9 text-white", !isCollapsed && "ml-2")} strokeWidth={2.5} /> {/* Alterado para text-white */}
+        <PawPrint className={cn("h-9 w-9 text-white", !isCollapsed && "ml-2")} strokeWidth={2.5} />
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
@@ -98,15 +100,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                 asChild
                 variant="ghost"
                 className={cn(
-                  "text-sidebar-foreground", // Cor do texto padrão
-                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", // Estado de hover para o botão
+                  "text-sidebar-foreground",
+                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   isCollapsed
-                    ? "h-10 w-10 rounded-full flex items-center justify-center" // Estilo do botão quando recolhido
-                    : "w-full justify-start text-xl", // Estilo do botão quando expandido
-                  // Quando recolhido, sempre aplica a cor de fundo do item e a cor de texto primária
+                    ? "h-10 w-10 rounded-full flex items-center justify-center"
+                    : "w-full justify-start text-xl",
                   isCollapsed && item.activeBgClass,
                   isCollapsed && "text-sidebar-primary-foreground",
-                  // Quando expandido e ativo, aplica a cor de texto primária
                   !isCollapsed && location.pathname === item.path && "text-sidebar-primary-foreground"
                 )}
               >
@@ -114,8 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                   <div
                     className={cn(
                       "flex items-center justify-center",
-                      !isCollapsed && "w-10 h-10 rounded-full mr-3", // Tamanho e forma do div interno quando expandido
-                      // Quando expandido, sempre aplica a cor de fundo específica
+                      !isCollapsed && "w-10 h-10 rounded-full mr-3",
                       !isCollapsed && item.activeBgClass
                     )}
                   >
@@ -134,8 +133,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         ))}
       </nav>
 
-      <div className={cn("mt-auto pt-4", isCollapsed ? "flex justify-center" : "flex justify-start")}>
+      <div className={cn("mt-auto pt-4 flex", isCollapsed ? "justify-center" : "justify-between")}>
         <ThemeToggle isCollapsed={isCollapsed} />
+        <Button
+          variant="default"
+          size="icon"
+          onClick={onToggleCollapse}
+          className={cn(
+            "rounded-full",
+            "bg-indigo-500 text-white hover:bg-indigo-600",
+            "border border-border shadow-md",
+            isCollapsed && "hidden" // Esconde o botão quando o sidebar está recolhido
+          )}
+        >
+          {isCollapsed ? <ArrowRightToLine className="h-4 w-4" /> : <ArrowLeftToLine className="h-4 w-4" />}
+        </Button>
       </div>
     </div>
   );
