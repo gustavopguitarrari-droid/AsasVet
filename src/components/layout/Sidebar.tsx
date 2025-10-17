@@ -12,7 +12,6 @@ import {
   ArrowLeftToLine, // Importar ícones para o botão
   ArrowRightToLine, // Importar ícones para o botão
   ReceiptText, // Novo ícone para Caixa
-  FirstAid, // Novo ícone para Internação
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -63,13 +62,13 @@ const navItems = [
   },
   {
     name: "Caixa",
-    icon: ReceiptText,
+    icon: ReceiptText, // Ícone atualizado para ReceiptText
     path: "/caixa",
     activeBgClass: "bg-sidebar-item-bg-7",
   },
   {
     name: "Internação",
-    icon: FirstAid, // Ícone atualizado para FirstAid
+    icon: Bed,
     path: "/internacao",
     activeBgClass: "bg-sidebar-item-bg-8",
   },
