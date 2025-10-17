@@ -153,11 +153,8 @@ const Appointments = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Data</TableHead>
-              <TableHead>Hora</TableHead>
-              <TableHead>Cliente</TableHead>
-              <TableHead>Animal</TableHead>
+              <TableHead>Paciente</TableHead>
+              <TableHead>Tutor</TableHead>
               <TableHead>Serviço</TableHead>
               <TableHead>Veterinário</TableHead>
               <TableHead>Status</TableHead>
@@ -168,11 +165,8 @@ const Appointments = () => {
             {filteredAppointments.length > 0 ? (
               filteredAppointments.map((appointment) => (
                 <TableRow key={appointment.id}>
-                  <TableCell className="font-medium">{appointment.id}</TableCell>
-                  <TableCell>{appointment.date}</TableCell>
-                  <TableCell>{appointment.time}</TableCell>
+                  <TableCell className="font-medium">{appointment.pet}</TableCell>
                   <TableCell>{appointment.client}</TableCell>
-                  <TableCell>{appointment.pet}</TableCell>
                   <TableCell>{appointment.service}</TableCell>
                   <TableCell>{appointment.veterinarian}</TableCell>
                   <TableCell>
@@ -189,7 +183,7 @@ const Appointments = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={9} className="h-24 text-center">
+                <TableCell colSpan={6} className="h-24 text-center">
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
