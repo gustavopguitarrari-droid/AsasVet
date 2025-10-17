@@ -10,13 +10,21 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { ChevronUp, ChevronDown } from "lucide-react"; // Importando os ícones de seta
+import { ChevronUp, ChevronDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"; // Importar componentes de Select
 
 interface DashboardItemConfig {
   id: string;
   name: string;
   isVisible: boolean;
+  category: "overview" | "financial" | "animalHealth"; // Adicionar categoria
 }
 
 interface DashboardConfiguratorProps {
@@ -46,6 +54,14 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     );
   };
 
+  const handleCategoryChange = (id: string, newCategory: "overview" | "financial" | "animalHealth") => {
+    setTempConfig((prevConfig) =>
+      prevConfig.map((item) =>
+        item.id === id ? { ...item, category: newCategory } : item
+      )
+    );
+  };
+
   const moveItem = (index: number, direction: "up" | "down") => {
     setTempConfig((prevConfig) => {
       const newConfig = Array.from(prevConfig);
@@ -66,11 +82,11 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-2xl"> {/* Aumentar largura para acomodar o select */}
         <DialogHeader>
           <DialogTitle>Configurar Painel</DialogTitle>
           <DialogDescription>
-            Selecione quais cards você deseja ver no painel e use as setas para reordenar.
+            Selecione quais cards você deseja ver no painel, a qual aba pertencem e use as setas para reordenar.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4 max-h-[400px] overflow-y-auto">
@@ -81,8 +97,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                 "flex items-center justify-between space-x-2 p-2 rounded-md border"
               )}
             >
-              <div className="flex items-center space-x-2">
-                {/* Botões de seta movidos para a esquerda */}
+              <div className="flex items-center space-x-2 flex-1">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -101,9 +116,24 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                 >
                   <ChevronDown className="h-4 w-4" />
                 </Button>
-                <Label htmlFor={`item-${item.id}`} className="text-base flex-1">
+                <Label htmlFor={`item-${item.id}`} className="text-base flex-1 min-w-[120px]">
                   {item.name}
                 </Label>
+                <Select
+                  value={item.category}
+                  onValueChange={(value: "overview" | "financial" | "animalHealth") =>
+                    handleCategoryChange(item.id, value)
+                  }
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Selecionar Categoria" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="overview">Visão Geral</SelectItem>
+                    <SelectItem value="financial">Financeiro</SelectItem>
+                    <SelectItem value="animalHealth">Saúde Animal</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <Switch
                 id={`item-${item.id}`}
