@@ -1,8 +1,8 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, PawPrint, CalendarDays, Settings } from "lucide-react"; // Importando Settings
+import { Users, PawPrint, CalendarDays, Settings, DollarSign, Bed, Stethoscope, FileText } from "lucide-react"; // Importando novos ícones
 import { Button } from "@/components/ui/button";
-import DashboardConfigurator from "@/components/DashboardConfigurator"; // Importando o novo componente
+import DashboardConfigurator from "@/components/DashboardConfigurator";
 
 interface DashboardItemConfig {
   id: string;
@@ -15,6 +15,11 @@ const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "totalPets", name: "Total de Animais", isVisible: true },
   { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true },
   { id: "recentActivity", name: "Atividade Recente", isVisible: true },
+  { id: "financialSummary", name: "Resumo Financeiro", isVisible: true },
+  { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true },
+  { id: "internmentStatus", name: "Status de Internação", isVisible: true },
+  { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true },
+  { id: "medicalRecordsSummary", name: "Resumo de Prontuários", isVisible: true },
 ];
 
 const Dashboard = () => {
@@ -76,6 +81,71 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">Nenhuma atividade recente para mostrar.</p>
+            </CardContent>
+          </Card>
+        );
+      case "financialSummary":
+        return (
+          <Card key={item.id}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Resumo Financeiro</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">R$ 12.500,00</div>
+              <p className="text-xs text-muted-foreground">Receita do mês</p>
+            </CardContent>
+          </Card>
+        );
+      case "cashFlow":
+        return (
+          <Card key={item.id}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Fluxo de Caixa</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">R$ 5.230,00</div>
+              <p className="text-xs text-muted-foreground">Saldo atual</p>
+            </CardContent>
+          </Card>
+        );
+      case "internmentStatus":
+        return (
+          <Card key={item.id}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Status de Internação</CardTitle>
+              <Bed className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">3 Animais</div>
+              <p className="text-xs text-muted-foreground">Atualmente internados</p>
+            </CardContent>
+          </Card>
+        );
+      case "veterinariansOnDuty":
+        return (
+          <Card key={item.id}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Veterinários de Plantão</CardTitle>
+              <Stethoscope className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">2 Veterinários</div>
+              <p className="text-xs text-muted-foreground">Disponíveis hoje</p>
+            </CardContent>
+          </Card>
+        );
+      case "medicalRecordsSummary":
+        return (
+          <Card key={item.id}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Resumo de Prontuários</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">50 Prontuários</div>
+              <p className="text-xs text-muted-foreground">Atualizados esta semana</p>
             </CardContent>
           </Card>
         );
