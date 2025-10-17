@@ -42,7 +42,7 @@ const Dashboard = () => {
   const [dashboardConfig, setDashboardConfig] = React.useState<DashboardItemConfig[]>(
     initialDashboardConfig
   );
-  const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "animalHealth" | "recentActivity">("overview"); // Adicionar nova aba ao estado
+  const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "animalHealth" | "recentActivity">("recentActivity"); // Definir a primeira aba como 'Atividade Recente'
 
   const { user } = useUser();
 
@@ -220,10 +220,10 @@ const Dashboard = () => {
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "animalHealth" | "recentActivity")} className="w-full">
         <TabsList className="grid w-full grid-cols-4"> {/* Aumentar para 4 colunas */}
-          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-          <TabsTrigger value="financial">Financeiro</TabsTrigger>
-          <TabsTrigger value="animalHealth">Saúde Animal</TabsTrigger>
-          <TabsTrigger value="recentActivity">Atividade Recente</TabsTrigger> {/* Nova aba */}
+          <TabsTrigger value="recentActivity">Atividade Recente</TabsTrigger> {/* Nova ordem */}
+          <TabsTrigger value="animalHealth">Saúde Animal</TabsTrigger> {/* Nova ordem */}
+          <TabsTrigger value="overview">Visão Geral</TabsTrigger> {/* Nova ordem */}
+          <TabsTrigger value="financial">Financeiro</TabsTrigger> {/* Nova ordem */}
         </TabsList>
         <TabsContent value="overview" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
