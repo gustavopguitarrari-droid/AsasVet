@@ -7,7 +7,7 @@ import {
   CalendarDays,
   FileText,
   DollarSign,
-  Plus, // Ícone alterado de Hospital para Plus (cruz simples)
+  Plus,
   UserCog,
   ArrowLeftToLine,
   ArrowRightToLine,
@@ -58,7 +58,7 @@ const navItems = [
     name: "Financeiro",
     icon: DollarSign,
     path: "/financeiro",
-    activeBgClass: "bg-sidebar-item-bg-6",
+    activeBgClass: "bg-sidebar-item-bg-2", // Alterado para bg-sidebar-item-bg-2 (verde)
   },
   {
     name: "Caixa",
@@ -68,7 +68,7 @@ const navItems = [
   },
   {
     name: "Internação",
-    icon: Plus, // Ícone alterado para Plus
+    icon: Plus,
     path: "/internacao",
     activeBgClass: "bg-sidebar-item-bg-8",
   },
