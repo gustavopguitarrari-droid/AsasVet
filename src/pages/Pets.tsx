@@ -58,6 +58,12 @@ const Pets = () => {
     return matchesSpecies && matchesSearch;
   });
 
+  const handleRowClick = (pet: Pet) => {
+    console.log("Ver detalhes do animal:", pet);
+    // Aqui você pode adicionar a lógica para navegar para uma página de detalhes
+    // ou abrir um modal com as informações do animal.
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -86,39 +92,33 @@ const Pets = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Nome</TableHead>
-              <TableHead>Espécie</TableHead> {/* Cabeçalho da coluna */}
+              <TableHead>Espécie</TableHead>
               <TableHead>Raça</TableHead>
               <TableHead>Dono</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
+              <TableHead>ID</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredPets.length > 0 ? (
               filteredPets.map((pet) => {
-                const IconComponent = speciesIconMap[pet.species] || MoreHorizontal; // Pega o ícone ou um padrão
+                const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
                 return (
-                  <TableRow key={pet.id}>
-                    <TableCell className="font-medium">{pet.id}</TableCell>
-                    <TableCell>{pet.name}</TableCell>
+                  <TableRow key={pet.id} onClick={() => handleRowClick(pet)} className="cursor-pointer hover:bg-muted/50">
+                    <TableCell className="font-bold">{pet.name}</TableCell>
                     <TableCell className="flex items-center">
-                      <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" /> {/* Renderiza o ícone */}
+                      <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
                       {pet.species}
                     </TableCell>
                     <TableCell>{pet.breed}</TableCell>
                     <TableCell>{pet.owner}</TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">
-                        Ver Detalhes
-                      </Button>
-                    </TableCell>
+                    <TableCell>{pet.id}</TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={5} className="h-24 text-center">
                   Nenhum animal encontrado para a espécie selecionada.
                 </TableCell>
               </TableRow>
