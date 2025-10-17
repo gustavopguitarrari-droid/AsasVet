@@ -9,8 +9,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react"; // Importa os ícones
-import SpeciesFilter from "@/components/SpeciesFilter"; // Importa o novo componente de filtro
+import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
+import SpeciesFilter from "@/components/SpeciesFilter";
+import PetDetailsDialog from "@/components/PetDetailsDialog"; // Importa o novo componente de diálogo
 
 interface Pet {
   id: string;
@@ -44,6 +45,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
 const Pets = () => {
   const [selectedSpecies, setSelectedSpecies] = React.useState<string>("all");
   const [searchTerm, setSearchTerm] = React.useState<string>("");
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState<boolean>(false);
+  const [selectedPet, setSelectedPet] = React.useState<Pet | null>(null);
 
   const handleSelectSpecies = (species: string) => {
     setSelectedSpecies(species);
@@ -59,9 +62,8 @@ const Pets = () => {
   });
 
   const handleRowClick = (pet: Pet) => {
-    console.log("Ver detalhes do animal:", pet);
-    // Aqui você pode adicionar a lógica para navegar para uma página de detalhes
-    // ou abrir um modal com as informações do animal.
+    setSelectedPet(pet);
+    setIsDetailsDialogOpen(true);
   };
 
   return (
@@ -126,6 +128,12 @@ const Pets = () => {
           </TableBody>
         </Table>
       </div>
+
+      <PetDetailsDialog
+        pet={selectedPet}
+        isOpen={isDetailsDialogOpen}
+        onClose={() => setIsDetailsDialogOpen(false)}
+      />
     </div>
   );
 };
