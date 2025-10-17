@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search } from "lucide-react";
+import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react"; // Importa os ícones
 import SpeciesFilter from "@/components/SpeciesFilter"; // Importa o novo componente de filtro
 
 interface Pet {
@@ -30,6 +30,16 @@ const mockPets: Pet[] = [
   { id: "A007", name: "Nemo", species: "Peixe", breed: "Peixe-palhaço", owner: "Lucas Mendes" },
   { id: "A008", name: "Bolt", species: "Cachorro", breed: "Golden Retriever", owner: "Mariana Santos" },
 ];
+
+// Mapeamento de espécies para ícones
+const speciesIconMap: { [key: string]: React.ElementType } = {
+  Cachorro: Dog,
+  Gato: Cat,
+  Pássaro: Bird,
+  Roedor: Rabbit,
+  Peixe: Fish,
+  Outros: MoreHorizontal,
+};
 
 const Pets = () => {
   const [selectedSpecies, setSelectedSpecies] = React.useState<string>("all");
@@ -78,7 +88,7 @@ const Pets = () => {
             <TableRow>
               <TableHead>ID</TableHead>
               <TableHead>Nome</TableHead>
-              <TableHead>Espécie</TableHead>
+              <TableHead>Espécie</TableHead> {/* Cabeçalho da coluna */}
               <TableHead>Raça</TableHead>
               <TableHead>Dono</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -86,20 +96,26 @@ const Pets = () => {
           </TableHeader>
           <TableBody>
             {filteredPets.length > 0 ? (
-              filteredPets.map((pet) => (
-                <TableRow key={pet.id}>
-                  <TableCell className="font-medium">{pet.id}</TableCell>
-                  <TableCell>{pet.name}</TableCell>
-                  <TableCell>{pet.species}</TableCell>
-                  <TableCell>{pet.breed}</TableCell>
-                  <TableCell>{pet.owner}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      Ver Detalhes
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
+              filteredPets.map((pet) => {
+                const IconComponent = speciesIconMap[pet.species] || MoreHorizontal; // Pega o ícone ou um padrão
+                return (
+                  <TableRow key={pet.id}>
+                    <TableCell className="font-medium">{pet.id}</TableCell>
+                    <TableCell>{pet.name}</TableCell>
+                    <TableCell className="flex items-center">
+                      <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" /> {/* Renderiza o ícone */}
+                      {pet.species}
+                    </TableCell>
+                    <TableCell>{pet.breed}</TableCell>
+                    <TableCell>{pet.owner}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="sm">
+                        Ver Detalhes
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
                 <TableCell colSpan={6} className="h-24 text-center">
