@@ -11,7 +11,7 @@ import {
   UserCog,
   ArrowLeftToLine, // Importar ícones para o botão
   ArrowRightToLine, // Importar ícones para o botão
-  CashRegister, // Novo ícone para Caixa
+  ReceiptText, // Novo ícone para Caixa
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -62,7 +62,7 @@ const navItems = [
   },
   {
     name: "Caixa",
-    icon: CashRegister, // Ícone atualizado para CashRegister
+    icon: ReceiptText, // Ícone atualizado para ReceiptText
     path: "/caixa",
     activeBgClass: "bg-sidebar-item-bg-7",
   },
