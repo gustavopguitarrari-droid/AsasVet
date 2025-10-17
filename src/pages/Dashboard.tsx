@@ -17,14 +17,14 @@ interface DashboardItemConfig {
   id: string;
   name: string;
   isVisible: boolean;
-  category: "overview" | "financial" | "animalHealth"; // Adicionar categoria
+  category: "overview" | "financial" | "animalHealth" | "recentActivity"; // Adicionar nova categoria
 }
 
 const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "totalClients", name: "Total de Clientes", isVisible: true, category: "overview" },
   { id: "totalPets", name: "Total de Animais", isVisible: true, category: "overview" },
   { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview" },
-  { id: "recentActivity", name: "Atividade Recente", isVisible: true, category: "overview" },
+  { id: "recentActivity", name: "Atividade Recente", isVisible: true, category: "recentActivity" }, // Mover para nova categoria
   { id: "financialSummary", name: "Resumo Financeiro", isVisible: true, category: "financial" },
   { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial" },
   { id: "internmentStatus", name: "Status de Internação", isVisible: true, category: "animalHealth" },
@@ -42,7 +42,7 @@ const Dashboard = () => {
   const [dashboardConfig, setDashboardConfig] = React.useState<DashboardItemConfig[]>(
     initialDashboardConfig
   );
-  const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "animalHealth">("overview"); // Estado para a aba ativa
+  const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "animalHealth" | "recentActivity">("overview"); // Adicionar nova aba ao estado
 
   const { user } = useUser();
 
@@ -218,11 +218,12 @@ const Dashboard = () => {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "animalHealth")} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "animalHealth" | "recentActivity")} className="w-full">
+        <TabsList className="grid w-full grid-cols-4"> {/* Aumentar para 4 colunas */}
           <TabsTrigger value="overview">Visão Geral</TabsTrigger>
           <TabsTrigger value="financial">Financeiro</TabsTrigger>
           <TabsTrigger value="animalHealth">Saúde Animal</TabsTrigger>
+          <TabsTrigger value="recentActivity">Atividade Recente</TabsTrigger> {/* Nova aba */}
         </TabsList>
         <TabsContent value="overview" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -242,6 +243,13 @@ const Dashboard = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "animalHealth")
+              .map(item => getCardComponent(item))}
+          </div>
+        </TabsContent>
+        <TabsContent value="recentActivity" className="mt-4"> {/* Conteúdo para a nova aba */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {dashboardConfig
+              .filter(item => item.isVisible && item.category === "recentActivity")
               .map(item => getCardComponent(item))}
           </div>
         </TabsContent>

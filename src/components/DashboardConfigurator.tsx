@@ -24,7 +24,7 @@ interface DashboardItemConfig {
   id: string;
   name: string;
   isVisible: boolean;
-  category: "overview" | "financial" | "animalHealth"; // Adicionar categoria
+  category: "overview" | "financial" | "animalHealth" | "recentActivity"; // Adicionar nova categoria
 }
 
 interface DashboardConfiguratorProps {
@@ -54,7 +54,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     );
   };
 
-  const handleCategoryChange = (id: string, newCategory: "overview" | "financial" | "animalHealth") => {
+  const handleCategoryChange = (id: string, newCategory: "overview" | "financial" | "animalHealth" | "recentActivity") => {
     setTempConfig((prevConfig) =>
       prevConfig.map((item) =>
         item.id === id ? { ...item, category: newCategory } : item
@@ -121,7 +121,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                 </Label>
                 <Select
                   value={item.category}
-                  onValueChange={(value: "overview" | "financial" | "animalHealth") =>
+                  onValueChange={(value: "overview" | "financial" | "animalHealth" | "recentActivity") =>
                     handleCategoryChange(item.id, value)
                   }
                 >
@@ -132,6 +132,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                     <SelectItem value="overview">Visão Geral</SelectItem>
                     <SelectItem value="financial">Financeiro</SelectItem>
                     <SelectItem value="animalHealth">Saúde Animal</SelectItem>
+                    <SelectItem value="recentActivity">Atividade Recente</SelectItem> {/* Nova opção */}
                   </SelectContent>
                 </Select>
               </div>
