@@ -64,7 +64,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
       client: initialData?.client || "",
       pet: initialData?.pet || "",
       species: initialData?.species || "Cachorro", // Valor padrão para espécie
-      service: initialData?.service || "",
+      service: initialData?.service || "Consulta Geral", // Definir um valor padrão válido para o Select
       veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "", // Definir o primeiro veterinário como padrão
       status: initialData?.status || "Agendada",
     },
