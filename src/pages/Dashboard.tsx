@@ -220,10 +220,10 @@ const Dashboard = () => {
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "animalHealth" | "recentActivity")} className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="recentActivity">Atividade Recente</TabsTrigger>
-          <TabsTrigger value="animalHealth">Saúde Animal</TabsTrigger>
-          <TabsTrigger value="overview">Visão Geral</TabsTrigger>
-          <TabsTrigger value="financial">Financeiro</TabsTrigger>
+          <TabsTrigger value="recentActivity" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Atividade Recente</TabsTrigger>
+          <TabsTrigger value="animalHealth" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Saúde Animal</TabsTrigger>
+          <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Visão Geral</TabsTrigger>
+          <TabsTrigger value="financial" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Financeiro</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
