@@ -60,12 +60,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
     resolver: zodResolver(formSchema),
     defaultValues: {
       date: initialData?.date ? parseISO(initialData.date) : new Date(), // Converte string para Date
-      time: initialData?.time || "",
+      time: initialData?.time || format(new Date(), "HH:mm"), // Definir hora padrão como a hora atual formatada
       client: initialData?.client || "",
       pet: initialData?.pet || "",
       species: initialData?.species || "Cachorro", // Valor padrão para espécie
       service: initialData?.service || "",
-      veterinarian: initialData?.veterinarian || "",
+      veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "", // Definir o primeiro veterinário como padrão
       status: initialData?.status || "Agendada",
     },
   });
