@@ -120,7 +120,7 @@ const Appointments = () => {
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button>
-              <PlusCircle className="mr-2 h-4 w-4" /> Agendar Consulta
+              <PlusCircle className="mr-2 h-4 w-4" /> Incluir Consulta
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
