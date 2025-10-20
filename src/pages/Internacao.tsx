@@ -116,10 +116,10 @@ const Internacao = () => {
                     <IconComponent className="h-5 w-5 mr-2 text-muted-foreground" /> {/* Ícone um pouco maior */}
                     {patient.petName}
                   </p>
-                  <p className="text-base text-muted-foreground">Tutor: {patient.ownerName}</p> {/* Aumentado para text-base */}
-                  <p className="text-base text-muted-foreground">Motivo: {patient.reason}</p> {/* Aumentado para text-base */}
-                  <p className="text-base text-muted-foreground">Status: {patient.status}</p> {/* Aumentado para text-base */}
-                  <p className="text-base text-muted-foreground">Admissão: {patient.admissionDate}</p> {/* Aumentado para text-base */}
+                  <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.ownerName}</p> {/* Aumentado para text-base */}
+                  <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p> {/* Aumentado para text-base */}
+                  <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p> {/* Aumentado para text-base */}
+                  <p className="text-base text-muted-foreground"><span className="font-bold">Admissão:</span> {patient.admissionDate}</p> {/* Aumentado para text-base */}
                 </li>
               );
             })}
