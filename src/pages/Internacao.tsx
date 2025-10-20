@@ -2,25 +2,24 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm"; // Importar o novo formulário e seus tipos
-import { format } from "date-fns"; // Para formatar datas
+import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
+import { format } from "date-fns";
 
 interface InternedPatient {
   id: string;
   petName: string;
   ownerName: string;
   reason: string;
-  admissionDate: string; // Armazenar como string para simplicidade
-  expectedDischargeDate?: string; // Armazenar como string
+  admissionDate: string;
+  expectedDischargeDate?: string;
   veterinarian: string;
-  status: "Em Observação" | "Estável" | "Crítico" | "Alta"; // Adicionado "Alta"
+  status: "Em Observação" | "Estável" | "Crítico" | "Alta";
 }
 
 const Internacao = () => {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
 
-  // Mock de pacientes internados para demonstração
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
       {
@@ -58,7 +57,7 @@ const Internacao = () => {
       status: data.status,
     };
     setInternedPatients((prev) => [...prev, newPatient]);
-    setIsDialogOpen(false); // Fechar o diálogo após adicionar
+    setIsDialogOpen(false);
   };
 
   return (
@@ -80,14 +79,13 @@ const Internacao = () => {
         </Dialog>
       </div>
       <p className="text-muted-foreground">Esta página está pronta para ser refeita.</p>
-      {/* Aqui você pode adicionar uma tabela ou lista para exibir os pacientes internados */}
       <div className="mt-8">
         <h3 className="text-2xl font-semibold mb-4">Pacientes Internados</h3>
         {internedPatients.length > 0 ? (
           <ul className="space-y-2">
             {internedPatients.map((patient) => (
-              <li key={patient.id} className="p-4 border rounded-md bg-card shadow-sm">
-                <p className="font-bold">{patient.petName} ({patient.species})</p>
+              <li key={patient.id} className="p-3 border rounded-md bg-card shadow-sm"> {/* Alterado de p-4 para p-3 */}
+                <p className="font-bold">{patient.petName}</p> {/* Removido (patient.species) pois não está no tipo InternedPatient */}
                 <p className="text-sm text-muted-foreground">Tutor: {patient.ownerName}</p>
                 <p className="text-sm text-muted-foreground">Motivo: {patient.reason}</p>
                 <p className="text-sm text-muted-foreground">Status: {patient.status}</p>
