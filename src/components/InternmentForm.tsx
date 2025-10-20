@@ -60,6 +60,14 @@ interface InternmentFormProps {
   onCancel: () => void;
 }
 
+const riskOptions = [
+  { value: "Sem risco", label: "Sem risco", colorClass: "bg-risk-sem-risco" },
+  { value: "Baixo", label: "Baixo", colorClass: "bg-risk-baixo" },
+  { value: "Médio", label: "Médio", colorClass: "bg-risk-medio" },
+  { value: "Alto", label: "Alto", colorClass: "bg-risk-alto" },
+  { value: "Emergência", label: "Emergência", colorClass: "bg-risk-emergencia" },
+];
+
 const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) => {
   const form = useForm<InternmentFormValues>({
     resolver: zodResolver(formSchema),
@@ -131,24 +139,29 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
         />
         <FormField
           control={form.control}
-          name="risk" // Novo campo de risco
+          name="risk"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="space-y-3">
               <FormLabel>Risco</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o nível de risco" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Sem risco">Sem risco</SelectItem>
-                  <SelectItem value="Baixo">Baixo</SelectItem>
-                  <SelectItem value="Médio">Médio</SelectItem>
-                  <SelectItem value="Alto">Alto</SelectItem>
-                  <SelectItem value="Emergência">Emergência</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="flex flex-wrap gap-4" // Ajustado para que as bolinhas fiquem lado a lado
+                >
+                  {riskOptions.map((option) => (
+                    <FormItem key={option.value} className="flex items-center space-x-2 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value={option.value} id={`risk-${option.value}`} />
+                      </FormControl>
+                      <Label htmlFor={`risk-${option.value}`} className="flex items-center cursor-pointer">
+                        <span className={cn("h-4 w-4 rounded-full mr-2", option.colorClass)}></span>
+                        {option.label}
+                      </Label>
+                    </FormItem>
+                  ))}
+                </RadioGroup>
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

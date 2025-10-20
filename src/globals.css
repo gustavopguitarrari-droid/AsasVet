@@ -64,6 +64,13 @@
     --event-color-outros: 40 40% 50%;
 
     --green-500: 142.1 76.2% 36.3%; /* Default green for success */
+
+    /* Cores para o campo de Risco - Light Mode */
+    --risk-sem-risco: 220 80% 60%; /* Azul */
+    --risk-baixo: 142.1 76.2% 36.3%; /* Verde */
+    --risk-medio: 28.1 91.2% 50.6%; /* Laranja */
+    --risk-alto: 0 84.2% 60.2%; /* Vermelho (destructive) */
+    --risk-emergencia: 222.2 47.4% 11.2%; /* Preto (primary dark) */
   }
 
   .dark {
@@ -119,12 +126,19 @@
 
     --event-color-consulta: 220 80% 70%;
     --event-color-cirurgia: 0 62.8% 30.6%;
-    --event-color-vacina: 140 70% 70%;
-    --event-color-exame: 30 90% 70%;
-    --event-color-retorno: 270 70% 70%;
-    --event-color-outros: 40 40% 60%;
+    --event-color-vacina: 150 60% 65%;
+    --event-color-exame: 130 70% 55%;
+    --event-color-retorno: 160 70% 70%;
+    --event-color-outros: 170 60% 60%;
 
     --green-500: 142.1 76.2% 36.3%; /* Default green for success */
+
+    /* Cores para o campo de Risco - Dark Mode */
+    --risk-sem-risco: 220 80% 70%; /* Azul mais claro */
+    --risk-baixo: 142.1 76.2% 60%; /* Verde mais claro */
+    --risk-medio: 28.1 91.2% 70%; /* Laranja mais claro */
+    --risk-alto: 0 62.8% 30.6%; /* Vermelho mais escuro (destructive) */
+    --risk-emergencia: 210 40% 98%; /* Branco/cinza claro (foreground) */
   }
 
   /* Custom Color Themes - Light Mode Overrides */
@@ -169,6 +183,13 @@
     --event-color-outros: 170 60% 50%;
 
     --green-500: 142.1 76.2% 36.3%;
+
+    /* Cores para o campo de Risco - Green Theme */
+    --risk-sem-risco: 220 80% 60%; /* Azul */
+    --risk-baixo: 142.1 76.2% 36.3%; /* Verde */
+    --risk-medio: 28.1 91.2% 50.6%; /* Laranja */
+    --risk-alto: 0 84.2% 60.2%; /* Vermelho (destructive) */
+    --risk-emergencia: 222.2 47.4% 11.2%; /* Preto (primary dark) */
   }
 
   /* Purple Theme */
@@ -210,6 +231,13 @@
     --event-color-outros: 290 60% 50%;
 
     --green-500: 142.1 76.2% 36.3%;
+
+    /* Cores para o campo de Risco - Purple Theme */
+    --risk-sem-risco: 220 80% 60%; /* Azul */
+    --risk-baixo: 142.1 76.2% 36.3%; /* Verde */
+    --risk-medio: 28.1 91.2% 50.6%; /* Laranja */
+    --risk-alto: 0 84.2% 60.2%; /* Vermelho (destructive) */
+    --risk-emergencia: 222.2 47.4% 11.2%; /* Preto (primary dark) */
   }
 
   /* Orange Theme */
@@ -251,6 +279,13 @@
     --event-color-outros: 50 70% 50%;
 
     --green-500: 142.1 76.2% 36.3%;
+
+    /* Cores para o campo de Risco - Orange Theme */
+    --risk-sem-risco: 220 80% 60%; /* Azul */
+    --risk-baixo: 142.1 76.2% 36.3%; /* Verde */
+    --risk-medio: 28.1 91.2% 50.6%; /* Laranja */
+    --risk-alto: 0 84.2% 60.2%; /* Vermelho (destructive) */
+    --risk-emergencia: 222.2 47.4% 11.2%; /* Preto (primary dark) */
   }
 
   /* Teal Theme */
@@ -292,6 +327,13 @@
     --event-color-outros: 200 60% 50%;
 
     --green-500: 142.1 76.2% 36.3%;
+
+    /* Cores para o campo de Risco - Teal Theme */
+    --risk-sem-risco: 220 80% 60%; /* Azul */
+    --risk-baixo: 142.1 76.2% 36.3%; /* Verde */
+    --risk-medio: 28.1 91.2% 50.6%; /* Laranja */
+    --risk-alto: 0 84.2% 60.2%; /* Vermelho (destructive) */
+    --risk-emergencia: 222.2 47.4% 11.2%; /* Preto (primary dark) */
   }
 
   /* Custom Color Themes - Dark Mode Overrides */
@@ -336,6 +378,13 @@
     --event-color-outros: 170 60% 60%;
 
     --green-500: 142.1 76.2% 60%;
+
+    /* Cores para o campo de Risco - Green Theme (Dark Mode) */
+    --risk-sem-risco: 220 80% 70%; /* Azul mais claro */
+    --risk-baixo: 142.1 76.2% 60%; /* Verde mais claro */
+    --risk-medio: 28.1 91.2% 70%; /* Laranja mais claro */
+    --risk-alto: 0 62.8% 30.6%; /* Vermelho mais escuro (destructive) */
+    --risk-emergencia: 210 40% 98%; /* Branco/cinza claro (foreground) */
   }
 
   /* Purple Theme (Dark Mode) */
@@ -377,6 +426,13 @@
     --event-color-outros: 290 60% 60%;
 
     --green-500: 142.1 76.2% 60%;
+
+    /* Cores para o campo de Risco - Purple Theme (Dark Mode) */
+    --risk-sem-risco: 220 80% 70%; /* Azul mais claro */
+    --risk-baixo: 142.1 76.2% 60%; /* Verde mais claro */
+    --risk-medio: 28.1 91.2% 70%; /* Laranja mais claro */
+    --risk-alto: 0 62.8% 30.6%; /* Vermelho mais escuro (destructive) */
+    --risk-emergencia: 210 40% 98%; /* Branco/cinza claro (foreground) */
   }
 
   /* Orange Theme (Dark Mode) */
@@ -418,6 +474,13 @@
     --event-color-outros: 50 70% 60%;
 
     --green-500: 142.1 76.2% 60%;
+
+    /* Cores para o campo de Risco - Orange Theme (Dark Mode) */
+    --risk-sem-risco: 220 80% 70%; /* Azul mais claro */
+    --risk-baixo: 142.1 76.2% 60%; /* Verde mais claro */
+    --risk-medio: 28.1 91.2% 70%; /* Laranja mais claro */
+    --risk-alto: 0 62.8% 30.6%; /* Vermelho mais escuro (destructive) */
+    --risk-emergencia: 210 40% 98%; /* Branco/cinza claro (foreground) */
   }
 
   /* Teal Theme (Dark Mode) */
@@ -459,6 +522,13 @@
     --event-color-outros: 200 60% 60%;
 
     --green-500: 142.1 76.2% 60%;
+
+    /* Cores para o campo de Risco - Teal Theme (Dark Mode) */
+    --risk-sem-risco: 220 80% 70%; /* Azul mais claro */
+    --risk-baixo: 142.1 76.2% 60%; /* Verde mais claro */
+    --risk-medio: 28.1 91.2% 70%; /* Laranja mais claro */
+    --risk-alto: 0 62.8% 30.6%; /* Vermelho mais escuro (destructive) */
+    --risk-emergencia: 210 40% 98%; /* Branco/cinza claro (foreground) */
   }
 }
 
@@ -474,6 +544,13 @@
 .bg-event-exame { background-color: hsl(var(--event-color-exame)); }
 .bg-event-retorno { background-color: hsl(var(--event-color-retorno)); }
 .bg-event-outros { background-color: hsl(var(--event-color-outros)); }
+
+/* Classes Tailwind para cores de risco */
+.bg-risk-sem-risco { background-color: hsl(var(--risk-sem-risco)); }
+.bg-risk-baixo { background-color: hsl(var(--risk-baixo)); }
+.bg-risk-medio { background-color: hsl(var(--risk-medio)); }
+.bg-risk-alto { background-color: hsl(var(--risk-alto)); }
+.bg-risk-emergencia { background-color: hsl(var(--risk-emergencia)); }
 
 
 @layer base {
