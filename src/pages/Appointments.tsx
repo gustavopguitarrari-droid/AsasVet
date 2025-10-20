@@ -222,10 +222,8 @@ const Appointments = () => {
                     key={appointment.id}
                     onClick={() => handleRowClick(appointment)}
                     className={cn(
-                      "cursor-pointer hover:bg-muted/50",
-                      isCancelled && "border-l-4 border-destructive", // Borda vermelha para canceladas
-                      isRealizada && "border-l-4 border-green-500", // Borda verde para realizadas
-                      isEmAndamento && "border-l-4 border-orange-500" // Borda laranja para em andamento
+                      "cursor-pointer hover:bg-muted/50"
+                      // Removidas as classes de borda colorida
                     )}
                   >
                     <TableCell className="font-medium flex items-center">
