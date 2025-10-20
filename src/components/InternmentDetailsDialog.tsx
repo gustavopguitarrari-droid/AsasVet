@@ -12,10 +12,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, Stethoscope, User, FlaskConical, XCircle, CheckCircle } from "lucide-react"; // Adicionado XCircle e CheckCircle
+import { Edit, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, Stethoscope, User, FlaskConical, XCircle, CheckCircle } from "lucide-react";
 import InternmentEditForm, { InternmentEditFormValues } from "./InternmentEditForm";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns"; // Importar format para a data de alta/óbito
+import { format } from "date-fns";
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -27,7 +27,7 @@ interface InternedPatient {
   admissionDate: string;
   expectedDischargeDate?: string;
   veterinarian: string;
-  status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito"; // Adicionado 'Óbito'
+  status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
   species: string;
   risk: RiskLevel;
 }
@@ -39,7 +39,6 @@ interface InternmentDetailsDialogProps {
   onUpdate: (updatedPatient: InternedPatient) => void;
 }
 
-// Mapeamento de espécies para ícones
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
   Gato: Cat,
@@ -49,7 +48,6 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Outros: MoreHorizontal,
 };
 
-// Mapeamento de risco para classes de cor (as mesmas do RiskSelector)
 const riskColorMap: Record<RiskLevel, string> = {
   "Sem risco": "bg-blue-500",
   "Baixo": "bg-green-500",
@@ -68,7 +66,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
 
   React.useEffect(() => {
     if (!isOpen) {
-      setIsEditing(false); // Reset editing state when dialog closes
+      setIsEditing(false);
     }
   }, [isOpen]);
 
@@ -84,7 +82,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
         return "bg-red-500 text-white";
       case "Alta":
         return "bg-gray-500 text-white";
-      case "Óbito": // Novo status
+      case "Óbito":
         return "bg-black text-white";
       default:
         return "bg-muted text-muted-foreground";
@@ -114,7 +112,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
       const updatedPatient: InternedPatient = {
         ...patient,
         status: "Alta",
-        expectedDischargeDate: format(new Date(), "yyyy-MM-dd"), // Registrar data de alta como hoje
+        expectedDischargeDate: format(new Date(), "yyyy-MM-dd"),
       };
       onUpdate(updatedPatient);
       onClose();
@@ -126,7 +124,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
       const updatedPatient: InternedPatient = {
         ...patient,
         status: "Óbito",
-        expectedDischargeDate: format(new Date(), "yyyy-MM-dd"), // Registrar data do óbito
+        expectedDischargeDate: format(new Date(), "yyyy-MM-dd"),
       };
       onUpdate(updatedPatient);
       onClose();
@@ -152,13 +150,16 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        {!isEditing && !isFinalized && ( // Mostrar botões apenas se não estiver editando e não estiver finalizado
+        {!isEditing && !isFinalized && (
           <div className="flex justify-end space-x-2 mb-4">
             <Button variant="default" onClick={handleRegisterDischarge} className="bg-green-600 hover:bg-green-700 text-white">
               <CheckCircle className="mr-2 h-4 w-4" /> Registrar Alta
             </Button>
             <Button variant="destructive" onClick={handleRegisterObito}>
               <XCircle className="mr-2 h-4 w-4" /> Registrar Óbito
+            </Button>
+            <Button variant="outline" onClick={() => setIsEditing(true)}>
+              <Edit className="mr-2 h-4 w-4" /> Editar
             </Button>
           </div>
         )}
@@ -226,7 +227,6 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
               </>
             )}
             <Separator />
-            {/* REMOVIDO: Bloco de Status */}
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Risco:</p>
               <p className="col-span-2 text-sm">
@@ -238,13 +238,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
           </div>
         )}
 
-        {!isEditing && !isFinalized && ( // O botão de editar também não aparece se o status for Alta ou Óbito
-          <DialogFooter className="pt-4">
-            <Button variant="outline" onClick={() => setIsEditing(true)}>
-              <Edit className="mr-2 h-4 w-4" /> Editar
-            </Button>
-          </DialogFooter>
-        )}
+        {/* O DialogFooter foi removido para o botão de editar, pois ele foi movido para cima. */}
       </DialogContent>
     </Dialog>
   );
