@@ -76,6 +76,16 @@ export default {
         green: {
           500: "hsl(142.1 76.2% 36.3%)", // Um tom de verde para o modo claro
         },
+        // Novas cores para os botões de seleção de tema
+        purple: {
+          600: "hsl(262.1 83.3% 57.8%)",
+        },
+        orange: {
+          500: "hsl(28.1 91.2% 50.6%)",
+        },
+        teal: {
+          500: "hsl(177.1 70% 35%)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

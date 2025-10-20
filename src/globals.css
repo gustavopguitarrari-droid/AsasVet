@@ -131,6 +131,100 @@
     --event-color-retorno: 270 70% 70%; /* Roxo */
     --event-color-outros: 40 40% 60%; /* Marrom */
   }
+
+  /* Custom Color Themes - Light Mode Overrides */
+  /* Default theme uses the root variables */
+
+  /* Green Theme */
+  .theme-green {
+    --primary: 142.1 76.2% 36.3%;
+    --primary-foreground: 142.1 76.2% 98%;
+    --secondary: 142.1 76.2% 90%;
+    --secondary-foreground: 142.1 76.2% 15%;
+    --accent: 142.1 76.2% 90%;
+    --accent-foreground: 142.1 76.2% 15%;
+    --ring: 142.1 76.2% 36.3%;
+  }
+
+  /* Purple Theme */
+  .theme-purple {
+    --primary: 262.1 83.3% 57.8%;
+    --primary-foreground: 262.1 83.3% 98%;
+    --secondary: 262.1 83.3% 90%;
+    --secondary-foreground: 262.1 83.3% 15%;
+    --accent: 262.1 83.3% 90%;
+    --accent-foreground: 262.1 83.3% 15%;
+    --ring: 262.1 83.3% 57.8%;
+  }
+
+  /* Orange Theme */
+  .theme-orange {
+    --primary: 28.1 91.2% 50.6%;
+    --primary-foreground: 28.1 91.2% 98%;
+    --secondary: 28.1 91.2% 90%;
+    --secondary-foreground: 28.1 91.2% 15%;
+    --accent: 28.1 91.2% 90%;
+    --accent-foreground: 28.1 91.2% 15%;
+    --ring: 28.1 91.2% 50.6%;
+  }
+
+  /* Teal Theme */
+  .theme-teal {
+    --primary: 177.1 70% 35%;
+    --primary-foreground: 177.1 70% 98%;
+    --secondary: 177.1 70% 90%;
+    --secondary-foreground: 177.1 70% 15%;
+    --accent: 177.1 70% 90%;
+    --accent-foreground: 177.1 70% 15%;
+    --ring: 177.1 70% 35%;
+  }
+
+  /* Custom Color Themes - Dark Mode Overrides */
+  /* Default dark theme uses the .dark variables */
+
+  /* Green Theme (Dark Mode) */
+  .dark.theme-green {
+    --primary: 142.1 76.2% 60%;
+    --primary-foreground: 142.1 76.2% 15%;
+    --secondary: 142.1 76.2% 25%;
+    --secondary-foreground: 142.1 76.2% 90%;
+    --accent: 142.1 76.2% 25%;
+    --accent-foreground: 142.1 76.2% 90%;
+    --ring: 142.1 76.2% 60%;
+  }
+
+  /* Purple Theme (Dark Mode) */
+  .dark.theme-purple {
+    --primary: 262.1 83.3% 70%;
+    --primary-foreground: 262.1 83.3% 15%;
+    --secondary: 262.1 83.3% 25%;
+    --secondary-foreground: 262.1 83.3% 90%;
+    --accent: 262.1 83.3% 25%;
+    --accent-foreground: 262.1 83.3% 90%;
+    --ring: 262.1 83.3% 70%;
+  }
+
+  /* Orange Theme (Dark Mode) */
+  .dark.theme-orange {
+    --primary: 28.1 91.2% 70%;
+    --primary-foreground: 28.1 91.2% 15%;
+    --secondary: 28.1 91.2% 25%;
+    --secondary-foreground: 28.1 91.2% 90%;
+    --accent: 28.1 91.2% 25%;
+    --accent-foreground: 28.1 91.2% 90%;
+    --ring: 28.1 91.2% 70%;
+  }
+
+  /* Teal Theme (Dark Mode) */
+  .dark.theme-teal {
+    --primary: 177.1 70% 60%;
+    --primary-foreground: 177.1 70% 15%;
+    --secondary: 177.1 70% 25%;
+    --secondary-foreground: 177.1 70% 90%;
+    --accent: 177.1 70% 25%;
+    --accent-foreground: 177.1 70% 90%;
+    --ring: 177.1 70% 60%;
+  }
 }
 
 /* Classe personalizada para o fundo do sidebar com degradê */

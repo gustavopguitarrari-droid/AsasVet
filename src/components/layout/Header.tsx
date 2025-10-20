@@ -1,6 +1,8 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import UserProfile from "@/components/UserProfile";
+import ThemeToggle from "@/components/ThemeToggle"; // Importar o ThemeToggle existente
+import ColorThemeToggle from "@/components/ColorThemeToggle"; // Importar o novo ColorThemeToggle
 
 const Header = () => {
   const location = useLocation();
@@ -32,7 +34,11 @@ const Header = () => {
   return (
     <header className="flex items-center justify-between border-b bg-background p-4 shadow-sm">
       <h1 className="text-2xl font-semibold">{getTitle()}</h1>
-      <UserProfile />
+      <div className="flex items-center space-x-2">
+        <ColorThemeToggle /> {/* Adicionado o seletor de tema de cor */}
+        <ThemeToggle /> {/* Mantido o alternador de modo claro/escuro */}
+        <UserProfile />
+      </div>
     </header>
   );
 };
