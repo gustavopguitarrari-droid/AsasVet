@@ -8,10 +8,11 @@ import {
   FileText,
   DollarSign,
   Plus,
-  Stethoscope, // Importado o ícone Stethoscope
+  Stethoscope,
   ArrowLeftToLine,
   ArrowRightToLine,
   ReceiptText,
+  Package, // Importado o ícone Package
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -59,6 +60,12 @@ const navItems = [
     icon: FileText,
     path: "/medical-records",
     // activeBgClass: "bg-sidebar-item-bg-5", // Removido
+  },
+  {
+    name: "Estoque", // Novo item de navegação
+    icon: Package, // Ícone para Estoque
+    path: "/estoque",
+    // activeBgClass: "bg-sidebar-item-bg-8", // Pode ser ajustado conforme a paleta
   },
   {
     name: "Financeiro",
