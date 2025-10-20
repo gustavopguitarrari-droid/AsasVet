@@ -8,7 +8,7 @@ import {
   FileText,
   DollarSign,
   Plus,
-  UserCog,
+  Stethoscope, // Importado o ícone Stethoscope
   ArrowLeftToLine,
   ArrowRightToLine,
   ReceiptText,
@@ -50,7 +50,7 @@ const navItems = [
   },
   {
     name: "Veterinários",
-    icon: UserCog,
+    icon: Stethoscope, // Ícone atualizado para Stethoscope
     path: "/veterinarios",
     // activeBgClass: "bg-sidebar-item-bg-9", // Removido
   },
