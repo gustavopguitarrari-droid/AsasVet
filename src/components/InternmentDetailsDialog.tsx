@@ -12,9 +12,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, Stethoscope, User, FlaskConical } from "lucide-react";
+import { Edit, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, Stethoscope, User, FlaskConical, XCircle, CheckCircle } from "lucide-react"; // Adicionado XCircle e CheckCircle
 import InternmentEditForm, { InternmentEditFormValues } from "./InternmentEditForm";
 import { cn } from "@/lib/utils";
+import { format } from "date-fns"; // Importar format para a data de alta/óbito
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -26,7 +27,7 @@ interface InternedPatient {
   admissionDate: string;
   expectedDischargeDate?: string;
   veterinarian: string;
-  status: "Em Observação" | "Estável" | "Crítico" | "Alta";
+  status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito"; // Adicionado 'Óbito'
   species: string;
   risk: RiskLevel;
 }
@@ -83,6 +84,8 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
         return "bg-red-500 text-white";
       case "Alta":
         return "bg-gray-500 text-white";
+      case "Óbito": // Novo status
+        return "bg-black text-white";
       default:
         return "bg-muted text-muted-foreground";
     }
@@ -106,7 +109,33 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
     onClose();
   };
 
+  const handleRegisterDischarge = () => {
+    if (window.confirm(`Tem certeza que deseja registrar a alta de ${patient.petName}?`)) {
+      const updatedPatient: InternedPatient = {
+        ...patient,
+        status: "Alta",
+        expectedDischargeDate: format(new Date(), "yyyy-MM-dd"), // Registrar data de alta como hoje
+      };
+      onUpdate(updatedPatient);
+      onClose();
+    }
+  };
+
+  const handleRegisterObito = () => {
+    if (window.confirm(`Tem certeza que deseja registrar o óbito de ${patient.petName}? Esta ação não pode ser desfeita.`)) {
+      const updatedPatient: InternedPatient = {
+        ...patient,
+        status: "Óbito",
+        expectedDischargeDate: format(new Date(), "yyyy-MM-dd"), // Registrar data do óbito
+      };
+      onUpdate(updatedPatient);
+      onClose();
+    }
+  };
+
   const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
+
+  const isFinalized = patient.status === "Alta" || patient.status === "Óbito";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -122,6 +151,17 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
               : `Informações completas sobre ${patient.petName}.`}
           </DialogDescription>
         </DialogHeader>
+
+        {!isEditing && !isFinalized && ( // Mostrar botões apenas se não estiver editando e não estiver finalizado
+          <div className="flex justify-end space-x-2 mb-4">
+            <Button variant="default" onClick={handleRegisterDischarge} className="bg-green-600 hover:bg-green-700 text-white">
+              <CheckCircle className="mr-2 h-4 w-4" /> Registrar Alta
+            </Button>
+            <Button variant="destructive" onClick={handleRegisterObito}>
+              <XCircle className="mr-2 h-4 w-4" /> Registrar Óbito
+            </Button>
+          </div>
+        )}
 
         {isEditing ? (
           <InternmentEditForm initialData={patient} onSubmit={handleFormSubmit} onCancel={() => setIsEditing(false)} />
@@ -206,7 +246,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
           </div>
         )}
 
-        {!isEditing && (
+        {!isEditing && !isFinalized && ( // O botão de editar também não aparece se o status for Alta ou Óbito
           <DialogFooter className="pt-4">
             <Button variant="outline" onClick={() => setIsEditing(true)}>
               <Edit className="mr-2 h-4 w-4" /> Editar

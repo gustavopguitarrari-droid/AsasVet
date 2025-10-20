@@ -49,7 +49,7 @@ const formSchema = z.object({
   risk: z.enum(["Sem risco", "Baixo", "Médio", "Alto", "Emergência"], {
     required_error: "O nível de risco é obrigatório.",
   }),
-  status: z.enum(["Em Observação", "Estável", "Crítico", "Alta"], { // Adicionado campo de status
+  status: z.enum(["Em Observação", "Estável", "Crítico", "Alta", "Óbito"], { // Adicionado 'Óbito'
     required_error: "O status é obrigatório.",
   }),
 });
@@ -301,6 +301,12 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
                       <RadioGroupItem value="Alta" />
                     </FormControl>
                     <FormLabel className="font-normal">Alta</FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="Óbito" /> {/* Novo item para Óbito */}
+                    </FormControl>
+                    <FormLabel className="font-normal">Óbito</FormLabel>
                   </FormItem>
                 </RadioGroup>
               </FormControl>

@@ -17,7 +17,7 @@ interface InternedPatient {
   admissionDate: string;
   expectedDischargeDate?: string;
   veterinarian: string;
-  status: "Em Observação" | "Estável" | "Crítico" | "Alta";
+  status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito"; // Adicionado 'Óbito'
   species: string;
   risk: RiskLevel;
 }
