@@ -17,6 +17,7 @@ import AppointmentForm from "@/components/AppointmentForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
+import AppointmentChronometer from "@/components/AppointmentChronometer"; // Importa o novo componente
 
 interface Appointment {
   id: string;
@@ -215,6 +216,7 @@ const Appointments = () => {
                 const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
                 const isCancelled = activeTab === "finalizadas" && appointment.status === "Cancelada";
                 const isRealizada = activeTab === "finalizadas" && appointment.status === "Realizada";
+                const isEmAndamento = activeTab === "em-andamento" && appointment.status === "Em Andamento"; // Nova condição
                 return (
                   <TableRow
                     key={appointment.id}
@@ -222,7 +224,8 @@ const Appointments = () => {
                     className={cn(
                       "cursor-pointer hover:bg-muted/50",
                       isCancelled && "border-l-4 border-destructive", // Borda vermelha para canceladas
-                      isRealizada && "border-l-4 border-green-500" // Borda verde para realizadas
+                      isRealizada && "border-l-4 border-green-500", // Borda verde para realizadas
+                      isEmAndamento && "border-l-4 border-orange-500" // Borda laranja para em andamento
                     )}
                   >
                     <TableCell className="font-medium flex items-center">
@@ -238,10 +241,18 @@ const Appointments = () => {
                           Cancelada
                         </Badge>
                       )}
-                      {isRealizada && ( // Adiciona o badge "Concluída"
+                      {isRealizada && (
                         <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
                           Concluída
                         </Badge>
+                      )}
+                      {isEmAndamento && ( // Badge e Cronômetro para 'Em Andamento'
+                        <>
+                          <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
+                            Iniciada
+                          </Badge>
+                          <AppointmentChronometer date={appointment.date} time={appointment.time} />
+                        </>
                       )}
                     </TableCell>
                   </TableRow>
