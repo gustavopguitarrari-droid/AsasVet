@@ -17,10 +17,10 @@ const data = [
 ];
 
 const COLORS = [
-  "hsl(var(--sidebar-item-bg-1))", // Azul
-  "hsl(var(--sidebar-item-bg-2))", // Verde
-  "hsl(var(--sidebar-item-bg-3))", // Laranja
-  "hsl(var(--sidebar-item-bg-4))", // Rosa
+  "#3b82f6", // blue-500
+  "#22c55e", // green-500
+  "#f59e0b", // yellow-500
+  "#a855f7", // purple-500
 ];
 
 const PetsBySpeciesChart: React.FC = () => {

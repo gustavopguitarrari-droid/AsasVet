@@ -66,7 +66,7 @@ const Dashboard = () => {
     switch (item.id) {
       case "totalClients":
         return (
-          <Card key={item.id} className={cn("bg-blue-600", baseCardClasses)}> {/* Cor fixa */}
+          <Card key={item.id} className={cn("bg-blue-600", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Clientes</CardTitle>
               <Users className={iconClasses} />
@@ -79,7 +79,7 @@ const Dashboard = () => {
         );
       case "totalPets":
         return (
-          <Card key={item.id} className={cn("bg-indigo-600", baseCardClasses)}> {/* Cor fixa */}
+          <Card key={item.id} className={cn("bg-indigo-600", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Animais</CardTitle>
               <PawPrint className={iconClasses} />
@@ -92,7 +92,7 @@ const Dashboard = () => {
         );
       case "scheduledAppointments":
         return (
-          <Card key={item.id} className={cn("bg-pink-600", baseCardClasses)}> {/* Cor fixa */}
+          <Card key={item.id} className={cn("bg-pink-600", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Consultas Agendadas</CardTitle>
               <CalendarDays className={iconClasses} />
@@ -105,18 +105,18 @@ const Dashboard = () => {
         );
       case "recentActivity":
         return (
-          <Card key={item.id} className="bg-muted text-foreground shadow-md col-span-full">
+          <Card key={item.id} className="bg-gray-700 text-white shadow-md col-span-full">
             <CardHeader>
               <CardTitle>Atividade Recente</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">Nenhuma atividade recente para mostrar.</p>
+              <p className="text-white/80">Nenhuma atividade recente para mostrar.</p>
             </CardContent>
           </Card>
         );
       case "financialSummary":
         return (
-          <Card key={item.id} className={cn("bg-sidebar-item-bg-6", baseCardClasses)}>
+          <Card key={item.id} className={cn("bg-green-600", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Resumo Financeiro</CardTitle>
               <DollarSign className={iconClasses} />
@@ -129,7 +129,7 @@ const Dashboard = () => {
         );
       case "cashFlow":
         return (
-          <Card key={item.id} className={cn("bg-sidebar-item-bg-7", baseCardClasses)}>
+          <Card key={item.id} className={cn("bg-teal-600", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Fluxo de Caixa</CardTitle>
               <DollarSign className={iconClasses} />
@@ -142,7 +142,7 @@ const Dashboard = () => {
         );
       case "internmentStatus":
         return (
-          <Card key={item.id} className={cn("bg-sidebar-item-bg-8", baseCardClasses)}>
+          <Card key={item.id} className={cn("bg-purple-600", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Status de Internação</CardTitle>
               <Bed className={iconClasses} />
@@ -155,7 +155,7 @@ const Dashboard = () => {
         );
       case "veterinariansOnDuty":
         return (
-          <Card key={item.id} className={cn("bg-sidebar-item-bg-9", baseCardClasses)}>
+          <Card key={item.id} className={cn("bg-orange-600", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Veterinários de Plantão</CardTitle>
               <Stethoscope className={iconClasses} />
@@ -168,9 +168,9 @@ const Dashboard = () => {
         );
       case "medicalRecordsSummary":
         return (
-          <Card key={item.id} className={cn("bg-sidebar-item-bg-5", baseCardClasses)}>
+          <Card key={item.id} className={cn("bg-cyan-600", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Resumo da Agenda</CardTitle> {/* Nome atualizado */}
+              <CardTitle className="text-sm font-medium">Resumo da Agenda</CardTitle>
               <FileText className={iconClasses} />
             </CardHeader>
             <CardContent>
@@ -211,7 +211,7 @@ const Dashboard = () => {
         </div>
         <Button
           onClick={() => setIsConfiguratorOpen(true)}
-          variant="default" // Usará a cor --primary do tema
+          variant="default"
           className="font-bold"
         >
           <Settings className="mr-2 h-4 w-4" /> Configurar Painel

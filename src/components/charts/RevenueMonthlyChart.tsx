@@ -37,7 +37,7 @@ const RevenueMonthlyChart: React.FC = () => {
             <XAxis dataKey="name" stroke={axisLabelColor} />
             <YAxis stroke={axisLabelColor} />
             <Tooltip />
-            <Area type="monotone" dataKey="receita" stroke="hsl(var(--destructive))" fill="hsl(var(--destructive))" fillOpacity={0.3} />
+            <Area type="monotone" dataKey="receita" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} /> {/* Cor fixa: red-500 */}
           </AreaChart>
         </ResponsiveContainer>
       </CardContent>

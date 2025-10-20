@@ -40,17 +40,17 @@ const AppointmentsWeeklyChart: React.FC = () => {
             <XAxis dataKey="name" stroke={axisLabelColor} />
             <YAxis stroke={axisLabelColor} />
             <Tooltip />
-            <Line type="monotone" dataKey="consultas" stroke="hsl(var(--sidebar-item-bg-4))" activeDot={{ r: 8 }} />
+            <Line type="monotone" dataKey="consultas" stroke="#6366f1" activeDot={{ r: 8 }} /> {/* Cor fixa: indigo-500 */}
             <ReferenceLine
               y={averageConsultas}
-              stroke="hsl(var(--sidebar-item-bg-3))"
+              stroke="#4f46e5" // Cor fixa: indigo-700
               strokeDasharray="3 3"
               strokeWidth={2}
             />
           </LineChart>
         </ResponsiveContainer>
         <p className="text-sm text-muted-foreground mt-2">
-          Média de consultas: <span className="font-semibold text-sidebar-item-bg-3">{averageConsultas.toFixed(0)}</span>
+          Média de consultas: <span className="font-semibold text-indigo-700">{averageConsultas.toFixed(0)}</span> {/* Cor fixa */}
         </p>
       </CardContent>
     </Card>

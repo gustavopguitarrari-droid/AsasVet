@@ -41,17 +41,17 @@ const AppointmentsMonthlyChart: React.FC = () => {
             <XAxis dataKey="name" stroke={axisLabelColor} />
             <YAxis stroke={axisLabelColor} />
             <Tooltip />
-            <Bar dataKey="consultas" fill="hsl(var(--sidebar-item-bg-1))" />
+            <Bar dataKey="consultas" fill="#3b82f6" /> {/* Cor fixa: blue-500 */}
             <ReferenceLine
               y={averageConsultas}
-              stroke="hsl(var(--sidebar-item-bg-3))"
+              stroke="#2563eb" // Cor fixa: blue-700
               strokeDasharray="3 3"
               strokeWidth={2}
             />
           </BarChart>
         </ResponsiveContainer>
         <p className="text-sm text-muted-foreground mt-2">
-          Média de consultas: <span className="font-semibold text-sidebar-item-bg-3">{averageConsultas.toFixed(0)}</span>
+          Média de consultas: <span className="font-semibold text-blue-700">{averageConsultas.toFixed(0)}</span> {/* Cor fixa */}
         </p>
       </CardContent>
     </Card>
