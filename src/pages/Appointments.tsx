@@ -190,8 +190,7 @@ const Appointments = () => {
       </div>
 
       <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
-        {/* A barra de pesquisa foi removida daqui */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full"> {/* Adicionado w-full aqui */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-muted/50">
             <TabsTrigger value="em-espera" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Em Espera</TabsTrigger>
             <TabsTrigger value="em-andamento" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">Em Andamento</TabsTrigger>
@@ -208,7 +207,7 @@ const Appointments = () => {
               <TableHead>Tutor</TableHead>
               <TableHead>Serviço</TableHead>
               <TableHead>Veterinário</TableHead>
-              <TableHead>Status</TableHead>
+              {/* <TableHead>Status</TableHead> Removido */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -224,17 +223,17 @@ const Appointments = () => {
                     <TableCell>{appointment.client}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
                     <TableCell>{appointment.veterinarian}</TableCell>
-                    <TableCell>
+                    {/* <TableCell>
                       <Badge className={getStatusBadgeVariant(appointment.status)}>
                         {appointment.status}
                       </Badge>
-                    </TableCell>
+                    </TableCell> Removido */}
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center">
+                <TableCell colSpan={4} className="h-24 text-center"> {/* colSpan ajustado para 4 */}
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
