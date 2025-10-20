@@ -80,6 +80,30 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
+          name="risk" // Novo campo de risco
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Risco</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o nível de risco" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Sem risco">Sem risco</SelectItem>
+                  <SelectItem value="Baixo">Baixo</SelectItem>
+                  <SelectItem value="Médio">Médio</SelectItem>
+                  <SelectItem value="Alto">Alto</SelectItem>
+                  <SelectItem value="Emergência">Emergência</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="petName"
           render={({ field }) => (
             <FormItem>
@@ -129,30 +153,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="risk" // Novo campo de risco
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Risco</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o nível de risco" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Sem risco">Sem risco</SelectItem>
-                  <SelectItem value="Baixo">Baixo</SelectItem>
-                  <SelectItem value="Médio">Médio</SelectItem>
-                  <SelectItem value="Alto">Alto</SelectItem>
-                  <SelectItem value="Emergência">Emergência</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        
         <FormField
           control={form.control}
           name="reason"
