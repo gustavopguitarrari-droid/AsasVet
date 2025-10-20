@@ -66,7 +66,7 @@ const Dashboard = () => {
     switch (item.id) {
       case "totalClients":
         return (
-          <Card key={item.id} className={cn("bg-sidebar-item-bg-1", baseCardClasses)}>
+          <Card key={item.id} className={cn("bg-blue-600", baseCardClasses)}> {/* Cor fixa */}
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Clientes</CardTitle>
               <Users className={iconClasses} />
@@ -79,7 +79,7 @@ const Dashboard = () => {
         );
       case "totalPets":
         return (
-          <Card key={item.id} className={cn("bg-sidebar-item-bg-2", baseCardClasses)}>
+          <Card key={item.id} className={cn("bg-indigo-600", baseCardClasses)}> {/* Cor fixa */}
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total de Animais</CardTitle>
               <PawPrint className={iconClasses} />
@@ -92,7 +92,7 @@ const Dashboard = () => {
         );
       case "scheduledAppointments":
         return (
-          <Card key={item.id} className={cn("bg-sidebar-item-bg-3", baseCardClasses)}>
+          <Card key={item.id} className={cn("bg-pink-600", baseCardClasses)}> {/* Cor fixa */}
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Consultas Agendadas</CardTitle>
               <CalendarDays className={iconClasses} />
