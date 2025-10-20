@@ -153,13 +153,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
               <p className="text-sm font-medium text-muted-foreground">Veterinário:</p>
               <p className="col-span-2 text-sm">{appointment.veterinarian}</p>
             </div>
-            <Separator />
-            <div className="grid grid-cols-3 items-center gap-4">
-              <p className="text-sm font-medium text-muted-foreground">Status:</p>
-              <Badge className={cn("col-span-2", getStatusBadgeVariant(appointment.status))}>
-                {appointment.status}
-              </Badge>
-            </div>
+            {/* O campo de Status foi removido daqui */}
           </div>
         )}
 
