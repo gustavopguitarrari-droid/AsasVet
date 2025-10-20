@@ -1,12 +1,13 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react"; // Importar ícones
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
+import InternmentDetailsDialog from "@/components/InternmentDetailsDialog"; // Importar o novo diálogo
 import { format } from "date-fns";
-import { cn } from "@/lib/utils"; // Importar cn para classes condicionais
+import { cn } from "@/lib/utils";
 
-type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência"; // Definir o tipo RiskLevel
+type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
 interface InternedPatient {
   id: string;
@@ -17,8 +18,8 @@ interface InternedPatient {
   expectedDischargeDate?: string;
   veterinarian: string;
   status: "Em Observação" | "Estável" | "Crítico" | "Alta";
-  species: string; // Adicionado campo de espécie
-  risk: RiskLevel; // Adicionado campo de risco
+  species: string;
+  risk: RiskLevel;
 }
 
 // Mapeamento de espécies para ícones (reutilizado de Pets.tsx)
@@ -51,7 +52,9 @@ const riskColorMap: Record<RiskLevel, string> = {
 };
 
 const Internacao = () => {
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false); // Renomeado para clareza
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false); // Novo estado para o diálogo de detalhes
+  const [selectedPatient, setSelectedPatient] = React.useState<InternedPatient | null>(null); // Novo estado para o paciente selecionado
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
 
   React.useEffect(() => {
@@ -66,7 +69,7 @@ const Internacao = () => {
         veterinarian: "Dr. Ana Paula",
         status: "Estável",
         species: "Cachorro",
-        risk: "Médio", // Adicionado risco
+        risk: "Médio",
       },
       {
         id: "INT002",
@@ -77,7 +80,7 @@ const Internacao = () => {
         veterinarian: "Dr. Carlos Eduardo",
         status: "Em Observação",
         species: "Gato",
-        risk: "Alto", // Adicionado risco
+        risk: "Alto",
       },
       {
         id: "INT003",
@@ -88,7 +91,7 @@ const Internacao = () => {
         veterinarian: "Dra. Beatriz Lima",
         status: "Em Observação",
         species: "Pássaro",
-        risk: "Baixo", // Adicionado risco
+        risk: "Baixo",
       },
       {
         id: "INT004",
@@ -99,7 +102,7 @@ const Internacao = () => {
         veterinarian: "Dr. Ana Paula",
         status: "Crítico",
         species: "Cachorro",
-        risk: "Emergência", // Adicionado risco
+        risk: "Emergência",
       },
       {
         id: "INT005",
@@ -110,7 +113,7 @@ const Internacao = () => {
         veterinarian: "Dr. Carlos Eduardo",
         status: "Estável",
         species: "Peixe",
-        risk: "Sem risco", // Adicionado risco
+        risk: "Sem risco",
       },
     ];
     setInternedPatients(mockPatients);
@@ -125,19 +128,30 @@ const Internacao = () => {
       admissionDate: format(data.admissionDate, "yyyy-MM-dd"),
       expectedDischargeDate: data.expectedDischargeDate ? format(data.expectedDischargeDate, "yyyy-MM-dd") : undefined,
       veterinarian: data.veterinarian,
-      status: data.status,
+      status: "Em Observação", // Status inicial padrão ao adicionar
       species: data.species,
-      risk: data.risk, // Capturar o risco do formulário
+      risk: data.risk,
     };
     setInternedPatients((prev) => [...prev, newPatient]);
-    setIsDialogOpen(false);
+    setIsAddDialogOpen(false);
+  };
+
+  const handleUpdateInternment = (updatedPatient: InternedPatient) => {
+    setInternedPatients((prev) =>
+      prev.map((patient) => (patient.id === updatedPatient.id ? updatedPatient : patient))
+    );
+  };
+
+  const handleCardClick = (patient: InternedPatient) => {
+    setSelectedPatient(patient);
+    setIsDetailsDialogOpen(true);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Internação</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button className="font-bold">
               <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
@@ -147,7 +161,7 @@ const Internacao = () => {
             <DialogHeader>
               <DialogTitle>Internar Novo Paciente</DialogTitle>
             </DialogHeader>
-            <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsDialogOpen(false)} />
+            <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
           </DialogContent>
         </Dialog>
       </div>
@@ -155,14 +169,18 @@ const Internacao = () => {
       <div className="mt-8">
         <h3 className="text-2xl font-semibold mb-4">Pacientes Internados</h3>
         {internedPatients.length > 0 ? (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"> {/* Alterado para lg:grid-cols-4 */}
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {internedPatients.map((patient) => {
               const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
               const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
-              const riskStripeColorClass = riskColorMap[patient.risk]; // Obter a classe de cor para a faixa de risco
+              const riskStripeColorClass = riskColorMap[patient.risk];
 
               return (
-                <li key={patient.id} className="relative p-3 border rounded-md bg-gray-100 dark:bg-gray-800 shadow-sm overflow-hidden">
+                <li
+                  key={patient.id}
+                  className="relative p-3 border rounded-md bg-gray-100 dark:bg-gray-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => handleCardClick(patient)}
+                >
                   {/* Faixa lateral de risco */}
                   <div className={cn("absolute top-0 right-0 h-full w-2 rounded-r-md", riskStripeColorClass)}></div>
                   
@@ -173,7 +191,7 @@ const Internacao = () => {
                   <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.ownerName}</p>
                   <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
                   <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
-                  <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p> {/* Exibir o risco */}
+                  <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
                   <p className="text-base text-muted-foreground"><span className="font-bold">Admissão:</span> {patient.admissionDate}</p>
                 </li>
               );
@@ -183,6 +201,13 @@ const Internacao = () => {
           <p className="text-muted-foreground">Nenhum paciente internado no momento.</p>
         )}
       </div>
+
+      <InternmentDetailsDialog
+        patient={selectedPatient}
+        isOpen={isDetailsDialogOpen}
+        onClose={() => setIsDetailsDialogOpen(false)}
+        onUpdate={handleUpdateInternment}
+      />
     </div>
   );
 };
