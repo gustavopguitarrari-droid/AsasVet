@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { CalendarCheck, CalendarX, CalendarClock, Edit, Trash2, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
-import AppointmentForm from "./AppointmentForm"; // Reutilizar o formulário de agendamento
+import AppointmentForm, { AppointmentFormValues } from "./AppointmentForm"; // Reutilizar o formulário de agendamento
 import { cn } from "@/lib/utils";
 
 interface Appointment {
@@ -78,8 +78,15 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
     }
   };
 
-  const handleFormSubmit = (data: Omit<Appointment, "id">) => {
-    onUpdate({ ...appointment, ...data });
+  const handleFormSubmit = (data: AppointmentFormValues) => {
+    // O formulário agora não inclui 'date' e 'status'.
+    // Preservamos os valores originais do 'appointment' e mesclamos com os dados do formulário.
+    onUpdate({
+      ...appointment, // Mantém id, date, status e outros campos originais
+      ...data,        // Sobrescreve os campos editáveis (client, pet, etc.)
+      date: appointment.date, // Garante que a data original seja mantida
+      status: appointment.status, // Garante que o status original seja mantido
+    });
     setIsEditing(false);
     onClose();
   };

@@ -42,9 +42,6 @@ const serviceOptions = [
 ] as const; // 'as const' para inferir como tupla de strings literais
 
 const formSchema = z.object({
-  date: z.date({
-    required_error: "A data da consulta é obrigatória.",
-  }),
   time: z.string().min(1, "A hora da consulta é obrigatória."),
   client: z.string().min(1, "O nome do cliente é obrigatório."),
   pet: z.string().min(1, "O nome do animal é obrigatório."),
@@ -55,30 +52,27 @@ const formSchema = z.object({
     required_error: "O serviço é obrigatório.",
   }),
   veterinarian: z.string().min(1, "O veterinário é obrigatório."),
-  status: z.enum(["Agendada", "Realizada", "Cancelada", "Em Andamento"], {
-    required_error: "O status da consulta é obrigatório.",
-  }),
 });
 
 export type AppointmentFormValues = z.infer<typeof formSchema>;
 
 interface AppointmentFormProps {
   onSubmit: (data: AppointmentFormValues) => void;
-  initialData?: Omit<AppointmentFormValues, "date"> & { date: string };
+  // initialData agora aceita um objeto parcial do tipo Appointment,
+  // pois 'date' e 'status' não são mais gerenciados diretamente por este formulário.
+  initialData?: Partial<Omit<AppointmentFormValues, "date" | "status"> & { date?: string; status?: string }>;
 }
 
 const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData }) => {
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      date: initialData?.date ? parseISO(initialData.date) : new Date(),
       time: initialData?.time || format(new Date(), "HH:mm"),
       client: initialData?.client || "",
       pet: initialData?.pet || "",
       species: initialData?.species || "Cachorro",
       service: initialData?.service || serviceOptions[0], // Garantir que o default seja uma das opções válidas
       veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
-      status: initialData?.status || "Agendada",
     },
   });
 
@@ -184,104 +178,21 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
             </FormItem>
           )}
         />
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Data</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Selecione uma data</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="time"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Hora</FormLabel>
-                <FormControl>
-                  <Input type="time" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        {/* O campo de data foi removido */}
         <FormField
           control={form.control}
-          name="status"
+          name="time"
           render={({ field }) => (
-            <FormItem className="space-y-3">
-              <FormLabel>Status</FormLabel>
+            <FormItem>
+              <FormLabel>Hora</FormLabel>
               <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex flex-col space-y-1"
-                >
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Agendada" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Agendada</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Em Andamento" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Em Andamento</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Realizada" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Realizada</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Cancelada" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Cancelada</FormLabel>
-                  </FormItem>
-                </RadioGroup>
+                <Input type="time" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+        {/* O campo de status foi removido */}
         <DialogFooter>
           <Button type="submit">{initialData ? "Salvar Alterações" : "Agendar"}</Button>
         </DialogFooter>

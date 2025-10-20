@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 import AppointmentChronometer from "@/components/AppointmentChronometer"; // Importa o novo componente
+import { format } from "date-fns"; // Importar format para a data
 
 interface Appointment {
   id: string;
@@ -84,14 +85,14 @@ const Appointments = () => {
   const handleAddAppointment = (data: AppointmentFormValues) => {
     const newAppointment: Appointment = {
       id: `C${(appointments.length + 1).toString().padStart(3, '0')}`, // Gerar um ID simples
-      date: data.date.toISOString().split('T')[0], // Formatar a data para string "YYYY-MM-DD"
+      date: format(new Date(), "yyyy-MM-dd"), // Data atual definida automaticamente
       time: data.time,
       client: data.client,
       pet: data.pet,
       species: data.species,
       service: data.service,
       veterinarian: data.veterinarian,
-      status: data.status,
+      status: "Agendada", // Status padrão definido automaticamente
     };
     setAppointments((prev) => [...prev, newAppointment]);
     setIsAddAppointmentDialogOpen(false); // Fechar o diálogo após adicionar
