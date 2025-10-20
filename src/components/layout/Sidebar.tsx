@@ -28,49 +28,49 @@ const navItems = [
     name: "Painel",
     icon: LayoutDashboard,
     path: "/dashboard",
-    activeBgClass: "bg-sidebar-item-bg-1",
+    // activeBgClass: "bg-sidebar-item-bg-1", // Removido
   },
   {
     name: "Consultas",
     icon: CalendarDays,
     path: "/appointments",
-    activeBgClass: "bg-sidebar-item-bg-4",
+    // activeBgClass: "bg-sidebar-item-bg-4", // Removido
   },
   {
     name: "Internação",
     icon: Plus,
     path: "/internacao",
-    activeBgClass: "bg-sidebar-item-bg-6",
+    // activeBgClass: "bg-sidebar-item-bg-6", // Removido
   },
   {
     name: "Animais",
     icon: PawPrint,
     path: "/pets",
-    activeBgClass: "bg-sidebar-item-bg-3",
+    // activeBgClass: "bg-sidebar-item-bg-3", // Removido
   },
   {
     name: "Veterinários",
     icon: UserCog,
     path: "/veterinarios",
-    activeBgClass: "bg-sidebar-item-bg-9",
+    // activeBgClass: "bg-sidebar-item-bg-9", // Removido
   },
   {
     name: "Agenda", // Nome atualizado
     icon: FileText,
     path: "/medical-records",
-    activeBgClass: "bg-sidebar-item-bg-5",
+    // activeBgClass: "bg-sidebar-item-bg-5", // Removido
   },
   {
     name: "Financeiro",
     icon: DollarSign,
     path: "/financeiro",
-    activeBgClass: "bg-sidebar-item-bg-2",
+    // activeBgClass: "bg-sidebar-item-bg-2", // Removido
   },
   {
     name: "Caixa",
     icon: ReceiptText,
     path: "/caixa",
-    activeBgClass: "bg-sidebar-item-bg-7",
+    // activeBgClass: "bg-sidebar-item-bg-7", // Removido
   },
 ];
 
@@ -100,9 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                   isCollapsed
                     ? "h-10 w-10 rounded-full flex items-center justify-center"
                     : "w-full justify-start text-xl",
-                  isCollapsed && item.activeBgClass,
-                  isCollapsed && "text-sidebar-primary-foreground",
-                  !isCollapsed && location.pathname === item.path && "text-sidebar-primary-foreground"
+                  location.pathname === item.path && "bg-sidebar-primary text-sidebar-primary-foreground" // Usando cores dinâmicas
                 )}
               >
                 <Link to={item.path} className="flex items-center">
@@ -110,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                     className={cn(
                       "flex items-center justify-center",
                       !isCollapsed && "w-10 h-10 rounded-full mr-3",
-                      !isCollapsed && item.activeBgClass
+                      location.pathname === item.path && "bg-sidebar-primary" // Usando cores dinâmicas
                     )}
                   >
                     <item.icon className="h-6 w-6" strokeWidth={2.5} />
@@ -131,19 +129,17 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       <div
         className={cn(
           "mt-auto pt-4 flex items-center",
-          isCollapsed ? "justify-center" : "justify-end" // Ajustado para justificar à direita quando não colapsado
+          isCollapsed ? "justify-center" : "justify-end"
         )}
       >
-        {/* <ThemeToggle isCollapsed={isCollapsed} /> Removido */}
         <Button
-          variant="default"
+          variant="default" // Usará a cor --primary do tema
           size="icon"
           onClick={onToggleCollapse}
           className={cn(
             "rounded-full",
-            "bg-indigo-500 text-white hover:bg-indigo-600",
             "border border-border shadow-md",
-            isCollapsed ? "ml-0" : "ml-auto" // Ajustado para alinhar à direita
+            isCollapsed ? "ml-0" : "ml-auto"
           )}
         >
           {isCollapsed ? <ArrowRightToLine className="h-4 w-4" /> : <ArrowLeftToLine className="h-4 w-4" />}

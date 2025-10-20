@@ -211,8 +211,8 @@ const Dashboard = () => {
         </div>
         <Button
           onClick={() => setIsConfiguratorOpen(true)}
-          variant="default"
-          className="bg-purple-600 text-white hover:bg-purple-700 font-bold"
+          variant="default" // Usará a cor --primary do tema
+          className="font-bold"
         >
           <Settings className="mr-2 h-4 w-4" /> Configurar Painel
         </Button>

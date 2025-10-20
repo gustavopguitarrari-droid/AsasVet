@@ -99,11 +99,11 @@ const Appointments = () => {
   const getStatusBadgeVariant = (status: Appointment["status"]) => {
     switch (status) {
       case "Agendada":
-        return "bg-sidebar-item-bg-1 text-white"; // Azul para agendada
+        return "bg-primary text-primary-foreground"; // Usando primary do tema
       case "Realizada":
-        return "bg-green-500 text-white"; // Verde para realizada
+        return "bg-green-500 text-white"; // Usando green-500 do tema
       case "Cancelada":
-        return "bg-destructive text-white"; // Vermelho para cancelada
+        return "bg-destructive text-destructive-foreground"; // Usando destructive do tema
       default:
         return "bg-muted text-muted-foreground";
     }
@@ -134,17 +134,17 @@ const Appointments = () => {
 
       {/* Cards de Resumo */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-sidebar-item-bg-1 text-white shadow-md">
+        <Card className="bg-primary text-primary-foreground shadow-md"> {/* Usando primary do tema */}
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Agendadas</CardTitle>
-            <CalendarClock className="h-4 w-4 text-white" />
+            <CalendarClock className="h-4 w-4 text-primary-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalAgendadas}</div>
-            <p className="text-white/80 text-xs">Consultas pendentes</p>
+            <p className="text-primary-foreground/80 text-xs">Consultas pendentes</p>
           </CardContent>
         </Card>
-        <Card className="bg-green-500 text-white shadow-md">
+        <Card className="bg-green-500 text-white shadow-md"> {/* Usando green-500 do tema */}
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Realizadas</CardTitle>
             <CalendarCheck className="h-4 w-4 text-white" />
@@ -154,14 +154,14 @@ const Appointments = () => {
             <p className="text-white/80 text-xs">Consultas concluídas</p>
           </CardContent>
         </Card>
-        <Card className="bg-destructive text-white shadow-md">
+        <Card className="bg-destructive text-destructive-foreground shadow-md"> {/* Usando destructive do tema */}
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Canceladas</CardTitle>
-            <CalendarX className="h-4 w-4 text-white" />
+            <CalendarX className="h-4 w-4 text-destructive-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalCanceladas}</div>
-            <p className="text-white/80 text-xs">Consultas canceladas</p>
+            <p className="text-destructive-foreground/80 text-xs">Consultas canceladas</p>
           </CardContent>
         </Card>
       </div>
@@ -179,9 +179,9 @@ const Appointments = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
           <TabsList className="grid w-full grid-cols-4 bg-muted/50">
             <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Todas</TabsTrigger>
-            <TabsTrigger value="Agendada" className="data-[state=active]:bg-sidebar-item-bg-1 data-[state=active]:text-white">Agendadas</TabsTrigger>
+            <TabsTrigger value="Agendada" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Agendadas</TabsTrigger>
             <TabsTrigger value="Realizada" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">Realizadas</TabsTrigger>
-            <TabsTrigger value="Cancelada" className="data-[state=active]:bg-destructive data-[state=active]:text-white">Canceladas</TabsTrigger>
+            <TabsTrigger value="Cancelada" className="data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground">Canceladas</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
