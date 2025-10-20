@@ -162,7 +162,7 @@ const Internacao = () => {
               const riskStripeColorClass = riskColorMap[patient.risk]; // Obter a classe de cor para a faixa de risco
 
               return (
-                <li key={patient.id} className="relative p-3 border rounded-md bg-secondary shadow-md overflow-hidden">
+                <li key={patient.id} className="relative p-3 border rounded-md bg-card shadow-sm overflow-hidden">
                   {/* Faixa lateral de risco */}
                   <div className={cn("absolute top-0 right-0 h-full w-2 rounded-r-md", riskStripeColorClass)}></div>
                   
