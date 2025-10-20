@@ -1,9 +1,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react"; // Importar ícones
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils"; // Importar cn para classes condicionais
 
 interface InternedPatient {
   id: string;
@@ -14,7 +15,18 @@ interface InternedPatient {
   expectedDischargeDate?: string;
   veterinarian: string;
   status: "Em Observação" | "Estável" | "Crítico" | "Alta";
+  species: string; // Adicionado campo de espécie
 }
+
+// Mapeamento de espécies para ícones (reutilizado de Pets.tsx)
+const speciesIconMap: { [key: string]: React.ElementType } = {
+  Cachorro: Dog,
+  Gato: Cat,
+  Pássaro: Bird,
+  Roedor: Rabbit,
+  Peixe: Fish,
+  Outros: MoreHorizontal,
+};
 
 const Internacao = () => {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
@@ -31,6 +43,7 @@ const Internacao = () => {
         expectedDischargeDate: "2024-10-28",
         veterinarian: "Dr. Ana Paula",
         status: "Estável",
+        species: "Cachorro", // Adicionado espécie
       },
       {
         id: "INT002",
@@ -40,6 +53,17 @@ const Internacao = () => {
         admissionDate: "2024-10-25",
         veterinarian: "Dr. Carlos Eduardo",
         status: "Em Observação",
+        species: "Gato", // Adicionado espécie
+      },
+      {
+        id: "INT003",
+        petName: "Chico",
+        ownerName: "Carlos Pereira",
+        reason: "Check-up de rotina",
+        admissionDate: "2024-10-26",
+        veterinarian: "Dra. Beatriz Lima",
+        status: "Em Observação",
+        species: "Pássaro", // Adicionado espécie
       },
     ];
     setInternedPatients(mockPatients);
@@ -55,6 +79,7 @@ const Internacao = () => {
       expectedDischargeDate: data.expectedDischargeDate ? format(data.expectedDischargeDate, "yyyy-MM-dd") : undefined,
       veterinarian: data.veterinarian,
       status: data.status,
+      species: data.species, // Capturar a espécie do formulário
     };
     setInternedPatients((prev) => [...prev, newPatient]);
     setIsDialogOpen(false);
@@ -82,16 +107,22 @@ const Internacao = () => {
       <div className="mt-8">
         <h3 className="text-2xl font-semibold mb-4">Pacientes Internados</h3>
         {internedPatients.length > 0 ? (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Adicionado layout de grid */}
-            {internedPatients.map((patient) => (
-              <li key={patient.id} className="p-3 border rounded-md bg-card shadow-sm">
-                <p className="font-bold">{patient.petName}</p>
-                <p className="text-sm text-muted-foreground">Tutor: {patient.ownerName}</p>
-                <p className="text-sm text-muted-foreground">Motivo: {patient.reason}</p>
-                <p className="text-sm text-muted-foreground">Status: {patient.status}</p>
-                <p className="text-sm text-muted-foreground">Admissão: {patient.admissionDate}</p>
-              </li>
-            ))}
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {internedPatients.map((patient) => {
+              const IconComponent = speciesIconMap[patient.species] || MoreHorizontal; // Obter o componente do ícone
+              return (
+                <li key={patient.id} className="p-3 border rounded-md bg-card shadow-sm">
+                  <p className="font-bold flex items-center">
+                    <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" /> {/* Renderizar o ícone */}
+                    {patient.petName}
+                  </p>
+                  <p className="text-sm text-muted-foreground">Tutor: {patient.ownerName}</p>
+                  <p className="text-sm text-muted-foreground">Motivo: {patient.reason}</p>
+                  <p className="text-sm text-muted-foreground">Status: {patient.status}</p>
+                  <p className="text-sm text-muted-foreground">Admissão: {patient.admissionDate}</p>
+                </li>
+              );
+            })}
           </ul>
         ) : (
           <p className="text-muted-foreground">Nenhum paciente internado no momento.</p>

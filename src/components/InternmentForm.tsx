@@ -45,6 +45,9 @@ const formSchema = z.object({
   status: z.enum(["Em Observação", "Estável", "Crítico"], {
     required_error: "O status inicial é obrigatório.",
   }),
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], { // Novo campo de espécie
+    required_error: "A espécie do animal é obrigatória.",
+  }),
 });
 
 export type InternmentFormValues = z.infer<typeof formSchema>;
@@ -64,6 +67,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
       admissionDate: new Date(),
       veterinarian: mockVeterinarians[0]?.name || "",
       status: "Em Observação",
+      species: "Cachorro", // Valor padrão para espécie
     },
   });
 
@@ -92,6 +96,31 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
               <FormControl>
                 <Input placeholder="Ex: João Silva" {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="species"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Espécie</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a espécie" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Cachorro">Cachorro</SelectItem>
+                  <SelectItem value="Gato">Gato</SelectItem>
+                  <SelectItem value="Pássaro">Pássaro</SelectItem>
+                  <SelectItem value="Roedor">Roedor</SelectItem>
+                  <SelectItem value="Peixe">Peixe</SelectItem>
+                  <SelectItem value="Outros">Outros</SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
@@ -209,9 +238,9 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
                   </PopoverContent>
                 </Popover>
                 <FormMessage />
-              </FormItem>
-            )}
-          />
+            </FormItem>
+          )}
+        />
         </div>
         <FormField
           control={form.control}
