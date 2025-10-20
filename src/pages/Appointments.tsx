@@ -13,6 +13,12 @@ import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"; // Importar DropdownMenu components
 import AppointmentForm from "@/components/AppointmentForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -132,11 +138,19 @@ const Appointments = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Consultas</h2>
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" /> Incluir Consulta
-            </Button>
-          </DialogTrigger>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" /> Incluir Consulta
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setIsAddDialogOpen(true)}>
+                Nova Consulta
+              </DropdownMenuItem>
+              {/* Adicione outras opções de agendamento aqui, se necessário */}
+            </DropdownMenuContent>
+          </DropdownMenu>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Agendar Nova Consulta</DialogTitle>
@@ -150,7 +164,7 @@ const Appointments = () => {
       <div className="grid gap-4 md:grid-cols-4"> {/* Ajustado para 4 colunas */}
         <Card className="bg-gray-700 text-white shadow-md"> {/* Alterado para cinza escuro */}
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Em espera</CardTitle> {/* Nome alterado aqui */}
+            <CardTitle className="text-sm font-medium">Em espera</CardTitle>
             <CalendarClock className="h-4 w-4 text-white" /> {/* Ícone branco */}
           </CardHeader>
           <CardContent>
