@@ -112,14 +112,14 @@ const Internacao = () => {
               const IconComponent = speciesIconMap[patient.species] || MoreHorizontal; // Obter o componente do ícone
               return (
                 <li key={patient.id} className="p-3 border rounded-md bg-card shadow-sm">
-                  <p className="font-bold text-lg flex items-center"> {/* Aumentado para text-lg */}
-                    <IconComponent className="h-5 w-5 mr-2 text-muted-foreground" /> {/* Ícone um pouco maior */}
+                  <p className="font-bold text-lg flex items-center">
+                    <IconComponent className="h-6 w-6 mr-2 text-muted-foreground" /> {/* Ícone aumentado para h-6 w-6 */}
                     {patient.petName}
                   </p>
-                  <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.ownerName}</p> {/* Aumentado para text-base */}
-                  <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p> {/* Aumentado para text-base */}
-                  <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p> {/* Aumentado para text-base */}
-                  <p className="text-base text-muted-foreground"><span className="font-bold">Admissão:</span> {patient.admissionDate}</p> {/* Aumentado para text-base */}
+                  <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.ownerName}</p>
+                  <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
+                  <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
+                  <p className="text-base text-muted-foreground"><span className="font-bold">Admissão:</span> {patient.admissionDate}</p>
                 </li>
               );
             })}
