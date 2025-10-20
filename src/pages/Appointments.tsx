@@ -12,12 +12,13 @@ import {
 import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import AppointmentForm, { AppointmentFormValues } from "@/components/AppointmentForm"; // Importa AppointmentFormValues
+import { DialogTrigger } from "@/components/ui/dialog"; // Apenas DialogTrigger é necessário aqui
+import AppointmentForm, { AppointmentFormValues } from "@/components/AppointmentForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
-import AppointmentChronometer from "@/components/AppointmentChronometer"; // Importa o novo componente
+import AppointmentChronometer from "@/components/AppointmentChronometer";
+import AddAppointmentDialog from "@/components/AddAppointmentDialog"; // Importa o novo componente de diálogo
 
 interface Appointment {
   id: string;
@@ -28,7 +29,7 @@ interface Appointment {
   species: string;
   service: string;
   veterinarian: string;
-  status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento"; // Adicionado 'Em Andamento'
+  status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
 }
 
 const mockAppointments: Appointment[] = [
@@ -36,7 +37,7 @@ const mockAppointments: Appointment[] = [
   { id: "C002", date: "2024-10-26", time: "14:30", client: "Maria Souza", pet: "Miau", species: "Gato", service: "Vacinação", veterinarian: "Dr. Carlos Eduardo", status: "Realizada" },
   { id: "C003", date: "2024-10-27", time: "09:00", client: "Pedro Santos", pet: "Pingo", species: "Pássaro", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Cancelada" },
   { id: "C004", date: "2024-10-28", time: "11:00", client: "Ana Costa", pet: "Bob", species: "Cachorro", service: "Banho e Tosa", veterinarian: "Dr. Ana Paula", status: "Agendada" },
-  { id: "C005", date: "2024-10-29", time: "16:00", client: "Carlos Lima", pet: "Luna", species: "Gato", service: "Consulta de Retorno", veterinarian: "Dr. Carlos Eduardo", status: "Em Andamento" }, // Exemplo de 'Em Andamento'
+  { id: "C005", date: "2024-10-29", time: "16:00", client: "Carlos Lima", pet: "Luna", species: "Gato", service: "Consulta de Retorno", veterinarian: "Dr. Carlos Eduardo", status: "Em Andamento" },
   { id: "C006", date: "2024-10-25", time: "13:00", client: "Fernanda Reis", pet: "Thor", species: "Cachorro", service: "Cirurgia", veterinarian: "Dra. Beatriz Lima", status: "Realizada" },
   { id: "C007", date: "2024-10-30", time: "10:00", client: "Lucas Mendes", pet: "Nemo", species: "Peixe", service: "Consulta Geral", veterinarian: "Dr. Ana Paula", status: "Agendada" },
   { id: "C008", date: "2024-10-31", time: "15:00", client: "Mariana Santos", pet: "Pipoca", species: "Roedor", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Agendada" },
@@ -53,16 +54,15 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
 };
 
 const Appointments = () => {
-  const [activeTab, setActiveTab] = React.useState<string>("em-espera"); // Alterado para a nova aba padrão
+  const [activeTab, setActiveTab] = React.useState<string>("em-espera");
   const [appointments, setAppointments] = React.useState<Appointment[]>(mockAppointments);
   const [searchTerm, setSearchTerm] = React.useState<string>("");
 
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState<boolean>(false);
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
-  const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false); // Estado para o novo diálogo
+  const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false);
 
   const filteredAppointments = appointments.filter((appointment) => {
-    // A busca por termo foi removida, então apenas o filtro por aba é aplicado
     let matchesTab = false;
     switch (activeTab) {
       case "em-espera":
@@ -74,17 +74,17 @@ const Appointments = () => {
       case "finalizadas":
         matchesTab = appointment.status === "Realizada" || appointment.status === "Cancelada";
         break;
-      default: // Fallback para 'all' ou qualquer outro caso
+      default:
         matchesTab = true;
         break;
     }
-    return matchesTab; // Retorna apenas o filtro por aba
+    return matchesTab;
   });
 
   const handleAddAppointment = (data: AppointmentFormValues) => {
     const newAppointment: Appointment = {
-      id: `C${(appointments.length + 1).toString().padStart(3, '0')}`, // Gerar um ID simples
-      date: data.date.toISOString().split('T')[0], // Formatar a data para string "YYYY-MM-DD"
+      id: `C${(appointments.length + 1).toString().padStart(3, '0')}`,
+      date: data.date.toISOString().split('T')[0],
       time: data.time,
       client: data.client,
       pet: data.pet,
@@ -94,7 +94,7 @@ const Appointments = () => {
       status: data.status,
     };
     setAppointments((prev) => [...prev, newAppointment]);
-    setIsAddAppointmentDialogOpen(false); // Fechar o diálogo após adicionar
+    setIsAddAppointmentDialogOpen(false);
   };
 
   const handleUpdateAppointment = (updatedAppointment: Appointment) => {
@@ -120,7 +120,7 @@ const Appointments = () => {
     switch (status) {
       case "Agendada":
         return "bg-primary text-primary-foreground";
-      case "Em Andamento": // Novo status
+      case "Em Andamento":
         return "bg-orange-500 text-white";
       case "Realizada":
         return "bg-green-500 text-white";
@@ -141,34 +141,26 @@ const Appointments = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Consultas</h2>
-        <Dialog open={isAddAppointmentDialogOpen} onOpenChange={setIsAddAppointmentDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" /> Incluir Consulta
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Incluir Nova Consulta</DialogTitle>
-            </DialogHeader>
-            <AppointmentForm onSubmit={handleAddAppointment} />
-          </DialogContent>
-        </Dialog>
+        <DialogTrigger asChild> {/* Usando DialogTrigger diretamente */}
+          <Button onClick={() => setIsAddAppointmentDialogOpen(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" /> Incluir Consulta
+          </Button>
+        </DialogTrigger>
       </div>
 
       {/* Cards de Resumo */}
-      <div className="grid gap-4 md:grid-cols-4"> {/* Ajustado para 4 colunas */}
-        <Card className="bg-gray-700 text-white shadow-md"> {/* Alterado para cinza escuro */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card className="bg-gray-700 text-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Em espera</CardTitle> {/* Nome alterado aqui */}
-            <CalendarClock className="h-4 w-4 text-white" /> {/* Ícone branco */}
+            <CardTitle className="text-sm font-medium">Em espera</CardTitle>
+            <CalendarClock className="h-4 w-4 text-white" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalAgendadas}</div>
-            <p className="text-gray-200 text-xs">Consultas aguardando</p> {/* Texto cinza claro */}
+            <p className="text-gray-200 text-xs">Consultas aguardando</p>
           </CardContent>
         </Card>
-        <Card className="bg-orange-500 text-white shadow-md"> {/* Novo card para 'Em Andamento' */}
+        <Card className="bg-orange-500 text-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Em Andamento</CardTitle>
             <CalendarClock className="h-4 w-4 text-white" />
@@ -217,7 +209,7 @@ const Appointments = () => {
               <TableHead>Paciente</TableHead>
               <TableHead>Tutor</TableHead>
               <TableHead>Serviço</TableHead>
-              {activeTab !== "em-espera" && <TableHead>Veterinário</TableHead>} {/* Condicional para Veterinário */}
+              {activeTab !== "em-espera" && <TableHead>Veterinário</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -226,7 +218,7 @@ const Appointments = () => {
                 const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
                 const isCancelled = activeTab === "finalizadas" && appointment.status === "Cancelada";
                 const isRealizada = activeTab === "finalizadas" && appointment.status === "Realizada";
-                const isEmAndamento = activeTab === "em-andamento" && appointment.status === "Em Andamento"; // Nova condição
+                const isEmAndamento = activeTab === "em-andamento" && appointment.status === "Em Andamento";
                 return (
                   <TableRow
                     key={appointment.id}
@@ -241,7 +233,7 @@ const Appointments = () => {
                     </TableCell>
                     <TableCell>{appointment.client}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
-                    {activeTab !== "em-espera" && ( // Condicional para Veterinário
+                    {activeTab !== "em-espera" && (
                       <TableCell className="flex items-center">
                         {appointment.veterinarian}
                         {isCancelled && (
@@ -254,7 +246,7 @@ const Appointments = () => {
                             Concluída
                           </Badge>
                         )}
-                        {isEmAndamento && ( // Badge e Cronômetro para 'Em Andamento'
+                        {isEmAndamento && (
                           <>
                             <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
                               Iniciada
@@ -269,7 +261,7 @@ const Appointments = () => {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={activeTab === "em-espera" ? 3 : 4} className="h-24 text-center"> {/* Ajuste do colSpan */}
+                <TableCell colSpan={activeTab === "em-espera" ? 3 : 4} className="h-24 text-center">
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
@@ -284,6 +276,12 @@ const Appointments = () => {
         onClose={() => setIsDetailsDialogOpen(false)}
         onUpdate={handleUpdateAppointment}
         onCancelAppointment={handleCancelAppointment}
+      />
+
+      <AddAppointmentDialog
+        isOpen={isAddAppointmentDialogOpen}
+        onOpenChange={setIsAddAppointmentDialogOpen}
+        onSubmit={handleAddAppointment}
       />
     </div>
   );
