@@ -22,7 +22,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter } from "@/components/ui/dialog";
 import RiskSelector from "./RiskSelector"; // Importar o novo componente RiskSelector
@@ -43,9 +42,6 @@ const formSchema = z.object({
   }),
   expectedDischargeDate: z.date().optional(),
   veterinarian: z.string().min(1, "O veterinário responsável é obrigatório."),
-  status: z.enum(["Em Observação", "Estável", "Crítico"], {
-    required_error: "O status inicial é obrigatório.",
-  }),
   species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], { // Novo campo de espécie
     required_error: "A espécie do animal é obrigatória.",
   }),
@@ -70,7 +66,6 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
       reason: "",
       admissionDate: new Date(),
       veterinarian: mockVeterinarians[0]?.name || "",
-      status: "Em Observação",
       species: "Cachorro", // Valor padrão para espécie
       risk: "Sem risco", // Valor padrão para risco
     },
@@ -261,42 +256,6 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
           )}
         />
         </div>
-        <FormField
-          control={form.control}
-          name="status"
-          render={({ field }) => (
-            <FormItem className="space-y-3">
-              <FormLabel>Status Inicial</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex flex-col space-y-1"
-                >
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Em Observação" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Em Observação</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Estável" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Estável</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Crítico" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Crítico</FormLabel>
-                  </FormItem>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
         <DialogFooter>
           <Button variant="outline" onClick={onCancel}>
             Cancelar
