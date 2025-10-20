@@ -113,7 +113,7 @@ const Internacao = () => {
               return (
                 <li key={patient.id} className="p-3 border rounded-md bg-card shadow-sm">
                   <p className="font-bold text-lg flex items-center">
-                    <IconComponent className="h-6 w-6 mr-2 text-muted-foreground" /> {/* Ícone aumentado para h-6 w-6 */}
+                    <IconComponent className="h-6 w-6 mr-2 text-foreground" /> {/* Alterado para text-foreground */}
                     {patient.petName}
                   </p>
                   <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.ownerName}</p>
