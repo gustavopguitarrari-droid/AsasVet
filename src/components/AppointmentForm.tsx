@@ -43,7 +43,7 @@ const formSchema = z.object({
   }),
   service: z.string().min(1, "O serviço é obrigatório."),
   veterinarian: z.string().min(1, "O veterinário é obrigatório."),
-  status: z.enum(["Agendada", "Realizada", "Cancelada"], {
+  status: z.enum(["Agendada", "Realizada", "Cancelada", "Em Andamento"], { // Adicionado 'Em Andamento'
     required_error: "O status da consulta é obrigatório.",
   }),
 });
@@ -246,6 +246,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
                       <RadioGroupItem value="Agendada" />
                     </FormControl>
                     <FormLabel className="font-normal">Agendada</FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="Em Andamento" /> {/* Novo item */}
+                    </FormControl>
+                    <FormLabel className="font-normal">Em Andamento</FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>

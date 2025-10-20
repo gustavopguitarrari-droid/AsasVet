@@ -25,7 +25,7 @@ interface Appointment {
   species: string; // Adicionado campo de espécie
   service: string;
   veterinarian: string;
-  status: "Agendada" | "Realizada" | "Cancelada";
+  status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento"; // Adicionado 'Em Andamento'
 }
 
 interface AppointmentDetailsDialogProps {
@@ -67,6 +67,8 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
     switch (status) {
       case "Agendada":
         return "bg-sidebar-item-bg-1 text-white";
+      case "Em Andamento": // Novo status
+        return "bg-orange-500 text-white";
       case "Realizada":
         return "bg-green-500 text-white";
       case "Cancelada":

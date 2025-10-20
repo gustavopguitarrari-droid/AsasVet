@@ -27,7 +27,7 @@ interface Appointment {
   species: string;
   service: string;
   veterinarian: string;
-  status: "Agendada" | "Realizada" | "Cancelada";
+  status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento"; // Adicionado 'Em Andamento'
 }
 
 const mockAppointments: Appointment[] = [
@@ -35,7 +35,7 @@ const mockAppointments: Appointment[] = [
   { id: "C002", date: "2024-10-26", time: "14:30", client: "Maria Souza", pet: "Miau", species: "Gato", service: "Vacinação", veterinarian: "Dr. Carlos Eduardo", status: "Realizada" },
   { id: "C003", date: "2024-10-27", time: "09:00", client: "Pedro Santos", pet: "Pingo", species: "Pássaro", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Cancelada" },
   { id: "C004", date: "2024-10-28", time: "11:00", client: "Ana Costa", pet: "Bob", species: "Cachorro", service: "Banho e Tosa", veterinarian: "Dr. Ana Paula", status: "Agendada" },
-  { id: "C005", date: "2024-10-29", time: "16:00", client: "Carlos Lima", pet: "Luna", species: "Gato", service: "Consulta de Retorno", veterinarian: "Dr. Carlos Eduardo", status: "Agendada" },
+  { id: "C005", date: "2024-10-29", time: "16:00", client: "Carlos Lima", pet: "Luna", species: "Gato", service: "Consulta de Retorno", veterinarian: "Dr. Carlos Eduardo", status: "Em Andamento" }, // Exemplo de 'Em Andamento'
   { id: "C006", date: "2024-10-25", time: "13:00", client: "Fernanda Reis", pet: "Thor", species: "Cachorro", service: "Cirurgia", veterinarian: "Dra. Beatriz Lima", status: "Realizada" },
   { id: "C007", date: "2024-10-30", time: "10:00", client: "Lucas Mendes", pet: "Nemo", species: "Peixe", service: "Consulta Geral", veterinarian: "Dr. Ana Paula", status: "Agendada" },
   { id: "C008", date: "2024-10-31", time: "15:00", client: "Mariana Santos", pet: "Pipoca", species: "Roedor", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Agendada" },
@@ -52,7 +52,7 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
 };
 
 const Appointments = () => {
-  const [activeTab, setActiveTab] = React.useState<string>("all");
+  const [activeTab, setActiveTab] = React.useState<string>("em-espera"); // Alterado para a nova aba padrão
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState<boolean>(false);
   const [appointments, setAppointments] = React.useState<Appointment[]>(mockAppointments);
   const [searchTerm, setSearchTerm] = React.useState<string>("");
@@ -61,13 +61,28 @@ const Appointments = () => {
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
 
   const filteredAppointments = appointments.filter((appointment) => {
-    const matchesTab = activeTab === "all" || appointment.status === activeTab;
     const matchesSearch =
       appointment.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.pet.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.species.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    let matchesTab = false;
+    switch (activeTab) {
+      case "em-espera":
+        matchesTab = appointment.status === "Agendada";
+        break;
+      case "em-andamento":
+        matchesTab = appointment.status === "Em Andamento";
+        break;
+      case "finalizadas":
+        matchesTab = appointment.status === "Realizada" || appointment.status === "Cancelada";
+        break;
+      default: // Fallback para 'all' ou qualquer outro caso
+        matchesTab = true;
+        break;
+    }
     return matchesTab && matchesSearch;
   });
 
@@ -100,6 +115,8 @@ const Appointments = () => {
     switch (status) {
       case "Agendada":
         return "bg-primary text-primary-foreground";
+      case "Em Andamento": // Novo status
+        return "bg-orange-500 text-white";
       case "Realizada":
         return "bg-green-500 text-white";
       case "Cancelada":
@@ -112,6 +129,8 @@ const Appointments = () => {
   const totalAgendadas = appointments.filter(a => a.status === "Agendada").length;
   const totalRealizadas = appointments.filter(a => a.status === "Realizada").length;
   const totalCanceladas = appointments.filter(a => a.status === "Cancelada").length;
+  const totalEmAndamento = appointments.filter(a => a.status === "Em Andamento").length;
+
 
   return (
     <div className="space-y-6">
@@ -133,7 +152,7 @@ const Appointments = () => {
       </div>
 
       {/* Cards de Resumo */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-4"> {/* Ajustado para 4 colunas */}
         <Card className="bg-primary text-primary-foreground shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Agendadas</CardTitle>
@@ -142,6 +161,16 @@ const Appointments = () => {
           <CardContent>
             <div className="text-2xl font-bold">{totalAgendadas}</div>
             <p className="text-primary-foreground/80 text-xs">Consultas pendentes</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-orange-500 text-white shadow-md"> {/* Novo card para 'Em Andamento' */}
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Em Andamento</CardTitle>
+            <CalendarClock className="h-4 w-4 text-white" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{totalEmAndamento}</div>
+            <p className="text-white/80 text-xs">Consultas em progresso</p>
           </CardContent>
         </Card>
         <Card className="bg-green-500 text-white shadow-md">
@@ -176,12 +205,12 @@ const Appointments = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
+        {/* Novas abas de filtro */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
-          <TabsList className="grid w-full grid-cols-4 bg-muted/50">
-            <TabsTrigger value="all" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Todas</TabsTrigger>
-            <TabsTrigger value="Agendada" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Agendadas</TabsTrigger>
-            <TabsTrigger value="Realizada" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">Realizadas</TabsTrigger>
-            <TabsTrigger value="Cancelada" className="data-[state=active]:bg-destructive data-[state=active]:text-destructive-foreground">Canceladas</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 bg-muted/50">
+            <TabsTrigger value="em-espera" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Em Espera</TabsTrigger>
+            <TabsTrigger value="em-andamento" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">Em Andamento</TabsTrigger>
+            <TabsTrigger value="finalizadas" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">Finalizadas</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
