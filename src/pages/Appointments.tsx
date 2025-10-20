@@ -214,7 +214,7 @@ const Appointments = () => {
               filteredAppointments.map((appointment) => {
                 const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
                 const isCancelled = activeTab === "finalizadas" && appointment.status === "Cancelada";
-                const isRealizada = activeTab === "finalizadas" && appointment.status === "Realizada"; // Nova condição
+                const isRealizada = activeTab === "finalizadas" && appointment.status === "Realizada";
                 return (
                   <TableRow
                     key={appointment.id}
@@ -231,11 +231,16 @@ const Appointments = () => {
                     </TableCell>
                     <TableCell>{appointment.client}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
-                    <TableCell className="flex items-center"> {/* Adicionado flex para alinhar o badge */}
+                    <TableCell className="flex items-center">
                       {appointment.veterinarian}
                       {isCancelled && (
                         <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
                           Cancelada
+                        </Badge>
+                      )}
+                      {isRealizada && ( // Adiciona o badge "Concluída"
+                        <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
+                          Concluída
                         </Badge>
                       )}
                     </TableCell>
