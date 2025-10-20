@@ -82,10 +82,10 @@ const Internacao = () => {
       <div className="mt-8">
         <h3 className="text-2xl font-semibold mb-4">Pacientes Internados</h3>
         {internedPatients.length > 0 ? (
-          <ul className="space-y-2">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"> {/* Adicionado layout de grid */}
             {internedPatients.map((patient) => (
-              <li key={patient.id} className="p-3 border rounded-md bg-card shadow-sm"> {/* Alterado de p-4 para p-3 */}
-                <p className="font-bold">{patient.petName}</p> {/* Removido (patient.species) pois não está no tipo InternedPatient */}
+              <li key={patient.id} className="p-3 border rounded-md bg-card shadow-sm">
+                <p className="font-bold">{patient.petName}</p>
                 <p className="text-sm text-muted-foreground">Tutor: {patient.ownerName}</p>
                 <p className="text-sm text-muted-foreground">Motivo: {patient.reason}</p>
                 <p className="text-sm text-muted-foreground">Status: {patient.status}</p>
