@@ -13,7 +13,7 @@ import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import AppointmentForm from "@/components/AppointmentForm";
+import AppointmentForm, { AppointmentFormValues } from "@/components/AppointmentForm"; // Importa AppointmentFormValues
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
@@ -59,6 +59,7 @@ const Appointments = () => {
 
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState<boolean>(false);
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
+  const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false); // Estado para o novo diálogo
 
   const filteredAppointments = appointments.filter((appointment) => {
     // A busca por termo foi removida, então apenas o filtro por aba é aplicado
@@ -79,6 +80,22 @@ const Appointments = () => {
     }
     return matchesTab; // Retorna apenas o filtro por aba
   });
+
+  const handleAddAppointment = (data: AppointmentFormValues) => {
+    const newAppointment: Appointment = {
+      id: `C${(appointments.length + 1).toString().padStart(3, '0')}`, // Gerar um ID simples
+      date: data.date.toISOString().split('T')[0], // Formatar a data para string "YYYY-MM-DD"
+      time: data.time,
+      client: data.client,
+      pet: data.pet,
+      species: data.species,
+      service: data.service,
+      veterinarian: data.veterinarian,
+      status: data.status,
+    };
+    setAppointments((prev) => [...prev, newAppointment]);
+    setIsAddAppointmentDialogOpen(false); // Fechar o diálogo após adicionar
+  };
 
   const handleUpdateAppointment = (updatedAppointment: Appointment) => {
     setAppointments((prev) =>
@@ -124,7 +141,19 @@ const Appointments = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Consultas</h2>
-        {/* O botão "Incluir Consulta" e o Dialog associado foram removidos daqui */}
+        <Dialog open={isAddAppointmentDialogOpen} onOpenChange={setIsAddAppointmentDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <PlusCircle className="mr-2 h-4 w-4" /> Incluir Consulta
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Incluir Nova Consulta</DialogTitle>
+            </DialogHeader>
+            <AppointmentForm onSubmit={handleAddAppointment} />
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Cards de Resumo */}
