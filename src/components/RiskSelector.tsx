@@ -14,11 +14,11 @@ interface RiskOption {
 }
 
 const riskOptions: RiskOption[] = [
-  { label: "Sem risco", value: "Sem risco", colorClass: "bg-green-500" },
-  { label: "Baixo", value: "Baixo", colorClass: "bg-blue-500" },
-  { label: "Médio", value: "Médio", colorClass: "bg-orange-500" },
-  { label: "Alto", value: "Alto", colorClass: "bg-red-500" },
-  { label: "Emergência", value: "Emergência", colorClass: "bg-red-700" },
+  { label: "Sem risco", value: "Sem risco", colorClass: "bg-blue-500" }, // Alterado para azul
+  { label: "Baixo", value: "Baixo", colorClass: "bg-green-500" }, // Alterado para verde
+  { label: "Médio", value: "Médio", colorClass: "bg-orange-500" }, // Alterado para laranja
+  { label: "Alto", value: "Alto", colorClass: "bg-red-500" }, // Alterado para vermelho vivo
+  { label: "Emergência", value: "Emergência", colorClass: "bg-black" }, // Alterado para preto
 ];
 
 interface RiskSelectorProps {
