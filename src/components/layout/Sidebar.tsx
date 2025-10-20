@@ -4,15 +4,15 @@ import {
   LayoutDashboard,
   Users,
   PawPrint,
-  CalendarDays,
-  FileText,
+  CalendarDays, // Usado para Agenda
+  ClipboardList, // Novo ícone para Consultas
   DollarSign,
   Plus,
   Stethoscope,
   ArrowLeftToLine,
   ArrowRightToLine,
   ReceiptText,
-  Package, // Importado o ícone Package
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -33,7 +33,7 @@ const navItems = [
   },
   {
     name: "Consultas",
-    icon: CalendarDays,
+    icon: ClipboardList, // Ícone atualizado para ClipboardList
     path: "/appointments",
     // activeBgClass: "bg-sidebar-item-bg-4", // Removido
   },
@@ -50,20 +50,20 @@ const navItems = [
     // activeBgClass: "bg-sidebar-item-bg-3", // Removido
   },
   {
-    name: "Equipe", // Texto atualizado para "Equipe"
+    name: "Equipe",
     icon: Stethoscope,
     path: "/veterinarios",
     // activeBgClass: "bg-sidebar-item-bg-9", // Removido
   },
   {
-    name: "Agenda", // Nome atualizado
-    icon: FileText,
+    name: "Agenda",
+    icon: CalendarDays, // Ícone atualizado para CalendarDays
     path: "/medical-records",
     // activeBgClass: "bg-sidebar-item-bg-5", // Removido
   },
   {
-    name: "Estoque", // Novo item de navegação
-    icon: Package, // Ícone para Estoque
+    name: "Estoque",
+    icon: Package,
     path: "/estoque",
     // activeBgClass: "bg-sidebar-item-bg-8", // Pode ser ajustado conforme a paleta
   },
