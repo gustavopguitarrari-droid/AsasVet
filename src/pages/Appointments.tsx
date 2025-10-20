@@ -221,10 +221,12 @@ const Appointments = () => {
                     </TableCell>
                     <TableCell>{appointment.client}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
-                    <TableCell>
+                    <TableCell className="flex items-center"> {/* Adicionado flex para alinhar o badge */}
                       {appointment.veterinarian}
                       {activeTab === "finalizadas" && appointment.status === "Cancelada" && (
-                        <span className="ml-2 text-destructive font-semibold">(Cancelada)</span>
+                        <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
+                          Cancelada
+                        </Badge>
                       )}
                     </TableCell>
                   </TableRow>
