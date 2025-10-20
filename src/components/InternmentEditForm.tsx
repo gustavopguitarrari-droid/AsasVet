@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, isValid } from "date-fns"; // Importar isValid
 import { CalendarIcon } from "lucide-react";
 import { ptBR } from "date-fns/locale";
 
@@ -25,7 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter } from "@/components/ui/dialog";
 import RiskSelector from "./RiskSelector";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"; // Importar RadioGroup
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 // Mock de veterinários (reutilizando do AppointmentForm)
 const mockVeterinarians = [
@@ -41,7 +41,7 @@ const formSchema = z.object({
   admissionDate: z.date({
     required_error: "A data de admissão é obrigatória.",
   }),
-  expectedDischargeDate: z.date().optional(),
+  expectedDischargeDate: z.date().nullable().optional(), // Permitir null para data opcional
   veterinarian: z.string().min(1, "O veterinário responsável é obrigatório."),
   species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
     required_error: "A espécie do animal é obrigatória.",
@@ -49,7 +49,7 @@ const formSchema = z.object({
   risk: z.enum(["Sem risco", "Baixo", "Médio", "Alto", "Emergência"], {
     required_error: "O nível de risco é obrigatório.",
   }),
-  status: z.enum(["Em Observação", "Estável", "Crítico", "Alta", "Óbito"], { // Adicionado 'Óbito'
+  status: z.enum(["Em Observação", "Estável", "Crítico", "Alta", "Óbito"], {
     required_error: "O status é obrigatório.",
   }),
 });
@@ -61,23 +61,30 @@ interface InternmentEditFormProps {
   onCancel: () => void;
   initialData: Omit<InternmentEditFormValues, "admissionDate" | "expectedDischargeDate"> & {
     admissionDate: string;
-    expectedDischargeDate?: string;
+    expectedDischargeDate?: string | null; // Permitir null ou undefined para a string da data opcional
   };
 }
 
 const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCancel, initialData }) => {
+  // Função auxiliar para analisar strings de data com segurança
+  const safeParseDate = (dateString?: string | null): Date | undefined => {
+    if (!dateString) return undefined;
+    const parsed = parseISO(dateString);
+    return isValid(parsed) ? parsed : undefined;
+  };
+
   const form = useForm<InternmentEditFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      petName: initialData.petName,
-      ownerName: initialData.ownerName,
-      reason: initialData.reason,
-      admissionDate: parseISO(initialData.admissionDate),
-      expectedDischargeDate: initialData.expectedDischargeDate ? parseISO(initialData.expectedDischargeDate) : undefined,
-      veterinarian: initialData.veterinarian,
-      species: initialData.species,
-      risk: initialData.risk,
-      status: initialData.status, // Definir valor inicial para status
+      petName: initialData.petName || "",
+      ownerName: initialData.ownerName || "",
+      reason: initialData.reason || "",
+      admissionDate: safeParseDate(initialData.admissionDate) || new Date(), // Fallback para a data atual se inválida
+      expectedDischargeDate: safeParseDate(initialData.expectedDischargeDate),
+      veterinarian: initialData.veterinarian || mockVeterinarians[0]?.name || "",
+      species: initialData.species || "Cachorro",
+      risk: initialData.risk || "Sem risco",
+      status: initialData.status || "Em Observação",
     },
   });
 
@@ -304,7 +311,7 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="Óbito" /> {/* Novo item para Óbito */}
+                      <RadioGroupItem value="Óbito" />
                     </FormControl>
                     <FormLabel className="font-normal">Óbito</FormLabel>
                   </FormItem>
