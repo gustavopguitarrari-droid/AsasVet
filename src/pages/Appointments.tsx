@@ -16,7 +16,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import AppointmentForm from "@/components/AppointmentForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog"; // Importar o novo diálogo
+import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 
 interface Appointment {
   id: string;
@@ -24,7 +24,7 @@ interface Appointment {
   time: string;
   client: string;
   pet: string;
-  species: string; // Adicionado campo de espécie
+  species: string;
   service: string;
   veterinarian: string;
   status: "Agendada" | "Realizada" | "Cancelada";
@@ -65,7 +65,7 @@ const Appointments = () => {
     const matchesSearch =
       appointment.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.pet.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.species.toLowerCase().includes(searchTerm.toLowerCase()) || // Incluir busca por espécie
+      appointment.species.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesTab && matchesSearch;
@@ -99,11 +99,11 @@ const Appointments = () => {
   const getStatusBadgeVariant = (status: Appointment["status"]) => {
     switch (status) {
       case "Agendada":
-        return "bg-primary text-primary-foreground"; // Usando primary do tema
+        return "bg-primary text-primary-foreground";
       case "Realizada":
-        return "bg-green-500 text-white"; // Usando green-500 do tema
+        return "bg-green-500 text-white";
       case "Cancelada":
-        return "bg-destructive text-destructive-foreground"; // Usando destructive do tema
+        return "bg-destructive text-destructive-foreground";
       default:
         return "bg-muted text-muted-foreground";
     }
@@ -134,7 +134,7 @@ const Appointments = () => {
 
       {/* Cards de Resumo */}
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="bg-primary text-primary-foreground shadow-md"> {/* Usando primary do tema */}
+        <Card className="bg-primary text-primary-foreground shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Agendadas</CardTitle>
             <CalendarClock className="h-4 w-4 text-primary-foreground" />
@@ -144,7 +144,7 @@ const Appointments = () => {
             <p className="text-primary-foreground/80 text-xs">Consultas pendentes</p>
           </CardContent>
         </Card>
-        <Card className="bg-green-500 text-white shadow-md"> {/* Usando green-500 do tema */}
+        <Card className="bg-green-500 text-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Realizadas</CardTitle>
             <CalendarCheck className="h-4 w-4 text-white" />
@@ -154,7 +154,7 @@ const Appointments = () => {
             <p className="text-white/80 text-xs">Consultas concluídas</p>
           </CardContent>
         </Card>
-        <Card className="bg-destructive text-destructive-foreground shadow-md"> {/* Usando destructive do tema */}
+        <Card className="bg-destructive text-destructive-foreground shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Canceladas</CardTitle>
             <CalendarX className="h-4 w-4 text-destructive-foreground" />
