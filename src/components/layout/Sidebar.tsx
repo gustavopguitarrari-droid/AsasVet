@@ -49,8 +49,8 @@ const navItems = [
     // activeBgClass: "bg-sidebar-item-bg-3", // Removido
   },
   {
-    name: "Veterinários",
-    icon: Stethoscope, // Ícone atualizado para Stethoscope
+    name: "Equipe", // Texto atualizado para "Equipe"
+    icon: Stethoscope,
     path: "/veterinarios",
     // activeBgClass: "bg-sidebar-item-bg-9", // Removido
   },
