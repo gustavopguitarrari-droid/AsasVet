@@ -214,13 +214,15 @@ const Appointments = () => {
               filteredAppointments.map((appointment) => {
                 const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
                 const isCancelled = activeTab === "finalizadas" && appointment.status === "Cancelada";
+                const isRealizada = activeTab === "finalizadas" && appointment.status === "Realizada"; // Nova condição
                 return (
                   <TableRow
                     key={appointment.id}
                     onClick={() => handleRowClick(appointment)}
                     className={cn(
                       "cursor-pointer hover:bg-muted/50",
-                      isCancelled && "border-l-4 border-destructive" // Adiciona a borda vermelha
+                      isCancelled && "border-l-4 border-destructive", // Borda vermelha para canceladas
+                      isRealizada && "border-l-4 border-green-500" // Borda verde para realizadas
                     )}
                   >
                     <TableCell className="font-medium flex items-center">
@@ -229,7 +231,7 @@ const Appointments = () => {
                     </TableCell>
                     <TableCell>{appointment.client}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
-                    <TableCell className="flex items-center">
+                    <TableCell className="flex items-center"> {/* Adicionado flex para alinhar o badge */}
                       {appointment.veterinarian}
                       {isCancelled && (
                         <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
