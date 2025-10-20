@@ -112,14 +112,14 @@ const Internacao = () => {
               const IconComponent = speciesIconMap[patient.species] || MoreHorizontal; // Obter o componente do ícone
               return (
                 <li key={patient.id} className="p-3 border rounded-md bg-card shadow-sm">
-                  <p className="font-bold flex items-center">
-                    <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" /> {/* Renderizar o ícone */}
+                  <p className="font-bold text-lg flex items-center"> {/* Aumentado para text-lg */}
+                    <IconComponent className="h-5 w-5 mr-2 text-muted-foreground" /> {/* Ícone um pouco maior */}
                     {patient.petName}
                   </p>
-                  <p className="text-sm text-muted-foreground">Tutor: {patient.ownerName}</p>
-                  <p className="text-sm text-muted-foreground">Motivo: {patient.reason}</p>
-                  <p className="text-sm text-muted-foreground">Status: {patient.status}</p>
-                  <p className="text-sm text-muted-foreground">Admissão: {patient.admissionDate}</p>
+                  <p className="text-base text-muted-foreground">Tutor: {patient.ownerName}</p> {/* Aumentado para text-base */}
+                  <p className="text-base text-muted-foreground">Motivo: {patient.reason}</p> {/* Aumentado para text-base */}
+                  <p className="text-base text-muted-foreground">Status: {patient.status}</p> {/* Aumentado para text-base */}
+                  <p className="text-base text-muted-foreground">Admissão: {patient.admissionDate}</p> {/* Aumentado para text-base */}
                 </li>
               );
             })}
