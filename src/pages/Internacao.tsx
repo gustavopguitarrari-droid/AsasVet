@@ -155,7 +155,7 @@ const Internacao = () => {
       <div className="mt-8">
         <h3 className="text-2xl font-semibold mb-4">Pacientes Internados</h3>
         {internedPatients.length > 0 ? (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"> {/* Alterado para lg:grid-cols-4 */}
             {internedPatients.map((patient) => {
               const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
               const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
