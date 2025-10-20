@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format, parseISO } from "date-fns"; // Importar parseISO
+import { format, parseISO } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -31,6 +31,16 @@ const mockVeterinarians = [
   { id: "V003", name: "Dra. Beatriz Lima" },
 ];
 
+// Definir as opções de serviço como um array para reutilização
+const serviceOptions = [
+  "Consulta Geral",
+  "Vacinação",
+  "Exame de Rotina",
+  "Banho e Tosa",
+  "Cirurgia",
+  "Consulta de Retorno",
+] as const; // 'as const' para inferir como tupla de strings literais
+
 const formSchema = z.object({
   date: z.date({
     required_error: "A data da consulta é obrigatória.",
@@ -41,9 +51,11 @@ const formSchema = z.object({
   species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
     required_error: "A espécie do animal é obrigatória.",
   }),
-  service: z.string().min(1, "O serviço é obrigatório."),
+  service: z.enum(serviceOptions, { // Usar o array de opções para o enum
+    required_error: "O serviço é obrigatório.",
+  }),
   veterinarian: z.string().min(1, "O veterinário é obrigatório."),
-  status: z.enum(["Agendada", "Realizada", "Cancelada", "Em Andamento"], { // Adicionado 'Em Andamento'
+  status: z.enum(["Agendada", "Realizada", "Cancelada", "Em Andamento"], {
     required_error: "O status da consulta é obrigatório.",
   }),
 });
@@ -52,20 +64,20 @@ export type AppointmentFormValues = z.infer<typeof formSchema>;
 
 interface AppointmentFormProps {
   onSubmit: (data: AppointmentFormValues) => void;
-  initialData?: Omit<AppointmentFormValues, "date"> & { date: string }; // Para edição, a data pode vir como string
+  initialData?: Omit<AppointmentFormValues, "date"> & { date: string };
 }
 
 const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData }) => {
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      date: initialData?.date ? parseISO(initialData.date) : new Date(), // Converte string para Date
-      time: initialData?.time || format(new Date(), "HH:mm"), // Definir hora padrão como a hora atual formatada
+      date: initialData?.date ? parseISO(initialData.date) : new Date(),
+      time: initialData?.time || format(new Date(), "HH:mm"),
       client: initialData?.client || "",
       pet: initialData?.pet || "",
-      species: initialData?.species || "Cachorro", // Valor padrão para espécie
-      service: initialData?.service || "Consulta Geral", // Definir um valor padrão válido para o Select
-      veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "", // Definir o primeiro veterinário como padrão
+      species: initialData?.species || "Cachorro",
+      service: initialData?.service || serviceOptions[0], // Garantir que o default seja uma das opções válidas
+      veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
       status: initialData?.status || "Agendada",
     },
   });
@@ -137,12 +149,11 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Consulta Geral">Consulta Geral</SelectItem>
-                  <SelectItem value="Vacinação">Vacinação</SelectItem>
-                  <SelectItem value="Exame de Rotina">Exame de Rotina</SelectItem>
-                  <SelectItem value="Banho e Tosa">Banho e Tosa</SelectItem>
-                  <SelectItem value="Cirurgia">Cirurgia</SelectItem>
-                  <SelectItem value="Consulta de Retorno">Consulta de Retorno</SelectItem>
+                  {serviceOptions.map((service) => ( // Mapear as opções do array
+                    <SelectItem key={service} value={service}>
+                      {service}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -249,7 +260,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
-                      <RadioGroupItem value="Em Andamento" /> {/* Novo item */}
+                      <RadioGroupItem value="Em Andamento" />
                     </FormControl>
                     <FormLabel className="font-normal">Em Andamento</FormLabel>
                   </FormItem>
