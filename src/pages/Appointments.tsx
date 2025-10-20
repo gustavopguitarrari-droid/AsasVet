@@ -213,17 +213,25 @@ const Appointments = () => {
             {filteredAppointments.length > 0 ? (
               filteredAppointments.map((appointment) => {
                 const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
+                const isCancelled = activeTab === "finalizadas" && appointment.status === "Cancelada";
                 return (
-                  <TableRow key={appointment.id} onClick={() => handleRowClick(appointment)} className="cursor-pointer hover:bg-muted/50">
+                  <TableRow
+                    key={appointment.id}
+                    onClick={() => handleRowClick(appointment)}
+                    className={cn(
+                      "cursor-pointer hover:bg-muted/50",
+                      isCancelled && "border-l-4 border-destructive" // Adiciona a borda vermelha
+                    )}
+                  >
                     <TableCell className="font-medium flex items-center">
                       <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
                       {appointment.pet}
                     </TableCell>
                     <TableCell>{appointment.client}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
-                    <TableCell className="flex items-center"> {/* Adicionado flex para alinhar o badge */}
+                    <TableCell className="flex items-center">
                       {appointment.veterinarian}
-                      {activeTab === "finalizadas" && appointment.status === "Cancelada" && (
+                      {isCancelled && (
                         <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
                           Cancelada
                         </Badge>
