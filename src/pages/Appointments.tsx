@@ -148,14 +148,14 @@ const Appointments = () => {
 
       {/* Cards de Resumo */}
       <div className="grid gap-4 md:grid-cols-4"> {/* Ajustado para 4 colunas */}
-        <Card className="bg-primary text-primary-foreground shadow-md">
+        <Card className="bg-gray-700 text-white shadow-md"> {/* Alterado para cinza escuro */}
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Agendadas</CardTitle>
-            <CalendarClock className="h-4 w-4 text-primary-foreground" />
+            <CalendarClock className="h-4 w-4 text-white" /> {/* Ícone branco */}
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalAgendadas}</div>
-            <p className="text-primary-foreground/80 text-xs">Consultas pendentes</p>
+            <p className="text-gray-200 text-xs">Consultas pendentes</p> {/* Texto cinza claro */}
           </CardContent>
         </Card>
         <Card className="bg-orange-500 text-white shadow-md"> {/* Novo card para 'Em Andamento' */}
