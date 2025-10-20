@@ -54,7 +54,6 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
 
 const Appointments = () => {
   const [activeTab, setActiveTab] = React.useState<string>("em-espera"); // Alterado para a nova aba padrão
-  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState<boolean>(false);
   const [appointments, setAppointments] = React.useState<Appointment[]>(mockAppointments);
   const [searchTerm, setSearchTerm] = React.useState<string>("");
 
@@ -80,12 +79,6 @@ const Appointments = () => {
     }
     return matchesTab; // Retorna apenas o filtro por aba
   });
-
-  const handleAddAppointment = (newAppointmentData: Omit<Appointment, "id">) => {
-    const newId = `C${(appointments.length + 1).toString().padStart(3, '0')}`;
-    setAppointments((prev) => [...prev, { id: newId, ...newAppointmentData }]);
-    setIsAddDialogOpen(false);
-  };
 
   const handleUpdateAppointment = (updatedAppointment: Appointment) => {
     setAppointments((prev) =>
@@ -131,19 +124,7 @@ const Appointments = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Consultas</h2>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" /> Incluir Consulta
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Agendar Nova Consulta</DialogTitle>
-            </DialogHeader>
-            <AppointmentForm onSubmit={handleAddAppointment} />
-          </DialogContent>
-        </Dialog>
+        {/* O botão "Incluir Consulta" e o Dialog associado foram removidos daqui */}
       </div>
 
       {/* Cards de Resumo */}
