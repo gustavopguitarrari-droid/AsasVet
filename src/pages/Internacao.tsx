@@ -1,10 +1,65 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"; // Importar componentes do Dialog
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm"; // Importar o novo formulário e seus tipos
+import { format } from "date-fns"; // Para formatar datas
+
+interface InternedPatient {
+  id: string;
+  petName: string;
+  ownerName: string;
+  reason: string;
+  admissionDate: string; // Armazenar como string para simplicidade
+  expectedDischargeDate?: string; // Armazenar como string
+  veterinarian: string;
+  status: "Em Observação" | "Estável" | "Crítico" | "Alta"; // Adicionado "Alta"
+}
 
 const Internacao = () => {
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false); // Estado para controlar a abertura do diálogo
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
+
+  // Mock de pacientes internados para demonstração
+  React.useEffect(() => {
+    const mockPatients: InternedPatient[] = [
+      {
+        id: "INT001",
+        petName: "Buddy",
+        ownerName: "Alice Smith",
+        reason: "Fratura na pata",
+        admissionDate: "2024-10-20",
+        expectedDischargeDate: "2024-10-28",
+        veterinarian: "Dr. Ana Paula",
+        status: "Estável",
+      },
+      {
+        id: "INT002",
+        petName: "Mittens",
+        ownerName: "Bob Johnson",
+        reason: "Infecção respiratória",
+        admissionDate: "2024-10-25",
+        veterinarian: "Dr. Carlos Eduardo",
+        status: "Em Observação",
+      },
+    ];
+    setInternedPatients(mockPatients);
+  }, []);
+
+  const handleAddInternment = (data: InternmentFormValues) => {
+    const newPatient: InternedPatient = {
+      id: `INT${(internedPatients.length + 1).toString().padStart(3, '0')}`,
+      petName: data.petName,
+      ownerName: data.ownerName,
+      reason: data.reason,
+      admissionDate: format(data.admissionDate, "yyyy-MM-dd"),
+      expectedDischargeDate: data.expectedDischargeDate ? format(data.expectedDischargeDate, "yyyy-MM-dd") : undefined,
+      veterinarian: data.veterinarian,
+      status: data.status,
+    };
+    setInternedPatients((prev) => [...prev, newPatient]);
+    setIsDialogOpen(false); // Fechar o diálogo após adicionar
+  };
 
   return (
     <div className="space-y-6">
@@ -20,12 +75,30 @@ const Internacao = () => {
             <DialogHeader>
               <DialogTitle>Internar Novo Paciente</DialogTitle>
             </DialogHeader>
-            {/* Conteúdo do formulário de internação virá aqui */}
-            <p className="text-muted-foreground">Formulário de internação será adicionado aqui.</p>
+            <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsDialogOpen(false)} />
           </DialogContent>
         </Dialog>
       </div>
       <p className="text-muted-foreground">Esta página está pronta para ser refeita.</p>
+      {/* Aqui você pode adicionar uma tabela ou lista para exibir os pacientes internados */}
+      <div className="mt-8">
+        <h3 className="text-2xl font-semibold mb-4">Pacientes Internados</h3>
+        {internedPatients.length > 0 ? (
+          <ul className="space-y-2">
+            {internedPatients.map((patient) => (
+              <li key={patient.id} className="p-4 border rounded-md bg-card shadow-sm">
+                <p className="font-bold">{patient.petName} ({patient.species})</p>
+                <p className="text-sm text-muted-foreground">Tutor: {patient.ownerName}</p>
+                <p className="text-sm text-muted-foreground">Motivo: {patient.reason}</p>
+                <p className="text-sm text-muted-foreground">Status: {patient.status}</p>
+                <p className="text-sm text-muted-foreground">Admissão: {patient.admissionDate}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-muted-foreground">Nenhum paciente internado no momento.</p>
+        )}
+      </div>
     </div>
   );
 };
