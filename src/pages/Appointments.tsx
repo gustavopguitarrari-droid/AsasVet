@@ -61,8 +61,9 @@ const Appointments = () => {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState<boolean>(false);
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
 
+  const isEmEsperaTab = activeTab === "em-espera";
+
   const filteredAppointments = appointments.filter((appointment) => {
-    // A busca por termo foi removida, então apenas o filtro por aba é aplicado
     let matchesTab = false;
     switch (activeTab) {
       case "em-espera":
@@ -74,11 +75,11 @@ const Appointments = () => {
       case "finalizadas":
         matchesTab = appointment.status === "Realizada" || appointment.status === "Cancelada";
         break;
-      default: // Fallback para 'all' ou qualquer outro caso
+      default:
         matchesTab = true;
         break;
     }
-    return matchesTab; // Retorna apenas o filtro por aba
+    return matchesTab;
   });
 
   const handleAddAppointment = (newAppointmentData: Omit<Appointment, "id">) => {
@@ -110,7 +111,7 @@ const Appointments = () => {
     switch (status) {
       case "Agendada":
         return "bg-primary text-primary-foreground";
-      case "Em Andamento": // Novo status
+      case "Em Andamento":
         return "bg-orange-500 text-white";
       case "Realizada":
         return "bg-green-500 text-white";
@@ -147,7 +148,7 @@ const Appointments = () => {
       </div>
 
       {/* Cards de Resumo */}
-      <div className="grid gap-4 md:grid-cols-4"> {/* Ajustado para 4 colunas */}
+      <div className="grid gap-4 md:grid-cols-4">
         <Card className="bg-primary text-primary-foreground shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Agendadas</CardTitle>
@@ -158,7 +159,7 @@ const Appointments = () => {
             <p className="text-primary-foreground/80 text-xs">Consultas pendentes</p>
           </CardContent>
         </Card>
-        <Card className="bg-orange-500 text-white shadow-md"> {/* Novo card para 'Em Andamento' */}
+        <Card className="bg-orange-500 text-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Em Andamento</CardTitle>
             <CalendarClock className="h-4 w-4 text-white" />
@@ -207,7 +208,7 @@ const Appointments = () => {
               <TableHead>Paciente</TableHead>
               <TableHead>Tutor</TableHead>
               <TableHead>Serviço</TableHead>
-              <TableHead>Veterinário</TableHead>
+              {!isEmEsperaTab && <TableHead>Veterinário</TableHead>} {/* Condicional */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -216,14 +217,13 @@ const Appointments = () => {
                 const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
                 const isCancelled = activeTab === "finalizadas" && appointment.status === "Cancelada";
                 const isRealizada = activeTab === "finalizadas" && appointment.status === "Realizada";
-                const isEmAndamento = activeTab === "em-andamento" && appointment.status === "Em Andamento"; // Nova condição
+                const isEmAndamento = activeTab === "em-andamento" && appointment.status === "Em Andamento";
                 return (
                   <TableRow
                     key={appointment.id}
                     onClick={() => handleRowClick(appointment)}
                     className={cn(
                       "cursor-pointer hover:bg-muted/50"
-                      // Removidas as classes de borda colorida
                     )}
                   >
                     <TableCell className="font-medium flex items-center">
@@ -232,33 +232,35 @@ const Appointments = () => {
                     </TableCell>
                     <TableCell>{appointment.client}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
-                    <TableCell className="flex items-center">
-                      {appointment.veterinarian}
-                      {isCancelled && (
-                        <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
-                          Cancelada
-                        </Badge>
-                      )}
-                      {isRealizada && (
-                        <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
-                          Concluída
-                        </Badge>
-                      )}
-                      {isEmAndamento && ( // Badge e Cronômetro para 'Em Andamento'
-                        <>
-                          <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
-                            Iniciada
+                    {!isEmEsperaTab && ( {/* Condicional */}
+                      <TableCell className="flex items-center">
+                        {appointment.veterinarian}
+                        {isCancelled && (
+                          <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
+                            Cancelada
                           </Badge>
-                          <AppointmentChronometer date={appointment.date} time={appointment.time} />
-                        </>
-                      )}
-                    </TableCell>
+                        )}
+                        {isRealizada && (
+                          <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
+                            Concluída
+                          </Badge>
+                        )}
+                        {isEmAndamento && (
+                          <>
+                            <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
+                              Iniciada
+                            </Badge>
+                            <AppointmentChronometer date={appointment.date} time={appointment.time} />
+                          </>
+                        )}
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
+                <TableCell colSpan={isEmEsperaTab ? 3 : 4} className="h-24 text-center"> {/* colSpan condicional */}
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
