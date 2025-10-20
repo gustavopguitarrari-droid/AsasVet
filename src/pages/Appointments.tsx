@@ -61,13 +61,7 @@ const Appointments = () => {
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
 
   const filteredAppointments = appointments.filter((appointment) => {
-    const matchesSearch =
-      appointment.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.pet.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.species.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase());
-    
+    // A busca por termo foi removida, então apenas o filtro por aba é aplicado
     let matchesTab = false;
     switch (activeTab) {
       case "em-espera":
@@ -83,7 +77,7 @@ const Appointments = () => {
         matchesTab = true;
         break;
     }
-    return matchesTab && matchesSearch;
+    return matchesTab; // Retorna apenas o filtro por aba
   });
 
   const handleAddAppointment = (newAppointmentData: Omit<Appointment, "id">) => {
@@ -196,16 +190,7 @@ const Appointments = () => {
       </div>
 
       <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
-        <div className="relative flex-1 w-full md:w-auto">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar consultas..."
-            className="pl-9"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        {/* Novas abas de filtro */}
+        {/* A barra de pesquisa foi removida daqui */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto">
           <TabsList className="grid w-full grid-cols-3 bg-muted/50">
             <TabsTrigger value="em-espera" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Em Espera</TabsTrigger>
