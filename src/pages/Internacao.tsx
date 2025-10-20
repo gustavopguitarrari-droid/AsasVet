@@ -28,6 +28,16 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Outros: MoreHorizontal,
 };
 
+// Mapeamento de espécies para classes de cor dinâmicas (usando as cores do sidebar-item-bg)
+const speciesColorMap: { [key: string]: string } = {
+  Cachorro: "text-sidebar-item-bg-1",
+  Gato: "text-sidebar-item-bg-4",
+  Pássaro: "text-sidebar-item-bg-3",
+  Roedor: "text-sidebar-item-bg-7",
+  Peixe: "text-sidebar-item-bg-5",
+  Outros: "text-sidebar-item-bg-9",
+};
+
 const Internacao = () => {
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
@@ -109,11 +119,12 @@ const Internacao = () => {
         {internedPatients.length > 0 ? (
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {internedPatients.map((patient) => {
-              const IconComponent = speciesIconMap[patient.species] || MoreHorizontal; // Obter o componente do ícone
+              const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
+              const colorClass = speciesColorMap[patient.species] || "text-muted-foreground"; // Obter a classe de cor dinâmica
               return (
                 <li key={patient.id} className="p-3 border rounded-md bg-card shadow-sm">
                   <p className="font-bold text-lg flex items-center">
-                    <IconComponent className="h-6 w-6 mr-2 text-foreground" /> {/* Alterado para text-foreground */}
+                    <IconComponent className={cn("h-6 w-6 mr-2", colorClass)} /> {/* Aplicar a classe de cor */}
                     {patient.petName}
                   </p>
                   <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.ownerName}</p>
