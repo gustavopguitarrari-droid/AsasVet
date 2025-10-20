@@ -207,7 +207,7 @@ const Appointments = () => {
               <TableHead>Paciente</TableHead>
               <TableHead>Tutor</TableHead>
               <TableHead>Serviço</TableHead>
-              <TableHead>Veterinário</TableHead>
+              {activeTab !== "em-espera" && <TableHead>Veterinário</TableHead>} {/* Condicional para Veterinário */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -223,7 +223,6 @@ const Appointments = () => {
                     onClick={() => handleRowClick(appointment)}
                     className={cn(
                       "cursor-pointer hover:bg-muted/50"
-                      // Removidas as classes de borda colorida
                     )}
                   >
                     <TableCell className="font-medium flex items-center">
@@ -232,33 +231,35 @@ const Appointments = () => {
                     </TableCell>
                     <TableCell>{appointment.client}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
-                    <TableCell className="flex items-center">
-                      {appointment.veterinarian}
-                      {isCancelled && (
-                        <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
-                          Cancelada
-                        </Badge>
-                      )}
-                      {isRealizada && (
-                        <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
-                          Concluída
-                        </Badge>
-                      )}
-                      {isEmAndamento && ( // Badge e Cronômetro para 'Em Andamento'
-                        <>
-                          <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
-                            Iniciada
+                    {activeTab !== "em-espera" && ( // Condicional para Veterinário
+                      <TableCell className="flex items-center">
+                        {appointment.veterinarian}
+                        {isCancelled && (
+                          <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
+                            Cancelada
                           </Badge>
-                          <AppointmentChronometer date={appointment.date} time={appointment.time} />
-                        </>
-                      )}
-                    </TableCell>
+                        )}
+                        {isRealizada && (
+                          <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
+                            Concluída
+                          </Badge>
+                        )}
+                        {isEmAndamento && ( // Badge e Cronômetro para 'Em Andamento'
+                          <>
+                            <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
+                              Iniciada
+                            </Badge>
+                            <AppointmentChronometer date={appointment.date} time={appointment.time} />
+                          </>
+                        )}
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
+                <TableCell colSpan={activeTab === "em-espera" ? 3 : 4} className="h-24 text-center"> {/* Ajuste do colSpan */}
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
