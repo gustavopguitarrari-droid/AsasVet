@@ -147,7 +147,7 @@ const Appointments = () => {
               <PlusCircle className="mr-2 h-4 w-4" /> Incluir Consulta
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-2xl max-h-[60vh] overflow-y-auto p-6">
             <DialogHeader>
               <DialogTitle>Incluir Nova Consulta</DialogTitle>
             </DialogHeader>
