@@ -105,7 +105,7 @@ const Internacao = () => {
               <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto p-4"> {/* Ajustado aqui */}
             <DialogHeader>
               <DialogTitle>Internar Novo Paciente</DialogTitle>
             </DialogHeader>
