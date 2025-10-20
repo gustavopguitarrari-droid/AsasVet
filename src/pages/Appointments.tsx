@@ -207,7 +207,6 @@ const Appointments = () => {
               <TableHead>Tutor</TableHead>
               <TableHead>Serviço</TableHead>
               <TableHead>Veterinário</TableHead>
-              {/* <TableHead>Status</TableHead> Removido */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -222,18 +221,18 @@ const Appointments = () => {
                     </TableCell>
                     <TableCell>{appointment.client}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
-                    <TableCell>{appointment.veterinarian}</TableCell>
-                    {/* <TableCell>
-                      <Badge className={getStatusBadgeVariant(appointment.status)}>
-                        {appointment.status}
-                      </Badge>
-                    </TableCell> Removido */}
+                    <TableCell>
+                      {appointment.veterinarian}
+                      {activeTab === "finalizadas" && appointment.status === "Cancelada" && (
+                        <span className="ml-2 text-destructive font-semibold">(Cancelada)</span>
+                      )}
+                    </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center"> {/* colSpan ajustado para 4 */}
+                <TableCell colSpan={4} className="h-24 text-center">
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
