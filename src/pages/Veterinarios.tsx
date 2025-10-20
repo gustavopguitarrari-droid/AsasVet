@@ -9,28 +9,83 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Stethoscope } from "lucide-react";
+import { PlusCircle, Search, Stethoscope, User, Briefcase, Hospital, IdCard } from "lucide-react";
+import RoleFilter from "@/components/RoleFilter"; // Importa o novo componente de filtro
+import VeterinarianDetailsDialog from "@/components/VeterinarianDetailsDialog"; // Importa o novo componente de diálogo
 
-const mockVeterinarios = [
-  { id: "V001", name: "Dr. Ana Paula", crmv: "CRMV-SP 12345", email: "ana.paula@example.com", phone: "(11) 99999-8888" },
-  { id: "V002", name: "Dr. Carlos Eduardo", crmv: "CRMV-RJ 67890", email: "carlos.eduardo@example.com", phone: "(21) 98888-7777" },
-  { id: "V003", name: "Dra. Beatriz Lima", crmv: "CRMV-MG 11223", email: "beatriz.lima@example.com", phone: "(31) 97777-6666" },
+interface Veterinario {
+  id: string;
+  name: string;
+  crmv: string;
+  email: string;
+  phone: string;
+  role: string; // Adicionado campo de cargo
+}
+
+const mockVeterinarios: Veterinario[] = [
+  { id: "V001", name: "Dr. Ana Paula", crmv: "CRMV-SP 12345", email: "ana.paula@example.com", phone: "(11) 99999-8888", role: "Veterinário" },
+  { id: "V002", name: "Dr. Carlos Eduardo", crmv: "CRMV-RJ 67890", email: "carlos.eduardo@example.com", phone: "(21) 98888-7777", role: "Veterinário" },
+  { id: "V003", name: "Dra. Beatriz Lima", crmv: "CRMV-MG 11223", email: "beatriz.lima@example.com", phone: "(31) 97777-6666", role: "Veterinário" },
+  { id: "V004", name: "Mariana Costa", crmv: "N/A", email: "mariana.c@example.com", phone: "(11) 91234-5678", role: "Recepcionista" },
+  { id: "V005", name: "Fernando Alves", crmv: "N/A", email: "fernando.a@example.com", phone: "(21) 98765-4321", role: "Gerente" },
+  { id: "V006", name: "Lucas Pereira", crmv: "CRMV-SP 98765", email: "lucas.p@example.com", phone: "(11) 97654-3210", role: "Estagiário" },
 ];
 
+// Mapeamento de cargos para ícones
+const roleIconMap: { [key: string]: React.ElementType } = {
+  Veterinário: Stethoscope,
+  Recepcionista: User,
+  Gerente: Briefcase,
+  Estagiário: Hospital,
+  Outros: IdCard,
+};
+
 const Veterinarios = () => {
+  const [selectedRole, setSelectedRole] = React.useState<string>("all");
+  const [searchTerm, setSearchTerm] = React.useState<string>("");
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState<boolean>(false);
+  const [selectedVeterinarian, setSelectedVeterinarian] = React.useState<Veterinario | null>(null);
+
+  const handleSelectRole = (role: string) => {
+    setSelectedRole(role);
+  };
+
+  const filteredVeterinarios = mockVeterinarios.filter((vet) => {
+    const matchesRole = selectedRole === "all" || vet.role === selectedRole;
+    const matchesSearch =
+      vet.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vet.crmv.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vet.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vet.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      vet.role.toLowerCase().includes(searchTerm.toLowerCase());
+    return matchesRole && matchesSearch;
+  });
+
+  const handleRowClick = (vet: Veterinario) => {
+    setSelectedVeterinarian(vet);
+    setIsDetailsDialogOpen(true);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Veterinários</h2>
+        <h2 className="text-3xl font-bold">Equipe</h2>
         <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Veterinário
+          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
         </Button>
       </div>
+
+      <RoleFilter selectedRole={selectedRole} onSelectRole={handleSelectRole} />
 
       <div className="flex items-center space-x-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Buscar veterinários..." className="pl-9" />
+          <Input
+            placeholder="Buscar membros da equipe..."
+            className="pl-9"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
         <Button variant="outline">Filtrar</Button>
       </div>
@@ -39,32 +94,46 @@ const Veterinarios = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>ID</TableHead>
               <TableHead>Nome</TableHead>
+              <TableHead>Cargo</TableHead>
               <TableHead>CRMV</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Telefone</TableHead>
-              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {mockVeterinarios.map((vet) => (
-              <TableRow key={vet.id}>
-                <TableCell className="font-medium">{vet.id}</TableCell>
-                <TableCell>{vet.name}</TableCell>
-                <TableCell>{vet.crmv}</TableCell>
-                <TableCell>{vet.email}</TableCell>
-                <TableCell>{vet.phone}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="sm">
-                    Ver Detalhes
-                  </Button>
+            {filteredVeterinarios.length > 0 ? (
+              filteredVeterinarios.map((vet) => {
+                const IconComponent = roleIconMap[vet.role] || IdCard;
+                return (
+                  <TableRow key={vet.id} onClick={() => handleRowClick(vet)} className="cursor-pointer hover:bg-muted/50">
+                    <TableCell className="font-bold">{vet.name}</TableCell>
+                    <TableCell className="flex items-center">
+                      <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
+                      {vet.role}
+                    </TableCell>
+                    <TableCell>{vet.crmv}</TableCell>
+                    <TableCell>{vet.email}</TableCell>
+                    <TableCell>{vet.phone}</TableCell>
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="h-24 text-center">
+                  Nenhum membro da equipe encontrado para o cargo selecionado.
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>
+
+      <VeterinarianDetailsDialog
+        veterinarian={selectedVeterinarian}
+        isOpen={isDetailsDialogOpen}
+        onClose={() => setIsDetailsDialogOpen(false)}
+      />
     </div>
   );
 };
