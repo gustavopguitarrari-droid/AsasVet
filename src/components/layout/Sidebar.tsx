@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import ThemeToggle from "@/components/ThemeToggle";
+// import ThemeToggle from "@/components/ThemeToggle"; // Removido
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -131,10 +131,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       <div
         className={cn(
           "mt-auto pt-4 flex items-center",
-          isCollapsed ? "justify-center space-x-2" : "justify-between"
+          isCollapsed ? "justify-center" : "justify-end" // Ajustado para justificar à direita quando não colapsado
         )}
       >
-        <ThemeToggle isCollapsed={isCollapsed} />
+        {/* <ThemeToggle isCollapsed={isCollapsed} /> Removido */}
         <Button
           variant="default"
           size="icon"
@@ -143,7 +143,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
             "rounded-full",
             "bg-indigo-500 text-white hover:bg-indigo-600",
             "border border-border shadow-md",
-            isCollapsed && "ml-2"
+            isCollapsed ? "ml-0" : "ml-auto" // Ajustado para alinhar à direita
           )}
         >
           {isCollapsed ? <ArrowRightToLine className="h-4 w-4" /> : <ArrowLeftToLine className="h-4 w-4" />}
