@@ -48,6 +48,9 @@ const formSchema = z.object({
   species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], { // Novo campo de espécie
     required_error: "A espécie do animal é obrigatória.",
   }),
+  risk: z.enum(["Sem risco", "Baixo", "Médio", "Alto", "Emergência"], { // Novo campo de risco
+    required_error: "O nível de risco é obrigatório.",
+  }),
 });
 
 export type InternmentFormValues = z.infer<typeof formSchema>;
@@ -68,6 +71,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
       veterinarian: mockVeterinarians[0]?.name || "",
       status: "Em Observação",
       species: "Cachorro", // Valor padrão para espécie
+      risk: "Sem risco", // Valor padrão para risco
     },
   });
 
@@ -119,6 +123,30 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
                   <SelectItem value="Roedor">Roedor</SelectItem>
                   <SelectItem value="Peixe">Peixe</SelectItem>
                   <SelectItem value="Outros">Outros</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="risk" // Novo campo de risco
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Risco</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o nível de risco" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="Sem risco">Sem risco</SelectItem>
+                  <SelectItem value="Baixo">Baixo</SelectItem>
+                  <SelectItem value="Médio">Médio</SelectItem>
+                  <SelectItem value="Alto">Alto</SelectItem>
+                  <SelectItem value="Emergência">Emergência</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
