@@ -226,15 +226,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
               </>
             )}
             <Separator />
-            <div className="grid grid-cols-3 items-center gap-4">
-              <p className="text-sm font-medium text-muted-foreground">Status:</p>
-              <p className="col-span-2 text-sm">
-                <Badge className={cn(getStatusBadgeVariant(patient.status))}>
-                  {patient.status}
-                </Badge>
-              </p>
-            </div>
-            <Separator />
+            {/* REMOVIDO: Bloco de Status */}
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Risco:</p>
               <p className="col-span-2 text-sm">
