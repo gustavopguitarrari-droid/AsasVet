@@ -86,6 +86,14 @@ export default {
         teal: {
           500: "hsl(177.1 70% 35%)",
         },
+        // Novas cores para os níveis de risco
+        blue: {
+          500: "hsl(220 80% 60%)", // Para risco 'Baixo'
+        },
+        red: {
+          500: "hsl(0 84.2% 60.2%)", // Para risco 'Alto' (igual a destructive DEFAULT)
+          700: "hsl(0 84.2% 40%)", // Para risco 'Emergência' (vermelho mais escuro)
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

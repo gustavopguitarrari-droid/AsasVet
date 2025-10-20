@@ -25,6 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter } from "@/components/ui/dialog";
+import RiskSelector from "./RiskSelector"; // Importar o novo componente RiskSelector
 
 // Mock de veterinários (reutilizando do AppointmentForm)
 const mockVeterinarians = [
@@ -80,24 +81,13 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
-          name="risk" // Novo campo de risco
+          name="risk"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Risco</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o nível de risco" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Sem risco">Sem risco</SelectItem>
-                  <SelectItem value="Baixo">Baixo</SelectItem>
-                  <SelectItem value="Médio">Médio</SelectItem>
-                  <SelectItem value="Alto">Alto</SelectItem>
-                  <SelectItem value="Emergência">Emergência</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <RiskSelector value={field.value} onValueChange={field.onChange} />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
