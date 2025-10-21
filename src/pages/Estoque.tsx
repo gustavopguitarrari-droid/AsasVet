@@ -9,10 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, Syringe } from "lucide-react"; // Importar Syringe
-import CategoryFilter from "@/components/CategoryFilter"; // Importa o novo componente de filtro
-import StockItemDetailsDialog from "@/components/StockItemDetailsDialog"; // Importa o novo componente de diálogo
-import { cn } from "@/lib/utils"; // Importa cn para classes condicionais
+import { PlusCircle, Search, Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, Syringe } from "lucide-react";
+import CategoryFilter from "@/components/CategoryFilter";
+import StockItemDetailsDialog from "@/components/StockItemDetailsDialog";
+import { cn } from "@/lib/utils";
 
 interface ItemEstoque {
   id: string;
@@ -25,9 +25,9 @@ interface ItemEstoque {
 
 const mockEstoque: ItemEstoque[] = [
   { id: "IT001", name: "Ração para Cães Adultos", category: "Insumos", quantity: 50, unit: "sacos", lastUpdate: "2024-10-20" },
-  { id: "IT002", name: "Vacina V8", category: "Medicamentos", quantity: 120, unit: "doses", lastUpdate: "2024-10-25" },
+  { id: "IT002", name: "Vacina V8", category: "Farmácia", quantity: 120, unit: "doses", lastUpdate: "2024-10-25" }, // Alterado para Farmácia
   { id: "IT003", name: "Shampoo para Gatos", category: "Higiene", quantity: 30, unit: "unidades", lastUpdate: "2024-10-22" },
-  { id: "IT004", name: "Antibiótico Amoxicilina", category: "Medicamentos", quantity: 75, unit: "caixas", lastUpdate: "2024-10-24" },
+  { id: "IT004", name: "Antibiótico Amoxicilina", category: "Farmácia", quantity: 75, unit: "caixas", lastUpdate: "2024-10-24" }, // Alterado para Farmácia
   { id: "IT005", name: "Seringas 5ml", category: "Equipamentos", quantity: 200, unit: "unidades", lastUpdate: "2024-10-23" },
   { id: "IT006", name: "Brinquedo para Gatos", category: "Outros", quantity: 40, unit: "unidades", lastUpdate: "2024-10-21" },
   { id: "IT007", name: "Luvas Cirúrgicas", category: "Equipamentos", quantity: 100, unit: "pares", lastUpdate: "2024-10-26" },
@@ -36,8 +36,8 @@ const mockEstoque: ItemEstoque[] = [
 
 // Mapeamento de categorias para ícones para a tabela
 const categoryIconMap: { [key: string]: React.ElementType } = {
-  Insumos: Syringe, // Alterado para Syringe
-  Medicamentos: Pill,
+  Insumos: Syringe,
+  Farmácia: Pill, // Alterado para Farmácia
   Higiene: SprayCan,
   Equipamentos: Wrench,
   Outros: MoreHorizontal,

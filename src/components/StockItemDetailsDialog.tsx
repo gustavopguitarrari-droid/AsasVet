@@ -9,7 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, CalendarDays, Syringe } from "lucide-react"; // Importar Syringe
+import { Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, CalendarDays, Syringe } from "lucide-react";
 
 interface ItemEstoque {
   id: string;
@@ -28,8 +28,8 @@ interface StockItemDetailsDialogProps {
 
 // Mapeamento de categorias para ícones
 const categoryIconMap: { [key: string]: React.ElementType } = {
-  Insumos: Syringe, // Alterado para Syringe
-  Medicamentos: Pill,
+  Insumos: Syringe,
+  Farmácia: Pill, // Alterado para Farmácia
   Higiene: SprayCan,
   Equipamentos: Wrench,
   Outros: MoreHorizontal,
