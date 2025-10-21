@@ -1,13 +1,14 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope } from "lucide-react"; // Adicionado CalendarDays, User, Stethoscope para o histórico
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search } from "lucide-react"; // Adicionado Search
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge"; // Importar Badge para o histórico
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input"; // Importar Input
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -63,8 +64,9 @@ const Internacao = () => {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
   const [selectedPatient, setSelectedPatient] = React.useState<InternedPatient | null>(null);
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
-  const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]); // Novo estado para histórico
+  const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
+  const [searchTerm, setSearchTerm] = React.useState<string>(""); // Novo estado para a barra de pesquisa
 
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
@@ -124,9 +126,33 @@ const Internacao = () => {
         species: "Peixe",
         risk: "Sem risco",
       },
+      // Adicionando alguns pacientes de histórico para demonstração
+      {
+        id: "INT006",
+        petName: "Rocky",
+        ownerName: "Gabriel Santos",
+        reason: "Recuperação de cirurgia",
+        admissionDate: "2024-09-10",
+        expectedDischargeDate: "2024-09-15",
+        veterinarian: "Dr. Ana Paula",
+        status: "Alta",
+        species: "Cachorro",
+        risk: "Baixo",
+      },
+      {
+        id: "INT007",
+        petName: "Shadow",
+        ownerName: "Isabela Oliveira",
+        reason: "Doença crônica",
+        admissionDate: "2024-08-01",
+        expectedDischargeDate: "2024-08-05",
+        veterinarian: "Dr. Carlos Eduardo",
+        status: "Óbito",
+        species: "Gato",
+        risk: "Emergência",
+      },
     ];
 
-    // Separar pacientes ativos e históricos
     const active = mockPatients.filter(p => p.status !== "Alta" && p.status !== "Óbito");
     const history = mockPatients.filter(p => p.status === "Alta" || p.status === "Óbito");
     setInternedPatients(active);
@@ -152,11 +178,9 @@ const Internacao = () => {
 
   const handleUpdateInternment = (updatedPatient: InternedPatient) => {
     if (updatedPatient.status === "Alta" || updatedPatient.status === "Óbito") {
-      // Remove do internedPatients e adiciona ao historyPatients
       setInternedPatients((prev) => prev.filter((p) => p.id !== updatedPatient.id));
       setHistoryPatients((prev) => [...prev, updatedPatient]);
     } else {
-      // Apenas atualiza se o status não for de finalização
       setInternedPatients((prev) =>
         prev.map((patient) => (patient.id === updatedPatient.id ? updatedPatient : patient))
       );
@@ -167,6 +191,14 @@ const Internacao = () => {
     setSelectedPatient(patient);
     setIsDetailsDialogOpen(true);
   };
+
+  const filteredHistoryPatients = historyPatients.filter(patient =>
+    patient.petName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.species.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="space-y-6">
@@ -242,12 +274,21 @@ const Internacao = () => {
         <TabsContent value="historico-internados" className="mt-4">
           <div className="p-4 border rounded-md bg-background">
             <h3 className="text-2xl font-semibold mb-4">Histórico de Pacientes Internados</h3>
-            {historyPatients.length > 0 ? (
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar no histórico..."
+                className="pl-9"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            {filteredHistoryPatients.length > 0 ? (
               <ul className="space-y-4">
-                {historyPatients.map((patient) => {
+                {filteredHistoryPatients.map((patient) => {
                   const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
                   const statusColorClass = statusBadgeColorMap[patient.status] || "bg-gray-500";
-                  const finalDate = patient.expectedDischargeDate || patient.admissionDate; // Usa a data de alta/óbito se disponível
+                  const finalDate = patient.expectedDischargeDate || patient.admissionDate;
 
                   return (
                     <li key={patient.id} className="flex items-center p-4 border rounded-md shadow-sm bg-card text-card-foreground">
@@ -274,7 +315,7 @@ const Internacao = () => {
                 })}
               </ul>
             ) : (
-              <p className="text-muted-foreground">Nenhum paciente no histórico de internações.</p>
+              <p className="text-muted-foreground">Nenhum paciente no histórico de internações que corresponda à sua busca.</p>
             )}
           </div>
         </TabsContent>
