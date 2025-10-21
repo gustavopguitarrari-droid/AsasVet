@@ -286,8 +286,17 @@ const Internacao = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Internação</h2>
-        {activeTab === "pacientes-internados" && (
-          <div className="flex space-x-2">
+        {/* Os botões foram removidos daqui */}
+      </div>
+      
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+          <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
+          <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pacientes-internados" className="mt-4">
+          <div className="flex space-x-2 mb-4"> {/* Botões movidos para cá */}
             <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
               <History className="mr-2 h-4 w-4" /> Ver Histórico
             </Button>
@@ -305,16 +314,6 @@ const Internacao = () => {
               </DialogContent>
             </Dialog>
           </div>
-        )}
-      </div>
-      
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-auto p-1">
-          <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
-          <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="pacientes-internados" className="mt-4">
           <div className="mt-8">
             <div className="flex flex-wrap gap-4 mb-6"> {/* Container para a legenda */}
               {Object.entries(riskColorMap).map(([risk, colorClass]) => (
