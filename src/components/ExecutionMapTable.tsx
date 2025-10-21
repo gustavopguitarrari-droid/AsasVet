@@ -71,10 +71,10 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
     <div className="overflow-x-auto rounded-md border">
       <Table className="min-w-full divide-y divide-border">
         <TableHeader>
-          <TableRow className="bg-muted/20"> {/* Fundo sutil para o cabeçalho */}
-            <TableHead className="sticky left-0 bg-background z-10 w-[150px] text-base font-semibold">Paciente</TableHead> {/* Texto maior e mais forte */}
+          <TableRow className="bg-secondary"> {/* Fundo mais distinto para o cabeçalho */}
+            <TableHead className="sticky left-0 bg-secondary z-10 w-[150px] text-lg font-bold">Paciente</TableHead> {/* Texto maior e mais forte */}
             {hourlySlots.map((hour) => (
-              <TableHead key={hour} className="text-center w-[40px] p-1 text-sm font-semibold"> {/* Horários um pouco maiores e mais fortes */}
+              <TableHead key={hour} className="text-center w-[40px] p-1 text-sm font-semibold text-muted-foreground"> {/* Horários com texto mais sutil */}
                 {hour}
               </TableHead>
             ))}
@@ -88,7 +88,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
 
               return (
                 <TableRow key={patient.id} className="hover:bg-muted/50 transition-colors duration-150"> {/* Efeito de hover na linha */}
-                  <TableCell className="sticky left-0 bg-card font-medium flex items-center py-4 w-[150px]">
+                  <TableCell className="sticky left-0 bg-card font-semibold flex items-center py-4 w-[150px] border-r"> {/* Fundo da célula fixa e borda direita */}
                     <IconComponent className={cn("h-5 w-5 mr-2", speciesTextColorClass)} />
                     {patient.petName}
                   </TableCell>
@@ -97,16 +97,13 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
                       <Tooltip delayDuration={0}>
                         <TooltipTrigger asChild>
                           <Button
-                            variant="ghost"
+                            variant="outline" // Usar variant outline para um visual mais limpo
                             size="icon"
-                            className="h-7 w-7 group relative rounded-sm" // Aumentado o tamanho do botão e arredondamento
+                            className="h-8 w-8 group relative rounded-md border-dashed border-muted-foreground/50 bg-background hover:bg-accent/50 transition-colors duration-200" // Aumentado o tamanho, borda tracejada, fundo sutil no hover
                             onClick={() => handleAddAction(patient.id, hour)}
                           >
-                            {/* Quadrado branco com borda */}
-                            <div className="absolute inset-0 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-sm flex items-center justify-center group-hover:bg-gray-50 dark:group-hover:bg-gray-600 transition-colors duration-200"> {/* Efeito de hover no quadrado */}
-                              {/* Ícone Plus que aparece no hover */}
-                              <Plus className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-200" /> {/* Ícone maior e com cor primária no hover */}
-                            </div>
+                            {/* Ícone Plus que aparece no hover */}
+                            <Plus className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-200" /> {/* Ícone maior e com cor primária no hover */}
                             <span className="sr-only">Adicionar Ação</span>
                           </Button>
                         </TooltipTrigger>
