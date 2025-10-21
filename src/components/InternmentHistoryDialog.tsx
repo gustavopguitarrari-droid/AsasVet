@@ -17,6 +17,7 @@ type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
 interface InternedPatient {
   id: string;
+  bayName: string; // Novo campo
   petName: string;
   ownerName: string;
   reason: string;
@@ -72,7 +73,8 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
     patient.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.species.toLowerCase().includes(searchTerm.toLowerCase())
+    patient.species.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.bayName.toLowerCase().includes(searchTerm.toLowerCase()) // Incluindo busca por nome da baia
   );
 
   return (
@@ -119,6 +121,7 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
                     <span className="text-sm text-muted-foreground flex items-center">
                       <CalendarDays className="h-4 w-4 mr-1" /> {finalDate}
                     </span>
+                    <span className="text-xs text-muted-foreground mt-1">Baia: {patient.bayName}</span> {/* Exibindo o nome da baia */}
                   </div>
                 </li>
               );

@@ -34,6 +34,7 @@ const mockVeterinarians = [
 ];
 
 const formSchema = z.object({
+  bayName: z.string().min(1, "O nome da baia é obrigatório."), // Novo campo
   petName: z.string().min(1, "O nome do animal é obrigatório."),
   ownerName: z.string().min(1, "O nome do tutor é obrigatório."),
   reason: z.string().min(1, "O motivo da internação é obrigatório."),
@@ -61,6 +62,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
   const form = useForm<InternmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      bayName: "", // Valor padrão para o novo campo
       petName: "",
       ownerName: "",
       reason: "",
@@ -74,6 +76,19 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="bayName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome da Baia</FormLabel>
+              <FormControl>
+                <Input placeholder="Ex: Baia 1, UTI, Isolamento" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="risk"

@@ -21,6 +21,7 @@ type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
 interface InternedPatient {
   id: string;
+  bayName: string; // Novo campo
   petName: string;
   ownerName: string;
   reason: string;
@@ -92,6 +93,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
   const handleFormSubmit = (data: InternmentEditFormValues) => {
     const updatedPatient: InternedPatient = {
       ...patient,
+      bayName: data.bayName, // Incluindo o nome da baia
       petName: data.petName,
       ownerName: data.ownerName,
       reason: data.reason,
@@ -171,6 +173,11 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">ID:</p>
               <p className="col-span-2 text-sm">{patient.id}</p>
+            </div>
+            <Separator />
+            <div className="grid grid-cols-3 items-center gap-4">
+              <p className="text-sm font-medium text-muted-foreground">Baia:</p> {/* Exibindo o nome da baia */}
+              <p className="col-span-2 text-sm font-bold">{patient.bayName}</p>
             </div>
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">

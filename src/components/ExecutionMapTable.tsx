@@ -19,6 +19,7 @@ type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
 interface InternedPatient {
   id: string;
+  bayName: string; // Novo campo
   petName: string;
   ownerName: string;
   reason: string;
@@ -117,6 +118,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
                       <IconComponent className={cn("h-5 w-5 mr-2", speciesTextColorClass)} />
                       <span className="font-bold text-base">{patient.petName}</span>
                     </div>
+                    <p className="text-xs text-muted-foreground ml-7">Baia: {patient.bayName}</p> {/* Exibindo o nome da baia */}
                     <p className="text-xs text-muted-foreground ml-7">Tutor: {patient.ownerName}</p>
                     <p className="text-xs text-muted-foreground ml-7">Vet: {patient.veterinarian}</p>
                     {/* O Badge de status foi removido daqui */}

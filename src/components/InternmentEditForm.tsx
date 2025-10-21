@@ -35,6 +35,7 @@ const mockVeterinarians = [
 ];
 
 const formSchema = z.object({
+  bayName: z.string().min(1, "O nome da baia é obrigatório."), // Novo campo
   petName: z.string().min(1, "O nome do animal é obrigatório."),
   ownerName: z.string().min(1, "O nome do tutor é obrigatório."),
   reason: z.string().min(1, "O motivo da internação é obrigatório."),
@@ -62,6 +63,7 @@ interface InternmentEditFormProps {
   initialData: Omit<InternmentEditFormValues, "admissionDate" | "expectedDischargeDate"> & {
     admissionDate: string;
     expectedDischargeDate?: string | null; // Permitir null ou undefined para a string da data opcional
+    bayName: string; // Adicionado
   };
 }
 
@@ -76,6 +78,7 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
   const form = useForm<InternmentEditFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      bayName: initialData.bayName || "", // Valor padrão para o novo campo
       petName: initialData.petName || "",
       ownerName: initialData.ownerName || "",
       reason: initialData.reason || "",
@@ -91,6 +94,19 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="bayName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome da Baia</FormLabel>
+              <FormControl>
+                <Input placeholder="Ex: Baia 1, UTI, Isolamento" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="risk"

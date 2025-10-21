@@ -19,6 +19,7 @@ type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
 interface InternedPatient {
   id: string;
+  bayName: string; // Novo campo
   petName: string;
   ownerName: string;
   reason: string;
@@ -78,6 +79,7 @@ const Internacao = () => {
     const mockPatients: InternedPatient[] = [
       {
         id: "INT001",
+        bayName: "Baia 1", // Adicionado
         petName: "Buddy",
         ownerName: "Alice Smith",
         reason: "Fratura na pata",
@@ -90,6 +92,7 @@ const Internacao = () => {
       },
       {
         id: "INT002",
+        bayName: "UTI 2", // Adicionado
         petName: "Mittens",
         ownerName: "Bob Johnson",
         reason: "Infecção respiratória",
@@ -101,6 +104,7 @@ const Internacao = () => {
       },
       {
         id: "INT003",
+        bayName: "Baia 3", // Adicionado
         petName: "Chico",
         ownerName: "Carlos Pereira",
         reason: "Check-up de rotina",
@@ -112,6 +116,7 @@ const Internacao = () => {
       },
       {
         id: "INT004",
+        bayName: "Emergência", // Adicionado
         petName: "Max",
         ownerName: "Fernanda Reis",
         reason: "Emergência - atropelamento",
@@ -123,6 +128,7 @@ const Internacao = () => {
       },
       {
         id: "INT005",
+        bayName: "Baia 4", // Adicionado
         petName: "Dory",
         ownerName: "Lucas Mendes",
         reason: "Observação pós-cirúrgica",
@@ -135,6 +141,7 @@ const Internacao = () => {
       // Adicionando alguns pacientes de histórico para demonstração
       {
         id: "INT006",
+        bayName: "Baia 5", // Adicionado
         petName: "Rocky",
         ownerName: "Gabriel Santos",
         reason: "Recuperação de cirurgia",
@@ -147,6 +154,7 @@ const Internacao = () => {
       },
       {
         id: "INT007",
+        bayName: "UTI 1", // Adicionado
         petName: "Shadow",
         ownerName: "Isabela Oliveira",
         reason: "Doença crônica",
@@ -168,6 +176,7 @@ const Internacao = () => {
   const handleAddInternment = (data: InternmentFormValues) => {
     const newPatient: InternedPatient = {
       id: `INT${(internedPatients.length + historyPatients.length + 1).toString().padStart(3, '0')}`,
+      bayName: data.bayName, // Incluindo o nome da baia
       petName: data.petName,
       ownerName: data.ownerName,
       reason: data.reason,
@@ -273,6 +282,11 @@ const Internacao = () => {
                     >
                       <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
                       
+                      {/* Nome da Baia no canto superior direito */}
+                      <div className="absolute top-2 right-6 text-sm font-semibold text-muted-foreground">
+                        {patient.bayName}
+                      </div>
+
                       <p className="font-bold text-lg flex items-center">
                         <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
                         {patient.petName}
@@ -320,8 +334,8 @@ const Internacao = () => {
                     initialFocus
                     locale={ptBR}
                   />
-                </PopoverContent>
-              </Popover>
+                  </PopoverContent>
+                </Popover>
               <Button variant="outline" size="icon" onClick={handleNextDay}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
