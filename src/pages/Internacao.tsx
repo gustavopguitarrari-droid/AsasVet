@@ -295,27 +295,62 @@ const Internacao = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">{getPageTitle()}</h2> {/* Título dinâmico aqui */}
-        {activeTab === "pacientes-internados" && (
-          <div className="flex space-x-2">
-            <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
-              <History className="mr-2 h-4 w-4" /> Ver Histórico
-            </Button>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="font-bold">
-                  <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
-                <DialogHeader>
-                  <DialogTitle>Internar Novo Paciente</DialogTitle>
-                </DialogHeader>
-                <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
-              </DialogContent>
-            </Dialog>
-          </div>
-        )}
+        <h2 className="text-3xl font-bold">{getPageTitle()}</h2>
+        <div className="flex space-x-2"> {/* Este div agora agrupa os botões e o calendário */}
+          {activeTab === "pacientes-internados" && (
+            <>
+              <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
+                <History className="mr-2 h-4 w-4" /> Ver Histórico
+              </Button>
+              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="font-bold">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
+                  <DialogHeader>
+                    <DialogTitle>Internar Novo Paciente</DialogTitle>
+                  </DialogHeader>
+                  <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            </>
+          )}
+          {activeTab === "mapa-execucao" && (
+            <div className="flex items-center space-x-2"> {/* Bloco do calendário */}
+              <Button variant="default" size="icon" onClick={handlePreviousDay}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[280px] justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    initialFocus
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+              <Button variant="default" size="icon" onClick={handleNextDay}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -383,37 +418,7 @@ const Internacao = () => {
 
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
-            <div className="flex justify-end items-center space-x-2 mb-4">
-              <Button variant="default" size="icon" onClick={handlePreviousDay}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-[280px] justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    initialFocus
-                    locale={ptBR}
-                  />
-                  </PopoverContent>
-                </Popover>
-              <Button variant="default" size="icon" onClick={handleNextDay}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+            {/* O bloco do calendário foi movido para cima */}
             <ExecutionMapTable
               patients={patientsForExecutionMap}
               selectedDate={selectedDate}
