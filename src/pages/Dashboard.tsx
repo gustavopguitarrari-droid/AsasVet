@@ -14,6 +14,7 @@ import RevenueMonthlyChart from "@/components/charts/RevenueMonthlyChart";
 import PetsBySpeciesChart from "@/components/charts/PetsBySpeciesChart";
 import AverageWaitingTimeCard from "@/components/AverageWaitingTimeCard"; // Importar o card de tempo de espera
 import AverageConsultationTimeCard from "@/components/AverageConsultationTimeCard"; // Importar o novo card de tempo de consulta
+import UpcomingEventsCard from "@/components/UpcomingEventsCard"; // Importar o novo componente de Próximos Eventos
 
 interface DashboardItemConfig {
   id: string;
@@ -28,7 +29,7 @@ const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview" },
   { id: "averageWaitingTime", name: "Média de Tempo de Espera", isVisible: true, category: "overview" },
   { id: "averageConsultationTime", name: "Média de Tempo da Consulta", isVisible: true, category: "overview" }, // Novo item
-  { id: "recentActivity", name: "Atividade Recente", isVisible: true, category: "recentActivity" },
+  { id: "upcomingEvents", name: "Próximos Eventos", isVisible: true, category: "recentActivity" }, // Renomeado e ajustado
   { id: "financialSummary", name: "Resumo Financeiro", isVisible: true, category: "financial" },
   { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial" },
   { id: "internmentStatus", name: "Status de Internação", isVisible: true, category: "animalHealth" },
@@ -137,17 +138,8 @@ const Dashboard = () => {
         return <AverageWaitingTimeCard key={item.id} />;
       case "averageConsultationTime": // Novo case para o card de média de tempo da consulta
         return <AverageConsultationTimeCard key={item.id} />;
-      case "recentActivity":
-        return (
-          <Card key={item.id} className="bg-gray-100 text-gray-800 shadow-md col-span-full">
-            <CardHeader>
-              <CardTitle>Atividade Recente</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">Nenhuma atividade recente para mostrar.</p>
-            </CardContent>
-          </Card>
-        );
+      case "upcomingEvents": // Novo case para o card de Próximos Eventos
+        return <UpcomingEventsCard key={item.id} />;
       case "financialSummary":
         return (
           <Card key={item.id} className={cn("bg-green-600", baseCardClasses)}>
