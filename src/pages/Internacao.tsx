@@ -81,6 +81,9 @@ const statusBadgeColorMap: Record<InternedPatient["status"], string> = {
   "Óbito": "bg-red-500",
 };
 
+// Helper para gerar IDs únicos
+const generateUniqueActionId = () => `ACT-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
 const Internacao = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
@@ -98,7 +101,7 @@ const Internacao = () => {
   const [actionPatientName, setActionPatientName] = React.useState<string | null>(null);
   const [actionDate, setActionDate] = React.useState<Date | null>(null);
   const [actionHour, setActionHour] = React.useState<string | null>(null);
-  const [initialActionsForSlot, setInitialActionsForSlot] = React.useState<PatientAction[]>([]); // Novo estado para ações iniciais
+  const [allActionsForPatientOnDate, setAllActionsForPatientOnDate] = React.useState<PatientAction[]>([]); // Novo estado para todas as ações do dia
   const [patientActions, setPatientActions] = React.useState<PatientAction[]>([]); // Novo estado para as ações
 
   // Estados para o novo diálogo de confirmação de ações
@@ -207,11 +210,17 @@ const Internacao = () => {
 
     // Mock de ações iniciais
     const mockActions: PatientAction[] = [
-      { id: "ACT001", patientId: "INT001", date: "2024-10-27", hour: "10", description: "Administrar antibiótico", type: "Medicação", isCompleted: false, frequency: "BID" },
-      { id: "ACT002", patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação", isCompleted: false, frequency: "TID" },
-      { id: "ACT003", patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
-      { id: "ACT004", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Trocar curativo", type: "Medicação", isCompleted: false, frequency: "SID" },
-      { id: "ACT005", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Passeio", type: "Outro", isCompleted: false, frequency: "Outro" },
+      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "10", description: "Administrar antibiótico", type: "Medicação", isCompleted: false, frequency: "BID" },
+      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "22", description: "Administrar antibiótico", type: "Medicação", isCompleted: false, frequency: "BID" },
+      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação", isCompleted: false, frequency: "TID" },
+      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "06", description: "Alimentação", type: "Alimentação", isCompleted: false, frequency: "TID" },
+      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "22", description: "Alimentação", type: "Alimentação", isCompleted: false, frequency: "TID" },
+      { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
+      { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "17", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
+      { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "23", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
+      { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "05", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
+      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-28", hour: "10", description: "Trocar curativo", type: "Medicação", isCompleted: false, frequency: "SID" },
+      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-28", hour: "10", description: "Passeio", type: "Outro", isCompleted: false, frequency: "Outro" },
     ];
     setPatientActions(mockActions);
 
@@ -279,43 +288,35 @@ const Internacao = () => {
     patientName: string,
     date: Date,
     hour: string,
-    initialActions: PatientActionFormValues[] = [] // Pode ser vazio para adicionar, ou preenchido para editar
   ) => {
     setActionPatientId(patientId);
     setActionPatientName(patientName);
     setActionDate(date);
     setActionHour(hour);
-    setInitialActionsForSlot(initialActions); // Define as ações iniciais
+    // Filtra todas as ações para este paciente e esta data
+    const actionsForThisPatientOnDate = patientActions.filter(
+      (action) => action.patientId === patientId && action.date === format(date, "yyyy-MM-dd")
+    );
+    setAllActionsForPatientOnDate(actionsForThisPatientOnDate);
     setIsAddActionDialogOpen(true);
   };
 
-  const handleSaveAllPatientActions = (actionsToSave: PatientActionFormValues[]) => {
-    if (actionPatientId && actionDate && actionHour) {
+  const handleSaveAllPatientActions = (updatedActionsForDay: PatientAction[]) => {
+    if (actionPatientId && actionDate) {
       const formattedDate = format(actionDate, "yyyy-MM-dd");
 
-      // Remove todas as ações existentes para este paciente, data e hora
-      const filteredExistingActions = patientActions.filter(
-        (action) =>
-          !(
-            action.patientId === actionPatientId &&
-            action.date === formattedDate &&
-            action.hour === actionHour
-          )
+      // Remove todas as ações existentes para este paciente e esta data
+      const otherPatientsActions = patientActions.filter(
+        (action) => !(action.patientId === actionPatientId && action.date === formattedDate)
       );
 
-      // Adiciona as novas ações (ou as ações editadas)
-      const newActions: PatientAction[] = actionsToSave.map((data, index) => ({
-        id: `ACT${(patientActions.length + index + 1).toString().padStart(3, '0')}`, // Gerar ID único para cada ação
-        patientId: actionPatientId,
-        date: formattedDate,
-        hour: actionHour,
-        description: data.description,
-        type: data.type,
-        isCompleted: false, // Novas ações começam como não concluídas
-        frequency: data.frequency, // Incluir a frequência
+      // Adiciona as ações atualizadas (com IDs únicos)
+      const newActionsWithUniqueIds = updatedActionsForDay.map(action => ({
+        ...action,
+        id: generateUniqueActionId(), // Garante que cada ação tenha um ID único
       }));
 
-      setPatientActions([...filteredExistingActions, ...newActions]);
+      setPatientActions([...otherPatientsActions, ...newActionsWithUniqueIds]);
       setIsAddActionDialogOpen(false);
     }
   };
@@ -517,10 +518,11 @@ const Internacao = () => {
           isOpen={isAddActionDialogOpen}
           onClose={() => setIsAddActionDialogOpen(false)}
           onSaveAllActions={handleSaveAllPatientActions}
+          patientId={actionPatientId} // Passa o ID do paciente
           patientName={actionPatientName}
           date={actionDate}
-          hour={actionHour}
-          initialActions={initialActionsForSlot} // Passa as ações iniciais
+          initialHour={actionHour} // Passa o horário inicial
+          allActionsForPatientOnDate={allActionsForPatientOnDate} // Passa todas as ações do dia
         />
       )}
 
@@ -535,11 +537,7 @@ const Internacao = () => {
           actionsForSlot={confirmActionsForSlot}
           onEditActionsClick={(pId, pName, dt, hr, initialActs) => { // Implementa a callback
             setIsConfirmActionsDialogOpen(false); // Fecha o diálogo de confirmação
-            openAddEditActionDialog(pId, pName, dt, hr, initialActs.map(a => ({ // Mapeia para PatientActionFormValues
-              description: a.description,
-              type: a.type,
-              frequency: a.frequency // Incluir a frequência
-            })));
+            openAddEditActionDialog(pId, pName, dt, hr); // Reabre o diálogo de adicionar/editar
           }}
           patientId={confirmActionsPatientId} // Passa o ID do paciente
         />
