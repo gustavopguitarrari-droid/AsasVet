@@ -1,18 +1,19 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History } from "lucide-react";
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon } from "lucide-react"; // Importar CalendarIcon
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
 import InternmentHistoryDialog from "@/components/InternmentHistoryDialog";
 import ExecutionMapTable from "@/components/ExecutionMapTable";
-import { format, isSameDay, parseISO, isBefore, isAfter, isEqual } from "date-fns"; // Importar isBefore, isAfter, isEqual
-import { ptBR } from "date-fns/locale"; // Importar locale
+import { format, isSameDay, parseISO, isBefore, isAfter, isEqual } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar"; // Importar Calendar
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -71,7 +72,7 @@ const Internacao = () => {
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
   const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
-  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date()); // Novo estado para a data do calendário
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
 
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
@@ -287,13 +288,29 @@ const Internacao = () => {
           <div className="p-4 border rounded-md bg-background space-y-4">
             <h3 className="text-2xl font-semibold mb-4">Mapa de Execução Diário</h3>
             <div className="flex justify-center">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={setSelectedDate}
-                locale={ptBR}
-                className="rounded-md border shadow-md"
-              />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[280px] justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    initialFocus
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <ExecutionMapTable patients={patientsForExecutionMap} />
           </div>
