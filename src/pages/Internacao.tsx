@@ -89,12 +89,13 @@ const Internacao = () => {
   const [selectedDate, setSelectedDate] = React.useState<Date>(new Date()); // Alterado para sempre ser Date
   const [patientSearchTerm, setPatientSearchTerm] = React.useState<string>("");
 
-  // Estados para o diálogo de adicionar ação
+  // Estados para o diálogo de adicionar/editar ação
   const [isAddActionDialogOpen, setIsAddActionDialogOpen] = React.useState(false);
   const [actionPatientId, setActionPatientId] = React.useState<string | null>(null);
   const [actionPatientName, setActionPatientName] = React.useState<string | null>(null);
   const [actionDate, setActionDate] = React.useState<Date | null>(null);
   const [actionHour, setActionHour] = React.useState<string | null>(null);
+  const [initialActionsForSlot, setInitialActionsForSlot] = React.useState<PatientAction[]>([]); // Novo estado para ações iniciais
   const [patientActions, setPatientActions] = React.useState<PatientAction[]>([]); // Novo estado para as ações
 
   React.useEffect(() => {
@@ -196,8 +197,10 @@ const Internacao = () => {
     // Mock de ações iniciais
     const mockActions: PatientAction[] = [
       { id: "ACT001", patientId: "INT001", date: "2024-10-27", hour: "10", description: "Administrar antibiótico", type: "Medicação" },
-      { id: "ACT001", patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação" },
-      { id: "ACT002", patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação" },
+      { id: "ACT002", patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação" },
+      { id: "ACT003", patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação" },
+      { id: "ACT004", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Trocar curativo", type: "Medicação" },
+      { id: "ACT005", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Passeio", type: "Outro" },
     ];
     setPatientActions(mockActions);
 
@@ -259,27 +262,47 @@ const Internacao = () => {
     patient.risk.toLowerCase().includes(patientSearchTerm.toLowerCase())
   );
 
-  // Funções para o diálogo de adicionar ação
-  const handleOpenAddActionDialog = (patientId: string, patientName: string, date: Date, hour: string) => {
+  // Funções para o diálogo de adicionar/editar ação
+  const openAddEditActionDialog = (
+    patientId: string,
+    patientName: string,
+    date: Date,
+    hour: string,
+    initialActions: PatientAction[] = [] // Pode ser vazio para adicionar, ou preenchido para editar
+  ) => {
     setActionPatientId(patientId);
     setActionPatientName(patientName);
     setActionDate(date);
     setActionHour(hour);
+    setInitialActionsForSlot(initialActions); // Define as ações iniciais
     setIsAddActionDialogOpen(true);
   };
 
-  // Modificado para aceitar um array de ações
   const handleSaveAllPatientActions = (actionsToSave: PatientActionFormValues[]) => {
     if (actionPatientId && actionDate && actionHour) {
+      const formattedDate = format(actionDate, "yyyy-MM-dd");
+
+      // Remove todas as ações existentes para este paciente, data e hora
+      const filteredExistingActions = patientActions.filter(
+        (action) =>
+          !(
+            action.patientId === actionPatientId &&
+            action.date === formattedDate &&
+            action.hour === actionHour
+          )
+      );
+
+      // Adiciona as novas ações (ou as ações editadas)
       const newActions: PatientAction[] = actionsToSave.map((data, index) => ({
         id: `ACT${(patientActions.length + index + 1).toString().padStart(3, '0')}`, // Gerar ID único para cada ação
         patientId: actionPatientId,
-        date: format(actionDate, "yyyy-MM-dd"),
+        date: formattedDate,
         hour: actionHour,
         description: data.description,
         type: data.type,
       }));
-      setPatientActions((prev) => [...prev, ...newActions]); // Adicionar todas as novas ações
+
+      setPatientActions([...filteredExistingActions, ...newActions]);
       setIsAddActionDialogOpen(false);
     }
   };
@@ -425,7 +448,8 @@ const Internacao = () => {
               patients={patientsForExecutionMap}
               selectedDate={selectedDate}
               patientActions={patientActions}
-              onAddActionClick={handleOpenAddActionDialog}
+              onAddActionClick={openAddEditActionDialog} // Usar a função unificada
+              onEditActionsClick={openAddEditActionDialog} // Usar a função unificada
             />
           </div>
         </TabsContent>
@@ -452,6 +476,7 @@ const Internacao = () => {
           patientName={actionPatientName}
           date={actionDate}
           hour={actionHour}
+          initialActions={initialActionsForSlot} // Passa as ações iniciais
         />
       )}
     </div>

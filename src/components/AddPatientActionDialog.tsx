@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -24,6 +24,7 @@ import { DialogFooter, DialogHeader, DialogTitle, DialogDescription, DialogConte
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils"; // Import cn for utility classes
+import { PatientAction } from "@/pages/Internacao"; // Import PatientAction type
 
 const formSchema = z.object({
   description: z.string().min(1, "A descrição da ação é obrigatória."),
@@ -41,6 +42,7 @@ interface AddPatientActionDialogProps {
   patientName: string;
   date: Date;
   hour: string;
+  initialActions?: PatientAction[]; // Nova prop para ações iniciais
 }
 
 // Mapeamento de ícones para tipos de ação (reutilizado de ExecutionMapTable)
@@ -58,6 +60,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
   patientName,
   date,
   hour,
+  initialActions = [], // Valor padrão para evitar undefined
 }) => {
   const form = useForm<PatientActionFormValues>({
     resolver: zodResolver(formSchema),
@@ -69,16 +72,20 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
 
   const [currentActionsInCart, setCurrentActionsInCart] = useState<PatientActionFormValues[]>([]);
 
-  // Reset cart and form when dialog opens
+  // Reset cart and form when dialog opens or initialActions change
   useEffect(() => {
     if (isOpen) {
-      setCurrentActionsInCart([]);
+      // Mapeia PatientAction para PatientActionFormValues para o 'carrinho'
+      setCurrentActionsInCart(initialActions.map(action => ({
+        description: action.description,
+        type: action.type,
+      })));
       form.reset({
         description: "",
         type: "Medicação",
       });
     }
-  }, [isOpen, form]);
+  }, [isOpen, form, initialActions]); // Adicionado initialActions como dependência
 
   const handleAddActionToCart = (data: PatientActionFormValues) => {
     setCurrentActionsInCart((prev) => [...prev, data]);

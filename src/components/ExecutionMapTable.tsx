@@ -38,6 +38,7 @@ interface ExecutionMapTableProps {
   selectedDate: Date | undefined;
   patientActions: PatientAction[]; // Receber as ações
   onAddActionClick: (patientId: string, patientName: string, date: Date, hour: string) => void; // Callback para adicionar ação
+  onEditActionsClick: (patientId: string, patientName: string, date: Date, hour: string, initialActions: PatientAction[]) => void; // Nova callback para editar ações
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -85,10 +86,16 @@ const generateHourlySlots = () => {
 
 const hourlySlots = generateHourlySlots();
 
-const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selectedDate, patientActions, onAddActionClick }) => {
+const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selectedDate, patientActions, onAddActionClick, onEditActionsClick }) => {
   const handleAddAction = (patient: InternedPatient, hour: string) => {
     if (selectedDate) {
       onAddActionClick(patient.id, patient.petName, selectedDate, hour);
+    }
+  };
+
+  const handleEditActions = (patient: InternedPatient, hour: string, actions: PatientAction[]) => {
+    if (selectedDate) {
+      onEditActionsClick(patient.id, patient.petName, selectedDate, hour, actions);
     }
   };
 
@@ -147,6 +154,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                                     "h-7 w-7 p-0 flex items-center justify-center rounded-full",
                                     "bg-primary text-primary-foreground cursor-pointer"
                                   )}
+                                  onClick={() => handleEditActions(patient, hour, actionsForSlot)} // Adicionado onClick aqui
                                 >
                                   {actionsForSlot.length}
                                 </Badge>
