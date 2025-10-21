@@ -323,7 +323,6 @@ const Internacao = () => {
 
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
-            {/* Seletor de data movido para o topo deste TabsContent */}
             <div className="flex justify-end items-center space-x-2 mb-4">
               <Button variant="default" size="icon" onClick={handlePreviousDay}>
                 <ChevronLeft className="h-4 w-4" />
