@@ -143,7 +143,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                             {actionsForSlot.map((action) => {
                               const ActionIcon = actionTypeIconMap[action.type] || FlaskConical;
                               return (
-                                <Tooltip key={action.id} delayDuration={0}>
+                                <Tooltip key={action.id} delayDuration={0}> {/* Usando action.id como key */}
                                   <TooltipTrigger asChild>
                                     <Badge variant="secondary" className="h-6 w-6 p-0 flex items-center justify-center">
                                       <ActionIcon className="h-4 w-4" />

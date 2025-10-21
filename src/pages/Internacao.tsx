@@ -279,7 +279,11 @@ const Internacao = () => {
         description: data.description,
         type: data.type,
       }));
-      setPatientActions((prev) => [...prev, ...newActions]); // Adicionar todas as novas ações
+      setPatientActions((prev) => {
+        const updatedActions = [...prev, ...newActions];
+        console.log("Ações atualizadas:", updatedActions); // Log para depuração
+        return updatedActions;
+      }); // Adicionar todas as novas ações
       setIsAddActionDialogOpen(false);
     }
   };
@@ -444,16 +448,18 @@ const Internacao = () => {
         historyPatients={historyPatients}
       />
 
-      {isAddActionDialogOpen && actionPatientId && actionPatientName && actionDate && actionHour && (
-        <AddPatientActionDialog
-          isOpen={isAddActionDialogOpen}
-          onClose={() => setIsAddActionDialogOpen(false)}
-          onSaveAllActions={handleSaveAllPatientActions}
-          patientName={actionPatientName}
-          date={actionDate}
-          hour={actionHour}
-        />
-      )}
+      <Dialog open={isAddActionDialogOpen} onOpenChange={setIsAddActionDialogOpen}>
+        {actionPatientId && actionPatientName && actionDate && actionHour && (
+          <AddPatientActionDialog
+            isOpen={isAddActionDialogOpen}
+            onClose={() => setIsAddActionDialogOpen(false)}
+            onSaveAllActions={handleSaveAllPatientActions}
+            patientName={actionPatientName}
+            date={actionDate}
+            hour={actionHour}
+          />
+        )}
+      </Dialog>
     </div>
   );
 };
