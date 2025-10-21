@@ -72,9 +72,8 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
     return eachDayOfInterval({ start, end });
   }, [currentMonth]);
 
-  // Preenche os dias da semana antes do início do mês
   const firstDayOfMonth = startOfMonth(currentMonth);
-  const startingDayOfWeek = firstDayOfMonth.getDay(); // 0 = Domingo, 1 = Segunda...
+  const startingDayOfWeek = firstDayOfMonth.getDay();
   const emptyDaysBefore = Array.from({ length: startingDayOfWeek }).map((_, i) => null);
 
   const handleDayClick = (day: Date | null) => {
@@ -166,7 +165,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
                 <div className="flex flex-wrap justify-center gap-0.5 mt-1">
                   {vetsOnDuty.map((vetName, index) => (
                     <Badge key={index} variant="secondary" className="text-[0.6rem] h-auto px-1 py-0.5 leading-none">
-                      {vetName.split(' ')[0]}
+                      {vetName} {/* Alterado para mostrar o nome completo */}
                     </Badge>
                   ))}
                 </div>
@@ -196,7 +195,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
                     editingDaySchedule.includes(vet.name) ? "bg-primary text-primary-foreground" : ""
                   )}
                 >
-                  {vet.name.split(' ')[0]}
+                  {vet.name} {/* Alterado para mostrar o nome completo */}
                   {editingDaySchedule.includes(vet.name) ? <X className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
                 </Button>
               ))}
