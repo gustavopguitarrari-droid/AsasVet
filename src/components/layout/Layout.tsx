@@ -7,6 +7,7 @@ import Sidebar from "./Sidebar";
 import Header from "./Header";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { cn } from "@/lib/utils";
+import FloatingChatButton from "@/components/FloatingChatButton"; // Importar o novo componente
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -25,6 +26,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   // minSize e maxSize devem ser os mesmos que defaultSize para fixar o tamanho do painel
   const sidebarMinSize = sidebarSize;
   const sidebarMaxSize = sidebarSize;
+
+  const handleChatButtonClick = () => {
+    console.log("Botão de chat clicado!");
+    // Futuramente, aqui será a lógica para abrir o chat
+  };
 
   return (
     <div className="flex h-screen w-screen overflow-hidden">
@@ -46,6 +52,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
+      <FloatingChatButton onClick={handleChatButtonClick} /> {/* Adicionado o botão flutuante aqui */}
     </div>
   );
 };
