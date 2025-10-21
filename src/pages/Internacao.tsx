@@ -242,11 +242,11 @@ const Internacao = () => {
   }, [internedPatients]);
 
   const handlePreviousDay = () => {
-    setSelectedDate((prevDate) => subDays(prevDate, 1)); // Não precisa de verificação de undefined
+    setSelectedDate((prevDate) => subDays(prevDate, 1));
   };
 
   const handleNextDay = () => {
-    setSelectedDate((prevDate) => addDays(prevDate, 1)); // Não precisa de verificação de undefined
+    setSelectedDate((prevDate) => addDays(prevDate, 1));
   };
 
   const filteredInternedPatients = internedPatients.filter(patient =>
@@ -261,29 +261,25 @@ const Internacao = () => {
 
   // Funções para o diálogo de adicionar ação
   const handleOpenAddActionDialog = (patientId: string, patientName: string, date: Date, hour: string) => {
-    try {
-      setActionPatientId(patientId);
-      setActionPatientName(patientName);
-      setActionDate(date);
-      setActionHour(hour);
-      setIsAddActionDialogOpen(true);
-    } catch (error) {
-      console.error("Erro ao abrir o diálogo de adicionar ação:", error);
-      // Adicione um toast de erro aqui se desejar
-    }
+    setActionPatientId(patientId);
+    setActionPatientName(patientName);
+    setActionDate(date);
+    setActionHour(hour);
+    setIsAddActionDialogOpen(true);
   };
 
-  const handleAddPatientAction = (data: PatientActionFormValues) => {
+  // Modificado para aceitar um array de ações
+  const handleSaveAllPatientActions = (actionsToSave: PatientActionFormValues[]) => {
     if (actionPatientId && actionDate && actionHour) {
-      const newAction: PatientAction = {
-        id: `ACT${(patientActions.length + 1).toString().padStart(3, '0')}`,
+      const newActions: PatientAction[] = actionsToSave.map((data, index) => ({
+        id: `ACT${(patientActions.length + index + 1).toString().padStart(3, '0')}`, // Gerar ID único para cada ação
         patientId: actionPatientId,
         date: format(actionDate, "yyyy-MM-dd"),
         hour: actionHour,
         description: data.description,
         type: data.type,
-      };
-      setPatientActions((prev) => [...prev, newAction]);
+      }));
+      setPatientActions((prev) => [...prev, ...newActions]); // Adicionar todas as novas ações
       setIsAddActionDialogOpen(false);
     }
   };
@@ -303,7 +299,7 @@ const Internacao = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">{getPageTitle()}</h2>
-        <div className="flex space-x-2"> {/* Este div agora agrupa os botões e o calendário */}
+        <div className="flex space-x-2">
           {activeTab === "pacientes-internados" && (
             <>
               <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
@@ -325,7 +321,7 @@ const Internacao = () => {
             </>
           )}
           {activeTab === "mapa-execucao" && (
-            <div className="flex items-center space-x-2"> {/* Bloco do calendário */}
+            <div className="flex items-center space-x-2">
               <Button variant="default" size="icon" onClick={handlePreviousDay}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -346,7 +342,7 @@ const Internacao = () => {
                   <Calendar
                     mode="single"
                     selected={selectedDate}
-                    onSelect={(day) => setSelectedDate(day || new Date())} // Garante que selectedDate seja sempre Date
+                    onSelect={(day) => setSelectedDate(day || new Date())}
                     initialFocus
                     locale={ptBR}
                   />
@@ -368,7 +364,7 @@ const Internacao = () => {
 
         <TabsContent value="pacientes-internados" className="mt-4">
           <div className="mt-8">
-            <div className="flex flex-wrap gap-4 mb-6"> {/* Container para a legenda */}
+            <div className="flex flex-wrap gap-4 mb-6">
               {Object.entries(riskColorMap).map(([risk, colorClass]) => (
                 <div key={risk} className="flex items-center space-x-2">
                   <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
@@ -425,7 +421,6 @@ const Internacao = () => {
 
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
-            {/* O bloco do calendário foi movido para cima */}
             <ExecutionMapTable
               patients={patientsForExecutionMap}
               selectedDate={selectedDate}
@@ -449,19 +444,16 @@ const Internacao = () => {
         historyPatients={historyPatients}
       />
 
-      {/* Diálogo para adicionar ação, agora com controle explícito de Dialog */}
-      <Dialog open={isAddActionDialogOpen} onOpenChange={setIsAddActionDialogOpen}>
-        {actionPatientId && actionPatientName && actionDate && actionHour && (
-          <AddPatientActionDialog
-            isOpen={isAddActionDialogOpen}
-            onClose={() => setIsAddActionDialogOpen(false)}
-            onSubmit={handleAddPatientAction}
-            patientName={actionPatientName}
-            date={actionDate}
-            hour={actionHour}
-          />
-        )}
-      </Dialog>
+      {isAddActionDialogOpen && actionPatientId && actionPatientName && actionDate && actionHour && (
+        <AddPatientActionDialog
+          isOpen={isAddActionDialogOpen}
+          onClose={() => setIsAddActionDialogOpen(false)}
+          onSaveAllActions={handleSaveAllPatientActions}
+          patientName={actionPatientName}
+          date={actionDate}
+          hour={actionHour}
+        />
+      )}
     </div>
   );
 };
