@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns"; // Adicionado isValid
 import { ptBR } from "date-fns/locale";
 
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Adicionar Ação para {patientName}</DialogTitle>
           <DialogDescription>
-            Agendamento para {date ? format(date, "PPP", { locale: ptBR }) : "Data inválida"} às {hour}:00
+            Agendamento para {date && isValid(date) ? format(date, "PPP", { locale: ptBR }) : "Data inválida"} às {hour}:00
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
