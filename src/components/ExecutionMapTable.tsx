@@ -98,7 +98,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
   return (
     <div className="overflow-x-auto overflow-y-auto max-h-[60vh] rounded-md border">
       <Table className="min-w-full divide-y divide-border">
-        <TableHeader>
+        <TableHeader className="sticky top-0 z-20 bg-secondary"> {/* Adicionado sticky top-0 z-20 bg-secondary */}
           <TableRow className="bg-secondary">
             <TableHead className="sticky left-0 bg-secondary z-10 w-[250px] text-lg font-bold">Paciente</TableHead> {/* Largura aumentada */}
             {hourlySlots.map((hour) => (
