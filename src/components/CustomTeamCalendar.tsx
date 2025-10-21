@@ -140,7 +140,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
 
         <div className="grid grid-cols-7 gap-1">
           {emptyDaysBefore.map((_, index) => (
-            <div key={`empty-${index}`} className="h-24 w-full"></div>
+            <div key={`empty-${index}`} className="h-28 w-full"></div> {/* Alterado de h-24 para h-28 */}
           ))}
           {daysInMonth.map((day) => {
             const dayKey = format(day, "yyyy-MM-dd");
@@ -153,7 +153,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
                 key={dayKey}
                 variant="ghost"
                 className={cn(
-                  "h-24 w-full flex flex-col items-center justify-start p-1 text-sm font-normal relative",
+                  "h-28 w-full flex flex-col items-center justify-start p-1 text-sm font-normal relative", // Alterado de h-24 para h-28
                   "hover:bg-accent hover:text-accent-foreground",
                   isCurrentDay && "bg-accent text-accent-foreground",
                   isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
@@ -165,7 +165,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
                 <div className="flex flex-wrap justify-center gap-0.5 mt-1">
                   {vetsOnDuty.map((vetName, index) => (
                     <Badge key={index} variant="secondary" className="text-[0.6rem] h-auto px-1 py-0.5 leading-none">
-                      {vetName} {/* Alterado para mostrar o nome completo */}
+                      {vetName}
                     </Badge>
                   ))}
                 </div>
@@ -195,7 +195,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
                     editingDaySchedule.includes(vet.name) ? "bg-primary text-primary-foreground" : ""
                   )}
                 >
-                  {vet.name} {/* Alterado para mostrar o nome completo */}
+                  {vet.name}
                   {editingDaySchedule.includes(vet.name) ? <X className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
                 </Button>
               ))}
