@@ -79,8 +79,10 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
   };
 
   const handleFormSubmit = (data: AppointmentFormValues) => {
-    // O formulário agora não inclui 'date' e 'status'.
+    // O formulário agora não inclui 'date' e 'status' diretamente para edição.
     // Preservamos os valores originais do 'appointment' e mesclamos com os dados do formulário.
+    // A data será a original do appointment, pois o formulário de edição não a altera.
+    // O status também será o original, pois o formulário de edição não o altera.
     onUpdate({
       ...appointment, // Mantém id, date, status e outros campos originais
       ...data,        // Sobrescreve os campos editáveis (client, pet, etc.)

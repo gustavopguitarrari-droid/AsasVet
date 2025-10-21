@@ -4,12 +4,10 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format, parseISO } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -19,10 +17,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DialogFooter } from "@/components/ui/dialog";
+import AppointmentDateSelector from "./AppointmentDateSelector"; // Importar o novo seletor de data
 
 // Mock de veterinários para o select
 const mockVeterinarians = [
@@ -42,6 +39,10 @@ const serviceOptions = [
 ] as const; // 'as const' para inferir como tupla de strings literais
 
 const formSchema = z.object({
+  dateOption: z.enum(["today", "specific"], {
+    required_error: "Selecione uma opção de data.",
+  }),
+  date: z.date().optional(), // Optional, as it's only required if dateOption is "specific"
   time: z.string().min(1, "A hora da consulta é obrigatória."),
   client: z.string().min(1, "O nome do cliente é obrigatório."),
   pet: z.string().min(1, "O nome do animal é obrigatório."),
@@ -52,26 +53,44 @@ const formSchema = z.object({
     required_error: "O serviço é obrigatório.",
   }),
   veterinarian: z.string().min(1, "O veterinário é obrigatório."),
+}).superRefine((data, ctx) => {
+  if (data.dateOption === "specific" && !data.date) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "A data é obrigatória para agendamento específico.",
+      path: ["date"],
+    });
+  }
 });
 
 export type AppointmentFormValues = z.infer<typeof formSchema>;
 
 interface AppointmentFormProps {
   onSubmit: (data: AppointmentFormValues) => void;
-  // initialData agora aceita um objeto parcial do tipo Appointment,
-  // pois 'date' e 'status' não são mais gerenciados diretamente por este formulário.
-  initialData?: Partial<Omit<AppointmentFormValues, "date" | "status"> & { date?: string; status?: string }>;
+  initialData?: { // Simplified initialData type for clarity in this context
+    time?: string;
+    client?: string;
+    pet?: string;
+    species?: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros";
+    service?: typeof serviceOptions[number];
+    veterinarian?: string;
+    date?: string; // Date as string from existing appointment
+    status?: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento"; // Status as string
+  };
 }
 
 const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData }) => {
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      // If initialData has a date, assume it's a specific date, otherwise default to today
+      dateOption: initialData?.date ? "specific" : "today",
+      date: initialData?.date ? new Date(initialData.date) : undefined,
       time: initialData?.time || format(new Date(), "HH:mm"),
       client: initialData?.client || "",
-      pet: initialData?.pet || "",
+      pet: initialData?.pet || "Cachorro",
       species: initialData?.species || "Cachorro",
-      service: initialData?.service || serviceOptions[0], // Garantir que o default seja uma das opções válidas
+      service: initialData?.service || serviceOptions[0],
       veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
     },
   });
@@ -79,6 +98,20 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <AppointmentDateSelector /> {/* Novo componente de seleção de data */}
+        <FormField
+          control={form.control}
+          name="time"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Hora</FormLabel>
+              <FormControl>
+                <Input type="time" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="client"
@@ -178,21 +211,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
             </FormItem>
           )}
         />
-        {/* O campo de data foi removido */}
-        <FormField
-          control={form.control}
-          name="time"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Hora</FormLabel>
-              <FormControl>
-                <Input type="time" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* O campo de status foi removido */}
         <DialogFooter>
           <Button type="submit">{initialData ? "Salvar Alterações" : "Agendar"}</Button>
         </DialogFooter>

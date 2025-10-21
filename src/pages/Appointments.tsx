@@ -83,9 +83,13 @@ const Appointments = () => {
   });
 
   const handleAddAppointment = (data: AppointmentFormValues) => {
+    const appointmentDate = data.dateOption === "today"
+      ? format(new Date(), "yyyy-MM-dd")
+      : data.date ? format(data.date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"); // Fallback para hoje se data específica não for selecionada
+
     const newAppointment: Appointment = {
       id: `C${(appointments.length + 1).toString().padStart(3, '0')}`, // Gerar um ID simples
-      date: format(new Date(), "yyyy-MM-dd"), // Data atual definida automaticamente
+      date: appointmentDate,
       time: data.time,
       client: data.client,
       pet: data.pet,
