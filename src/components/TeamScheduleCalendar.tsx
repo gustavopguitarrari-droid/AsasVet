@@ -129,23 +129,12 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
     );
   };
 
-  // DayContent to display assigned vets as badges
+  // DayContent SIMPLIFICADO para depuração
   const DayContent: DateFormatter = (day) => {
-    const dayKey = format(day, "yyyy-MM-dd");
-    const assignedVets = schedule.get(dayKey) || [];
-
     return (
       <div className="relative h-full w-full flex flex-col items-center justify-start p-1">
         <span className="text-sm font-medium">{format(day, "d")}</span>
-        {assignedVets.length > 0 && (
-          <div className="flex flex-wrap justify-center gap-1 mt-1">
-            {assignedVets.map((vetName, index) => (
-              <Badge key={index} variant="secondary" className="h-auto px-1 py-0.5 text-xs leading-none whitespace-nowrap">
-                {vetName.split(' ')[0]} {/* Show only first name */}
-              </Badge>
-            ))}
-          </div>
-        )}
+        {/* Badges removidos temporariamente para depuração */}
       </div>
     );
   };
@@ -164,7 +153,7 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
           locale={ptBR}
           components={{
             Caption: CustomCaption,
-            DayContent: DayContent,
+            DayContent: DayContent, // Usando a versão simplificada
           }}
           classNames={{
             root: "w-full",
