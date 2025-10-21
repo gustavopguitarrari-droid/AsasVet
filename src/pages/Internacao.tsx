@@ -182,7 +182,7 @@ const Internacao = () => {
                   onClick={() => handleCardClick(patient)}
                 >
                   {/* Faixa lateral de risco */}
-                  <div className={cn("absolute top-0 right-0 h-full w-2 rounded-r-md", riskStripeColorClass)}></div>
+                  <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
                   
                   <p className="font-bold text-lg flex items-center">
                     <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
