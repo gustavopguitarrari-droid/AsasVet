@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 
 const ExecutionMapLegend: React.FC = () => {
   return (
-    <div className="flex flex-wrap gap-4 p-4 border rounded-md bg-card shadow-sm">
-      <h3 className="text-lg font-semibold mr-4">Legenda:</h3>
+    <div className="flex flex-wrap gap-4 p-4 bg-card shadow-sm"> {/* Removido 'border' e 'rounded-md' */}
+      {/* Removido o h3 com o texto 'Legenda:' */}
       <div className="flex items-center space-x-2">
         <Badge className={cn("h-7 w-7 p-0 flex items-center justify-center rounded-full bg-primary text-primary-foreground")}>
           2
