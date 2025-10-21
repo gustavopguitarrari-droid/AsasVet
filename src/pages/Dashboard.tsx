@@ -253,11 +253,11 @@ const Dashboard = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "animalHealth" | "recentActivity")} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-auto p-1"> {/* Adicionado h-auto e p-1 para melhor espaçamento */}
-          <TabsTrigger value="recentActivity" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2">Atividade Recente</TabsTrigger> {/* Adicionado text-lg e py-2 */}
-          <TabsTrigger value="animalHealth" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2">Saúde Animal</TabsTrigger> {/* Adicionado text-lg e py-2 */}
-          <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2">Visão Geral</TabsTrigger> {/* Adicionado text-lg e py-2 */}
-          <TabsTrigger value="financial" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2">Financeiro</TabsTrigger> {/* Adicionado text-lg e py-2 */}
+        <TabsList className="grid w-full grid-cols-4 h-auto p-1">
+          <TabsTrigger value="recentActivity" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Atividade Recente</TabsTrigger>
+          <TabsTrigger value="animalHealth" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Saúde Animal</TabsTrigger>
+          <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Visão Geral</TabsTrigger>
+          <TabsTrigger value="financial" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Financeiro</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
