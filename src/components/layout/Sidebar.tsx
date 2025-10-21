@@ -86,14 +86,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
-      <div
-        className={cn(
-          "mb-6 flex items-center justify-center text-4xl font-bold text-white",
-        )}
-      >
+      <Link to="/dashboard" className="mb-6 flex items-center justify-center text-4xl font-bold text-white cursor-pointer">
         {!isCollapsed && "AsasVet"}{" "}
         <PawPrint className={cn("h-10 w-10 text-white", !isCollapsed && "ml-2")} strokeWidth={2.5} />
-      </div>
+      </Link>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
           <Tooltip key={item.name} delayDuration={0}>
