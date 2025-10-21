@@ -81,7 +81,7 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col">
-        <DialogHeader className="relative"> {/* Adicionado relative para posicionar o botão */}
+        <DialogHeader className="relative">
           <DialogTitle className="flex items-center">
             <CheckCircle className="h-5 w-5 mr-2 text-green-600" /> Confirmar Ações para {patientName}
           </DialogTitle>
@@ -91,7 +91,7 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
           <Button
             variant="outline"
             size="icon"
-            className="absolute top-4 right-4 h-8 w-8" // Posição no canto superior direito
+            className="absolute top-4 right-4 h-8 w-8"
             onClick={handleEditClick}
           >
             <Edit className="h-4 w-4" />
@@ -130,6 +130,11 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
                         )}
                       >
                         {action.description}
+                        {action.type === "Medicação" && action.quantity && action.route && (
+                          <span className="text-xs text-muted-foreground ml-2">
+                            ({action.quantity} - {action.route})
+                          </span>
+                        )}
                       </label>
                     </div>
                     <div className="flex items-center space-x-2">

@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format, isValid, addDays, parseISO, isEqual, isAfter, isBefore } from "date-fns"; // Import addDays, parseISO, isEqual, isAfter, isBefore
+import { format, isValid, addDays, parseISO, isEqual, isAfter, isBefore } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Plus, Trash2, Syringe, Utensils, Eye, FlaskConical } from "lucide-react";
 
@@ -23,16 +23,35 @@ import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter, DialogHeader, DialogTitle, DialogDescription, DialogContent, Dialog } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils"; // Import cn for utility classes
-import { PatientAction } from "@/pages/Internacao"; // Import PatientAction type
+import { cn } from "@/lib/utils";
+import { PatientAction } from "@/pages/Internacao";
 
 const formSchema = z.object({
   description: z.string().min(1, "A descrição da ação é obrigatória."),
   type: z.enum(["Medicação", "Alimentação", "Observação", "Outro"], {
-    required_error: "O tipo de ação é obrigatório.",
+    required_error: "O tipo de ação é obrigatória.",
   }),
   frequency: z.enum(["SID", "BID", "TID", "QID", "Outro"]).optional(),
-  durationInDays: z.number().min(1, "A duração deve ser de pelo menos 1 dia.").default(1), // New field
+  durationInDays: z.number().min(1, "A duração deve ser de pelo menos 1 dia.").default(1),
+  quantity: z.string().optional(), // NOVO: Quantidade
+  route: z.string().optional(), // NOVO: Via de administração
+}).superRefine((data, ctx) => {
+  if (data.type === "Medicação") {
+    if (!data.quantity || data.quantity.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "A quantidade é obrigatória para medicação.",
+        path: ["quantity"],
+      });
+    }
+    if (!data.route || data.route.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "A via de administração é obrigatória para medicação.",
+        path: ["route"],
+      });
+    }
+  }
 });
 
 export type PatientActionFormValues = z.infer<typeof formSchema>;
@@ -100,7 +119,9 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
       description: "",
       type: "Medicação",
       frequency: "SID",
-      durationInDays: 1, // Default to 1 day
+      durationInDays: 1,
+      quantity: "", // Default para os novos campos
+      route: "",    // Default para os novos campos
     },
   });
 
@@ -114,11 +135,14 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
         type: "Medicação",
         frequency: "SID",
         durationInDays: 1,
+        quantity: "",
+        route: "",
       });
     }
   }, [isOpen, form, allActionsForPatient]);
 
   const frequencyWatch = form.watch("frequency");
+  const typeWatch = form.watch("type"); // Observar o tipo de ação
 
   const handleAddAction = (data: PatientActionFormValues) => {
     const duration = data.frequency === "Outro" ? 1 : data.durationInDays;
@@ -139,6 +163,8 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
           type: data.type,
           isCompleted: false,
           frequency: data.frequency,
+          quantity: data.type === "Medicação" ? data.quantity : undefined, // Inclui condicionalmente
+          route: data.type === "Medicação" ? data.route : undefined,       // Inclui condicionalmente
         });
       });
     }
@@ -171,6 +197,8 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
       type: "Medicação",
       frequency: "SID",
       durationInDays: 1,
+      quantity: "",
+      route: "",
     });
   };
 
@@ -207,7 +235,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
   try {
     return (
       <Dialog open={isOpen} onOpenChange={handleCancelAndClose}>
-        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] flex flex-col"> {/* Increased max-width to 90vw */}
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Gerenciar Ações para {patientName}</DialogTitle>
             <DialogDescription>
@@ -256,6 +284,38 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
                       </FormItem>
                     )}
                   />
+
+                  {typeWatch === "Medicação" && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="quantity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Quantidade</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Ex: 5ml" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="route"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Via de Adm.</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Ex: Oral, IV, SC" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+
                   <FormField
                     control={form.control}
                     name="frequency"
@@ -331,7 +391,14 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
                                   <div key={action.id} className="flex items-center justify-between p-2 border rounded-md bg-card mb-1">
                                     <div className="flex items-center">
                                       <ActionIcon className="h-5 w-5 mr-2 text-muted-foreground" />
-                                      <p className="font-medium text-sm">{action.description}</p>
+                                      <p className="font-medium text-sm">
+                                        {action.description}
+                                        {action.type === "Medicação" && action.quantity && action.route && (
+                                          <span className="text-xs text-muted-foreground ml-2">
+                                            ({action.quantity} - {action.route})
+                                          </span>
+                                        )}
+                                      </p>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                       {action.frequency && (
