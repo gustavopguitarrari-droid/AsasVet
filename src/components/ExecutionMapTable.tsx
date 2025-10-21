@@ -95,7 +95,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
   const formattedSelectedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
 
   return (
-    <div className="overflow-x-auto rounded-md border">
+    <div className="overflow-x-auto overflow-y-auto max-h-[60vh] rounded-md border">
       <Table className="min-w-full divide-y divide-border">
         <TableHeader>
           <TableRow className="bg-secondary">
