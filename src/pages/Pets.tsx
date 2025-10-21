@@ -68,14 +68,12 @@ const Pets = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        {/* <h2 className="text-3xl font-bold">Animais</h2> -- Removido */}
+      <div className="flex items-center justify-between flex-wrap gap-4"> {/* Novo contêiner flexível */}
+        <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
         </Button>
       </div>
-
-      <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
 
       <div className="flex items-center space-x-2">
         <div className="relative flex-1">
