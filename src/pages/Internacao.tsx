@@ -14,23 +14,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { InternedPatient, ExecutionAction, RiskLevel } from "@/types/internment"; // Importar tipos
 
-type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
-
-interface InternedPatient {
-  id: string;
-  bayName: string;
-  petName: string;
-  ownerName: string;
-  reason: string;
-  admissionDate: string;
-  expectedDischargeDate?: string;
-  veterinarian: string;
-  status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
-  species: string;
-  risk: RiskLevel;
-}
-
+// Mapeamentos de ícones e cores (mantidos como estavam)
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
   Gato: Cat,
@@ -72,6 +58,7 @@ const Internacao = () => {
   const [selectedPatient, setSelectedPatient] = React.useState<InternedPatient | null>(null);
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
   const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]);
+  const [executionActions, setExecutionActions] = React.useState<ExecutionAction[]>([]); // Novo estado para ações de execução
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
   const [patientSearchTerm, setPatientSearchTerm] = React.useState<string>("");
@@ -167,10 +154,44 @@ const Internacao = () => {
       },
     ];
 
+    const mockActions: ExecutionAction[] = [
+      {
+        id: "ACT001",
+        patientId: "INT001",
+        patientName: "Buddy",
+        date: "2024-10-27",
+        scheduledTime: "10:00",
+        type: "Medicação",
+        description: "200mg Amoxicilina",
+        status: "Pendente",
+      },
+      {
+        id: "ACT002",
+        patientId: "INT001",
+        patientName: "Buddy",
+        date: "2024-10-27",
+        scheduledTime: "14:00",
+        type: "Alimentação",
+        description: "Ração úmida",
+        status: "Pendente",
+      },
+      {
+        id: "ACT003",
+        patientId: "INT002",
+        patientName: "Mittens",
+        date: "2024-10-27",
+        scheduledTime: "11:00",
+        type: "Parâmetro",
+        description: "Verificar temperatura",
+        status: "Pendente",
+      },
+    ];
+
     const active = mockPatients.filter(p => p.status !== "Alta" && p.status !== "Óbito");
     const history = mockPatients.filter(p => p.status === "Alta" || p.status === "Óbito");
     setInternedPatients(active);
     setHistoryPatients(history);
+    setExecutionActions(mockActions);
   }, []);
 
   const handleAddInternment = (data: InternmentFormValues) => {
@@ -200,6 +221,15 @@ const Internacao = () => {
         prev.map((patient) => (patient.id === updatedPatient.id ? updatedPatient : patient))
       );
     }
+  };
+
+  const handleAddExecutionAction = (action: Omit<ExecutionAction, "id" | "status">) => {
+    const newAction: ExecutionAction = {
+      ...action,
+      id: `ACT${(executionActions.length + 1).toString().padStart(3, '0')}`,
+      status: "Pendente",
+    };
+    setExecutionActions((prev) => [...prev, newAction]);
   };
 
   const handleCardClick = (patient: InternedPatient) => {
@@ -265,8 +295,6 @@ const Internacao = () => {
         )}
       </div>
       
-      {/* O seletor de data foi movido para dentro do TabsContent de 'mapa-execucao' */}
-
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
           <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
@@ -332,7 +360,6 @@ const Internacao = () => {
 
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
-            {/* Seletor de data agora está aqui, dentro do TabsContent */}
             <div className="flex justify-end items-center space-x-2 mb-4">
               <Button variant="default" size="icon" onClick={handlePreviousDay}>
                 <ChevronLeft className="h-4 w-4" />
@@ -364,7 +391,12 @@ const Internacao = () => {
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
-            <ExecutionMapTable patients={patientsForExecutionMap} />
+            <ExecutionMapTable
+              patients={patientsForExecutionMap}
+              selectedDate={selectedDate || new Date()} // Passa a data selecionada
+              executionActions={executionActions}
+              onAddAction={handleAddExecutionAction}
+            />
           </div>
         </TabsContent>
       </Tabs>

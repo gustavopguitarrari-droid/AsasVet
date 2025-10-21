@@ -10,29 +10,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
+import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Pill, Utensils, Thermometer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge"; // Importar Badge
-
-type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
-
-interface InternedPatient {
-  id: string;
-  bayName: string; // Novo campo
-  petName: string;
-  ownerName: string;
-  reason: string;
-  admissionDate: string;
-  expectedDischargeDate?: string;
-  veterinarian: string;
-  status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
-  species: string;
-  risk: RiskLevel;
-}
+import { Badge } from "@/components/ui/badge";
+import { Dialog } from "@/components/ui/dialog"; // Importar Dialog para envolver o formulário
+import AddExecutionActionDialog, { AddExecutionActionFormValues } from "./AddExecutionActionDialog"; // Importar o novo diálogo
+import { InternedPatient, ExecutionAction, RiskLevel } from "@/types/internment"; // Importar tipos
 
 interface ExecutionMapTableProps {
   patients: InternedPatient[];
+  selectedDate: Date; // A data selecionada no calendário pai
+  executionActions: ExecutionAction[]; // Todas as ações de execução
+  onAddAction: (action: Omit<ExecutionAction, "id" | "status">) => void; // Função para adicionar ação
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -53,7 +43,6 @@ const speciesColorMap: { [key: string]: string } = {
   Outros: "text-sidebar-item-bg-9",
 };
 
-// Mapeamento de cores para o nível de risco
 const riskColorMap: Record<RiskLevel, string> = {
   "Sem risco": "bg-blue-500",
   "Baixo": "bg-green-500",
@@ -62,13 +51,11 @@ const riskColorMap: Record<RiskLevel, string> = {
   "Emergência": "bg-red-500",
 };
 
-// Mapeamento de cores para o badge de status (mantido, mas não usado diretamente aqui)
-const statusBadgeColorMap: Record<InternedPatient["status"], string> = {
-  "Em Observação": "bg-blue-500",
-  "Estável": "bg-green-500",
-  "Crítico": "bg-red-500",
-  "Alta": "bg-green-500",
-  "Óbito": "bg-red-500",
+const actionTypeIconMap: Record<ExecutionAction["type"], React.ElementType> = {
+  Medicação: Pill,
+  Parâmetro: Thermometer,
+  Alimentação: Utensils,
+  Outro: Plus,
 };
 
 const generateHourlySlots = () => {
@@ -81,82 +68,144 @@ const generateHourlySlots = () => {
 
 const hourlySlots = generateHourlySlots();
 
-const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
-  const handleAddAction = (patientId: string, hour: string) => {
-    console.log(`Adicionar ação para o paciente ${patientId} no horário ${hour}:00`);
-    // Lógica para adicionar ação (medicação, alimentação, etc.)
+const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selectedDate, executionActions, onAddAction }) => {
+  const [isAddActionDialogOpen, setIsAddActionDialogOpen] = React.useState(false);
+  const [currentPatientForAction, setCurrentPatientForAction] = React.useState<InternedPatient | null>(null);
+  const [currentHourForAction, setCurrentHourForAction] = React.useState<string>("00");
+
+  const handleAddActionClick = (patient: InternedPatient, hour: string) => {
+    setCurrentPatientForAction(patient);
+    setCurrentHourForAction(hour);
+    setIsAddActionDialogOpen(true);
+  };
+
+  const handleAddActionSubmit = (formData: AddExecutionActionFormValues) => {
+    if (currentPatientForAction && selectedDate) {
+      const newAction: Omit<ExecutionAction, "id" | "status"> = {
+        patientId: currentPatientForAction.id,
+        patientName: currentPatientForAction.petName,
+        date: format(selectedDate, "yyyy-MM-dd"),
+        scheduledTime: formData.scheduledTime,
+        type: formData.type,
+        description: formData.description,
+        notes: formData.notes,
+      };
+      onAddAction(newAction);
+    }
   };
 
   return (
-    <div className="overflow-x-auto rounded-md border">
-      <Table className="min-w-full divide-y divide-border">
-        <TableHeader>
-          <TableRow className="bg-secondary">
-            <TableHead className="sticky left-0 bg-secondary z-10 w-[250px] text-lg font-bold">Paciente</TableHead> {/* Largura aumentada */}
-            {hourlySlots.map((hour) => (
-              <TableHead key={hour} className="text-center w-[40px] p-1 text-sm font-semibold text-muted-foreground">
-                {hour}
-              </TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {patients.length > 0 ? (
-            patients.map((patient) => {
-              const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
-              const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
-              const riskStripeColorClass = riskColorMap[patient.risk];
-              // const statusBadgeClass = statusBadgeColorMap[patient.status]; // Não é mais necessário aqui
-
-              return (
-                <TableRow key={patient.id} className="hover:bg-muted/50 transition-colors duration-150">
-                  <TableCell className="sticky left-0 bg-card font-semibold py-4 w-[250px] border-r relative pl-6"> {/* Largura aumentada, adicionado relative e ajustado padding-left */}
-                    {/* Faixa de risco */}
-                    <div className={cn("absolute top-0 left-0 h-full w-2 rounded-l-md", riskStripeColorClass)}></div>
-
-                    <div className="flex items-center mb-1">
-                      <IconComponent className={cn("h-5 w-5 mr-2", speciesTextColorClass)} />
-                      <span className="font-bold text-base">{patient.petName}</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground ml-7">Baia: {patient.bayName}</p> {/* Exibindo o nome da baia */}
-                    <p className="text-xs text-muted-foreground ml-7">Tutor: {patient.ownerName}</p>
-                    <p className="text-xs text-muted-foreground ml-7">Vet: {patient.veterinarian}</p>
-                    {/* O Badge de status foi removido daqui */}
-                  </TableCell>
-                  {hourlySlots.map((hour) => (
-                    <TableCell key={`${patient.id}-${hour}`} className="text-center p-1.5">
-                      <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 group relative rounded-md border-dashed border-muted-foreground/50 bg-background hover:bg-accent/50 transition-colors duration-200"
-                            onClick={() => handleAddAction(patient.id, hour)}
-                          >
-                            <Plus className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                            <span className="sr-only">Adicionar Ação</span>
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">
-                          Adicionar ação para {patient.petName} às {hour}:00
-                        </TooltipContent>
-                      </Tooltip>
-                      {/* Aqui você pode renderizar ações existentes para este paciente e horário */}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              );
-            })
-          ) : (
-            <TableRow>
-              <TableCell colSpan={hourlySlots.length + 1} className="h-24 text-center text-muted-foreground">
-                Nenhum paciente internado para exibir no mapa de execução.
-              </TableCell>
+    <>
+      <div className="overflow-x-auto rounded-md border">
+        <Table className="min-w-full divide-y divide-border">
+          <TableHeader>
+            <TableRow className="bg-secondary">
+              <TableHead className="sticky left-0 bg-secondary z-10 w-[250px] text-lg font-bold">Paciente</TableHead>
+              {hourlySlots.map((hour) => (
+                <TableHead key={hour} className="text-center w-[40px] p-1 text-sm font-semibold text-muted-foreground">
+                  {hour}
+                </TableHead>
+              ))}
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+          </TableHeader>
+          <TableBody>
+            {patients.length > 0 ? (
+              patients.map((patient) => {
+                const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
+                const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
+                const riskStripeColorClass = riskColorMap[patient.risk];
+
+                return (
+                  <TableRow key={patient.id} className="hover:bg-muted/50 transition-colors duration-150">
+                    <TableCell className="sticky left-0 bg-card font-semibold py-4 w-[250px] border-r relative pl-6">
+                      <div className={cn("absolute top-0 left-0 h-full w-2 rounded-l-md", riskStripeColorClass)}></div>
+
+                      <div className="flex items-center mb-1">
+                        <IconComponent className={cn("h-5 w-5 mr-2", speciesTextColorClass)} />
+                        <span className="font-bold text-base">{patient.petName}</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground ml-7">Baia: {patient.bayName}</p>
+                      <p className="text-xs text-muted-foreground ml-7">Tutor: {patient.ownerName}</p>
+                      <p className="text-xs text-muted-foreground ml-7">Vet: {patient.veterinarian}</p>
+                    </TableCell>
+                    {hourlySlots.map((hour) => {
+                      const actionsForSlot = executionActions.filter(
+                        (action) =>
+                          action.patientId === patient.id &&
+                          action.date === format(selectedDate, "yyyy-MM-dd") &&
+                          action.scheduledTime.startsWith(hour)
+                      );
+                      return (
+                        <TableCell key={`${patient.id}-${hour}`} className="text-center p-1.5 relative">
+                          <Tooltip delayDuration={0}>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8 group relative rounded-md border-dashed border-muted-foreground/50 bg-background hover:bg-accent/50 transition-colors duration-200"
+                                onClick={() => handleAddActionClick(patient, hour)}
+                              >
+                                <Plus className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                                <span className="sr-only">Adicionar Ação</span>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              Adicionar ação para {patient.petName} às {hour}:00
+                            </TooltipContent>
+                          </Tooltip>
+                          {actionsForSlot.length > 0 && (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                              {actionsForSlot.map((action) => {
+                                const ActionIcon = actionTypeIconMap[action.type] || Plus;
+                                return (
+                                  <Tooltip key={action.id} delayDuration={0}>
+                                    <TooltipTrigger asChild>
+                                      <Badge variant="secondary" className="h-5 px-1.5 py-0.5 text-xs flex items-center justify-center mb-0.5 pointer-events-auto cursor-pointer">
+                                        <ActionIcon className="h-3 w-3 mr-1" />
+                                        {action.scheduledTime.substring(3)}
+                                      </Badge>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top">
+                                      <p className="font-bold">{action.type}: {action.description}</p>
+                                      <p className="text-xs text-muted-foreground">Agendado: {action.scheduledTime}</p>
+                                      {action.notes && <p className="text-xs text-muted-foreground">Notas: {action.notes}</p>}
+                                    </TooltipContent>
+                                  </Tooltip>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={hourlySlots.length + 1} className="h-24 text-center text-muted-foreground">
+                  Nenhum paciente internado para exibir no mapa de execução.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Dialog open={isAddActionDialogOpen} onOpenChange={setIsAddActionDialogOpen}>
+        {currentPatientForAction && selectedDate && (
+          <AddExecutionActionDialog
+            isOpen={isAddActionDialogOpen}
+            onClose={() => setIsAddActionDialogOpen(false)}
+            patientId={currentPatientForAction.id}
+            patientName={currentPatientForAction.petName}
+            date={selectedDate}
+            initialHour={currentHourForAction}
+            onSubmit={handleAddActionSubmit}
+          />
+        )}
+      </Dialog>
+    </>
   );
 };
 
