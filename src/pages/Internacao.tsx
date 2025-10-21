@@ -298,7 +298,7 @@ const Internacao = () => {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-4"> {/* Adicionado mb-4 aqui */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-4">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
           <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
           <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
@@ -306,7 +306,7 @@ const Internacao = () => {
 
         <TabsContent value="pacientes-internados" className="mt-4">
           <div className="mt-8">
-            <h3 className="text-2xl font-semibold mb-4">Pacientes Atualmente Internados</h3>
+            {/* Removido o h3 "Pacientes Atualmente Internados" */}
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -356,7 +356,6 @@ const Internacao = () => {
 
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
-            {/* O seletor de data foi movido para fora deste TabsContent */}
             <ExecutionMapTable patients={patientsForExecutionMap} />
           </div>
         </TabsContent>
