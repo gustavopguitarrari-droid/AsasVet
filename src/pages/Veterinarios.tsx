@@ -12,7 +12,8 @@ import {
 import { PlusCircle, Search, Stethoscope, User, Briefcase, Hospital, IdCard } from "lucide-react";
 import RoleFilter from "@/components/RoleFilter";
 import VeterinarianDetailsDialog from "@/components/VeterinarianDetailsDialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar componentes de Tabs
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import TeamScheduleCalendar from "@/components/TeamScheduleCalendar"; // Import the new calendar component
 
 interface Veterinario {
   id: string;
@@ -45,7 +46,7 @@ const Veterinarios = () => {
   const [searchTerm, setSearchTerm] = React.useState<string>("");
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState<boolean>(false);
   const [selectedVeterinarian, setSelectedVeterinarian] = React.useState<Veterinario | null>(null);
-  const [activeTab, setActiveTab] = React.useState<string>("equipe"); // Estado para controlar a aba ativa
+  const [activeTab, setActiveTab] = React.useState<string>("equipe");
 
   const handleSelectRole = (role: string) => {
     setSelectedRole(role);
@@ -81,6 +82,10 @@ const Veterinarios = () => {
           <TabsTrigger value="equipe" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Equipe</TabsTrigger>
           <TabsTrigger value="escala" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Escala</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="escala" className="mt-4">
+          <TeamScheduleCalendar veterinarians={mockVeterinarios} /> {/* Integrate the calendar here */}
+        </TabsContent>
 
         <TabsContent value="equipe" className="mt-4">
           <RoleFilter selectedRole={selectedRole} onSelectRole={handleSelectRole} />
@@ -135,16 +140,6 @@ const Veterinarios = () => {
                 )}
               </TableBody>
             </Table>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="escala" className="mt-4">
-          <div className="p-4 border rounded-md bg-background">
-            <h3 className="text-xl font-semibold mb-4">Escala de Trabalho</h3>
-            <p className="text-muted-foreground">
-              Aqui você poderá visualizar e gerenciar a escala de trabalho da equipe.
-              (Conteúdo da escala será implementado aqui)
-            </p>
           </div>
         </TabsContent>
       </Tabs>
