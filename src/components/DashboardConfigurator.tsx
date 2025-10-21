@@ -198,7 +198,26 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                         key={item.id}
                         className="flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
                       >
-                        <Label className="flex-1 text-sm font-medium">{item.name}</Label>
+                        <div className="flex flex-col flex-1">
+                          <Label className="text-sm font-medium">{item.name}</Label>
+                          <Select
+                            value={item.category}
+                            onValueChange={(value: DashboardItemConfig["category"]) =>
+                              handleCategoryChange(item.id, value)
+                            }
+                          >
+                            <SelectTrigger className="w-[180px] h-8 text-sm mt-1">
+                              <SelectValue placeholder="Selecionar Categoria" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.entries(categoryNames).map(([val, name]) => (
+                                <SelectItem key={val} value={val}>
+                                  {name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                         <Button
                           variant="ghost"
                           size="icon"
