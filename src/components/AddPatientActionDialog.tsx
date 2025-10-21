@@ -187,7 +187,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
           <DialogTitle>Gerenciar Ações para {patientName}</DialogTitle>
           <DialogDescription>
             Agendamento para {date instanceof Date && isValid(date) ? format(date, "PPP", { locale: ptBR }) : "Data inválida"}.
-            Horário inicial clicado: {initialHour}:00
+            Horário inicial clicado: {hour}:00
           </DialogDescription>
         </DialogHeader>
 
@@ -196,19 +196,6 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
           <div className="space-y-4 overflow-y-auto pr-2">
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleAddActionToCart)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Descrição da Ação</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Ex: Administrar 5ml de antibiótico" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                 <FormField
                   control={form.control}
                   name="type"
@@ -228,6 +215,19 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
                           <SelectItem value="Outro">Outro</SelectItem>
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Descrição da Ação</FormLabel>
+                      <FormControl>
+                        <Textarea placeholder="Ex: Administrar 5ml de antibiótico" {...field} />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
