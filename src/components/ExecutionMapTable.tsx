@@ -54,7 +54,7 @@ const speciesColorMap: { [key: string]: string } = {
 const generateHourlySlots = () => {
   const hours = [];
   for (let i = 0; i < 24; i++) {
-    hours.push(`${i.toString().padStart(2, "0")}:00`);
+    hours.push(`${i.toString().padStart(2, "0")}`); // Alterado para mostrar apenas a hora
   }
   return hours;
 };
@@ -64,7 +64,7 @@ const hourlySlots = generateHourlySlots();
 const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
   const handleAddAction = (patientId: string, hour: string) => {
     // Lógica para adicionar ação (medicação, alimentação, etc.)
-    console.log(`Adicionar ação para o paciente ${patientId} no horário ${hour}`);
+    console.log(`Adicionar ação para o paciente ${patientId} no horário ${hour}:00`); // Adicionado ":00" para o log
     // Aqui você pode abrir um diálogo para coletar mais informações
   };
 
@@ -108,7 +108,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent side="bottom">
-                          Adicionar ação para {patient.petName} às {hour}
+                          Adicionar ação para {patient.petName} às {hour}:00
                         </TooltipContent>
                       </Tooltip>
                       {/* Aqui você pode renderizar ações existentes para este paciente e horário */}
