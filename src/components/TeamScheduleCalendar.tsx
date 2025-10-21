@@ -32,73 +32,47 @@ interface TeamScheduleCalendarProps {
   veterinarians: Veterinario[];
 }
 
-// Custom header for the calendar to include month/year navigation
-// Mantido para referência, mas não será usado no DayPicker por enquanto
-const CustomCaption: React.FC<{
-  displayMonth: Date;
-  goToMonth: (month: Date) => void;
-  locale: Locale;
-}> = ({ displayMonth, goToMonth, locale }) => {
-  const handlePrevMonth = () => goToMonth(subMonths(displayMonth, 1));
-  const handleNextMonth = () => goToMonth(addMonths(displayMonth, 1));
-
-  return (
-    <div className="flex justify-between items-center p-2">
-      <Button variant="ghost" size="icon" onClick={handlePrevMonth}>
-        <ChevronLeft className="h-4 w-4" />
-      </Button>
-      <h2 className="text-lg font-semibold">
-        {format(displayMonth, "MMMM yyyy", { locale })}
-      </h2>
-      <Button variant="ghost" size="icon" onClick={handleNextMonth}>
-        <ChevronRight className="h-4 w-4" />
-      </Button>
-    </div>
-  );
-};
-
-// DayContent para referência, não será usado no DayPicker por enquanto
-const DayContentWithBadges: DateFormatter = (day) => {
-  // Esta função não será usada diretamente no DayPicker por enquanto
-  // para simplificar a depuração.
-  return (
-    <div className="relative h-full w-full flex flex-col items-center justify-start p-1">
-      <span className="text-sm font-medium">{format(day, "d")}</span>
-      {/* Badges removidos temporariamente */}
-    </div>
-  );
-};
-
-
 const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinarians }) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [editingDaySchedule, setEditingDaySchedule] = useState<string[]>([]); // Vets assigned to the selected day
-  const [schedule, setSchedule] = useState<Map<string, string[]>>(new Map()); // Map: "YYYY-MM-DD" -> ["Vet Name 1", "Vet Name 2"]
-
-  // Mock initial schedule (for demonstration)
-  useEffect(() => {
+  const [schedule, setSchedule] = useState<Map<string, string[]>>(() => {
+    // Initialize schedule from localStorage or with mock data
+    if (typeof window !== 'undefined') {
+      const savedSchedule = localStorage.getItem('teamSchedule');
+      if (savedSchedule) {
+        try {
+          return new Map(JSON.parse(savedSchedule));
+        } catch (e) {
+          console.error("Failed to parse saved schedule from localStorage", e);
+        }
+      }
+    }
+    // Mock initial schedule if no saved data or parsing failed
     const initialSchedule = new Map<string, string[]>();
     const today = new Date();
     const nextMonthDay = addMonths(today, 1);
     const twoMonthsLaterDay = addMonths(today, 2);
 
-    // Assign some vets to today
     if (veterinarians.length >= 2) {
       initialSchedule.set(format(today, "yyyy-MM-dd"), [veterinarians[0].name, veterinarians[1].name]);
     }
-    // Assign some vets to a day next month
     if (veterinarians.length >= 1) {
       initialSchedule.set(format(nextMonthDay, "yyyy-MM-dd"), [veterinarians[2]?.name || veterinarians[0].name]);
     }
-    // Assign some vets to a day two months later
     if (veterinarians.length >= 2) {
       initialSchedule.set(format(twoMonthsLaterDay, "yyyy-MM-dd"), [veterinarians[0].name, veterinarians[2]?.name || veterinarians[1].name]);
     }
+    return initialSchedule;
+  });
 
-    setSchedule(initialSchedule);
-  }, [veterinarians]);
+  // Save schedule to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('teamSchedule', JSON.stringify(Array.from(schedule.entries())));
+    }
+  }, [schedule]);
 
   const handleDayClick = (day: Date | undefined) => {
     if (day) {
@@ -131,6 +105,51 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
     setEditingDaySchedule(Array.from(currentVets)); // Update dialog's state immediately
   };
 
+  // Custom header for the calendar to include month/year navigation
+  const CustomCaption: React.FC<{
+    displayMonth: Date;
+    goToMonth: (month: Date) => void;
+    locale: Locale;
+  }> = ({ displayMonth, goToMonth, locale }) => {
+    const handlePrevMonth = () => goToMonth(subMonths(displayMonth, 1));
+    const handleNextMonth = () => goToMonth(addMonths(displayMonth, 1));
+
+    return (
+      <div className="flex justify-between items-center p-2">
+        <Button variant="ghost" size="icon" onClick={handlePrevMonth}>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <h2 className="text-lg font-semibold">
+          {format(displayMonth, "MMMM yyyy", { locale })}
+        </h2>
+        <Button variant="ghost" size="icon" onClick={handleNextMonth}>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  };
+
+  // DayContent to display assigned vets as badges
+  const DayContent: DateFormatter = (day) => {
+    const dayKey = format(day, "yyyy-MM-dd");
+    const assignedVets = schedule.get(dayKey) || [];
+
+    return (
+      <div className="relative h-full w-full flex flex-col items-center justify-start p-1">
+        <span className="text-sm font-medium">{format(day, "d")}</span>
+        {assignedVets.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-1 mt-1">
+            {assignedVets.map((vetName, index) => (
+              <Badge key={index} variant="secondary" className="h-auto px-1 py-0.5 text-xs leading-none whitespace-nowrap">
+                {vetName.split(' ')[0]} {/* Show only first name */}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="w-full max-w-full overflow-x-auto">
       <div className="rounded-md border p-4 bg-background shadow-sm">
@@ -143,11 +162,10 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
           showOutsideDays
           fixedWeeks
           locale={ptBR}
-          // Removendo as props 'components' para depuração
-          // components={{
-          //   Caption: CustomCaption,
-          //   DayContent: DayContent,
-          // }}
+          components={{
+            Caption: CustomCaption,
+            DayContent: DayContent,
+          }}
           classNames={{
             root: "w-full",
             months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
