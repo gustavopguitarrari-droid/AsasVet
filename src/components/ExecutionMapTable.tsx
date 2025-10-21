@@ -54,7 +54,7 @@ const speciesColorMap: { [key: string]: string } = {
 const generateHourlySlots = () => {
   const hours = [];
   for (let i = 0; i < 24; i++) {
-    hours.push(`${i.toString().padStart(2, "0")}`); // Alterado para mostrar apenas a hora
+    hours.push(`${i.toString().padStart(2, "0")}`);
   }
   return hours;
 };
@@ -64,7 +64,7 @@ const hourlySlots = generateHourlySlots();
 const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
   const handleAddAction = (patientId: string, hour: string) => {
     // Lógica para adicionar ação (medicação, alimentação, etc.)
-    console.log(`Adicionar ação para o paciente ${patientId} no horário ${hour}:00`); // Adicionado ":00" para o log
+    console.log(`Adicionar ação para o paciente ${patientId} no horário ${hour}:00`);
     // Aqui você pode abrir um diálogo para coletar mais informações
   };
 
@@ -75,7 +75,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
           <TableRow>
             <TableHead className="sticky left-0 bg-background z-10 w-[150px]">Paciente</TableHead>
             {hourlySlots.map((hour) => (
-              <TableHead key={hour} className="text-center min-w-[100px]">
+              <TableHead key={hour} className="text-center w-[40px] p-1 text-xs"> {/* Reduzido a largura e padding */}
                 {hour}
               </TableHead>
             ))}
@@ -94,16 +94,16 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
                     {patient.petName}
                   </TableCell>
                   {hourlySlots.map((hour) => (
-                    <TableCell key={`${patient.id}-${hour}`} className="text-center p-2">
+                    <TableCell key={`${patient.id}-${hour}`} className="text-center p-0.5"> {/* Reduzido o padding */}
                       <Tooltip delayDuration={0}>
                         <TooltipTrigger asChild>
                           <Button
-                            variant="outline"
+                            variant="ghost" // Alterado para ghost para ser mais discreto
                             size="icon"
-                            className="h-8 w-8 text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                            className="h-6 w-6 text-muted-foreground hover:bg-accent hover:text-accent-foreground" // Reduzido o tamanho do botão
                             onClick={() => handleAddAction(patient.id, hour)}
                           >
-                            <Plus className="h-4 w-4" />
+                            <Plus className="h-3 w-3" /> {/* Reduzido o tamanho do ícone */}
                             <span className="sr-only">Adicionar Ação</span>
                           </Button>
                         </TooltipTrigger>
