@@ -235,19 +235,10 @@ const Internacao = () => {
     setIsDetailsDialogOpen(true);
   };
 
+  // AQUI ESTÁ A MUDANÇA: patientsForExecutionMap agora retorna todos os pacientes internados
   const patientsForExecutionMap = React.useMemo(() => {
-    if (!selectedDate) return [];
-
-    return internedPatients.filter(patient => {
-      const admission = parseISO(patient.admissionDate);
-      const discharge = patient.expectedDischargeDate ? parseISO(patient.expectedDischargeDate) : null;
-
-      const isAdmittedOnOrBeforeSelectedDate = isBefore(admission, selectedDate) || isEqual(admission, selectedDate);
-      const isNotDischargedOnOrBeforeSelectedDate = !discharge || isAfter(discharge, selectedDate) || isEqual(discharge, selectedDate);
-
-      return isAdmittedOnOrBeforeSelectedDate && isNotDischargedOnOrBeforeSelectedDate;
-    });
-  }, [internedPatients, selectedDate]);
+    return internedPatients;
+  }, [internedPatients]);
 
   const handlePreviousDay = () => {
     setSelectedDate((prevDate) => (prevDate ? subDays(prevDate, 1) : undefined));
