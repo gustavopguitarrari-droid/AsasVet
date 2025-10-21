@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { ListFilter, Wheat, Pill, SprayCan, Wrench, MoreHorizontal } from "lucide-react";
+import { ListFilter, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, Syringe } from "lucide-react"; // Importar Syringe
 
 interface CategoryOption {
   name: string;
@@ -15,7 +15,7 @@ interface CategoryOption {
 
 const categoryOptions: CategoryOption[] = [
   { name: "Todos", icon: ListFilter, colorClass: "bg-gray-500", value: "all" },
-  { name: "Insumos", icon: Wheat, colorClass: "bg-sidebar-item-bg-1", value: "Insumos" },
+  { name: "Insumos", icon: Syringe, colorClass: "bg-sidebar-item-bg-1", value: "Insumos" }, // Alterado para Syringe
   { name: "Medicamentos", icon: Pill, colorClass: "bg-sidebar-item-bg-4", value: "Medicamentos" },
   { name: "Higiene", icon: SprayCan, colorClass: "bg-sidebar-item-bg-3", value: "Higiene" },
   { name: "Equipamentos", icon: Wrench, colorClass: "bg-sidebar-item-bg-7", value: "Equipamentos" },

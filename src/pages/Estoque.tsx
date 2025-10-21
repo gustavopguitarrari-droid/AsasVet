@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal } from "lucide-react";
+import { PlusCircle, Search, Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, Syringe } from "lucide-react"; // Importar Syringe
 import CategoryFilter from "@/components/CategoryFilter"; // Importa o novo componente de filtro
 import StockItemDetailsDialog from "@/components/StockItemDetailsDialog"; // Importa o novo componente de diálogo
 import { cn } from "@/lib/utils"; // Importa cn para classes condicionais
@@ -36,7 +36,7 @@ const mockEstoque: ItemEstoque[] = [
 
 // Mapeamento de categorias para ícones para a tabela
 const categoryIconMap: { [key: string]: React.ElementType } = {
-  Insumos: Wheat,
+  Insumos: Syringe, // Alterado para Syringe
   Medicamentos: Pill,
   Higiene: SprayCan,
   Equipamentos: Wrench,
