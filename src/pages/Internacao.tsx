@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
 import InternmentHistoryDialog from "@/components/InternmentHistoryDialog"; // Importa o novo componente
+import ExecutionMapTable from "@/components/ExecutionMapTable"; // Importa o novo componente
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -273,8 +274,8 @@ const Internacao = () => {
 
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background">
-            <h3 className="text-2xl font-semibold mb-4">Mapa de Execução</h3>
-            <p className="text-muted-foreground">Conteúdo para o mapa de execução será adicionado aqui.</p>
+            <h3 className="text-2xl font-semibold mb-4">Mapa de Execução Diário</h3>
+            <ExecutionMapTable patients={internedPatients} />
           </div>
         </TabsContent>
 
