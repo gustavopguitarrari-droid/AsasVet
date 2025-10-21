@@ -13,7 +13,7 @@ const Header = () => {
       case "/clients":
         return "Clientes";
       case "/pets":
-        return "Animais";
+        return "Cadastro de animais"; // Título atualizado aqui
       case "/appointments":
         return "Consultas";
       case "/medical-records":
