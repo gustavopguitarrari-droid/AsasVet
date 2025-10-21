@@ -5,7 +5,7 @@ import { format, addMonths, subMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { DayPicker, DateFormatter } from "react-day-picker";
-import "react-day-picker/dist/style.css"; // Import default styles
+// Removido: import "react-day-picker/dist/style.css";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -134,13 +134,13 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
     return (
       <div className="relative h-full w-full flex flex-col items-center justify-start p-1">
         <span className="text-sm font-medium">{format(day, "d")}</span>
-        {/* Badges removidos temporariamente para depuração */}
       </div>
     );
   };
 
   return (
     <div className="w-full max-w-full overflow-x-auto">
+      <p className="text-red-500 font-bold text-center my-4">DEBUG: Se você vir este texto, o componente TeamScheduleCalendar está carregando.</p>
       <div className="rounded-md border p-4 bg-background shadow-sm">
         <DayPicker
           mode="single"
