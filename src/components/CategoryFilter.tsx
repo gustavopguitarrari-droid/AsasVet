@@ -15,7 +15,7 @@ interface CategoryOption {
 
 const categoryOptions: CategoryOption[] = [
   { name: "Todos", icon: ListFilter, colorClass: "bg-gray-500", value: "all" },
-  { name: "Alimentos", icon: Wheat, colorClass: "bg-sidebar-item-bg-1", value: "Alimentos" },
+  { name: "Insumos", icon: Wheat, colorClass: "bg-sidebar-item-bg-1", value: "Insumos" },
   { name: "Medicamentos", icon: Pill, colorClass: "bg-sidebar-item-bg-4", value: "Medicamentos" },
   { name: "Higiene", icon: SprayCan, colorClass: "bg-sidebar-item-bg-3", value: "Higiene" },
   { name: "Equipamentos", icon: Wrench, colorClass: "bg-sidebar-item-bg-7", value: "Equipamentos" },

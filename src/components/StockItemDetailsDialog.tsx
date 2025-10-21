@@ -28,7 +28,7 @@ interface StockItemDetailsDialogProps {
 
 // Mapeamento de categorias para ícones
 const categoryIconMap: { [key: string]: React.ElementType } = {
-  Alimentos: Wheat,
+  Insumos: Wheat,
   Medicamentos: Pill,
   Higiene: SprayCan,
   Equipamentos: Wrench,
