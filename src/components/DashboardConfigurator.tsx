@@ -12,8 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { ChevronUp, ChevronDown, GripVertical } from "lucide-react"; // Adicionado GripVertical para indicar reordenação
-import { Switch } from "@/components/ui/switch";
+import { ChevronUp, ChevronDown, GripVertical, PlusCircle, MinusCircle } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -25,7 +24,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible"; // Importar componentes Collapsible
+} from "@/components/ui/collapsible";
 
 interface DashboardItemConfig {
   id: string;
@@ -60,10 +59,10 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     setTempConfig(config);
   }, [config]);
 
-  const handleSwitchChange = (id: string, checked: boolean) => {
+  const handleToggleVisibility = (id: string, isVisible: boolean) => {
     setTempConfig((prevConfig) =>
       prevConfig.map((item) =>
-        item.id === id ? { ...item, isVisible: checked } : item
+        item.id === id ? { ...item, isVisible: isVisible } : item
       )
     );
   };
@@ -76,14 +75,57 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     );
   };
 
-  const moveItem = (index: number, direction: "up" | "down") => {
+  const canMoveUp = (id: string) => {
+    const currentIndex = tempConfig.findIndex((item) => item.id === id);
+    if (currentIndex === -1 || !tempConfig[currentIndex].isVisible) return false;
+
+    for (let i = currentIndex - 1; i >= 0; i--) {
+      if (tempConfig[i].isVisible) {
+        return true; // Encontrou um item visível acima para trocar
+      }
+    }
+    return false; // Nenhum item visível acima
+  };
+
+  const canMoveDown = (id: string) => {
+    const currentIndex = tempConfig.findIndex((item) => item.id === id);
+    if (currentIndex === -1 || !tempConfig[currentIndex].isVisible) return false;
+
+    for (let i = currentIndex + 1; i < tempConfig.length; i++) {
+      if (tempConfig[i].isVisible) {
+        return true; // Encontrou um item visível abaixo para trocar
+      }
+    }
+    return false; // Nenhum item visível abaixo
+  };
+
+  const moveItem = (id: string, direction: "up" | "down") => {
     setTempConfig((prevConfig) => {
       const newConfig = Array.from(prevConfig);
-      const newIndex = direction === "up" ? index - 1 : index + 1;
+      const currentIndex = newConfig.findIndex((item) => item.id === id);
 
-      if (newIndex >= 0 && newIndex < newConfig.length) {
-        const [removed] = newConfig.splice(index, 1);
-        newConfig.splice(newIndex, 0, removed);
+      if (currentIndex === -1) return prevConfig;
+
+      let targetIndex = -1;
+      if (direction === "up") {
+        for (let i = currentIndex - 1; i >= 0; i--) {
+          if (newConfig[i].isVisible) { // Apenas troca com outros itens visíveis
+            targetIndex = i;
+            break;
+          }
+        }
+      } else { // direction === "down"
+        for (let i = currentIndex + 1; i < newConfig.length; i++) {
+          if (newConfig[i].isVisible) { // Apenas troca com outros itens visíveis
+            targetIndex = i;
+            break;
+          }
+        }
+      }
+
+      if (targetIndex !== -1) {
+        const [removed] = newConfig.splice(currentIndex, 1);
+        newConfig.splice(targetIndex, 0, removed);
       }
       return newConfig;
     });
@@ -94,9 +136,28 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     onOpenChange(false);
   };
 
-  // Agrupar itens por categoria para exibição
-  const groupedConfig = React.useMemo(() => {
-    return tempConfig.reduce((acc, item) => {
+  const availableItems = tempConfig.filter((item) => !item.isVisible);
+  const selectedItems = tempConfig.filter((item) => item.isVisible);
+
+  const groupedAvailable = React.useMemo(() => {
+    return availableItems.reduce((acc, item) => {
+      if (!acc[item.category]) {
+        acc[item.category] = [];
+      }
+      acc[item.category].push(item);
+      return acc;
+    }, {} as Record<DashboardItemConfig["category"], DashboardItemConfig[]>);
+  }, [availableItems]);
+
+  const groupedSelected = React.useMemo(() => {
+    const orderedSelected: DashboardItemConfig[] = [];
+    tempConfig.forEach(item => {
+      if (item.isVisible) {
+        orderedSelected.push(item);
+      }
+    });
+
+    return orderedSelected.reduce((acc, item) => {
       if (!acc[item.category]) {
         acc[item.category] = [];
       }
@@ -105,47 +166,80 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     }, {} as Record<DashboardItemConfig["category"], DashboardItemConfig[]>);
   }, [tempConfig]);
 
+  const allCategories = Object.keys(categoryNames) as DashboardItemConfig["category"][];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Configurar Painel</DialogTitle>
           <DialogDescription>
-            Selecione quais cards você deseja ver no painel, a qual aba pertencem e use as setas para reordenar.
+            Selecione quais cards você deseja ver no painel e reordene-os.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          {Object.keys(groupedConfig).map((categoryKey) => {
-            const category = categoryKey as DashboardItemConfig["category"];
-            const itemsInCategory = groupedConfig[category];
-            
-            // Encontrar os índices dos itens dentro do tempConfig original para a função moveItem
-            const getOriginalIndex = (itemId: string) => tempConfig.findIndex(item => item.id === itemId);
-
-            return (
-              <Collapsible key={category} className="space-y-2 border rounded-md p-2">
-                <CollapsibleTrigger asChild>
-                  <Button variant="ghost" className="w-full justify-between text-lg font-semibold">
-                    {categoryNames[category]} ({itemsInCategory.length})
-                    <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
-                  </Button>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="space-y-2 pt-2">
-                  {itemsInCategory.map((item) => {
-                    const originalIndex = getOriginalIndex(item.id);
-                    return (
+        <div className="grid grid-cols-2 gap-6 flex-1 overflow-hidden">
+          {/* Lado Esquerdo: Opções Disponíveis */}
+          <div className="flex flex-col space-y-4 overflow-y-auto pr-2">
+            <h3 className="text-lg font-semibold">Opções Disponíveis</h3>
+            {allCategories.map((category) => {
+              const items = groupedAvailable[category] || [];
+              if (items.length === 0) return null;
+              return (
+                <Collapsible key={category} className="space-y-2 border rounded-md p-2">
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" className="w-full justify-between text-base font-medium">
+                      {categoryNames[category]} ({items.length})
+                      <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-2 pt-2">
+                    {items.map((item) => (
                       <div
                         key={item.id}
-                        className={cn(
-                          "flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
-                        )}
+                        className="flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
+                      >
+                        <Label className="flex-1 text-sm font-medium">{item.name}</Label>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleToggleVisibility(item.id, true)}
+                          className="h-8 w-8 text-green-600 hover:bg-green-100"
+                        >
+                          <PlusCircle className="h-4 w-4" />
+                          <span className="sr-only">Adicionar</span>
+                        </Button>
+                      </div>
+                    ))}
+                  </CollapsibleContent>
+                </Collapsible>
+              );
+            })}
+          </div>
+
+          {/* Lado Direito: Cards Selecionados */}
+          <div className="flex flex-col space-y-4 overflow-y-auto pl-2">
+            <h3 className="text-lg font-semibold">Cards Selecionados</h3>
+            {allCategories.map((category) => {
+              const items = groupedSelected[category] || [];
+              if (items.length === 0) return null;
+              return (
+                <Collapsible key={category} className="space-y-2 border rounded-md p-2">
+                  <CollapsibleTrigger asChild>
+                    <Button variant="ghost" className="w-full justify-between text-base font-medium">
+                      {categoryNames[category]} ({items.length})
+                      <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-2 pt-2">
+                    {items.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
                       >
                         <div className="flex items-center space-x-2 flex-1">
-                          <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" /> {/* Ícone de arrastar */}
+                          <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
                           <div className="flex flex-col flex-1">
-                            <Label htmlFor={`item-${item.id}`} className="text-base font-medium">
-                              {item.name}
-                            </Label>
+                            <Label className="text-sm font-medium">{item.name}</Label>
                             <Select
                               value={item.category}
                               onValueChange={(value: DashboardItemConfig["category"]) =>
@@ -170,8 +264,8 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => moveItem(originalIndex, "up")}
-                              disabled={originalIndex === 0}
+                              onClick={() => moveItem(item.id, "up")}
+                              disabled={!canMoveUp(item.id)}
                               className="h-8 w-8"
                             >
                               <ChevronUp className="h-4 w-4" />
@@ -179,28 +273,30 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => moveItem(originalIndex, "down")}
-                              disabled={originalIndex === tempConfig.length - 1}
+                              onClick={() => moveItem(item.id, "down")}
+                              disabled={!canMoveDown(item.id)}
                               className="h-8 w-8"
                             >
                               <ChevronDown className="h-4 w-4" />
                             </Button>
                           </div>
-                          <Switch
-                            id={`item-${item.id}`}
-                            checked={item.isVisible}
-                            onCheckedChange={(checked) =>
-                              handleSwitchChange(item.id, checked as boolean)
-                            }
-                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleToggleVisibility(item.id, false)}
+                            className="h-8 w-8 text-red-600 hover:bg-red-100"
+                          >
+                            <MinusCircle className="h-4 w-4" />
+                            <span className="sr-only">Remover</span>
+                          </Button>
                         </div>
                       </div>
-                    );
-                  })}
-                </CollapsibleContent>
-              </Collapsible>
-            );
-          })}
+                    ))}
+                  </CollapsibleContent>
+                </Collapsible>
+              );
+            })}
+          </div>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
