@@ -531,6 +531,14 @@ const Internacao = () => {
           date={confirmActionsDate}
           hour={confirmActionsHour}
           actionsForSlot={confirmActionsForSlot}
+          onEditActionsClick={(pId, pName, dt, hr, initialActs) => { // Implementa a callback
+            setIsConfirmActionsDialogOpen(false); // Fecha o diálogo de confirmação
+            openAddEditActionDialog(pId, pName, dt, hr, initialActs.map(a => ({ // Mapeia para PatientActionFormValues
+              description: a.description,
+              type: a.type
+            })));
+          }}
+          patientId={confirmActionsPatientId} // Passa o ID do paciente
         />
       )}
     </div>

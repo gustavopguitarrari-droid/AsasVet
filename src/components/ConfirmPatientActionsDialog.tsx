@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { format, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Syringe, Utensils, Eye, FlaskConical, CheckCircle } from "lucide-react";
+import { Syringe, Utensils, Eye, FlaskConical, CheckCircle, Edit } from "lucide-react"; // Importar o ícone Edit
 import { cn } from "@/lib/utils";
 import { PatientAction } from "@/pages/Internacao"; // Importar o tipo PatientAction
 
@@ -27,6 +27,8 @@ interface ConfirmPatientActionsDialogProps {
   date: Date;
   hour: string;
   actionsForSlot: PatientAction[];
+  onEditActionsClick: (patientId: string, patientName: string, date: Date, hour: string, initialActions: PatientAction[]) => void; // Nova prop
+  patientId: string; // Adicionado para passar ao onEditActionsClick
 }
 
 // Mapeamento de ícones para tipos de ação
@@ -45,6 +47,8 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
   date,
   hour,
   actionsForSlot,
+  onEditActionsClick, // Recebe a nova prop
+  patientId, // Recebe o ID do paciente
 }) => {
   const [currentActionsStatus, setCurrentActionsStatus] = useState<PatientAction[]>([]);
 
@@ -67,18 +71,32 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
     onClose();
   };
 
+  const handleEditClick = () => {
+    onEditActionsClick(patientId, patientName, date, hour, actionsForSlot); // Chama a função de edição
+    onClose(); // Fecha o diálogo atual
+  };
+
   const allActionsCompleted = currentActionsStatus.every(action => action.isCompleted);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col">
-        <DialogHeader>
+        <DialogHeader className="relative"> {/* Adicionado relative para posicionar o botão */}
           <DialogTitle className="flex items-center">
             <CheckCircle className="h-5 w-5 mr-2 text-green-600" /> Confirmar Ações para {patientName}
           </DialogTitle>
           <DialogDescription>
             Marque as ações concluídas para {date instanceof Date && isValid(date) ? format(date, "PPP", { locale: ptBR }) : "Data inválida"} às {hour || "Hora inválida"}:00.
           </DialogDescription>
+          <Button
+            variant="outline"
+            size="icon"
+            className="absolute top-4 right-4 h-8 w-8" // Posição no canto superior direito
+            onClick={handleEditClick}
+          >
+            <Edit className="h-4 w-4" />
+            <span className="sr-only">Editar Ações</span>
+          </Button>
         </DialogHeader>
 
         <ScrollArea className="flex-1 p-4 border rounded-md bg-muted/20 mb-4">
