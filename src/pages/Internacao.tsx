@@ -520,8 +520,8 @@ const Internacao = () => {
           onSaveAllActions={handleSaveAllPatientActions}
           patientId={actionPatientId} // Passa o ID do paciente
           patientName={actionPatientName}
-          date={actionDate}
-          initialHour={actionHour} // Passa o horário inicial
+          date={actionDate as Date} // Explicit cast
+          initialHour={actionHour as string} // Explicit cast
           allActionsForPatientOnDate={allActionsForPatientOnDate} // Passa todas as ações do dia
         />
       )}

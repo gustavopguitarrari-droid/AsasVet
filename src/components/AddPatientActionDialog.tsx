@@ -180,142 +180,162 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
 
   const sortedHours = Object.keys(actionsGroupedByHour).sort();
 
-  return (
-    <Dialog open={isOpen} onOpenChange={handleCancelAndClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle>Gerenciar Ações para {patientName}</DialogTitle>
-          <DialogDescription>
-            Agendamento para {date instanceof Date && isValid(date) ? format(date, "PPP", { locale: ptBR }) : "Data inválida"}.
-            Horário inicial clicado: {hour}:00
-          </DialogDescription>
-        </DialogHeader>
+  // Add a try-catch around the return statement for debugging
+  try {
+    return (
+      <Dialog open={isOpen} onOpenChange={handleCancelAndClose}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Gerenciar Ações para {patientName}</DialogTitle>
+            <DialogDescription>
+              Agendamento para {date instanceof Date && isValid(date) ? format(date, "PPP", { locale: ptBR }) : "Data inválida"}.
+              Horário inicial clicado: {initialHour}:00
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 overflow-hidden">
-          {/* Left side: Form to add new action */}
-          <div className="space-y-4 overflow-y-auto pr-2">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleAddActionToCart)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipo de Ação</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 overflow-hidden">
+            {/* Left side: Form to add new action */}
+            <div className="space-y-4 overflow-y-auto pr-2">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleAddActionToCart)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Tipo de Ação</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione o tipo de ação" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Medicação">Medicação</SelectItem>
+                            <SelectItem value="Alimentação">Alimentação</SelectItem>
+                            <SelectItem value="Observação">Observação</SelectItem>
+                            <SelectItem value="Outro">Outro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Descrição da Ação</FormLabel>
                         <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione o tipo de ação" />
-                          </SelectTrigger>
+                          <Textarea placeholder="Ex: Administrar 5ml de antibiótico" {...field} />
                         </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Medicação">Medicação</SelectItem>
-                          <SelectItem value="Alimentação">Alimentação</SelectItem>
-                          <SelectItem value="Observação">Observação</SelectItem>
-                          <SelectItem value="Outro">Outro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="description"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Descrição da Ação</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Ex: Administrar 5ml de antibiótico" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="frequency"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Frequência</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Selecione a frequência" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="SID">SID (Uma vez ao dia)</SelectItem>
-                          <SelectItem value="BID">BID (Duas vezes ao dia)</SelectItem>
-                          <SelectItem value="TID">TID (Três vezes ao dia)</SelectItem>
-                          <SelectItem value="QID">QID (Quatro vezes ao dia)</SelectItem>
-                          <SelectItem value="Outro">Outro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full">
-                  <Plus className="mr-2 h-4 w-4" /> Adicionar/Atualizar Ação
-                </Button>
-              </form>
-            </Form>
-          </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="frequency"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Frequência</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Selecione a frequência" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="SID">SID (Uma vez ao dia)</SelectItem>
+                            <SelectItem value="BID">BID (Duas vezes ao dia)</SelectItem>
+                            <SelectItem value="TID">TID (Três vezes ao dia)</SelectItem>
+                            <SelectItem value="QID">QID (Quatro vezes ao dia)</SelectItem>
+                            <SelectItem value="Outro">Outro</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full">
+                    <Plus className="mr-2 h-4 w-4" /> Adicionar/Atualizar Ação
+                  </Button>
+                </form>
+              </Form>
+            </div>
 
-          {/* Right side: Actions in cart */}
-          <div className="space-y-4 flex flex-col">
-            <h3 className="text-lg font-semibold">Ações Agendadas para o Dia</h3>
-            <ScrollArea className="flex-1 rounded-md border p-4">
-              {currentDayActions.length === 0 ? (
-                <p className="text-center text-muted-foreground">Nenhuma ação adicionada ainda.</p>
-              ) : (
-                <div className="space-y-4">
-                  {sortedHours.map(hour => (
-                    <div key={hour} className="border-b pb-2 last:border-b-0">
-                      <p className="font-bold text-md mb-2">{hour}:00</p>
-                      <div className="space-y-2">
-                        {actionsGroupedByHour[hour].map((action, index) => {
-                          const ActionIcon = actionTypeIconMap[action.type] || FlaskConical;
-                          return (
-                            <div key={action.id} className="flex items-center justify-between p-2 border rounded-md bg-card">
-                              <div className="flex items-center">
-                                <ActionIcon className="h-5 w-5 mr-2 text-muted-foreground" />
-                                <p className="font-medium text-sm">{action.description}</p>
+            {/* Right side: Actions in cart */}
+            <div className="space-y-4 flex flex-col">
+              <h3 className="text-lg font-semibold">Ações Agendadas para o Dia</h3>
+              <ScrollArea className="flex-1 rounded-md border p-4">
+                {currentDayActions.length === 0 ? (
+                  <p className="text-center text-muted-foreground">Nenhuma ação adicionada ainda.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {sortedHours.map(hour => (
+                      <div key={hour} className="border-b pb-2 last:border-b-0">
+                        <p className="font-bold text-md mb-2">{hour}:00</p>
+                        <div className="space-y-2">
+                          {actionsGroupedByHour[hour].map((action, index) => {
+                            const ActionIcon = actionTypeIconMap[action.type] || FlaskConical;
+                            return (
+                              <div key={action.id} className="flex items-center justify-between p-2 border rounded-md bg-card">
+                                <div className="flex items-center">
+                                  <ActionIcon className="h-5 w-5 mr-2 text-muted-foreground" />
+                                  <p className="font-medium text-sm">{action.description}</p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  {action.frequency && (
+                                    <Badge variant="secondary" className="text-xs">{action.frequency}</Badge>
+                                  )}
+                                  <Badge variant="secondary" className="mr-2">{action.type}</Badge>
+                                  <Button variant="destructive" size="icon" className="h-7 w-7" onClick={() => handleRemoveFromCart(action)}>
+                                    <Trash2 className="h-4 w-4" />
+                                    <span className="sr-only">Remover</span>
+                                  </Button>
+                                </div>
                               </div>
-                              <div className="flex items-center space-x-2">
-                                {action.frequency && (
-                                  <Badge variant="secondary" className="text-xs">{action.frequency}</Badge>
-                                )}
-                                <Badge variant="secondary" className="mr-2">{action.type}</Badge>
-                                <Button variant="destructive" size="icon" className="h-7 w-7" onClick={() => handleRemoveFromCart(action)}>
-                                  <Trash2 className="h-4 w-4" />
-                                  <span className="sr-only">Remover</span>
-                                </Button>
-                              </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </ScrollArea>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
           </div>
-        </div>
 
-        <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-          <Button variant="outline" onClick={handleCancelAndClose} type="button">
-            Cancelar
-          </Button>
-          <Button type="button" onClick={handleSaveAndClose} disabled={currentDayActions.length === 0}>
-            Salvar Todas as Ações ({currentDayActions.length})
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
+          <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+            <Button variant="outline" onClick={handleCancelAndClose} type="button">
+              Cancelar
+            </Button>
+            <Button type="button" onClick={handleSaveAndClose} disabled={currentDayActions.length === 0}>
+              Salvar Todas as Ações ({currentDayActions.length})
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  } catch (error) {
+    console.error("Error rendering AddPatientActionDialog:", error);
+    return (
+      <Dialog open={isOpen} onOpenChange={handleCancelAndClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Erro ao Carregar Ações</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            Ocorreu um erro ao tentar carregar o diálogo de ações. Por favor, verifique o console do navegador para mais detalhes.
+          </DialogDescription>
+          <DialogFooter>
+            <Button onClick={handleCancelAndClose}>Fechar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 };
 
 export default AddPatientActionDialog;
