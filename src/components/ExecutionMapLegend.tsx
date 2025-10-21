@@ -7,25 +7,24 @@ import { cn } from "@/lib/utils";
 
 const ExecutionMapLegend: React.FC = () => {
   return (
-    <div className="flex flex-wrap gap-4 p-4 bg-card shadow-sm"> {/* Removido 'border' e 'rounded-md' */}
-      {/* Removido o h3 com o texto 'Legenda:' */}
-      <div className="flex items-center space-x-2">
-        <Badge className={cn("h-7 w-7 p-0 flex items-center justify-center rounded-full bg-primary text-primary-foreground")}>
+    <div className="flex flex-wrap gap-2 p-2 bg-card shadow-sm"> {/* Reduzido gap e padding */}
+      <div className="flex items-center space-x-1"> {/* Reduzido space-x */}
+        <Badge className={cn("h-6 w-6 p-0 flex items-center justify-center rounded-full bg-primary text-primary-foreground")}> {/* Reduzido h e w */}
           2
         </Badge>
-        <span className="text-sm text-muted-foreground">Ações Pendentes</span>
+        <span className="text-xs text-muted-foreground">Ações Pendentes</span> {/* Reduzido para text-xs */}
       </div>
-      <div className="flex items-center space-x-2">
-        <Badge className={cn("h-7 w-7 p-0 flex items-center justify-center rounded-full bg-green-600 text-white")}>
-          <Check className="h-4 w-4" />
+      <div className="flex items-center space-x-1"> {/* Reduzido space-x */}
+        <Badge className={cn("h-6 w-6 p-0 flex items-center justify-center rounded-full bg-green-600 text-white")}> {/* Reduzido h e w */}
+          <Check className="h-3 w-3" /> {/* Reduzido h e w */}
         </Badge>
-        <span className="text-sm text-muted-foreground">Todas as Ações Concluídas</span>
+        <span className="text-xs text-muted-foreground">Todas as Ações Concluídas</span> {/* Reduzido para text-xs */}
       </div>
-      <div className="flex items-center space-x-2">
-        <Badge className={cn("h-7 w-7 p-0 flex items-center justify-center rounded-full border-dashed border-muted-foreground/50 bg-background")}>
-          <Plus className="h-4 w-4 text-primary opacity-100" />
+      <div className="flex items-center space-x-1"> {/* Reduzido space-x */}
+        <Badge className={cn("h-6 w-6 p-0 flex items-center justify-center rounded-full border-dashed border-muted-foreground/50 bg-background")}> {/* Reduzido h e w */}
+          <Plus className="h-3 w-3 text-primary opacity-100" /> {/* Reduzido h e w */}
         </Badge>
-        <span className="text-sm text-muted-foreground">Nenhuma Ação Agendada</span>
+        <span className="text-xs text-muted-foreground">Nenhuma Ação Agendada</span> {/* Reduzido para text-xs */}
       </div>
     </div>
   );
