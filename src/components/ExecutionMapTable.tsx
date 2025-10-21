@@ -138,7 +138,8 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                     );
                     const completedActionsCount = actionsForSlot.filter(action => action.isCompleted).length;
                     const totalActionsCount = actionsForSlot.length;
-                    const allActionsCompleted = totalActionsCount > 0 && completedActionsCount === totalActionsCount;
+                    const pendingActionsCount = totalActionsCount - completedActionsCount;
+                    const allActionsCompleted = totalActionsCount > 0 && pendingActionsCount === 0;
 
                     return (
                       <TableCell key={`${patient.id}-${hour}`} className="text-center p-1.5 relative">
@@ -154,7 +155,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                                   )}
                                   onClick={() => onOpenConfirmActionsDialog(patient.id, patient.petName, selectedDate!, hour, actionsForSlot)}
                                 >
-                                  {allActionsCompleted ? <Check className="h-4 w-4" /> : totalActionsCount}
+                                  {allActionsCompleted ? <Check className="h-4 w-4" /> : pendingActionsCount}
                                 </Badge>
                               </TooltipTrigger>
                               <TooltipContent side="bottom" className="max-w-xs">
