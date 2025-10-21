@@ -169,22 +169,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                                 })}
                               </TooltipContent>
                             </Tooltip>
-                            <Tooltip delayDuration={0}>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6 rounded-full text-primary hover:bg-accent/50 transition-colors duration-200"
-                                  onClick={() => handleAddAction(patient, hour)}
-                                >
-                                  <Plus className="h-4 w-4" />
-                                  <span className="sr-only">Adicionar Mais Ações</span>
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent side="bottom">
-                                Adicionar mais ações para {patient.petName} às {hour}:00
-                              </TooltipContent>
-                            </Tooltip>
+                            {/* O botão de adicionar mais ações foi removido daqui, pois a edição será feita via o diálogo de confirmação */}
                           </div>
                         ) : (
                           <Tooltip delayDuration={0}>
