@@ -267,7 +267,7 @@ const Internacao = () => {
       
       {/* Seletor de data movido para aqui, acima das abas e condicional */}
       {activeTab === "mapa-execucao" && (
-        <div className="flex justify-end items-center space-x-2 mb-4">
+        <div className="flex justify-end items-center space-x-2 mb-2"> {/* Alterado mb-4 para mb-2 */}
           <Button variant="default" size="icon" onClick={handlePreviousDay}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
