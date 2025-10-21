@@ -137,17 +137,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
   };
 
   const availableItems = tempConfig.filter((item) => !item.isVisible);
-  const selectedItems = tempConfig.filter((item) => item.isVisible);
-
-  const groupedAvailable = React.useMemo(() => {
-    return availableItems.reduce((acc, item) => {
-      if (!acc[item.category]) {
-        acc[item.category] = [];
-      }
-      acc[item.category].push(item);
-      return acc;
-    }, {} as Record<DashboardItemConfig["category"], DashboardItemConfig[]>);
-  }, [availableItems]);
+  // const selectedItems = tempConfig.filter((item) => item.isVisible); // Não é mais usado diretamente para renderização
 
   const groupedSelected = React.useMemo(() => {
     const orderedSelected: DashboardItemConfig[] = [];
@@ -178,64 +168,54 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
           </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-6 flex-1 overflow-hidden">
-          {/* Lado Esquerdo: Opções Disponíveis */}
+          {/* Lado Esquerdo: Opções Disponíveis (lista plana) */}
           <div className="flex flex-col space-y-4 overflow-y-auto pr-2">
-            <h3 className="text-lg font-semibold">Opções Disponíveis</h3>
-            {allCategories.map((category) => {
-              const items = groupedAvailable[category] || [];
-              if (items.length === 0) return null;
-              return (
-                <Collapsible key={category} className="space-y-2 border rounded-md p-2">
-                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" className="w-full justify-between text-base font-medium">
-                      {categoryNames[category]} ({items.length})
-                      <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="space-y-2 pt-2">
-                    {items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
+            <h3 className="text-lg font-semibold">Opções Disponíveis ({availableItems.length})</h3>
+            <div className="space-y-2">
+              {availableItems.length === 0 ? (
+                <p className="text-muted-foreground text-sm">Todos os cards estão selecionados.</p>
+              ) : (
+                availableItems.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
+                  >
+                    <div className="flex flex-col flex-1">
+                      <Label className="text-sm font-medium">{item.name}</Label>
+                      <Select
+                        value={item.category}
+                        onValueChange={(value: DashboardItemConfig["category"]) =>
+                          handleCategoryChange(item.id, value)
+                        }
                       >
-                        <div className="flex flex-col flex-1">
-                          <Label className="text-sm font-medium">{item.name}</Label>
-                          <Select
-                            value={item.category}
-                            onValueChange={(value: DashboardItemConfig["category"]) =>
-                              handleCategoryChange(item.id, value)
-                            }
-                          >
-                            <SelectTrigger className="w-[180px] h-8 text-sm mt-1">
-                              <SelectValue placeholder="Selecionar Categoria" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.entries(categoryNames).map(([val, name]) => (
-                                <SelectItem key={val} value={val}>
-                                  {name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleToggleVisibility(item.id, true)}
-                          className="h-8 w-8 text-green-600 hover:bg-green-100"
-                        >
-                          <PlusCircle className="h-4 w-4" />
-                          <span className="sr-only">Adicionar</span>
-                        </Button>
-                      </div>
-                    ))}
-                  </CollapsibleContent>
-                </Collapsible>
-              );
-            })}
+                        <SelectTrigger className="w-[180px] h-8 text-sm mt-1">
+                          <SelectValue placeholder="Selecionar Categoria" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {Object.entries(categoryNames).map(([val, name]) => (
+                            <SelectItem key={val} value={val}>
+                              {name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleToggleVisibility(item.id, true)}
+                      className="h-8 w-8 text-green-600 hover:bg-green-100"
+                    >
+                      <PlusCircle className="h-4 w-4" />
+                      <span className="sr-only">Adicionar</span>
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
 
-          {/* Lado Direito: Cards Selecionados */}
+          {/* Lado Direito: Cards Selecionados (agrupados por categoria) */}
           <div className="flex flex-col space-y-4 overflow-y-auto pl-2">
             <h3 className="text-lg font-semibold">Cards Selecionados</h3>
             {allCategories.map((category) => {
