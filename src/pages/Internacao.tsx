@@ -275,7 +275,7 @@ const Internacao = () => {
 
         <TabsContent value="pacientes-internados" className="mt-4">
           <div className="mt-8">
-            <h3 className="text-2xl font-semibold mb-4">Pacientes Atualmente Internados</h3>
+            {/* <h3 className="text-2xl font-semibold mb-4">Pacientes Atualmente Internados</h3> */} {/* Removido este h3 */}
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
