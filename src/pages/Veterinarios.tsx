@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Stethoscope, User, Briefcase, Hospital, IdCard } from "lucide-react";
+import { PlusCircle, Search, Stethoscope, User, Briefcase, GraduationCap, IdCard } from "lucide-react"; // Importado GraduationCap
 import RoleFilter from "@/components/RoleFilter";
 import VeterinarianDetailsDialog from "@/components/VeterinarianDetailsDialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -37,7 +37,7 @@ const roleIconMap: { [key: string]: React.ElementType } = {
   Veterinário: Stethoscope,
   Recepcionista: User,
   Gerente: Briefcase,
-  Estagiário: Hospital,
+  Estagiário: GraduationCap, // Ícone atualizado aqui
   Outros: IdCard,
 };
 
@@ -70,7 +70,7 @@ const Veterinarios = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-end"> {/* Alterado para justify-end */}
+      <div className="flex items-center justify-end">
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
         </Button>
@@ -83,7 +83,7 @@ const Veterinarios = () => {
         </TabsList>
 
         <TabsContent value="escala" className="mt-4">
-          <CustomTeamCalendar veterinarians={mockVeterinarios} /> {/* Usando o novo componente */}
+          <CustomTeamCalendar veterinarians={mockVeterinarios} />
         </TabsContent>
 
         <TabsContent value="equipe" className="mt-4">
