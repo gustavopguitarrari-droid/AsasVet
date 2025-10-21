@@ -13,7 +13,7 @@ import { PlusCircle, Search, Stethoscope, User, Briefcase, Hospital, IdCard } fr
 import RoleFilter from "@/components/RoleFilter";
 import VeterinarianDetailsDialog from "@/components/VeterinarianDetailsDialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import TeamScheduleCalendar from "@/components/TeamScheduleCalendar"; // Descomentado
+import CustomTeamCalendar from "@/components/CustomTeamCalendar"; // Importado o novo componente
 
 interface Veterinario {
   id: string;
@@ -84,7 +84,7 @@ const Veterinarios = () => {
         </TabsList>
 
         <TabsContent value="escala" className="mt-4">
-          <TeamScheduleCalendar veterinarians={mockVeterinarios} /> {/* Descomentado */}
+          <CustomTeamCalendar veterinarians={mockVeterinarios} /> {/* Usando o novo componente */}
         </TabsContent>
 
         <TabsContent value="equipe" className="mt-4">

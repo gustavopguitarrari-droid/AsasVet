@@ -1,11 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { format, addMonths, subMonths } from "date-fns";
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  format,
+  addMonths,
+  subMonths,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameMonth,
+  isSameDay,
+  isToday,
+} from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
-import { DayPicker, DateFormatter } from "react-day-picker";
-import "react-day-picker/dist/style.css"; // Importa os estilos base do react-day-picker
 
 import { Button } from "@/components/ui/button";
 import {
@@ -28,42 +36,48 @@ interface Veterinario {
   role: string;
 }
 
-interface TeamScheduleCalendarProps {
+interface CustomTeamCalendarProps {
   veterinarians: Veterinario[];
 }
 
-const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinarians }) => {
+const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [editingDaySchedule, setEditingDaySchedule] = useState<string[]>([]);
-  
-  // Estado para armazenar a escala, usando Map para melhor performance e clareza
+
   const [schedule, setSchedule] = useState<Map<string, string[]>>(() => {
     if (typeof window !== 'undefined') {
       const savedSchedule = localStorage.getItem('teamSchedule');
       if (savedSchedule) {
         try {
-          // Converte a string JSON de volta para um Map
           return new Map(JSON.parse(savedSchedule));
         } catch (e) {
           console.error("Erro ao carregar a escala do localStorage:", e);
         }
       }
     }
-    // Retorna um Map vazio se não houver dados salvos ou se houver erro
     return new Map<string, string[]>();
   });
 
-  // Efeito para salvar a escala no localStorage sempre que ela mudar
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Converte o Map para um array de arrays para poder ser serializado em JSON
       localStorage.setItem('teamSchedule', JSON.stringify(Array.from(schedule.entries())));
     }
   }, [schedule]);
 
-  const handleDayClick = (day: Date | undefined) => {
+  const daysInMonth = useMemo(() => {
+    const start = startOfMonth(currentMonth);
+    const end = endOfMonth(currentMonth);
+    return eachDayOfInterval({ start, end });
+  }, [currentMonth]);
+
+  // Preenche os dias da semana antes do início do mês
+  const firstDayOfMonth = startOfMonth(currentMonth);
+  const startingDayOfWeek = firstDayOfMonth.getDay(); // 0 = Domingo, 1 = Segunda...
+  const emptyDaysBefore = Array.from({ length: startingDayOfWeek }).map((_, i) => null);
+
+  const handleDayClick = (day: Date | null) => {
     if (day) {
       setSelectedDay(day);
       const dayKey = format(day, "yyyy-MM-dd");
@@ -88,26 +102,78 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
     if (currentVets.size > 0) {
       newSchedule.set(dayKey, Array.from(currentVets));
     } else {
-      newSchedule.delete(dayKey); // Remove a entrada se não houver veterinários para o dia
+      newSchedule.delete(dayKey);
     }
     setSchedule(newSchedule);
-    setEditingDaySchedule(Array.from(currentVets)); // Atualiza o estado do diálogo imediatamente
+    setEditingDaySchedule(Array.from(currentVets));
   };
+
+  const goToPreviousMonth = () => {
+    setCurrentMonth((prevMonth) => subMonths(prevMonth, 1));
+  };
+
+  const goToNextMonth = () => {
+    setCurrentMonth((prevMonth) => addMonths(prevMonth, 1));
+  };
+
+  const weekdays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
   return (
     <div className="w-full max-w-full overflow-x-auto">
       <div className="rounded-md border p-4 bg-background shadow-sm">
-        <DayPicker
-          mode="single"
-          selected={selectedDay}
-          onSelect={handleDayClick}
-          month={currentMonth}
-          onMonthChange={setCurrentMonth}
-          showOutsideDays
-          fixedWeeks
-          locale={ptBR}
-          // Removido components e classNames para depuração
-        />
+        <div className="flex justify-between items-center p-2 mb-4">
+          <Button variant="ghost" size="icon" onClick={goToPreviousMonth}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <h2 className="text-lg font-semibold">
+            {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
+          </h2>
+          <Button variant="ghost" size="icon" onClick={goToNextMonth}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium text-muted-foreground">
+          {weekdays.map((day) => (
+            <div key={day} className="py-2">{day}</div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-7 gap-1">
+          {emptyDaysBefore.map((_, index) => (
+            <div key={`empty-${index}`} className="h-24 w-full"></div>
+          ))}
+          {daysInMonth.map((day) => {
+            const dayKey = format(day, "yyyy-MM-dd");
+            const vetsOnDuty = schedule.get(dayKey) || [];
+            const isSelected = selectedDay && isSameDay(day, selectedDay);
+            const isCurrentDay = isToday(day);
+
+            return (
+              <Button
+                key={dayKey}
+                variant="ghost"
+                className={cn(
+                  "h-24 w-full flex flex-col items-center justify-start p-1 text-sm font-normal relative",
+                  "hover:bg-accent hover:text-accent-foreground",
+                  isCurrentDay && "bg-accent text-accent-foreground",
+                  isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
+                  !isSameMonth(day, currentMonth) && "text-muted-foreground opacity-50"
+                )}
+                onClick={() => handleDayClick(day)}
+              >
+                <span className="font-medium">{format(day, "d")}</span>
+                <div className="flex flex-wrap justify-center gap-0.5 mt-1">
+                  {vetsOnDuty.map((vetName, index) => (
+                    <Badge key={index} variant="secondary" className="text-[0.6rem] h-auto px-1 py-0.5 leading-none">
+                      {vetName.split(' ')[0]}
+                    </Badge>
+                  ))}
+                </div>
+              </Button>
+            );
+          })}
+        </div>
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -145,4 +211,4 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
   );
 };
 
-export default TeamScheduleCalendar;
+export default CustomTeamCalendar;
