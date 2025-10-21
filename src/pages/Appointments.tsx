@@ -222,11 +222,10 @@ const Appointments = () => {
               <TableHead>Paciente</TableHead>
               <TableHead>Tutor</TableHead>
               <TableHead>Serviço</TableHead>
-              {activeTab === "em-espera" ? (
-                <TableHead>Tempo de Espera</TableHead>
-              ) : (
-                <TableHead>Veterinário</TableHead>
-              )}
+              {activeTab === "em-espera" && <TableHead>Tempo de Espera</TableHead>}
+              {activeTab === "em-andamento" && <TableHead>Veterinário</TableHead>}
+              {activeTab === "em-andamento" && <TableHead>Tempo de Consulta</TableHead>} {/* Nova coluna */}
+              {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -250,21 +249,27 @@ const Appointments = () => {
                     </TableCell>
                     <TableCell>{appointment.client}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
-                    {activeTab === "em-espera" ? (
+                    {activeTab === "em-espera" && (
                       <TableCell>
                         <AppointmentChronometer date={appointment.date} time={appointment.time} />
                       </TableCell>
-                    ) : (
+                    )}
+                    {activeTab === "em-andamento" && (
+                      <>
+                        <TableCell className="flex items-center">
+                          {appointment.veterinarian}
+                          <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
+                            Iniciada
+                          </Badge>
+                        </TableCell>
+                        <TableCell> {/* Nova célula para o cronômetro */}
+                          <AppointmentChronometer date={appointment.date} time={appointment.time} />
+                        </TableCell>
+                      </>
+                    )}
+                    {activeTab === "finalizadas" && (
                       <TableCell className="flex items-center">
                         {appointment.veterinarian}
-                        {isEmAndamento && (
-                          <>
-                            <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
-                              Iniciada
-                            </Badge>
-                            <AppointmentChronometer date={appointment.date} time={appointment.time} />
-                          </>
-                        )}
                         {isCancelled && (
                           <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
                             Cancelada
@@ -282,7 +287,7 @@ const Appointments = () => {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center">
+                <TableCell colSpan={activeTab === "em-andamento" ? 5 : 4} className="h-24 text-center">
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
