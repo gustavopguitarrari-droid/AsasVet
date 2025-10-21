@@ -283,7 +283,7 @@ const Internacao = () => {
                       <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
                       
                       {/* Nome da Baia no canto superior direito */}
-                      <div className="absolute top-2 right-6 text-sm font-semibold text-muted-foreground">
+                      <div className="absolute top-2 right-6 text-base font-bold text-muted-foreground"> {/* Alterado para text-base e font-bold */}
                         {patient.bayName}
                       </div>
 
