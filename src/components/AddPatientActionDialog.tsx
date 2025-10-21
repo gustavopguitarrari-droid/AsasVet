@@ -66,7 +66,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Adicionar Ação para {patientName}</DialogTitle>
           <DialogDescription>
-            Agendamento para {format(date, "PPP", { locale: ptBR })} às {hour}:00
+            Agendamento para {date ? format(date, "PPP", { locale: ptBR }) : "Data inválida"} às {hour}:00
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -94,19 +94,18 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o tipo de ação" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Medicação">Medicação</SelectItem>
-                      <SelectItem value="Alimentação">Alimentação</SelectItem>
-                      <SelectItem value="Observação">Observação</SelectItem>
-                      <SelectItem value="Outro">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Medicação">Medicação</SelectItem>
+                    <SelectItem value="Alimentação">Alimentação</SelectItem>
+                    <SelectItem value="Observação">Observação</SelectItem>
+                    <SelectItem value="Outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
+            )}
+          />
             <DialogFooter>
               <Button variant="outline" onClick={onClose} type="button">
                 Cancelar
