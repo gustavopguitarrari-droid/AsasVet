@@ -332,7 +332,7 @@ const Internacao = () => {
 
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
-            <div className="flex justify-center items-center space-x-2"> {/* Adicionado flexbox para alinhar */}
+            <div className="flex justify-end items-center space-x-2 mb-4"> {/* Alterado para justify-end e adicionado mb-4 */}
               <Button variant="default" size="icon" onClick={handlePreviousDay}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
