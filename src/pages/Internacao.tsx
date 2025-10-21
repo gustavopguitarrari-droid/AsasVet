@@ -255,10 +255,47 @@ const Internacao = () => {
           <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="pacientes-internados" className="mt-4">
+          <div className="mt-8">
+            <h3 className="text-2xl font-semibold mb-4">Pacientes Atualmente Internados</h3>
+            {internedPatients.length > 0 ? (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {internedPatients.map((patient) => {
+                  const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
+                  const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
+                  const riskStripeColorClass = riskColorMap[patient.risk];
+
+                  return (
+                    <li
+                      key={patient.id}
+                      className="relative p-3 border rounded-md bg-white dark:bg-gray-800 shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                      onClick={() => handleCardClick(patient)}
+                    >
+                      <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
+                      
+                      <p className="font-bold text-lg flex items-center">
+                        <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
+                        {patient.petName}
+                      </p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.ownerName}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Entrada:</span> {patient.admissionDate}</p>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground">Nenhum paciente internado no momento.</p>
+            )}
+          </div>
+        </TabsContent>
+
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
-            {/* Removido: <h3 className="text-2xl font-semibold mb-4">Mapa de Execução Diário</h3> */}
-            <div className="flex justify-center items-center space-x-2">
+            <h3 className="text-2xl font-semibold mb-4">Mapa de Execução Diário</h3>
+            <div className="flex justify-center items-center space-x-2"> {/* Adicionado flexbox para alinhar */}
               <Button variant="outline" size="icon" onClick={handlePreviousDay}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
