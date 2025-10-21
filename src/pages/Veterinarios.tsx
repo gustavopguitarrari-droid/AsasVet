@@ -71,7 +71,7 @@ const Veterinarios = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Equipe</h2>
+        {/* <h2 className="text-3xl font-bold">Equipe</h2> -- Removido */}
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
         </Button>
