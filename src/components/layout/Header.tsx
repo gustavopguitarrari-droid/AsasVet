@@ -26,6 +26,8 @@ const Header = () => {
         return "Internação";
       case "/veterinarios":
         return "Equipe"; // Título atualizado
+      case "/enfermeiros": // Novo título para Enfermeiros
+        return "Enfermeiros";
       case "/estoque": // Novo título para Estoque
         return "Estoque";
       default:
