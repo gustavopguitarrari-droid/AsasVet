@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal } from "lucide-react";
+import { PlusCircle, Search, Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, FlaskConical, ShoppingCart } from "lucide-react"; // Adicionado FlaskConical e ShoppingCart
 import CategoryFilter from "@/components/CategoryFilter"; // Importa o novo componente de filtro
 import StockItemDetailsDialog from "@/components/StockItemDetailsDialog"; // Importa o novo componente de diálogo
 import { cn } from "@/lib/utils"; // Importa cn para classes condicionais
@@ -24,22 +24,24 @@ interface ItemEstoque {
 }
 
 const mockEstoque: ItemEstoque[] = [
-  { id: "IT001", name: "Ração para Cães Adultos", category: "Alimentos", quantity: 50, unit: "sacos", lastUpdate: "2024-10-20" },
-  { id: "IT002", name: "Vacina V8", category: "Medicamentos", quantity: 120, unit: "doses", lastUpdate: "2024-10-25" },
-  { id: "IT003", name: "Shampoo para Gatos", category: "Higiene", quantity: 30, unit: "unidades", lastUpdate: "2024-10-22" },
-  { id: "IT004", name: "Antibiótico Amoxicilina", category: "Medicamentos", quantity: 75, unit: "caixas", lastUpdate: "2024-10-24" },
-  { id: "IT005", name: "Seringas 5ml", category: "Equipamentos", quantity: 200, unit: "unidades", lastUpdate: "2024-10-23" },
-  { id: "IT006", name: "Brinquedo para Gatos", category: "Outros", quantity: 40, unit: "unidades", lastUpdate: "2024-10-21" },
-  { id: "IT007", name: "Luvas Cirúrgicas", category: "Equipamentos", quantity: 100, unit: "pares", lastUpdate: "2024-10-26" },
-  { id: "IT008", name: "Petisco para Cães", category: "Alimentos", quantity: 80, unit: "pacotes", lastUpdate: "2024-10-27" },
+  { id: "IT001", name: "Ração para Cães Adultos", category: "Insumos", quantity: 50, unit: "sacos", lastUpdate: "2024-10-20" },
+  { id: "IT002", name: "Vacina V8", category: "Farmácia", quantity: 120, unit: "doses", lastUpdate: "2024-10-25" },
+  { id: "IT003", name: "Shampoo para Gatos", category: "Loja", quantity: 30, unit: "unidades", lastUpdate: "2024-10-22" },
+  { id: "IT004", name: "Antibiótico Amoxicilina", category: "Farmácia", quantity: 75, unit: "caixas", lastUpdate: "2024-10-24" },
+  { id: "IT005", name: "Seringas 5ml", category: "Insumos", quantity: 200, unit: "unidades", lastUpdate: "2024-10-23" },
+  { id: "IT006", name: "Brinquedo para Gatos", category: "Loja", quantity: 40, unit: "unidades", lastUpdate: "2024-10-21" },
+  { id: "IT007", name: "Morfina", category: "Controlados", quantity: 10, unit: "ampolas", lastUpdate: "2024-10-26" }, // Novo item controlado
+  { id: "IT008", name: "Coleira Antipulgas", category: "Loja", quantity: 80, unit: "unidades", lastUpdate: "2024-10-27" },
+  { id: "IT009", name: "Luvas Cirúrgicas", category: "Insumos", quantity: 100, unit: "pares", lastUpdate: "2024-10-26" },
+  { id: "IT010", name: "Outros Suprimentos", category: "Outros", quantity: 15, unit: "unidades", lastUpdate: "2024-10-28" },
 ];
 
 // Mapeamento de categorias para ícones para a tabela
 const categoryIconMap: { [key: string]: React.ElementType } = {
-  Alimentos: Wheat,
-  Medicamentos: Pill,
-  Higiene: SprayCan,
-  Equipamentos: Wrench,
+  Insumos: Wheat,
+  Farmácia: Pill,
+  Controlados: FlaskConical,
+  Loja: ShoppingCart,
   Outros: MoreHorizontal,
 };
 
