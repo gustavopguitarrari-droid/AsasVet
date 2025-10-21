@@ -18,6 +18,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import AddPatientActionDialog, { PatientActionFormValues } from "@/components/AddPatientActionDialog"; // Importar o novo diálogo
 import ConfirmPatientActionsDialog from "@/components/ConfirmPatientActionsDialog"; // Importar o novo diálogo de confirmação
+import ExecutionMapLegend from "@/components/ExecutionMapLegend"; // Importar o novo componente de legenda
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -469,7 +470,8 @@ const Internacao = () => {
         </TabsContent>
 
         <TabsContent value="mapa-execucao" className="mt-4">
-          <div className="p-4 border rounded-md bg-background space-y-4">
+          <ExecutionMapLegend /> {/* Adicionado o componente de legenda aqui */}
+          <div className="p-4 border rounded-md bg-background space-y-4 mt-4"> {/* Adicionado mt-4 para espaçamento */}
             <ExecutionMapTable
               patients={patientsForExecutionMap}
               selectedDate={selectedDate}
