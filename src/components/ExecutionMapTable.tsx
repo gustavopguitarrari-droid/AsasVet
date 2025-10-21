@@ -75,7 +75,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
           <TableRow>
             <TableHead className="sticky left-0 bg-background z-10 w-[150px]">Paciente</TableHead>
             {hourlySlots.map((hour) => (
-              <TableHead key={hour} className="text-center w-[40px] p-1 text-xs"> {/* Reduzido a largura e padding */}
+              <TableHead key={hour} className="text-center w-[40px] p-1 text-xs">
                 {hour}
               </TableHead>
             ))}
@@ -94,16 +94,20 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
                     {patient.petName}
                   </TableCell>
                   {hourlySlots.map((hour) => (
-                    <TableCell key={`${patient.id}-${hour}`} className="text-center p-0.5"> {/* Reduzido o padding */}
+                    <TableCell key={`${patient.id}-${hour}`} className="text-center p-0.5">
                       <Tooltip delayDuration={0}>
                         <TooltipTrigger asChild>
                           <Button
-                            variant="ghost" // Alterado para ghost para ser mais discreto
+                            variant="ghost"
                             size="icon"
-                            className="h-6 w-6 text-muted-foreground hover:bg-accent hover:text-accent-foreground" // Reduzido o tamanho do botão
+                            className="h-6 w-6 group relative" // Adicionado 'group' e 'relative'
                             onClick={() => handleAddAction(patient.id, hour)}
                           >
-                            <Plus className="h-3 w-3" /> {/* Reduzido o tamanho do ícone */}
+                            {/* Quadrado branco com borda */}
+                            <div className="absolute inset-0 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-sm flex items-center justify-center">
+                              {/* Ícone Plus que aparece no hover */}
+                              <Plus className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                            </div>
                             <span className="sr-only">Adicionar Ação</span>
                           </Button>
                         </TooltipTrigger>
