@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Stethoscope, User, Briefcase, GraduationCap, IdCard, HeartPulse } from "lucide-react"; // Importado HeartPulse
+import { PlusCircle, Search, Stethoscope, User, Briefcase, GraduationCap, IdCard, Nurse } from "lucide-react"; // Importado Nurse
 import RoleFilter from "@/components/RoleFilter";
 import VeterinarianDetailsDialog from "@/components/VeterinarianDetailsDialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -39,7 +39,7 @@ const roleIconMap: { [key: string]: React.ElementType } = {
   Recepcionista: User,
   Gerente: Briefcase,
   Estagiário: GraduationCap,
-  Enfermeiro: HeartPulse, // Novo ícone para Enfermeiro
+  Enfermeiro: Nurse, // Ícone atualizado para Nurse
   Outros: IdCard,
 };
 
