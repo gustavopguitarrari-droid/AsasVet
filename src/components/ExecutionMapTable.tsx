@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Syringe, Utensils, Eye, FlaskConical } from "lucide-react"; // Adicionado ícones para tipos de ação
+import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Syringe, Utensils, Eye, FlaskConical, Check } from "lucide-react"; // Adicionado ícones para tipos de ação e o ícone Check
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge"; // Importar Badge
@@ -138,6 +138,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                     );
                     const completedActionsCount = actionsForSlot.filter(action => action.isCompleted).length;
                     const totalActionsCount = actionsForSlot.length;
+                    const allActionsCompleted = totalActionsCount > 0 && completedActionsCount === totalActionsCount;
 
                     return (
                       <TableCell key={`${patient.id}-${hour}`} className="text-center p-1.5 relative">
@@ -149,11 +150,11 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                                   className={cn(
                                     "h-7 w-7 p-0 flex items-center justify-center rounded-full",
                                     "cursor-pointer",
-                                    completedActionsCount === totalActionsCount ? "bg-green-600 text-white" : "bg-primary text-primary-foreground"
+                                    allActionsCompleted ? "bg-green-600 text-white" : "bg-primary text-primary-foreground"
                                   )}
                                   onClick={() => onOpenConfirmActionsDialog(patient.id, patient.petName, selectedDate!, hour, actionsForSlot)}
                                 >
-                                  {totalActionsCount}
+                                  {allActionsCompleted ? <Check className="h-4 w-4" /> : totalActionsCount}
                                 </Badge>
                               </TooltipTrigger>
                               <TooltipContent side="bottom" className="max-w-xs">
@@ -169,7 +170,6 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                                 })}
                               </TooltipContent>
                             </Tooltip>
-                            {/* O botão de adicionar mais ações foi removido daqui, pois a edição será feita via o diálogo de confirmação */}
                           </div>
                         ) : (
                           <Tooltip delayDuration={0}>
