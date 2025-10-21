@@ -5,7 +5,7 @@ import { format, addMonths, subMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { DayPicker, DateFormatter } from "react-day-picker";
-import "react-day-picker/dist/style.css"; // Reintroduzindo estilos padrão, pois shadcn/ui os sobrescreve
+import "react-day-picker/dist/style.css"; // Garantindo que os estilos padrão sejam importados
 
 import { Button } from "@/components/ui/button";
 import {
