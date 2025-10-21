@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { ListFilter, Stethoscope, User, Briefcase, GraduationCap, Nurse } from "lucide-react"; // Importado Nurse
+import { ListFilter, Stethoscope, User, Briefcase, GraduationCap, HeartPulse } from "lucide-react"; // 'Nurse' substituído por 'HeartPulse'
 
 interface RoleOption {
   name: string;
@@ -16,7 +16,7 @@ interface RoleOption {
 const roleOptions: RoleOption[] = [
   { name: "Todos", icon: ListFilter, colorClass: "bg-gray-500", value: "all" },
   { name: "Veterinário", icon: Stethoscope, colorClass: "bg-sidebar-item-bg-1", value: "Veterinário" },
-  { name: "Enfermeiro", icon: Nurse, colorClass: "bg-sidebar-item-bg-2", value: "Enfermeiro" }, // Ícone atualizado para Nurse
+  { name: "Enfermeiro", icon: HeartPulse, colorClass: "bg-sidebar-item-bg-2", value: "Enfermeiro" }, // Ícone atualizado para HeartPulse
   { name: "Recepcionista", icon: User, colorClass: "bg-sidebar-item-bg-4", value: "Recepcionista" },
   { name: "Gerente", icon: Briefcase, colorClass: "bg-sidebar-item-bg-3", value: "Gerente" },
   { name: "Estagiário", icon: GraduationCap, colorClass: "bg-sidebar-item-bg-7", value: "Estagiário" },
