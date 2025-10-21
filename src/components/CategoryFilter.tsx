@@ -3,8 +3,8 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } => "@/lib/utils";
-import { ListFilter, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, FlaskConical, ShoppingCart } from "lucide-react"; // Adicionado FlaskConical e ShoppingCart
+import { cn } from "@/lib/utils";
+import { ListFilter, Wheat, Pill, SprayCan, Wrench, MoreHorizontal } from "lucide-react";
 
 interface CategoryOption {
   name: string;
@@ -15,10 +15,10 @@ interface CategoryOption {
 
 const categoryOptions: CategoryOption[] = [
   { name: "Todos", icon: ListFilter, colorClass: "bg-gray-500", value: "all" },
-  { name: "Insumos", icon: Wheat, colorClass: "bg-sidebar-item-bg-1", value: "Insumos" },
-  { name: "Farmácia", icon: Pill, colorClass: "bg-sidebar-item-bg-4", value: "Farmácia" },
-  { name: "Controlados", icon: FlaskConical, colorClass: "bg-sidebar-item-bg-3", value: "Controlados" }, // Nova categoria
-  { name: "Loja", icon: ShoppingCart, colorClass: "bg-sidebar-item-bg-7", value: "Loja" }, // Nova categoria
+  { name: "Alimentos", icon: Wheat, colorClass: "bg-sidebar-item-bg-1", value: "Alimentos" },
+  { name: "Medicamentos", icon: Pill, colorClass: "bg-sidebar-item-bg-4", value: "Medicamentos" },
+  { name: "Higiene", icon: SprayCan, colorClass: "bg-sidebar-item-bg-3", value: "Higiene" },
+  { name: "Equipamentos", icon: Wrench, colorClass: "bg-sidebar-item-bg-7", value: "Equipamentos" },
   { name: "Outros", icon: MoreHorizontal, colorClass: "bg-sidebar-item-bg-9", value: "Outros" },
 ];
 

@@ -9,7 +9,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, CalendarDays, FlaskConical, ShoppingCart } from "lucide-react"; // Adicionado FlaskConical e ShoppingCart
+import { Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, CalendarDays } from "lucide-react";
 
 interface ItemEstoque {
   id: string;
@@ -28,10 +28,10 @@ interface StockItemDetailsDialogProps {
 
 // Mapeamento de categorias para ícones
 const categoryIconMap: { [key: string]: React.ElementType } = {
-  Insumos: Wheat,
-  Farmácia: Pill,
-  Controlados: FlaskConical,
-  Loja: ShoppingCart,
+  Alimentos: Wheat,
+  Medicamentos: Pill,
+  Higiene: SprayCan,
+  Equipamentos: Wrench,
   Outros: MoreHorizontal,
 };
 
