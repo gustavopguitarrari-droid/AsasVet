@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search } from "lucide-react"; // Adicionado Search
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input"; // Importar Input
+import { Input } from "@/components/ui/input";
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -18,7 +18,7 @@ interface InternedPatient {
   ownerName: string;
   reason: string;
   admissionDate: string;
-  expectedDischargeDate?: string; // Pode ser a data de alta/óbito
+  expectedDischargeDate?: string;
   veterinarian: string;
   status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
   species: string;
@@ -55,8 +55,8 @@ const statusBadgeColorMap: Record<InternedPatient["status"], string> = {
   "Em Observação": "bg-blue-500",
   "Estável": "bg-green-500",
   "Crítico": "bg-red-500",
-  "Alta": "bg-gray-500",
-  "Óbito": "bg-black",
+  "Alta": "bg-green-500", // Alterado para verde
+  "Óbito": "bg-red-500",   // Alterado para vermelho
 };
 
 const Internacao = () => {
@@ -66,7 +66,7 @@ const Internacao = () => {
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
   const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
-  const [searchTerm, setSearchTerm] = React.useState<string>(""); // Novo estado para a barra de pesquisa
+  const [searchTerm, setSearchTerm] = React.useState<string>("");
 
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
