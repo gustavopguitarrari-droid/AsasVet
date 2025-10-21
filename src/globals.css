@@ -294,6 +294,88 @@
     --green-500: 142.1 76.2% 36.3%;
   }
 
+  /* Pink Theme */
+  .theme-pink {
+    --primary: 330 80% 70%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 330 80% 90%;
+    --secondary-foreground: 330 80% 15%;
+    --accent: 330 80% 90%;
+    --accent-foreground: 330 80% 15%;
+    --ring: 330 80% 70%;
+
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 330 80% 70%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 330 80% 45%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 330 80% 20%;
+    --sidebar-ring: 330 80% 70%;
+
+    --sidebar-gradient-start: 330 80% 15%;
+    --sidebar-gradient-end: 330 80% 25%;
+
+    --sidebar-item-bg-1: 330 80% 60%;
+    --sidebar-item-bg-2: 340 70% 65%;
+    --sidebar-item-bg-3: 320 90% 55%;
+    --sidebar-item-bg-4: 350 70% 70%;
+    --sidebar-item-bg-5: 10 60% 60%;
+    --sidebar-item-bg-6: 310 80% 50%;
+    --sidebar-item-bg-7: 300 70% 60%;
+    --sidebar-item-bg-8: 290 60% 65%;
+    --sidebar-item-bg-9: 280 50% 50%;
+
+    --event-color-consulta: 330 80% 60%;
+    --event-color-cirurgia: 0 84.2% 60.2%;
+    --event-color-vacina: 340 70% 65%;
+    --event-color-exame: 320 90% 55%;
+    --event-color-retorno: 350 70% 70%;
+    --event-color-outros: 10 60% 60%;
+
+    --green-500: 142.1 76.2% 36.3%;
+  }
+
+  /* Brown Theme */
+  .theme-brown {
+    --primary: 30 40% 30%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 30 40% 90%;
+    --secondary-foreground: 30 40% 15%;
+    --accent: 30 40% 90%;
+    --accent-foreground: 30 40% 15%;
+    --ring: 30 40% 30%;
+
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 30 40% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 30 40% 25%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 30 40% 15%;
+    --sidebar-ring: 30 40% 40%;
+
+    --sidebar-gradient-start: 30 40% 10%;
+    --sidebar-gradient-end: 30 40% 20%;
+
+    --sidebar-item-bg-1: 30 40% 35%;
+    --sidebar-item-bg-2: 40 35% 40%;
+    --sidebar-item-bg-3: 20 45% 30%;
+    --sidebar-item-bg-4: 50 35% 45%;
+    --sidebar-item-bg-5: 60 30% 35%;
+    --sidebar-item-bg-6: 10 45% 25%;
+    --sidebar-item-bg-7: 5 40% 30%;
+    --sidebar-item-bg-8: 0 35% 40%;
+    --sidebar-item-bg-9: 15 30% 25%;
+
+    --event-color-consulta: 30 40% 35%;
+    --event-color-cirurgia: 0 84.2% 60.2%;
+    --event-color-vacina: 40 35% 40%;
+    --event-color-exame: 20 45% 30%;
+    --event-color-retorno: 50 35% 45%;
+    --event-color-outros: 60 30% 35%;
+
+    --green-500: 142.1 76.2% 36.3%;
+  }
+
   /* Custom Color Themes - Dark Mode Overrides */
   /* Default dark theme uses the .dark variables */
 
@@ -457,6 +539,88 @@
     --event-color-exame: 170 80% 55%;
     --event-color-retorno: 190 70% 70%;
     --event-color-outros: 200 60% 60%;
+
+    --green-500: 142.1 76.2% 60%;
+  }
+
+  /* Pink Theme (Dark Mode) */
+  .dark.theme-pink {
+    --primary: 330 80% 80%;
+    --primary-foreground: 330 80% 15%;
+    --secondary: 330 80% 25%;
+    --secondary-foreground: 330 80% 90%;
+    --accent: 330 80% 25%;
+    --accent-foreground: 330 80% 90%;
+    --ring: 330 80% 80%;
+
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 330 80% 80%;
+    --sidebar-primary-foreground: hsl(var(--muted-foreground));
+    --sidebar-accent: 330 80% 50%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 330 80% 30%;
+    --sidebar-ring: 330 80% 80%;
+
+    --sidebar-gradient-start: 330 80% 25%;
+    --sidebar-gradient-end: 330 80% 35%;
+
+    --sidebar-item-bg-1: 330 80% 70%;
+    --sidebar-item-bg-2: 340 70% 75%;
+    --sidebar-item-bg-3: 320 90% 65%;
+    --sidebar-item-bg-4: 350 70% 80%;
+    --sidebar-item-bg-5: 10 60% 70%;
+    --sidebar-item-bg-6: 310 80% 60%;
+    --sidebar-item-bg-7: 300 70% 70%;
+    --sidebar-item-bg-8: 290 60% 75%;
+    --sidebar-item-bg-9: 280 50% 60%;
+
+    --event-color-consulta: 330 80% 70%;
+    --event-color-cirurgia: 0 62.8% 30.6%;
+    --event-color-vacina: 340 70% 75%;
+    --event-color-exame: 320 90% 65%;
+    --event-color-retorno: 350 70% 80%;
+    --event-color-outros: 10 60% 70%;
+
+    --green-500: 142.1 76.2% 60%;
+  }
+
+  /* Brown Theme (Dark Mode) */
+  .dark.theme-brown {
+    --primary: 30 40% 50%;
+    --primary-foreground: 30 40% 15%;
+    --secondary: 30 40% 25%;
+    --secondary-foreground: 30 40% 90%;
+    --accent: 30 40% 25%;
+    --accent-foreground: 30 40% 90%;
+    --ring: 30 40% 50%;
+
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 30 40% 60%;
+    --sidebar-primary-foreground: hsl(var(--muted-foreground));
+    --sidebar-accent: 30 40% 40%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 30 40% 20%;
+    --sidebar-ring: 30 40% 60%;
+
+    --sidebar-gradient-start: 30 40% 15%;
+    --sidebar-gradient-end: 30 40% 25%;
+
+    --sidebar-item-bg-1: 30 40% 45%;
+    --sidebar-item-bg-2: 40 35% 50%;
+    --sidebar-item-bg-3: 20 45% 40%;
+    --sidebar-item-bg-4: 50 35% 55%;
+    --sidebar-item-bg-5: 60 30% 45%;
+    --sidebar-item-bg-6: 10 45% 35%;
+    --sidebar-item-bg-7: 5 40% 40%;
+    --sidebar-item-bg-8: 0 35% 45%;
+    --sidebar-item-bg-9: 15 30% 35%;
+
+    --event-color-consulta: 30 40% 45%;
+    --event-color-cirurgia: 0 62.8% 30.6%;
+    --event-color-vacina: 40 35% 50%;
+    --event-color-exame: 20 45% 40%;
+    --event-color-retorno: 50 35% 55%;
+    --event-color-outros: 60 30% 45%;
 
     --green-500: 142.1 76.2% 60%;
   }

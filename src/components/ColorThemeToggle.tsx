@@ -18,6 +18,8 @@ const colorThemes = [
   { name: "Roxo", value: "purple", colorClass: "bg-purple-600" }, // Nova cor para o botão
   { name: "Laranja", value: "orange", colorClass: "bg-orange-500" }, // Nova cor para o botão
   { name: "Ciano", value: "teal", colorClass: "bg-teal-500" }, // Nova cor para o botão
+  { name: "Rosa", value: "pink", colorClass: "bg-pink-500" }, // Nova cor para o botão
+  { name: "Marrom", value: "brown", colorClass: "bg-amber-800" }, // Nova cor para o botão (usando amber para um tom de marrom)
 ];
 
 const ColorThemeToggle = () => {

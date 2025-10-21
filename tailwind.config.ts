@@ -86,6 +86,12 @@ export default {
         teal: {
           500: "hsl(177.1 70% 35%)",
         },
+        pink: { // Nova cor: Pink
+          500: "hsl(330 80% 70%)",
+        },
+        amber: { // Usado para o tema 'brown'
+          800: "hsl(30 40% 30%)",
+        },
         // Novas cores para os níveis de risco
         blue: {
           500: "hsl(220 80% 60%)", // Para risco 'Sem risco'

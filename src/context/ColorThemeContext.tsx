@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type ColorTheme = 'default' | 'green' | 'purple' | 'orange' | 'teal';
+type ColorTheme = 'default' | 'green' | 'purple' | 'orange' | 'teal' | 'pink' | 'brown';
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -24,7 +24,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const root = window.document.documentElement;
     // Remove a classe do tema anterior
-    root.classList.remove('theme-default', 'theme-green', 'theme-purple', 'theme-orange', 'theme-teal');
+    root.classList.remove('theme-default', 'theme-green', 'theme-purple', 'theme-orange', 'theme-teal', 'theme-pink', 'theme-brown');
     // Adiciona a classe do tema atual
     root.classList.add(`theme-${colorTheme}`);
     // Salva o tema no localStorage
