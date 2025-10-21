@@ -94,49 +94,6 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
     setEditingDaySchedule(Array.from(currentVets)); // Atualiza o estado do diálogo imediatamente
   };
 
-  // Componente de cabeçalho personalizado para navegação entre meses
-  const CustomCaption: React.FC<{
-    displayMonth: Date;
-    goToMonth: (month: Date) => void;
-    locale: Locale;
-  }> = ({ displayMonth, goToMonth, locale }) => {
-    const handlePrevMonth = () => goToMonth(subMonths(displayMonth, 1));
-    const handleNextMonth = () => goToMonth(addMonths(displayMonth, 1));
-
-    return (
-      <div className="flex justify-between items-center p-2">
-        <Button variant="ghost" size="icon" onClick={handlePrevMonth}>
-          <ChevronLeft className="h-4 w-4" />
-        </Button>
-        <h2 className="text-lg font-semibold">
-          {format(displayMonth, "MMMM yyyy", { locale })}
-        </h2>
-        <Button variant="ghost" size="icon" onClick={handleNextMonth}>
-          <ChevronRight className="h-4 w-4" />
-        </Button>
-      </div>
-    );
-  };
-
-  // Conteúdo personalizado para cada dia do calendário
-  const DayContent: DateFormatter = (day) => {
-    const dayKey = format(day, "yyyy-MM-dd");
-    const vetsOnDuty = schedule.get(dayKey) || [];
-
-    return (
-      <div className="relative h-full w-full flex flex-col items-center justify-start p-1">
-        <span className="text-sm font-medium">{format(day, "d")}</span>
-        <div className="flex flex-wrap justify-center gap-0.5 mt-1">
-          {vetsOnDuty.map((vetName, index) => (
-            <Badge key={index} variant="secondary" className="text-[0.6rem] h-auto px-1 py-0.5 leading-none">
-              {vetName.split(' ')[0]} {/* Mostra apenas o primeiro nome */}
-            </Badge>
-          ))}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="w-full max-w-full overflow-x-auto">
       <div className="rounded-md border p-4 bg-background shadow-sm">
@@ -149,45 +106,7 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
           showOutsideDays
           fixedWeeks
           locale={ptBR}
-          components={{
-            Caption: CustomCaption,
-            DayContent: DayContent,
-          }}
-          classNames={{
-            root: "p-3 w-full",
-            months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full",
-            month: "space-y-4 w-full",
-            caption: "flex justify-center pt-1 relative items-center",
-            caption_label: "text-sm font-medium",
-            nav: "space-x-1 flex items-center",
-            nav_button: cn(
-              "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100"
-            ),
-            nav_button_previous: "absolute left-1",
-            nav_button_next: "absolute right-1",
-            table: "w-full border-collapse space-y-1",
-            head_row: "flex",
-            head_cell:
-              "text-muted-foreground rounded-md w-full font-normal text-[0.8rem]",
-            row: "flex w-full mt-2",
-            cell: "h-24 w-full text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-range-start)]:rounded-l-md [&:has([aria-selected].day-range-middle)]:rounded-none [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-            day: cn(
-              "h-full w-full p-0 font-normal aria-selected:opacity-100",
-              "hover:bg-accent hover:text-accent-foreground",
-              "focus:bg-accent focus:text-accent-foreground",
-              "data-[selected]:bg-primary data-[selected]:text-primary-foreground data-[selected]:hover:bg-primary data-[selected]:hover:text-primary-foreground",
-              "data-[disabled]:text-muted-foreground data-[disabled]:opacity-50",
-              "data-[outside]:bg-accent/50 data-[outside]:text-muted-foreground data-[outside]:data-[selected]:bg-accent/50 data-[outside]:data-[selected]:text-muted-foreground"
-            ),
-            day_range_start: "day-range-start",
-            day_range_end: "day-range-end",
-            day_range_middle: "day-range-middle",
-            day_hidden: "invisible",
-            day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-            day_today: "bg-accent text-accent-foreground",
-            day_outside: "text-muted-foreground opacity-50",
-            day_disabled: "text-muted-foreground opacity-50",
-          }}
+          // Removido components e classNames para depuração
         />
       </div>
 
