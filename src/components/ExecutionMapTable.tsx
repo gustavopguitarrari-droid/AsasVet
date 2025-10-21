@@ -61,7 +61,7 @@ const riskColorMap: Record<RiskLevel, string> = {
   "Emergência": "bg-red-500",
 };
 
-// Mapeamento de cores para o badge de status
+// Mapeamento de cores para o badge de status (mantido, mas não usado diretamente aqui)
 const statusBadgeColorMap: Record<InternedPatient["status"], string> = {
   "Em Observação": "bg-blue-500",
   "Estável": "bg-green-500",
@@ -105,7 +105,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
               const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
               const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
               const riskStripeColorClass = riskColorMap[patient.risk];
-              const statusBadgeClass = statusBadgeColorMap[patient.status];
+              // const statusBadgeClass = statusBadgeColorMap[patient.status]; // Não é mais necessário aqui
 
               return (
                 <TableRow key={patient.id} className="hover:bg-muted/50 transition-colors duration-150">
@@ -119,9 +119,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
                     </div>
                     <p className="text-xs text-muted-foreground ml-7">Tutor: {patient.ownerName}</p>
                     <p className="text-xs text-muted-foreground ml-7">Vet: {patient.veterinarian}</p>
-                    <Badge className={cn("ml-7 mt-1 text-xs text-white", statusBadgeClass)}>
-                      {patient.status}
-                    </Badge>
+                    {/* O Badge de status foi removido daqui */}
                   </TableCell>
                   {hourlySlots.map((hour) => (
                     <TableCell key={`${patient.id}-${hour}`} className="text-center p-1.5">
