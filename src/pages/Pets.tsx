@@ -70,7 +70,7 @@ const Pets = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4"> {/* Novo contêiner flexível */}
         <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
-        <Button>
+        <Button className="font-bold"> {/* Adicionado font-bold aqui */}
           <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
         </Button>
       </div>
