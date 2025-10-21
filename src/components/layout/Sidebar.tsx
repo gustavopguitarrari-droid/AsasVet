@@ -13,7 +13,6 @@ import {
   ArrowRightToLine,
   ReceiptText,
   Package,
-  HeartPulse, // Novo ícone para Enfermeiros
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -55,11 +54,6 @@ const navItems = [
     icon: Stethoscope,
     path: "/veterinarios",
     // activeBgClass: "bg-sidebar-item-bg-9", // Removido
-  },
-  {
-    name: "Enfermeiros", // Novo item de navegação
-    icon: HeartPulse, // Ícone para Enfermeiros
-    path: "/enfermeiros",
   },
   {
     name: "Agenda",

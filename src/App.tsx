@@ -13,8 +13,7 @@ import Financeiro from "./pages/Financeiro";
 import Caixa from "./pages/Caixa";
 import Internacao from "./pages/Internacao";
 import Veterinarios from "./pages/Veterinarios";
-import Enfermeiros from "./pages/Enfermeiros"; // Importação da nova página de Enfermeiros
-import Estoque from "./pages/Estoque";
+import Estoque from "./pages/Estoque"; // Importação da nova página de Estoque
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -107,15 +106,7 @@ const App = () => (
             }
           />
           <Route
-            path="/enfermeiros" // Nova rota para Enfermeiros
-            element={
-              <Layout>
-                <Enfermeiros />
-              </Layout>
-            }
-          />
-          <Route
-            path="/estoque"
+            path="/estoque" // Nova rota para Estoque
             element={
               <Layout>
                 <Estoque />
