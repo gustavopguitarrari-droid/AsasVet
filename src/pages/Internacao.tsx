@@ -101,7 +101,7 @@ const Internacao = () => {
   const [actionPatientName, setActionPatientName] = React.useState<string | null>(null);
   const [actionDate, setActionDate] = React.useState<Date | null>(null);
   const [actionHour, setActionHour] = React.useState<string | null>(null);
-  const [allActionsForPatientOnDate, setAllActionsForPatientOnDate] = React.useState<PatientAction[]>([]); // Novo estado para todas as ações do dia
+  const [allActionsForCurrentPatient, setAllActionsForCurrentPatient] = React.useState<PatientAction[]>([]); // Renamed state
   const [patientActions, setPatientActions] = React.useState<PatientAction[]>([]); // Novo estado para as ações
 
   // Estados para o novo diálogo de confirmação de ações
@@ -293,30 +293,24 @@ const Internacao = () => {
     setActionPatientName(patientName);
     setActionDate(date);
     setActionHour(hour);
-    // Filtra todas as ações para este paciente e esta data
-    const actionsForThisPatientOnDate = patientActions.filter(
-      (action) => action.patientId === patientId && action.date === format(date, "yyyy-MM-dd")
+    // Filtra TODAS as ações para este paciente, independentemente da data
+    const actionsForThisPatient = patientActions.filter(
+      (action) => action.patientId === patientId
     );
-    setAllActionsForPatientOnDate(actionsForThisPatientOnDate);
+    setAllActionsForCurrentPatient(actionsForThisPatient); // Renamed state
     setIsAddActionDialogOpen(true);
   };
 
-  const handleSaveAllPatientActions = (updatedActionsForDay: PatientAction[]) => {
-    if (actionPatientId && actionDate) {
-      const formattedDate = format(actionDate, "yyyy-MM-dd");
-
-      // Remove todas as ações existentes para este paciente e esta data
+  const handleSaveAllPatientActions = (updatedActionsForPatient: PatientAction[]) => {
+    if (actionPatientId) {
+      // Remove todas as ações existentes para este paciente
       const otherPatientsActions = patientActions.filter(
-        (action) => !(action.patientId === actionPatientId && action.date === formattedDate)
+        (action) => action.patientId !== actionPatientId
       );
 
       // Adiciona as ações atualizadas (com IDs únicos)
-      const newActionsWithUniqueIds = updatedActionsForDay.map(action => ({
-        ...action,
-        id: generateUniqueActionId(), // Garante que cada ação tenha um ID único
-      }));
-
-      setPatientActions([...otherPatientsActions, ...newActionsWithUniqueIds]);
+      // Note: IDs are generated in AddPatientActionDialog, so we just add them here.
+      setPatientActions([...otherPatientsActions, ...updatedActionsForPatient]);
       setIsAddActionDialogOpen(false);
     }
   };
@@ -518,11 +512,11 @@ const Internacao = () => {
           isOpen={isAddActionDialogOpen}
           onClose={() => setIsAddActionDialogOpen(false)}
           onSaveAllActions={handleSaveAllPatientActions}
-          patientId={actionPatientId} // Passa o ID do paciente
+          patientId={actionPatientId}
           patientName={actionPatientName}
-          date={actionDate as Date} // Explicit cast
-          initialHour={actionHour as string} // Explicit cast
-          allActionsForPatientOnDate={allActionsForPatientOnDate} // Passa todas as ações do dia
+          date={actionDate}
+          initialHour={actionHour}
+          allActionsForPatient={allActionsForCurrentPatient} // Pass all actions for the patient
         />
       )}
 
@@ -535,11 +529,11 @@ const Internacao = () => {
           date={confirmActionsDate}
           hour={confirmActionsHour}
           actionsForSlot={confirmActionsForSlot}
-          onEditActionsClick={(pId, pName, dt, hr, initialActs) => { // Implementa a callback
-            setIsConfirmActionsDialogOpen(false); // Fecha o diálogo de confirmação
-            openAddEditActionDialog(pId, pName, dt, hr); // Reabre o diálogo de adicionar/editar
+          onEditActionsClick={(pId, pName, dt, hr, initialActs) => {
+            setIsConfirmActionsDialogOpen(false);
+            openAddEditActionDialog(pId, pName, dt, hr);
           }}
-          patientId={confirmActionsPatientId} // Passa o ID do paciente
+          patientId={confirmActionsPatientId}
         />
       )}
     </div>
