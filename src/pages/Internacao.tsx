@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import AddPatientActionDialog, { PatientActionFormValues } from "@/components/AddPatientActionDialog"; // Importar o novo diálogo
+import ConfirmPatientActionsDialog from "@/components/ConfirmPatientActionsDialog"; // Importar o novo diálogo de confirmação
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -42,6 +43,7 @@ export interface PatientAction {
   hour: string; // HH
   description: string;
   type: "Medicação" | "Alimentação" | "Observação" | "Outro";
+  isCompleted: boolean; // Adicionado status de conclusão
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -97,6 +99,14 @@ const Internacao = () => {
   const [actionHour, setActionHour] = React.useState<string | null>(null);
   const [initialActionsForSlot, setInitialActionsForSlot] = React.useState<PatientAction[]>([]); // Novo estado para ações iniciais
   const [patientActions, setPatientActions] = React.useState<PatientAction[]>([]); // Novo estado para as ações
+
+  // Estados para o novo diálogo de confirmação de ações
+  const [isConfirmActionsDialogOpen, setIsConfirmActionsDialogOpen] = React.useState(false);
+  const [confirmActionsPatientId, setConfirmActionsPatientId] = React.useState<string | null>(null);
+  const [confirmActionsPatientName, setConfirmActionsPatientName] = React.useState<string | null>(null);
+  const [confirmActionsDate, setConfirmActionsDate] = React.useState<Date | null>(null);
+  const [confirmActionsHour, setConfirmActionsHour] = React.useState<string | null>(null);
+  const [confirmActionsForSlot, setConfirmActionsForSlot] = React.useState<PatientAction[]>([]);
 
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
@@ -196,11 +206,11 @@ const Internacao = () => {
 
     // Mock de ações iniciais
     const mockActions: PatientAction[] = [
-      { id: "ACT001", patientId: "INT001", date: "2024-10-27", hour: "10", description: "Administrar antibiótico", type: "Medicação" },
-      { id: "ACT002", patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação" },
-      { id: "ACT003", patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação" },
-      { id: "ACT004", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Trocar curativo", type: "Medicação" },
-      { id: "ACT005", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Passeio", type: "Outro" },
+      { id: "ACT001", patientId: "INT001", date: "2024-10-27", hour: "10", description: "Administrar antibiótico", type: "Medicação", isCompleted: false },
+      { id: "ACT002", patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação", isCompleted: false },
+      { id: "ACT003", patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação", isCompleted: false },
+      { id: "ACT004", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Trocar curativo", type: "Medicação", isCompleted: false },
+      { id: "ACT005", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Passeio", type: "Outro", isCompleted: false },
     ];
     setPatientActions(mockActions);
 
@@ -268,7 +278,7 @@ const Internacao = () => {
     patientName: string,
     date: Date,
     hour: string,
-    initialActions: PatientAction[] = [] // Pode ser vazio para adicionar, ou preenchido para editar
+    initialActions: PatientActionFormValues[] = [] // Pode ser vazio para adicionar, ou preenchido para editar
   ) => {
     setActionPatientId(patientId);
     setActionPatientName(patientName);
@@ -300,11 +310,43 @@ const Internacao = () => {
         hour: actionHour,
         description: data.description,
         type: data.type,
+        isCompleted: false, // Novas ações começam como não concluídas
       }));
 
       setPatientActions([...filteredExistingActions, ...newActions]);
       setIsAddActionDialogOpen(false);
     }
+  };
+
+  // Funções para o novo diálogo de confirmação de ações
+  const handleOpenConfirmActionsDialog = (
+    patientId: string,
+    patientName: string,
+    date: Date,
+    hour: string,
+    actions: PatientAction[]
+  ) => {
+    setConfirmActionsPatientId(patientId);
+    setConfirmActionsPatientName(patientName);
+    setConfirmActionsDate(date);
+    setConfirmActionsHour(hour);
+    setConfirmActionsForSlot(actions);
+    setIsConfirmActionsDialogOpen(true);
+  };
+
+  const handleConfirmPatientActions = (updatedActions: PatientAction[]) => {
+    setPatientActions((prevActions) => {
+      const otherActions = prevActions.filter(
+        (action) =>
+          !(
+            action.patientId === confirmActionsPatientId &&
+            action.date === format(confirmActionsDate!, "yyyy-MM-dd") &&
+            action.hour === confirmActionsHour
+          )
+      );
+      return [...otherActions, ...updatedActions];
+    });
+    setIsConfirmActionsDialogOpen(false);
   };
 
   const getPageTitle = () => {
@@ -448,8 +490,8 @@ const Internacao = () => {
               patients={patientsForExecutionMap}
               selectedDate={selectedDate}
               patientActions={patientActions}
-              onAddActionClick={openAddEditActionDialog} // Usar a função unificada
-              onEditActionsClick={openAddEditActionDialog} // Usar a função unificada
+              onAddActionClick={openAddEditActionDialog}
+              onOpenConfirmActionsDialog={handleOpenConfirmActionsDialog} // Passa a nova função
             />
           </div>
         </TabsContent>
@@ -477,6 +519,18 @@ const Internacao = () => {
           date={actionDate}
           hour={actionHour}
           initialActions={initialActionsForSlot} // Passa as ações iniciais
+        />
+      )}
+
+      {isConfirmActionsDialogOpen && confirmActionsPatientId && confirmActionsPatientName && confirmActionsDate && confirmActionsHour && (
+        <ConfirmPatientActionsDialog
+          isOpen={isConfirmActionsDialogOpen}
+          onClose={() => setIsConfirmActionsDialogOpen(false)}
+          onConfirmActions={handleConfirmPatientActions}
+          patientName={confirmActionsPatientName}
+          date={confirmActionsDate}
+          hour={confirmActionsHour}
+          actionsForSlot={confirmActionsForSlot}
         />
       )}
     </div>

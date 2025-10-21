@@ -38,7 +38,7 @@ interface ExecutionMapTableProps {
   selectedDate: Date | undefined;
   patientActions: PatientAction[]; // Receber as ações
   onAddActionClick: (patientId: string, patientName: string, date: Date, hour: string) => void; // Callback para adicionar ação
-  onEditActionsClick: (patientId: string, patientName: string, date: Date, hour: string, initialActions: PatientAction[]) => void; // Nova callback para editar ações
+  onOpenConfirmActionsDialog: (patientId: string, patientName: string, date: Date, hour: string, actions: PatientAction[]) => void; // Nova callback para abrir o diálogo de confirmação
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -86,16 +86,10 @@ const generateHourlySlots = () => {
 
 const hourlySlots = generateHourlySlots();
 
-const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selectedDate, patientActions, onAddActionClick, onEditActionsClick }) => {
+const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selectedDate, patientActions, onAddActionClick, onOpenConfirmActionsDialog }) => {
   const handleAddAction = (patient: InternedPatient, hour: string) => {
     if (selectedDate) {
       onAddActionClick(patient.id, patient.petName, selectedDate, hour);
-    }
-  };
-
-  const handleEditActions = (patient: InternedPatient, hour: string, actions: PatientAction[]) => {
-    if (selectedDate) {
-      onEditActionsClick(patient.id, patient.petName, selectedDate, hour, actions);
     }
   };
 
@@ -142,21 +136,24 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                         action.date === formattedSelectedDate &&
                         action.hour === hour
                     );
+                    const completedActionsCount = actionsForSlot.filter(action => action.isCompleted).length;
+                    const totalActionsCount = actionsForSlot.length;
 
                     return (
                       <TableCell key={`${patient.id}-${hour}`} className="text-center p-1.5 relative">
-                        {actionsForSlot.length > 0 ? (
+                        {totalActionsCount > 0 ? (
                           <div className="flex items-center justify-center space-x-1">
                             <Tooltip delayDuration={0}>
                               <TooltipTrigger asChild>
                                 <Badge
                                   className={cn(
                                     "h-7 w-7 p-0 flex items-center justify-center rounded-full",
-                                    "bg-primary text-primary-foreground cursor-pointer"
+                                    "cursor-pointer",
+                                    completedActionsCount === totalActionsCount ? "bg-green-600 text-white" : "bg-primary text-primary-foreground"
                                   )}
-                                  onClick={() => handleEditActions(patient, hour, actionsForSlot)} // Adicionado onClick aqui
+                                  onClick={() => onOpenConfirmActionsDialog(patient.id, patient.petName, selectedDate!, hour, actionsForSlot)}
                                 >
-                                  {actionsForSlot.length}
+                                  {totalActionsCount}
                                 </Badge>
                               </TooltipTrigger>
                               <TooltipContent side="bottom" className="max-w-xs">
@@ -164,7 +161,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                                 {actionsForSlot.map((action) => {
                                   const ActionIcon = actionTypeIconMap[action.type] || FlaskConical;
                                   return (
-                                    <div key={action.id} className="flex items-center text-sm mt-1">
+                                    <div key={action.id} className={cn("flex items-center text-sm mt-1", action.isCompleted && "line-through text-muted-foreground")}>
                                       <ActionIcon className="h-4 w-4 mr-2 text-muted-foreground" />
                                       <span>{action.type}: {action.description}</span>
                                     </div>
