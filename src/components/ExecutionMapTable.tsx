@@ -63,19 +63,18 @@ const hourlySlots = generateHourlySlots();
 
 const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
   const handleAddAction = (patientId: string, hour: string) => {
-    // Lógica para adicionar ação (medicação, alimentação, etc.)
     console.log(`Adicionar ação para o paciente ${patientId} no horário ${hour}:00`);
-    // Aqui você pode abrir um diálogo para coletar mais informações
+    // Lógica para adicionar ação (medicação, alimentação, etc.)
   };
 
   return (
     <div className="overflow-x-auto rounded-md border">
       <Table className="min-w-full divide-y divide-border">
         <TableHeader>
-          <TableRow>
-            <TableHead className="sticky left-0 bg-background z-10 w-[150px]">Paciente</TableHead>
+          <TableRow className="bg-muted/20"> {/* Fundo sutil para o cabeçalho */}
+            <TableHead className="sticky left-0 bg-background z-10 w-[150px] text-base font-semibold">Paciente</TableHead> {/* Texto maior e mais forte */}
             {hourlySlots.map((hour) => (
-              <TableHead key={hour} className="text-center w-[40px] p-1 text-xs">
+              <TableHead key={hour} className="text-center w-[40px] p-1 text-sm font-semibold"> {/* Horários um pouco maiores e mais fortes */}
                 {hour}
               </TableHead>
             ))}
@@ -88,25 +87,25 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
               const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
 
               return (
-                <TableRow key={patient.id}>
+                <TableRow key={patient.id} className="hover:bg-muted/50 transition-colors duration-150"> {/* Efeito de hover na linha */}
                   <TableCell className="sticky left-0 bg-card font-medium flex items-center py-4 w-[150px]">
                     <IconComponent className={cn("h-5 w-5 mr-2", speciesTextColorClass)} />
                     {patient.petName}
                   </TableCell>
                   {hourlySlots.map((hour) => (
-                    <TableCell key={`${patient.id}-${hour}`} className="text-center p-0.5">
+                    <TableCell key={`${patient.id}-${hour}`} className="text-center p-1.5"> {/* Padding um pouco maior */}
                       <Tooltip delayDuration={0}>
                         <TooltipTrigger asChild>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-6 w-6 group relative" // Adicionado 'group' e 'relative'
+                            className="h-7 w-7 group relative rounded-sm" // Aumentado o tamanho do botão e arredondamento
                             onClick={() => handleAddAction(patient.id, hour)}
                           >
                             {/* Quadrado branco com borda */}
-                            <div className="absolute inset-0 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-sm flex items-center justify-center">
+                            <div className="absolute inset-0 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-sm flex items-center justify-center group-hover:bg-gray-50 dark:group-hover:bg-gray-600 transition-colors duration-200"> {/* Efeito de hover no quadrado */}
                               {/* Ícone Plus que aparece no hover */}
-                              <Plus className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                              <Plus className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-200" /> {/* Ícone maior e com cor primária no hover */}
                             </div>
                             <span className="sr-only">Adicionar Ação</span>
                           </Button>
@@ -123,7 +122,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
             })
           ) : (
             <TableRow>
-              <TableCell colSpan={hourlySlots.length + 1} className="h-24 text-center">
+              <TableCell colSpan={hourlySlots.length + 1} className="h-24 text-center text-muted-foreground">
                 Nenhum paciente internado para exibir no mapa de execução.
               </TableCell>
             </TableRow>
