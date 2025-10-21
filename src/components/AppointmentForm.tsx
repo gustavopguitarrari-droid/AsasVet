@@ -88,7 +88,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
       date: initialData?.date ? new Date(initialData.date) : undefined,
       time: initialData?.time || format(new Date(), "HH:mm"),
       client: initialData?.client || "",
-      pet: initialData?.pet || "Cachorro",
+      pet: initialData?.pet || "", // Alterado para string vazia
       species: initialData?.species || "Cachorro",
       service: initialData?.service || serviceOptions[0],
       veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
