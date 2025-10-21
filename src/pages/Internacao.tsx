@@ -330,9 +330,8 @@ const Internacao = () => {
 
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
-            {/* <h3 className="text-2xl font-semibold mb-4">Mapa de Execução Diário</h3> */} {/* Linha removida */}
             <div className="flex justify-center items-center space-x-2"> {/* Adicionado flexbox para alinhar */}
-              <Button variant="outline" size="icon" onClick={handlePreviousDay}>
+              <Button variant="default" size="icon" onClick={handlePreviousDay}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <Popover>
@@ -358,7 +357,7 @@ const Internacao = () => {
                   />
                   </PopoverContent>
                 </Popover>
-              <Button variant="outline" size="icon" onClick={handleNextDay}>
+              <Button variant="default" size="icon" onClick={handleNextDay}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
