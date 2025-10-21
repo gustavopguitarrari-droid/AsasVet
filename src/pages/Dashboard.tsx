@@ -12,6 +12,7 @@ import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyCha
 import AppointmentsWeeklyChart from "@/components/charts/AppointmentsWeeklyChart";
 import RevenueMonthlyChart from "@/components/charts/RevenueMonthlyChart";
 import PetsBySpeciesChart from "@/components/charts/PetsBySpeciesChart";
+import AverageWaitingTimeCard from "@/components/AverageWaitingTimeCard"; // Importar o novo card
 
 interface DashboardItemConfig {
   id: string;
@@ -24,6 +25,7 @@ const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "totalClients", name: "Total de Clientes", isVisible: true, category: "overview" },
   { id: "totalPets", name: "Total de Animais", isVisible: true, category: "overview" },
   { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview" },
+  { id: "averageWaitingTime", name: "Média de Tempo de Espera", isVisible: true, category: "overview" }, // Novo item
   { id: "recentActivity", name: "Atividade Recente", isVisible: true, category: "recentActivity" },
   { id: "financialSummary", name: "Resumo Financeiro", isVisible: true, category: "financial" },
   { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial" },
@@ -103,6 +105,8 @@ const Dashboard = () => {
             </CardContent>
           </Card>
         );
+      case "averageWaitingTime": // Novo case para o card de média de tempo de espera
+        return <AverageWaitingTimeCard key={item.id} />;
       case "recentActivity":
         return (
           <Card key={item.id} className="bg-gray-100 text-gray-800 shadow-md col-span-full"> {/* Alterado para cinza claro fixo */}
