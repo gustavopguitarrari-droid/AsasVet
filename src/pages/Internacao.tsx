@@ -1,12 +1,12 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react"; // Importar CalendarIcon, ChevronLeft, ChevronRight
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
 import InternmentHistoryDialog from "@/components/InternmentHistoryDialog";
 import ExecutionMapTable from "@/components/ExecutionMapTable";
-import { format, isSameDay, parseISO, isBefore, isAfter, isEqual, addDays, subDays } from "date-fns"; // Importar addDays e subDays
+import { format, isSameDay, parseISO, isBefore, isAfter, isEqual, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -19,7 +19,7 @@ type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
 interface InternedPatient {
   id: string;
-  bayName: string; // Novo campo
+  bayName: string;
   petName: string;
   ownerName: string;
   reason: string;
@@ -74,13 +74,13 @@ const Internacao = () => {
   const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
-  const [patientSearchTerm, setPatientSearchTerm] = React.useState<string>(""); // Novo estado para a pesquisa
+  const [patientSearchTerm, setPatientSearchTerm] = React.useState<string>("");
 
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
       {
         id: "INT001",
-        bayName: "Baia 1", // Adicionado
+        bayName: "Baia 1",
         petName: "Buddy",
         ownerName: "Alice Smith",
         reason: "Fratura na pata",
@@ -93,7 +93,7 @@ const Internacao = () => {
       },
       {
         id: "INT002",
-        bayName: "UTI 2", // Adicionado
+        bayName: "UTI 2",
         petName: "Mittens",
         ownerName: "Bob Johnson",
         reason: "Infecção respiratória",
@@ -105,7 +105,7 @@ const Internacao = () => {
       },
       {
         id: "INT003",
-        bayName: "Baia 3", // Adicionado
+        bayName: "Baia 3",
         petName: "Chico",
         ownerName: "Carlos Pereira",
         reason: "Check-up de rotina",
@@ -117,7 +117,7 @@ const Internacao = () => {
       },
       {
         id: "INT004",
-        bayName: "Emergência", // Adicionado
+        bayName: "Emergência",
         petName: "Max",
         ownerName: "Fernanda Reis",
         reason: "Emergência - atropelamento",
@@ -129,7 +129,7 @@ const Internacao = () => {
       },
       {
         id: "INT005",
-        bayName: "Baia 4", // Adicionado
+        bayName: "Baia 4",
         petName: "Dory",
         ownerName: "Lucas Mendes",
         reason: "Observação pós-cirúrgica",
@@ -139,10 +139,9 @@ const Internacao = () => {
         species: "Peixe",
         risk: "Sem risco",
       },
-      // Adicionando alguns pacientes de histórico para demonstração
       {
         id: "INT006",
-        bayName: "Baia 5", // Adicionado
+        bayName: "Baia 5",
         petName: "Rocky",
         ownerName: "Gabriel Santos",
         reason: "Recuperação de cirurgia",
@@ -155,7 +154,7 @@ const Internacao = () => {
       },
       {
         id: "INT007",
-        bayName: "UTI 1", // Adicionado
+        bayName: "UTI 1",
         petName: "Shadow",
         ownerName: "Isabela Oliveira",
         reason: "Doença crônica",
@@ -177,7 +176,7 @@ const Internacao = () => {
   const handleAddInternment = (data: InternmentFormValues) => {
     const newPatient: InternedPatient = {
       id: `INT${(internedPatients.length + historyPatients.length + 1).toString().padStart(3, '0')}`,
-      bayName: data.bayName, // Incluindo o nome da baia
+      bayName: data.bayName,
       petName: data.petName,
       ownerName: data.ownerName,
       reason: data.reason,
@@ -208,7 +207,6 @@ const Internacao = () => {
     setIsDetailsDialogOpen(true);
   };
 
-  // Filtra os pacientes para o mapa de execução com base na data selecionada
   const patientsForExecutionMap = React.useMemo(() => {
     if (!selectedDate) return [];
 
@@ -216,10 +214,6 @@ const Internacao = () => {
       const admission = parseISO(patient.admissionDate);
       const discharge = patient.expectedDischargeDate ? parseISO(patient.expectedDischargeDate) : null;
 
-      // Paciente está internado se:
-      // 1. A data de admissão é anterior ou igual à data selecionada
-      // 2. E (a data de alta esperada é posterior ou igual à data selecionada OU não há data de alta esperada)
-      // 3. E o status não é "Alta" nem "Óbito" (já filtrado em internedPatients, mas bom reforçar)
       const isAdmittedOnOrBeforeSelectedDate = isBefore(admission, selectedDate) || isEqual(admission, selectedDate);
       const isNotDischargedOnOrBeforeSelectedDate = !discharge || isAfter(discharge, selectedDate) || isEqual(discharge, selectedDate);
 
@@ -235,7 +229,6 @@ const Internacao = () => {
     setSelectedDate((prevDate) => (prevDate ? addDays(prevDate, 1) : undefined));
   };
 
-  // Filtra os pacientes internados com base no termo de pesquisa
   const filteredInternedPatients = internedPatients.filter(patient =>
     patient.petName.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
     patient.ownerName.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
@@ -272,7 +265,40 @@ const Internacao = () => {
         )}
       </div>
       
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      {/* Seletor de data movido para aqui, acima das abas */}
+      <div className="flex justify-end items-center space-x-2">
+        <Button variant="default" size="icon" onClick={handlePreviousDay}>
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant={"outline"}
+              className={cn(
+                "w-[280px] justify-start text-left font-normal",
+                !selectedDate && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              initialFocus
+              locale={ptBR}
+            />
+            </PopoverContent>
+          </Popover>
+        <Button variant="default" size="icon" onClick={handleNextDay}>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full mb-4"> {/* Adicionado mb-4 aqui */}
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
           <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
           <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
@@ -281,7 +307,6 @@ const Internacao = () => {
         <TabsContent value="pacientes-internados" className="mt-4">
           <div className="mt-8">
             <h3 className="text-2xl font-semibold mb-4">Pacientes Atualmente Internados</h3>
-            {/* Barra de pesquisa adicionada aqui */}
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -306,8 +331,7 @@ const Internacao = () => {
                     >
                       <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
                       
-                      {/* Nome da Baia no canto superior direito */}
-                      <div className="absolute top-2 right-6 text-base font-bold text-muted-foreground"> {/* Alterado para text-base e font-bold */}
+                      <div className="absolute top-2 right-6 text-base font-bold text-muted-foreground">
                         {patient.bayName}
                       </div>
 
@@ -332,37 +356,7 @@ const Internacao = () => {
 
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
-            <div className="flex justify-end items-center space-x-2 mb-4"> {/* Alterado para justify-end e adicionado mb-4 */}
-              <Button variant="default" size="icon" onClick={handlePreviousDay}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-[280px] justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    initialFocus
-                    locale={ptBR}
-                  />
-                  </PopoverContent>
-                </Popover>
-              <Button variant="default" size="icon" onClick={handleNextDay}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
+            {/* O seletor de data foi movido para fora deste TabsContent */}
             <ExecutionMapTable patients={patientsForExecutionMap} />
           </div>
         </TabsContent>
