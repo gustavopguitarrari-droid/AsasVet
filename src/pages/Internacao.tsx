@@ -250,24 +250,26 @@ const Internacao = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Internação</h2>
-        <div className="flex space-x-2">
-          <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
-            <History className="mr-2 h-4 w-4" /> Ver Histórico
-          </Button>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="font-bold">
-                <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
-              <DialogHeader>
-                <DialogTitle>Internar Novo Paciente</DialogTitle>
-              </DialogHeader>
-              <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
-            </DialogContent>
-          </Dialog>
-        </div>
+        {activeTab === "pacientes-internados" && (
+          <div className="flex space-x-2">
+            <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
+              <History className="mr-2 h-4 w-4" /> Ver Histórico
+            </Button>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="font-bold">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
+                <DialogHeader>
+                  <DialogTitle>Internar Novo Paciente</DialogTitle>
+                </DialogHeader>
+                <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
