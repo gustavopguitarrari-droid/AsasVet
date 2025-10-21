@@ -89,9 +89,10 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
 
               return (
                 <TableRow key={patient.id}>
-                  <TableCell className="sticky left-0 bg-card font-medium flex items-center py-4 w-[150px]">
-                    <IconComponent className={cn("h-5 w-5 mr-2", speciesTextColorClass)} />
-                    {patient.petName}
+                  <TableCell className="sticky left-0 bg-card font-medium py-2 w-[150px]">
+                    <div className="flex items-center justify-center h-16 w-full p-2 border rounded-md bg-secondary text-secondary-foreground shadow-sm">
+                      <span className="text-sm font-semibold text-center">{patient.petName}</span>
+                    </div>
                   </TableCell>
                   {hourlySlots.map((hour) => (
                     <TableCell key={`${patient.id}-${hour}`} className="text-center p-2">
