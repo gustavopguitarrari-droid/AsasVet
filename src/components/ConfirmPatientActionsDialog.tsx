@@ -132,7 +132,12 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
                         {action.description}
                       </label>
                     </div>
-                    <Badge variant="secondary" className="ml-4">{action.type}</Badge>
+                    <div className="flex items-center space-x-2">
+                      {action.frequency && (
+                        <Badge variant="secondary" className="text-xs">{action.frequency}</Badge>
+                      )}
+                      <Badge variant="secondary" className="ml-4">{action.type}</Badge>
+                    </div>
                   </div>
                 );
               })}

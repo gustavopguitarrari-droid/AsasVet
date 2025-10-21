@@ -44,6 +44,7 @@ export interface PatientAction {
   description: string;
   type: "Medicação" | "Alimentação" | "Observação" | "Outro";
   isCompleted: boolean; // Adicionado status de conclusão
+  frequency?: "SID" | "BID" | "TID" | "QID" | "Outro"; // Novo campo de frequência
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -206,11 +207,11 @@ const Internacao = () => {
 
     // Mock de ações iniciais
     const mockActions: PatientAction[] = [
-      { id: "ACT001", patientId: "INT001", date: "2024-10-27", hour: "10", description: "Administrar antibiótico", type: "Medicação", isCompleted: false },
-      { id: "ACT002", patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação", isCompleted: false },
-      { id: "ACT003", patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação", isCompleted: false },
-      { id: "ACT004", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Trocar curativo", type: "Medicação", isCompleted: false },
-      { id: "ACT005", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Passeio", type: "Outro", isCompleted: false },
+      { id: "ACT001", patientId: "INT001", date: "2024-10-27", hour: "10", description: "Administrar antibiótico", type: "Medicação", isCompleted: false, frequency: "BID" },
+      { id: "ACT002", patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação", isCompleted: false, frequency: "TID" },
+      { id: "ACT003", patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
+      { id: "ACT004", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Trocar curativo", type: "Medicação", isCompleted: false, frequency: "SID" },
+      { id: "ACT005", patientId: "INT001", date: "2024-10-28", hour: "10", description: "Passeio", type: "Outro", isCompleted: false, frequency: "Outro" },
     ];
     setPatientActions(mockActions);
 
@@ -311,6 +312,7 @@ const Internacao = () => {
         description: data.description,
         type: data.type,
         isCompleted: false, // Novas ações começam como não concluídas
+        frequency: data.frequency, // Incluir a frequência
       }));
 
       setPatientActions([...filteredExistingActions, ...newActions]);
@@ -535,7 +537,8 @@ const Internacao = () => {
             setIsConfirmActionsDialogOpen(false); // Fecha o diálogo de confirmação
             openAddEditActionDialog(pId, pName, dt, hr, initialActs.map(a => ({ // Mapeia para PatientActionFormValues
               description: a.description,
-              type: a.type
+              type: a.type,
+              frequency: a.frequency // Incluir a frequência
             })));
           }}
           patientId={confirmActionsPatientId} // Passa o ID do paciente

@@ -165,7 +165,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                                   return (
                                     <div key={action.id} className={cn("flex items-center text-sm mt-1", action.isCompleted && "line-through text-muted-foreground")}>
                                       <ActionIcon className="h-4 w-4 mr-2 text-muted-foreground" />
-                                      <span>{action.type}: {action.description}</span>
+                                      <span>{action.type}: {action.description} {action.frequency && `(${action.frequency})`}</span>
                                     </div>
                                   );
                                 })}

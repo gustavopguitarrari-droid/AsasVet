@@ -31,6 +31,7 @@ const formSchema = z.object({
   type: z.enum(["Medicação", "Alimentação", "Observação", "Outro"], {
     required_error: "O tipo de ação é obrigatório.",
   }),
+  frequency: z.enum(["SID", "BID", "TID", "QID", "Outro"]).optional(), // Novo campo de frequência
 });
 
 export type PatientActionFormValues = z.infer<typeof formSchema>;
@@ -42,7 +43,7 @@ interface AddPatientActionDialogProps {
   patientName: string;
   date: Date;
   hour: string;
-  initialActions?: PatientAction[]; // Nova prop para ações iniciais
+  initialActions?: PatientActionFormValues[]; // Nova prop para ações iniciais (agora PatientActionFormValues)
 }
 
 // Mapeamento de ícones para tipos de ação (reutilizado de ExecutionMapTable)
@@ -67,6 +68,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
     defaultValues: {
       description: "",
       type: "Medicação",
+      frequency: "SID", // Valor padrão para frequência
     },
   });
 
@@ -75,14 +77,11 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
   // Reset cart and form when dialog opens or initialActions change
   useEffect(() => {
     if (isOpen) {
-      // Mapeia PatientAction para PatientActionFormValues para o 'carrinho'
-      setCurrentActionsInCart(initialActions.map(action => ({
-        description: action.description,
-        type: action.type,
-      })));
+      setCurrentActionsInCart(initialActions); // Usa initialActions diretamente
       form.reset({
         description: "",
         type: "Medicação",
+        frequency: "SID", // Reset to default frequency
       });
     }
   }, [isOpen, form, initialActions]); // Adicionado initialActions como dependência
@@ -92,6 +91,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
     form.reset({
       description: "",
       type: "Medicação", // Reset to default type
+      frequency: "SID", // Reset to default frequency
     });
   };
 
@@ -161,6 +161,30 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="frequency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Frequência</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione a frequência" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="SID">SID (Uma vez ao dia)</SelectItem>
+                          <SelectItem value="BID">BID (Duas vezes ao dia)</SelectItem>
+                          <SelectItem value="TID">TID (Três vezes ao dia)</SelectItem>
+                          <SelectItem value="QID">QID (Quatro vezes ao dia)</SelectItem>
+                          <SelectItem value="Outro">Outro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <Button type="submit" className="w-full">
                   <Plus className="mr-2 h-4 w-4" /> Adicionar à Lista
                 </Button>
@@ -184,11 +208,16 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
                           <ActionIcon className="h-5 w-5 mr-2 text-muted-foreground" />
                           <p className="font-medium text-sm">{action.description}</p>
                         </div>
-                        <Badge variant="secondary" className="mr-2">{action.type}</Badge>
-                        <Button variant="destructive" size="icon" className="h-7 w-7" onClick={() => handleRemoveFromCart(index)}>
-                          <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Remover</span>
-                        </Button>
+                        <div className="flex items-center space-x-2">
+                          {action.frequency && (
+                            <Badge variant="secondary" className="text-xs">{action.frequency}</Badge>
+                          )}
+                          <Badge variant="secondary" className="mr-2">{action.type}</Badge>
+                          <Button variant="destructive" size="icon" className="h-7 w-7" onClick={() => handleRemoveFromCart(index)}>
+                            <Trash2 className="h-4 w-4" />
+                            <span className="sr-only">Remover</span>
+                          </Button>
+                        </div>
                       </div>
                     );
                   })}
