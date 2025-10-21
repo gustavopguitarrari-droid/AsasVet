@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Stethoscope, User, Briefcase, GraduationCap, IdCard } from "lucide-react"; // Importado GraduationCap
+import { PlusCircle, Search, Stethoscope, User, Briefcase, GraduationCap, IdCard, HeartPulse } from "lucide-react"; // Importado HeartPulse
 import RoleFilter from "@/components/RoleFilter";
 import VeterinarianDetailsDialog from "@/components/VeterinarianDetailsDialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -31,13 +31,15 @@ const mockVeterinarios: Veterinario[] = [
   { id: "V004", name: "Mariana Costa", crmv: "N/A", email: "mariana.c@example.com", phone: "(11) 91234-5678", role: "Recepcionista" },
   { id: "V005", name: "Fernando Alves", crmv: "N/A", email: "fernando.a@example.com", phone: "(21) 98765-4321", role: "Gerente" },
   { id: "V006", name: "Lucas Pereira", crmv: "CRMV-SP 98765", email: "lucas.p@example.com", phone: "(11) 97654-3210", role: "Estagiário" },
+  { id: "V007", name: "Sofia Mendes", crmv: "N/A", email: "sofia.m@example.com", phone: "(11) 96543-2109", role: "Enfermeiro" }, // Novo enfermeiro
 ];
 
 const roleIconMap: { [key: string]: React.ElementType } = {
   Veterinário: Stethoscope,
   Recepcionista: User,
   Gerente: Briefcase,
-  Estagiário: GraduationCap, // Ícone atualizado aqui
+  Estagiário: GraduationCap,
+  Enfermeiro: HeartPulse, // Novo ícone para Enfermeiro
   Outros: IdCard,
 };
 
