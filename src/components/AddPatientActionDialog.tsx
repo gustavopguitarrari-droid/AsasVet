@@ -66,7 +66,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Adicionar Ação para {patientName}</DialogTitle>
           <DialogDescription>
-            Agendamento para {date instanceof Date && isValid(date) ? format(date, "PPP", { locale: ptBR }) : "Data inválida"} às {hour || "Hora inválida"}:00
+            Agendamento para {date ? date.toDateString() : "Data inválida"} às {hour || "Hora inválida"}:00
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
