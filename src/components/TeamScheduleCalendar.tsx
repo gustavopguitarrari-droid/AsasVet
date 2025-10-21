@@ -33,7 +33,6 @@ interface TeamScheduleCalendarProps {
 }
 
 // Custom header for the calendar to include month/year navigation
-// Mantido para referência, mas não será usado no DayPicker por enquanto
 const CustomCaption: React.FC<{
   displayMonth: Date;
   goToMonth: (month: Date) => void;
@@ -56,19 +55,6 @@ const CustomCaption: React.FC<{
     </div>
   );
 };
-
-// DayContent para referência, não será usado no DayPicker por enquanto
-const DayContentWithBadges: DateFormatter = (day) => {
-  // Esta função não será usada diretamente no DayPicker por enquanto
-  // para simplificar a depuração.
-  return (
-    <div className="relative h-full w-full flex flex-col items-center justify-start p-1">
-      <span className="text-sm font-medium">{format(day, "d")}</span>
-      {/* Badges removidos temporariamente */}
-    </div>
-  );
-};
-
 
 const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinarians }) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
@@ -131,6 +117,26 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
     setEditingDaySchedule(Array.from(currentVets)); // Update dialog's state immediately
   };
 
+  const DayContent: DateFormatter = (day) => {
+    const dayKey = format(day, "yyyy-MM-dd");
+    const assignedVets = schedule.get(dayKey) || [];
+
+    return (
+      <div className="relative h-full w-full flex flex-col items-center justify-start p-1">
+        <span className="text-sm font-medium">{format(day, "d")}</span>
+        {assignedVets.length > 0 && (
+          <div className="flex flex-wrap justify-center gap-1 mt-1">
+            {assignedVets.map((vetName, index) => (
+              <Badge key={index} variant="secondary" className="h-auto px-1 py-0.5 text-xs leading-none whitespace-nowrap">
+                {vetName.split(' ')[0]} {/* Show only first name */}
+              </Badge>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="w-full max-w-full overflow-x-auto">
       <div className="rounded-md border p-4 bg-background shadow-sm">
@@ -143,11 +149,10 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
           showOutsideDays
           fixedWeeks
           locale={ptBR}
-          // Removendo as props 'components' para depuração
-          // components={{
-          //   Caption: CustomCaption,
-          //   DayContent: DayContent,
-          // }}
+          components={{
+            Caption: CustomCaption,
+            DayContent: DayContent,
+          }}
           classNames={{
             root: "w-full",
             months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
