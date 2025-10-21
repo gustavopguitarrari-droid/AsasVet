@@ -1,9 +1,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search } from "lucide-react";
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History } from "lucide-react"; // Adicionado History icon
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
+import InternmentHistoryDialog from "@/components/InternmentHistoryDialog"; // Importa o novo componente
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -55,18 +56,19 @@ const statusBadgeColorMap: Record<InternedPatient["status"], string> = {
   "Em Observação": "bg-blue-500",
   "Estável": "bg-green-500",
   "Crítico": "bg-red-500",
-  "Alta": "bg-green-500", // Alterado para verde
-  "Óbito": "bg-red-500",   // Alterado para vermelho
+  "Alta": "bg-green-500",
+  "Óbito": "bg-red-500",
 };
 
 const Internacao = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState(false); // Novo estado para o diálogo de histórico
   const [selectedPatient, setSelectedPatient] = React.useState<InternedPatient | null>(null);
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
   const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
-  const [searchTerm, setSearchTerm] = React.useState<string>("");
+  // const [searchTerm, setSearchTerm] = React.useState<string>(""); // Search term agora é gerenciado dentro do InternmentHistoryDialog
 
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
@@ -192,38 +194,43 @@ const Internacao = () => {
     setIsDetailsDialogOpen(true);
   };
 
-  const filteredHistoryPatients = historyPatients.filter(patient =>
-    patient.petName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.species.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // const filteredHistoryPatients = historyPatients.filter(patient =>
+  //   patient.petName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   patient.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   patient.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   patient.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  //   patient.species.toLowerCase().includes(searchTerm.toLowerCase())
+  // ); // Removido, pois a busca agora é interna ao InternmentHistoryDialog
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Internação</h2>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="font-bold">
-              <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
-            <DialogHeader>
-              <DialogTitle>Internar Novo Paciente</DialogTitle>
-            </DialogHeader>
-            <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
-          </DialogContent>
-        </Dialog>
+        <div className="flex space-x-2"> {/* Agrupa os botões */}
+          <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
+            <History className="mr-2 h-4 w-4" /> Ver Histórico
+          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="font-bold">
+                <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
+              <DialogHeader>
+                <DialogTitle>Internar Novo Paciente</DialogTitle>
+              </DialogHeader>
+              <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+        <TabsList className="grid w-full grid-cols-2 h-auto p-1"> {/* Reduzido para 2 colunas */}
           <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
           <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
-          <TabsTrigger value="historico-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Histórico de Internados</TabsTrigger>
+          {/* <TabsTrigger value="historico-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Histórico de Internados</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="pacientes-internados" className="mt-4">
@@ -271,54 +278,7 @@ const Internacao = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="historico-internados" className="mt-4">
-          <div className="p-4 border rounded-md bg-background">
-            <h3 className="text-2xl font-semibold mb-4">Histórico de Pacientes Internados</h3>
-            <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Buscar no histórico..."
-                className="pl-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            {filteredHistoryPatients.length > 0 ? (
-              <ul className="space-y-4">
-                {filteredHistoryPatients.map((patient) => {
-                  const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
-                  const statusColorClass = statusBadgeColorMap[patient.status] || "bg-gray-500";
-                  const finalDate = patient.expectedDischargeDate || patient.admissionDate;
-
-                  return (
-                    <li key={patient.id} className="flex items-center p-4 border rounded-md shadow-sm bg-card text-card-foreground">
-                      <IconComponent className={cn("h-6 w-6 mr-4", speciesColorMap[patient.species])} />
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
-                        <p className="font-bold text-lg">{patient.petName}</p>
-                        <p className="text-muted-foreground flex items-center">
-                          <User className="h-4 w-4 mr-2" /> {patient.ownerName}
-                        </p>
-                        <p className="text-muted-foreground flex items-center">
-                          <Stethoscope className="h-4 w-4 mr-2" /> {patient.veterinarian}
-                        </p>
-                      </div>
-                      <div className="flex flex-col items-end ml-4">
-                        <Badge className={cn("text-white mb-1", statusColorClass)}>
-                          {patient.status}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground flex items-center">
-                          <CalendarDays className="h-4 w-4 mr-1" /> {finalDate}
-                        </span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <p className="text-muted-foreground">Nenhum paciente no histórico de internações que corresponda à sua busca.</p>
-            )}
-          </div>
-        </TabsContent>
+        {/* O conteúdo do histórico foi movido para o InternmentHistoryDialog */}
       </Tabs>
 
       <InternmentDetailsDialog
@@ -326,6 +286,12 @@ const Internacao = () => {
         isOpen={isDetailsDialogOpen}
         onClose={() => setIsDetailsDialogOpen(false)}
         onUpdate={handleUpdateInternment}
+      />
+
+      <InternmentHistoryDialog
+        isOpen={isHistoryDialogOpen}
+        onClose={() => setIsHistoryDialogOpen(false)}
+        historyPatients={historyPatients}
       />
     </div>
   );
