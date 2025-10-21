@@ -84,7 +84,7 @@ const Internacao = () => {
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
   const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
-  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
+  const [selectedDate, setSelectedDate] = React.useState<Date>(new Date()); // Alterado para sempre ser Date
   const [patientSearchTerm, setPatientSearchTerm] = React.useState<string>("");
 
   // Estados para o diálogo de adicionar ação
@@ -240,11 +240,11 @@ const Internacao = () => {
   }, [internedPatients]);
 
   const handlePreviousDay = () => {
-    setSelectedDate((prevDate) => (prevDate ? subDays(prevDate, 1) : undefined));
+    setSelectedDate((prevDate) => subDays(prevDate, 1)); // Não precisa de verificação de undefined
   };
 
   const handleNextDay = () => {
-    setSelectedDate((prevDate) => (prevDate ? addDays(prevDate, 1) : undefined));
+    setSelectedDate((prevDate) => addDays(prevDate, 1)); // Não precisa de verificação de undefined
   };
 
   const filteredInternedPatients = internedPatients.filter(patient =>
@@ -339,7 +339,7 @@ const Internacao = () => {
                   <Calendar
                     mode="single"
                     selected={selectedDate}
-                    onSelect={setSelectedDate}
+                    onSelect={(day) => setSelectedDate(day || new Date())} // Garante que selectedDate seja sempre Date
                     initialFocus
                     locale={ptBR}
                   />
