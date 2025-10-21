@@ -6,7 +6,7 @@ import InternmentForm, { InternmentFormValues } from "@/components/InternmentFor
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar componentes de Tabs
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -166,9 +166,10 @@ const Internacao = () => {
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+        <TabsList className="grid w-full grid-cols-3 h-auto p-1"> {/* Alterado para grid-cols-3 */}
           <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
           <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
+          <TabsTrigger value="historico-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Histórico de Internados</TabsTrigger> {/* Nova aba */}
         </TabsList>
 
         <TabsContent value="pacientes-internados" className="mt-4">
@@ -213,6 +214,13 @@ const Internacao = () => {
           <div className="p-4 border rounded-md bg-background">
             <h3 className="text-2xl font-semibold mb-4">Mapa de Execução</h3>
             <p className="text-muted-foreground">Conteúdo para o mapa de execução será adicionado aqui.</p>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="historico-internados" className="mt-4"> {/* Novo TabsContent */}
+          <div className="p-4 border rounded-md bg-background">
+            <h3 className="text-2xl font-semibold mb-4">Histórico de Pacientes Internados</h3>
+            <p className="text-muted-foreground">Esta aba exibirá o histórico de pacientes que já receberam alta ou foram a óbito.</p>
           </div>
         </TabsContent>
       </Tabs>
