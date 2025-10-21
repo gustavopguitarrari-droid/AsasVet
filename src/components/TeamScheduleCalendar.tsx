@@ -5,7 +5,7 @@ import { format, addMonths, subMonths } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import { DayPicker, DateFormatter } from "react-day-picker";
-import "react-day-picker/dist/style.css"; // Garantindo que os estilos padrão sejam importados
+import "react-day-picker/dist/style.css"; // Importa os estilos base do react-day-picker
 
 import { Button } from "@/components/ui/button";
 import {
@@ -36,54 +36,39 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [editingDaySchedule, setEditingDaySchedule] = useState<string[]>([]); // Vets assigned to the selected day
+  const [editingDaySchedule, setEditingDaySchedule] = useState<string[]>([]);
+  
+  // Estado para armazenar a escala, usando Map para melhor performance e clareza
   const [schedule, setSchedule] = useState<Map<string, string[]>>(() => {
-    // Initialize schedule from localStorage or with mock data
     if (typeof window !== 'undefined') {
       const savedSchedule = localStorage.getItem('teamSchedule');
       if (savedSchedule) {
         try {
+          // Converte a string JSON de volta para um Map
           return new Map(JSON.parse(savedSchedule));
         } catch (e) {
-          console.error("Failed to parse saved schedule from localStorage", e);
+          console.error("Erro ao carregar a escala do localStorage:", e);
         }
       }
     }
-    // Mock initial schedule if no saved data or parsing failed
-    const initialSchedule = new Map<string, string[]>();
-    const today = new Date();
-    const nextMonthDay = addMonths(today, 1);
-    const twoMonthsLaterDay = addMonths(today, 2);
-
-    if (veterinarians.length >= 2) {
-      initialSchedule.set(format(today, "yyyy-MM-dd"), [veterinarians[0].name, veterinarians[1].name]);
-    }
-    if (veterinarians.length >= 1) {
-      initialSchedule.set(format(nextMonthDay, "yyyy-MM-dd"), [veterinarians[2]?.name || veterinarians[0].name]);
-    }
-    if (veterinarians.length >= 2) {
-      initialSchedule.set(format(twoMonthsLaterDay, "yyyy-MM-dd"), [veterinarians[0].name, veterinarians[2]?.name || veterinarians[1].name]);
-    }
-    return initialSchedule;
+    // Retorna um Map vazio se não houver dados salvos ou se houver erro
+    return new Map<string, string[]>();
   });
 
-  // Save schedule to localStorage whenever it changes
+  // Efeito para salvar a escala no localStorage sempre que ela mudar
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Converte o Map para um array de arrays para poder ser serializado em JSON
       localStorage.setItem('teamSchedule', JSON.stringify(Array.from(schedule.entries())));
     }
   }, [schedule]);
 
   const handleDayClick = (day: Date | undefined) => {
-    console.log("Day clicked:", day); // Debug log
     if (day) {
       setSelectedDay(day);
       const dayKey = format(day, "yyyy-MM-dd");
-      console.log("Day key:", dayKey); // Debug log
       setEditingDaySchedule(schedule.get(dayKey) || []);
-      console.log("Editing day schedule:", schedule.get(dayKey) || []); // Debug log
       setIsDialogOpen(true);
-      console.log("Dialog should be open."); // Debug log
     }
   };
 
@@ -103,13 +88,13 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
     if (currentVets.size > 0) {
       newSchedule.set(dayKey, Array.from(currentVets));
     } else {
-      newSchedule.delete(dayKey);
+      newSchedule.delete(dayKey); // Remove a entrada se não houver veterinários para o dia
     }
     setSchedule(newSchedule);
-    setEditingDaySchedule(Array.from(currentVets)); // Update dialog's state immediately
+    setEditingDaySchedule(Array.from(currentVets)); // Atualiza o estado do diálogo imediatamente
   };
 
-  // Custom header for the calendar to include month/year navigation
+  // Componente de cabeçalho personalizado para navegação entre meses
   const CustomCaption: React.FC<{
     displayMonth: Date;
     goToMonth: (month: Date) => void;
@@ -133,23 +118,21 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
     );
   };
 
-  // DayContent para exibir o número do dia e os nomes dos veterinários
+  // Conteúdo personalizado para cada dia do calendário
   const DayContent: DateFormatter = (day) => {
     const dayKey = format(day, "yyyy-MM-dd");
     const vetsOnDuty = schedule.get(dayKey) || [];
-    console.log(`Rendering day ${format(day, "d")}. Vets:`, vetsOnDuty); // Debug log
 
     return (
       <div className="relative h-full w-full flex flex-col items-center justify-start p-1">
         <span className="text-sm font-medium">{format(day, "d")}</span>
-        {/* Temporariamente removido a renderização dos badges para depuração */}
-        {/* <div className="flex flex-wrap justify-center gap-0.5 mt-1">
+        <div className="flex flex-wrap justify-center gap-0.5 mt-1">
           {vetsOnDuty.map((vetName, index) => (
             <Badge key={index} variant="secondary" className="text-[0.6rem] h-auto px-1 py-0.5 leading-none">
-              {vetName.split(' ')[0]}
+              {vetName.split(' ')[0]} {/* Mostra apenas o primeiro nome */}
             </Badge>
           ))}
-        </div> */}
+        </div>
       </div>
     );
   };
