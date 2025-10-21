@@ -75,11 +75,15 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
   }, [schedule]);
 
   const handleDayClick = (day: Date | undefined) => {
+    console.log("Day clicked:", day); // Debug log
     if (day) {
       setSelectedDay(day);
       const dayKey = format(day, "yyyy-MM-dd");
+      console.log("Day key:", dayKey); // Debug log
       setEditingDaySchedule(schedule.get(dayKey) || []);
+      console.log("Editing day schedule:", schedule.get(dayKey) || []); // Debug log
       setIsDialogOpen(true);
+      console.log("Dialog should be open."); // Debug log
     }
   };
 
@@ -133,17 +137,19 @@ const TeamScheduleCalendar: React.FC<TeamScheduleCalendarProps> = ({ veterinaria
   const DayContent: DateFormatter = (day) => {
     const dayKey = format(day, "yyyy-MM-dd");
     const vetsOnDuty = schedule.get(dayKey) || [];
+    console.log(`Rendering day ${format(day, "d")}. Vets:`, vetsOnDuty); // Debug log
 
     return (
       <div className="relative h-full w-full flex flex-col items-center justify-start p-1">
         <span className="text-sm font-medium">{format(day, "d")}</span>
-        <div className="flex flex-wrap justify-center gap-0.5 mt-1">
+        {/* Temporariamente removido a renderização dos badges para depuração */}
+        {/* <div className="flex flex-wrap justify-center gap-0.5 mt-1">
           {vetsOnDuty.map((vetName, index) => (
             <Badge key={index} variant="secondary" className="text-[0.6rem] h-auto px-1 py-0.5 leading-none">
-              {vetName.split(' ')[0]} {/* Mostra apenas o primeiro nome */}
+              {vetName.split(' ')[0]}
             </Badge>
           ))}
-        </div>
+        </div> */}
       </div>
     );
   };
