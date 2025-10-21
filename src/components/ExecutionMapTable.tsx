@@ -139,32 +139,41 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                     return (
                       <TableCell key={`${patient.id}-${hour}`} className="text-center p-1.5 relative">
                         {actionsForSlot.length > 0 ? (
-                          <div className="flex flex-col items-center justify-center space-y-1">
-                            {actionsForSlot.map((action) => {
-                              const ActionIcon = actionTypeIconMap[action.type] || FlaskConical;
-                              return (
-                                <Tooltip key={action.id} delayDuration={0}>
-                                  <TooltipTrigger asChild>
-                                    <Badge variant="secondary" className="h-6 w-6 p-0 flex items-center justify-center">
-                                      <ActionIcon className="h-4 w-4" />
-                                    </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent side="bottom">
-                                    {action.type}: {action.description}
-                                  </TooltipContent>
-                                </Tooltip>
-                              );
-                            })}
+                          <div className="flex items-center justify-center space-x-1">
+                            <Tooltip delayDuration={0}>
+                              <TooltipTrigger asChild>
+                                <Badge
+                                  className={cn(
+                                    "h-7 w-7 p-0 flex items-center justify-center rounded-full",
+                                    "bg-primary text-primary-foreground cursor-pointer"
+                                  )}
+                                >
+                                  {actionsForSlot.length}
+                                </Badge>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom" className="max-w-xs">
+                                <p className="font-semibold mb-1">Ações para {patient.petName} às {hour}:00</p>
+                                {actionsForSlot.map((action) => {
+                                  const ActionIcon = actionTypeIconMap[action.type] || FlaskConical;
+                                  return (
+                                    <div key={action.id} className="flex items-center text-sm mt-1">
+                                      <ActionIcon className="h-4 w-4 mr-2 text-muted-foreground" />
+                                      <span>{action.type}: {action.description}</span>
+                                    </div>
+                                  );
+                                })}
+                              </TooltipContent>
+                            </Tooltip>
                             <Tooltip delayDuration={0}>
                               <TooltipTrigger asChild>
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-6 w-6 group relative rounded-md border-dashed border-muted-foreground/50 bg-background hover:bg-accent/50 transition-colors duration-200"
+                                  className="h-6 w-6 rounded-full text-primary hover:bg-accent/50 transition-colors duration-200"
                                   onClick={() => handleAddAction(patient, hour)}
                                 >
-                                  <Plus className="h-3 w-3 text-primary opacity-100 group-hover:opacity-100 transition-opacity duration-200" />
-                                  <span className="sr-only">Adicionar Ação</span>
+                                  <Plus className="h-4 w-4" />
+                                  <span className="sr-only">Adicionar Mais Ações</span>
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent side="bottom">
