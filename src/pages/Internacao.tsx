@@ -235,7 +235,6 @@ const Internacao = () => {
     setIsDetailsDialogOpen(true);
   };
 
-  // AQUI ESTÁ A MUDANÇA: patientsForExecutionMap agora retorna todos os pacientes internados
   const patientsForExecutionMap = React.useMemo(() => {
     return internedPatients;
   }, [internedPatients]);
@@ -282,10 +281,21 @@ const Internacao = () => {
     }
   };
 
+  const getPageTitle = () => {
+    switch (activeTab) {
+      case "pacientes-internados":
+        return "Pacientes Internados";
+      case "mapa-execucao":
+        return "Mapa de Execução";
+      default:
+        return "Internação";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Internação</h2>
+        <h2 className="text-3xl font-bold">{getPageTitle()}</h2> {/* Título dinâmico aqui */}
         {activeTab === "pacientes-internados" && (
           <div className="flex space-x-2">
             <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
