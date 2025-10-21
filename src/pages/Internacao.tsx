@@ -1,19 +1,19 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon } from "lucide-react"; // Importar CalendarIcon
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react"; // Importar CalendarIcon, ChevronLeft, ChevronRight
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
 import InternmentHistoryDialog from "@/components/InternmentHistoryDialog";
 import ExecutionMapTable from "@/components/ExecutionMapTable";
-import { format, isSameDay, parseISO, isBefore, isAfter, isEqual } from "date-fns";
+import { format, isSameDay, parseISO, isBefore, isAfter, isEqual, addDays, subDays } from "date-fns"; // Importar addDays e subDays
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -217,6 +217,14 @@ const Internacao = () => {
     });
   }, [internedPatients, selectedDate]);
 
+  const handlePreviousDay = () => {
+    setSelectedDate((prevDate) => (prevDate ? subDays(prevDate, 1) : undefined));
+  };
+
+  const handleNextDay = () => {
+    setSelectedDate((prevDate) => (prevDate ? addDays(prevDate, 1) : undefined));
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -287,7 +295,10 @@ const Internacao = () => {
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
             <h3 className="text-2xl font-semibold mb-4">Mapa de Execução Diário</h3>
-            <div className="flex justify-center">
+            <div className="flex justify-center items-center space-x-2"> {/* Adicionado flexbox para alinhar */}
+              <Button variant="outline" size="icon" onClick={handlePreviousDay}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -311,6 +322,9 @@ const Internacao = () => {
                   />
                 </PopoverContent>
               </Popover>
+              <Button variant="outline" size="icon" onClick={handleNextDay}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
             <ExecutionMapTable patients={patientsForExecutionMap} />
           </div>
