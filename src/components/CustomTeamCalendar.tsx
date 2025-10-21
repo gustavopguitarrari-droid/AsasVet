@@ -153,7 +153,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
                 key={dayKey}
                 variant="ghost"
                 className={cn(
-                  "h-24 w-full flex flex-col items-center justify-start p-1 text-sm font-normal relative",
+                  "h-24 w-full flex flex-col p-1 text-sm font-normal relative", // Removido items-center justify-start
                   "hover:bg-accent hover:text-accent-foreground",
                   isCurrentDay && "bg-accent text-accent-foreground",
                   isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
@@ -161,11 +161,11 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
                 )}
                 onClick={() => handleDayClick(day)}
               >
-                <span className="font-medium">{format(day, "d")}</span>
-                <div className="flex flex-wrap justify-center gap-0.5 mt-1">
+                <span className="absolute top-2 right-2 font-bold">{format(day, "d")}</span>
+                <div className="flex flex-wrap justify-center gap-0.5 mt-auto mb-1"> {/* Adicionado mt-auto para empurrar os badges para baixo */}
                   {vetsOnDuty.map((vetName, index) => (
                     <Badge key={index} variant="secondary" className="text-[0.6rem] h-auto px-1 py-0.5 leading-none">
-                      {vetName} {/* Alterado para mostrar o nome completo */}
+                      {vetName}
                     </Badge>
                   ))}
                 </div>
@@ -195,7 +195,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
                     editingDaySchedule.includes(vet.name) ? "bg-primary text-primary-foreground" : ""
                   )}
                 >
-                  {vet.name} {/* Alterado para mostrar o nome completo */}
+                  {vet.name}
                   {editingDaySchedule.includes(vet.name) ? <X className="h-3 w-3" /> : <Plus className="h-3 w-3" />}
                 </Button>
               ))}
