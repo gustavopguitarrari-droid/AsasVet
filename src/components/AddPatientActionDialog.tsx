@@ -19,7 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { DialogFooter, DialogHeader, DialogTitle, DialogDescription, DialogContent } from "@/components/ui/dialog";
+import { DialogFooter, DialogHeader, DialogTitle, DialogDescription, DialogContent, Dialog } from "@/components/ui/dialog";
 
 const formSchema = z.object({
   description: z.string().min(1, "A descrição da ação é obrigatória."),
@@ -66,7 +66,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Adicionar Ação para {patientName}</DialogTitle>
           <DialogDescription>
-            Agendamento para {date ? date.toDateString() : "Data inválida"} às {hour || "Hora inválida"}:00
+            Agendamento para {date instanceof Date && isValid(date) ? format(date, "PPP", { locale: ptBR }) : "Data inválida"} às {hour || "Hora inválida"}:00
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>

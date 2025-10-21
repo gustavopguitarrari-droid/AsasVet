@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
@@ -259,11 +261,16 @@ const Internacao = () => {
 
   // Funções para o diálogo de adicionar ação
   const handleOpenAddActionDialog = (patientId: string, patientName: string, date: Date, hour: string) => {
-    setActionPatientId(patientId);
-    setActionPatientName(patientName);
-    setActionDate(date);
-    setActionHour(hour);
-    setIsAddActionDialogOpen(true);
+    try {
+      setActionPatientId(patientId);
+      setActionPatientName(patientName);
+      setActionDate(date);
+      setActionHour(hour);
+      setIsAddActionDialogOpen(true);
+    } catch (error) {
+      console.error("Erro ao abrir o diálogo de adicionar ação:", error);
+      // Adicione um toast de erro aqui se desejar
+    }
   };
 
   const handleAddPatientAction = (data: PatientActionFormValues) => {
@@ -442,16 +449,19 @@ const Internacao = () => {
         historyPatients={historyPatients}
       />
 
-      {isAddActionDialogOpen && actionPatientId && actionPatientName && actionDate && actionHour && (
-        <AddPatientActionDialog
-          isOpen={isAddActionDialogOpen}
-          onClose={() => setIsAddActionDialogOpen(false)}
-          onSubmit={handleAddPatientAction}
-          patientName={actionPatientName}
-          date={actionDate}
-          hour={actionHour}
-        />
-      )}
+      {/* Diálogo para adicionar ação, agora com controle explícito de Dialog */}
+      <Dialog open={isAddActionDialogOpen} onOpenChange={setIsAddActionDialogOpen}>
+        {actionPatientId && actionPatientName && actionDate && actionHour && (
+          <AddPatientActionDialog
+            isOpen={isAddActionDialogOpen}
+            onClose={() => setIsAddActionDialogOpen(false)}
+            onSubmit={handleAddPatientAction}
+            patientName={actionPatientName}
+            date={actionDate}
+            hour={actionHour}
+          />
+        )}
+      </Dialog>
     </div>
   );
 };
