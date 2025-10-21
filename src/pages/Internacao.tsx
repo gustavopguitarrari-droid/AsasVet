@@ -1,12 +1,13 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope } from "lucide-react"; // Adicionado CalendarDays, User, Stethoscope para o histórico
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge"; // Importar Badge para o histórico
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -16,7 +17,7 @@ interface InternedPatient {
   ownerName: string;
   reason: string;
   admissionDate: string;
-  expectedDischargeDate?: string;
+  expectedDischargeDate?: string; // Pode ser a data de alta/óbito
   veterinarian: string;
   status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
   species: string;
@@ -49,11 +50,20 @@ const riskColorMap: Record<RiskLevel, string> = {
   "Emergência": "bg-red-500",
 };
 
+const statusBadgeColorMap: Record<InternedPatient["status"], string> = {
+  "Em Observação": "bg-blue-500",
+  "Estável": "bg-green-500",
+  "Crítico": "bg-red-500",
+  "Alta": "bg-gray-500",
+  "Óbito": "bg-black",
+};
+
 const Internacao = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
   const [selectedPatient, setSelectedPatient] = React.useState<InternedPatient | null>(null);
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
+  const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]); // Novo estado para histórico
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
 
   React.useEffect(() => {
@@ -115,12 +125,17 @@ const Internacao = () => {
         risk: "Sem risco",
       },
     ];
-    setInternedPatients(mockPatients);
+
+    // Separar pacientes ativos e históricos
+    const active = mockPatients.filter(p => p.status !== "Alta" && p.status !== "Óbito");
+    const history = mockPatients.filter(p => p.status === "Alta" || p.status === "Óbito");
+    setInternedPatients(active);
+    setHistoryPatients(history);
   }, []);
 
   const handleAddInternment = (data: InternmentFormValues) => {
     const newPatient: InternedPatient = {
-      id: `INT${(internedPatients.length + 1).toString().padStart(3, '0')}`,
+      id: `INT${(internedPatients.length + historyPatients.length + 1).toString().padStart(3, '0')}`,
       petName: data.petName,
       ownerName: data.ownerName,
       reason: data.reason,
@@ -136,9 +151,16 @@ const Internacao = () => {
   };
 
   const handleUpdateInternment = (updatedPatient: InternedPatient) => {
-    setInternedPatients((prev) =>
-      prev.map((patient) => (patient.id === updatedPatient.id ? updatedPatient : patient))
-    );
+    if (updatedPatient.status === "Alta" || updatedPatient.status === "Óbito") {
+      // Remove do internedPatients e adiciona ao historyPatients
+      setInternedPatients((prev) => prev.filter((p) => p.id !== updatedPatient.id));
+      setHistoryPatients((prev) => [...prev, updatedPatient]);
+    } else {
+      // Apenas atualiza se o status não for de finalização
+      setInternedPatients((prev) =>
+        prev.map((patient) => (patient.id === updatedPatient.id ? updatedPatient : patient))
+      );
+    }
   };
 
   const handleCardClick = (patient: InternedPatient) => {
@@ -166,10 +188,10 @@ const Internacao = () => {
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-auto p-1"> {/* Alterado para grid-cols-3 */}
+        <TabsList className="grid w-full grid-cols-3 h-auto p-1">
           <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
           <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
-          <TabsTrigger value="historico-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Histórico de Internados</TabsTrigger> {/* Nova aba */}
+          <TabsTrigger value="historico-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Histórico de Internados</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pacientes-internados" className="mt-4">
@@ -217,10 +239,43 @@ const Internacao = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="historico-internados" className="mt-4"> {/* Novo TabsContent */}
+        <TabsContent value="historico-internados" className="mt-4">
           <div className="p-4 border rounded-md bg-background">
             <h3 className="text-2xl font-semibold mb-4">Histórico de Pacientes Internados</h3>
-            <p className="text-muted-foreground">Esta aba exibirá o histórico de pacientes que já receberam alta ou foram a óbito.</p>
+            {historyPatients.length > 0 ? (
+              <ul className="space-y-4">
+                {historyPatients.map((patient) => {
+                  const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
+                  const statusColorClass = statusBadgeColorMap[patient.status] || "bg-gray-500";
+                  const finalDate = patient.expectedDischargeDate || patient.admissionDate; // Usa a data de alta/óbito se disponível
+
+                  return (
+                    <li key={patient.id} className="flex items-center p-4 border rounded-md shadow-sm bg-card text-card-foreground">
+                      <IconComponent className={cn("h-6 w-6 mr-4", speciesColorMap[patient.species])} />
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
+                        <p className="font-bold text-lg">{patient.petName}</p>
+                        <p className="text-muted-foreground flex items-center">
+                          <User className="h-4 w-4 mr-2" /> {patient.ownerName}
+                        </p>
+                        <p className="text-muted-foreground flex items-center">
+                          <Stethoscope className="h-4 w-4 mr-2" /> {patient.veterinarian}
+                        </p>
+                      </div>
+                      <div className="flex flex-col items-end ml-4">
+                        <Badge className={cn("text-white mb-1", statusColorClass)}>
+                          {patient.status}
+                        </Badge>
+                        <span className="text-sm text-muted-foreground flex items-center">
+                          <CalendarDays className="h-4 w-4 mr-1" /> {finalDate}
+                        </span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground">Nenhum paciente no histórico de internações.</p>
+            )}
           </div>
         </TabsContent>
       </Tabs>
