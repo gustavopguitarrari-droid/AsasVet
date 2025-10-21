@@ -3,7 +3,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import *s z from "zod";
 import { format, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -35,8 +35,8 @@ interface AddPatientActionDialogProps {
   onClose: () => void;
   onSubmit: (data: PatientActionFormValues) => void;
   patientName: string;
-  date: Date;
-  hour: string;
+  date: Date | null; // Alterado para permitir null
+  hour: string | null; // Alterado para permitir null
 }
 
 const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
@@ -66,7 +66,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Adicionar Ação para {patientName}</DialogTitle>
           <DialogDescription>
-            Agendamento para {date instanceof Date && isValid(date) ? format(date, "PPP", { locale: ptBR }) : "Data inválida"} às {hour || "Hora inválida"}:00
+            Agendamento para {date && isValid(date) ? format(date, "PPP", { locale: ptBR }) : "Data inválida"} às {hour || "Hora inválida"}:00
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
