@@ -207,7 +207,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
   try {
     return (
       <Dialog open={isOpen} onOpenChange={handleCancelAndClose}>
-        <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col"> {/* Increased max-width */}
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] flex flex-col"> {/* Increased max-width to 90vw */}
           <DialogHeader>
             <DialogTitle>Gerenciar Ações para {patientName}</DialogTitle>
             <DialogDescription>
