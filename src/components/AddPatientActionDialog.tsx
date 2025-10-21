@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format, isValid, addDays, parseISO, isEqual, isAfter, isBefore } from "date-fns"; // Import addDays, parseISO, isEqual, isAfter, isBefore
+import { format, isValid, addDays, parseISO, isEqual, isAfter, isBefore } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Plus, Trash2, Syringe, Utensils, Eye, FlaskConical } from "lucide-react";
 
@@ -215,7 +215,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1"> {/* Removed overflow-hidden */}
             {/* Left side: Form to add new action */}
             <div className="space-y-4 overflow-y-auto pr-2">
               <Form {...form}>
