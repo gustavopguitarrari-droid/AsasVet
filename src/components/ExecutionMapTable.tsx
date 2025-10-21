@@ -98,9 +98,11 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
   return (
     <div className="overflow-x-auto overflow-y-auto max-h-[60vh] rounded-md border">
       <Table className="min-w-full divide-y divide-border">
-        <TableHeader>
+        <TableHeader className="sticky top-0 z-20"> {/* Adicionado sticky top-0 z-20 */}
           <TableRow className="bg-secondary">
-            <TableHead className="sticky left-0 bg-secondary z-10 w-[250px] text-lg font-bold">Paciente</TableHead> {/* Largura aumentada */}
+            <TableHead className="sticky left-0 bg-secondary z-30 w-[250px] text-lg font-bold border-r"> {/* Adicionado sticky left-0 z-30 e border-r */}
+              Paciente
+            </TableHead>
             {hourlySlots.map((hour) => (
               <TableHead key={hour} className="text-center w-[40px] p-1 text-sm font-semibold text-muted-foreground">
                 {hour}
@@ -117,7 +119,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
 
               return (
                 <TableRow key={patient.id} className="hover:bg-muted/50 transition-colors duration-150">
-                  <TableCell className="sticky left-0 bg-card font-semibold py-4 w-[250px] border-r relative pl-6"> {/* Largura aumentada, adicionado relative e ajustado padding-left */}
+                  <TableCell className="sticky left-0 bg-card font-semibold py-4 w-[250px] border-r relative pl-6 z-10"> {/* Adicionado sticky left-0 z-10 */}
                     {/* Faixa de risco */}
                     <div className={cn("absolute top-0 left-0 h-full w-2 rounded-l-md", riskStripeColorClass)}></div>
 
