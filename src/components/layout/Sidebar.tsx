@@ -101,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                   "text-sidebar-foreground",
                   "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   isCollapsed
-                    ? "h-10 w-10 rounded-full flex items-center justify-center"
+                    ? "h-12 w-12 rounded-full flex items-center justify-center" // Aumentado para h-12 w-12
                     : "w-full justify-start text-xl",
                   location.pathname === item.path && "bg-sidebar-primary text-sidebar-primary-foreground" // Usando cores dinâmicas
                 )}
@@ -110,11 +110,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                   <div
                     className={cn(
                       "flex items-center justify-center",
-                      !isCollapsed && "w-10 h-10 rounded-full mr-3",
+                      !isCollapsed && "w-12 h-12 rounded-full mr-3", // Aumentado para w-12 h-12
                       location.pathname === item.path && "bg-sidebar-primary" // Usando cores dinâmicas
                     )}
                   >
-                    <item.icon className="h-8 w-8" strokeWidth={2.5} />
+                    <item.icon className="h-7 w-7" strokeWidth={3} /> {/* Aumentado para h-7 w-7 e strokeWidth={3} */}
                   </div>
                   {!isCollapsed && (
                     <span className={cn(location.pathname === item.path && "text-sidebar-primary-foreground")}>
