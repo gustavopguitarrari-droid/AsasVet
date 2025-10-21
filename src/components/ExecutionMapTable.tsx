@@ -67,7 +67,7 @@ const riskColorMap: Record<RiskLevel, string> = {
   "Emergência": "bg-red-500",
 };
 
-// Mapeamento de ícones para tipos de ação (mantido para o Tooltip)
+// Mapeamento de ícones para tipos de ação
 const actionTypeIconMap: Record<PatientAction["type"], React.ElementType> = {
   Medicação: Syringe,
   Alimentação: Utensils,
@@ -138,41 +138,50 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
 
                     return (
                       <TableCell key={`${patient.id}-${hour}`} className="text-center p-1.5 relative">
-                        <div className="flex flex-col items-center justify-center space-y-1">
-                          {actionsForSlot.length > 0 && (
+                        {actionsForSlot.length > 0 ? (
+                          <div className="flex flex-col items-center justify-center space-y-1">
+                            {actionsForSlot.map((action) => {
+                              const ActionIcon = actionTypeIconMap[action.type] || FlaskConical;
+                              return (
+                                <Tooltip key={action.id} delayDuration={0}>
+                                  <TooltipTrigger asChild>
+                                    <Badge variant="secondary" className="h-6 w-6 p-0 flex items-center justify-center">
+                                      <ActionIcon className="h-4 w-4" />
+                                    </Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">
+                                    {action.type}: {action.description}
+                                  </TooltipContent>
+                                </Tooltip>
+                              );
+                            })}
                             <Tooltip delayDuration={0}>
                               <TooltipTrigger asChild>
-                                <Badge
-                                  variant="default"
-                                  className="h-6 w-6 p-0 flex items-center justify-center rounded-full text-primary-foreground font-bold text-xs"
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 group relative rounded-md border-dashed border-muted-foreground/50 bg-background hover:bg-accent/50 transition-colors duration-200"
+                                  onClick={() => handleAddAction(patient, hour)}
                                 >
-                                  {actionsForSlot.length}
-                                </Badge>
+                                  <Plus className="h-3 w-3 text-primary opacity-100 group-hover:opacity-100 transition-opacity duration-200" />
+                                  <span className="sr-only">Adicionar Ação</span>
+                                </Button>
                               </TooltipTrigger>
                               <TooltipContent side="bottom">
-                                <p className="font-semibold mb-1">{actionsForSlot.length} Ações:</p>
-                                <ul className="list-disc pl-4 text-sm">
-                                  {actionsForSlot.map((action) => (
-                                    <li key={action.id}>
-                                      <span className="font-medium">{action.type}:</span> {action.description}
-                                    </li>
-                                  ))}
-                                </ul>
+                                Adicionar mais ações para {patient.petName} às {hour}:00
                               </TooltipContent>
                             </Tooltip>
-                          )}
+                          </div>
+                        ) : (
                           <Tooltip delayDuration={0}>
                             <TooltipTrigger asChild>
                               <Button
-                                variant="ghost"
+                                variant="outline"
                                 size="icon"
-                                className={cn(
-                                  "h-8 w-8 group relative rounded-md border-dashed border-muted-foreground/50 bg-background hover:bg-accent/50 transition-colors duration-200",
-                                  actionsForSlot.length > 0 ? "h-6 w-6" : "" // Ajusta o tamanho se já houver ações
-                                )}
+                                className="h-8 w-8 group relative rounded-md border-dashed border-muted-foreground/50 bg-background hover:bg-accent/50 transition-colors duration-200"
                                 onClick={() => handleAddAction(patient, hour)}
                               >
-                                <Plus className={cn("h-4 w-4 text-primary", actionsForSlot.length > 0 ? "h-3 w-3" : "opacity-0 group-hover:opacity-100")} />
+                                <Plus className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                                 <span className="sr-only">Adicionar Ação</span>
                               </Button>
                             </TooltipTrigger>
@@ -180,7 +189,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                               Adicionar ação para {patient.petName} às {hour}:00
                             </TooltipContent>
                           </Tooltip>
-                        </div>
+                        )}
                       </TableCell>
                     );
                   })}
