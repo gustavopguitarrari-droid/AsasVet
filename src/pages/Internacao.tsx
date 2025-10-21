@@ -286,13 +286,13 @@ const Internacao = () => {
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
             <h3 className="text-2xl font-semibold mb-4">Mapa de Execução Diário</h3>
-            <div className="flex justify-end"> {/* Alinhado à direita */}
+            <div className="flex justify-center">
               <Calendar
                 mode="single"
                 selected={selectedDate}
                 onSelect={setSelectedDate}
                 locale={ptBR}
-                className="rounded-md border shadow-md max-w-sm" {/* Adicionado max-w-sm para torná-lo menor */}
+                className="rounded-md border shadow-md"
               />
             </div>
             <ExecutionMapTable patients={patientsForExecutionMap} />
