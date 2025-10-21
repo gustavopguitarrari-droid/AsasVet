@@ -30,15 +30,17 @@ interface Appointment {
   service: string;
   veterinarian: string;
   status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento"; // Adicionado 'Em Andamento'
+  completionDate?: string; // NOVO: Data de finalização/cancelamento
+  completionTime?: string; // NOVO: Hora de finalização/cancelamento
 }
 
 const mockAppointments: Appointment[] = [
   { id: "C001", date: "2024-10-26", time: "10:00", client: "João Silva", pet: "Rex", species: "Cachorro", service: "Consulta Geral", veterinarian: "Dr. Ana Paula", status: "Agendada" },
-  { id: "C002", date: "2024-10-26", time: "14:30", client: "Maria Souza", pet: "Miau", species: "Gato", service: "Vacinação", veterinarian: "Dr. Carlos Eduardo", status: "Realizada" },
-  { id: "C003", date: "2024-10-27", time: "09:00", client: "Pedro Santos", pet: "Pingo", species: "Pássaro", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Cancelada" },
+  { id: "C002", date: "2024-10-26", time: "14:30", client: "Maria Souza", pet: "Miau", species: "Gato", service: "Vacinação", veterinarian: "Dr. Carlos Eduardo", status: "Realizada", completionDate: "2024-10-26", completionTime: "15:00" },
+  { id: "C003", date: "2024-10-27", time: "09:00", client: "Pedro Santos", pet: "Pingo", species: "Pássaro", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Cancelada", completionDate: "2024-10-27", completionTime: "08:30" },
   { id: "C004", date: "2024-10-28", time: "11:00", client: "Ana Costa", pet: "Bob", species: "Cachorro", service: "Banho e Tosa", veterinarian: "Dr. Ana Paula", status: "Agendada" },
   { id: "C005", date: "2024-10-29", time: "16:00", client: "Carlos Lima", pet: "Luna", species: "Gato", service: "Consulta de Retorno", veterinarian: "Dr. Carlos Eduardo", status: "Em Andamento" }, // Exemplo de 'Em Andamento'
-  { id: "C006", date: "2024-10-25", time: "13:00", client: "Fernanda Reis", pet: "Thor", species: "Cachorro", service: "Cirurgia", veterinarian: "Dra. Beatriz Lima", status: "Realizada" },
+  { id: "C006", date: "2024-10-25", time: "13:00", client: "Fernanda Reis", pet: "Thor", species: "Cachorro", service: "Cirurgia", veterinarian: "Dra. Beatriz Lima", status: "Realizada", completionDate: "2024-10-25", completionTime: "14:30" },
   { id: "C007", date: "2024-10-30", time: "10:00", client: "Lucas Mendes", pet: "Nemo", species: "Peixe", service: "Consulta Geral", veterinarian: "Dr. Ana Paula", status: "Agendada" },
   { id: "C008", date: "2024-10-31", time: "15:00", client: "Mariana Santos", pet: "Pipoca", species: "Roedor", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Agendada" },
 ];
@@ -109,9 +111,17 @@ const Appointments = () => {
   };
 
   const handleCancelAppointment = (appointmentId: string) => {
+    const now = new Date();
     setAppointments((prev) =>
       prev.map((app) =>
-        app.id === appointmentId ? { ...app, status: "Cancelada" } : app
+        app.id === appointmentId
+          ? {
+              ...app,
+              status: "Cancelada",
+              completionDate: format(now, "yyyy-MM-dd"), // Define a data de cancelamento
+              completionTime: format(now, "HH:mm"),     // Define a hora de cancelamento
+            }
+          : app
       )
     );
   };
@@ -226,6 +236,8 @@ const Appointments = () => {
               {activeTab === "em-andamento" && <TableHead>Veterinário</TableHead>}
               {activeTab === "em-andamento" && <TableHead>Tempo de Consulta</TableHead>} {/* Nova coluna */}
               {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
+              {activeTab === "finalizadas" && <TableHead>Data Finalização</TableHead>} {/* NOVO */}
+              {activeTab === "finalizadas" && <TableHead>Hora Finalização</TableHead>} {/* NOVO */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -268,26 +280,30 @@ const Appointments = () => {
                       </>
                     )}
                     {activeTab === "finalizadas" && (
-                      <TableCell className="flex items-center">
-                        {appointment.veterinarian}
-                        {isCancelled && (
-                          <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
-                            Cancelada
-                          </Badge>
-                        )}
-                        {isRealizada && (
-                          <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
-                            Concluída
-                          </Badge>
-                        )}
-                      </TableCell>
+                      <>
+                        <TableCell className="flex items-center">
+                          {appointment.veterinarian}
+                          {isCancelled && (
+                            <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
+                              Cancelada
+                            </Badge>
+                          )}
+                          {isRealizada && (
+                            <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
+                              Concluída
+                            </Badge>
+                          )}
+                        </TableCell>
+                        <TableCell>{appointment.completionDate || "N/A"}</TableCell> {/* NOVO */}
+                        <TableCell>{appointment.completionTime || "N/A"}</TableCell> {/* NOVO */}
+                      </>
                     )}
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={activeTab === "em-andamento" ? 5 : 4} className="h-24 text-center">
+                <TableCell colSpan={activeTab === "em-andamento" ? 5 : (activeTab === "finalizadas" ? 7 : 4)} className="h-24 text-center">
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
