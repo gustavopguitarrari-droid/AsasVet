@@ -74,6 +74,7 @@ const Internacao = () => {
   const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
+  const [patientSearchTerm, setPatientSearchTerm] = React.useState<string>(""); // Novo estado para a pesquisa
 
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
@@ -234,6 +235,17 @@ const Internacao = () => {
     setSelectedDate((prevDate) => (prevDate ? addDays(prevDate, 1) : undefined));
   };
 
+  // Filtra os pacientes internados com base no termo de pesquisa
+  const filteredInternedPatients = internedPatients.filter(patient =>
+    patient.petName.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
+    patient.ownerName.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
+    patient.bayName.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
+    patient.veterinarian.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
+    patient.species.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
+    patient.status.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
+    patient.risk.toLowerCase().includes(patientSearchTerm.toLowerCase())
+  );
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -267,9 +279,19 @@ const Internacao = () => {
         <TabsContent value="pacientes-internados" className="mt-4">
           <div className="mt-8">
             <h3 className="text-2xl font-semibold mb-4">Pacientes Atualmente Internados</h3>
-            {internedPatients.length > 0 ? (
+            {/* Barra de pesquisa adicionada aqui */}
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar pacientes internados..."
+                className="pl-9"
+                value={patientSearchTerm}
+                onChange={(e) => setPatientSearchTerm(e.target.value)}
+              />
+            </div>
+            {filteredInternedPatients.length > 0 ? (
               <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {internedPatients.map((patient) => {
+                {filteredInternedPatients.map((patient) => {
                   const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
                   const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
                   const riskStripeColorClass = riskColorMap[patient.risk];
