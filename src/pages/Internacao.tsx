@@ -208,22 +208,21 @@ const Internacao = () => {
     setInternedPatients(active);
     setHistoryPatients(history);
 
-    // Mock de ações iniciais
-    const mockActions: PatientAction[] = [
-      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "10", description: "Administrar antibiótico", type: "Medicação", isCompleted: false, frequency: "BID" },
-      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "22", description: "Administrar antibiótico", type: "Medicação", isCompleted: false, frequency: "BID" },
-      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação", isCompleted: false, frequency: "TID" },
-      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "06", description: "Alimentação", type: "Alimentação", isCompleted: false, frequency: "TID" },
-      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "22", description: "Alimentação", type: "Alimentação", isCompleted: false, frequency: "TID" },
-      { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
-      { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "17", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
-      { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "23", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
-      { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "05", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
-      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-28", hour: "10", description: "Trocar curativo", type: "Medicação", isCompleted: false, frequency: "SID" },
-      { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-28", hour: "10", description: "Passeio", type: "Outro", isCompleted: false, frequency: "Outro" },
-    ];
-    setPatientActions(mockActions);
-
+    // Removido o mock de ações iniciais para que o diálogo comece em branco.
+    // const mockActions: PatientAction[] = [
+    //   { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "10", description: "Administrar antibiótico", type: "Medicação", isCompleted: false, frequency: "BID" },
+    //   { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "22", description: "Administrar antibiótico", type: "Medicação", isCompleted: false, frequency: "BID" },
+    //   { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação", isCompleted: false, frequency: "TID" },
+    //   { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "06", description: "Alimentação", type: "Alimentação", isCompleted: false, frequency: "TID" },
+    //   { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-27", hour: "22", description: "Alimentação", type: "Alimentação", isCompleted: false, frequency: "TID" },
+    //   { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
+    //   { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "17", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
+    //   { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "23", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
+    //   { id: generateUniqueActionId(), patientId: "INT002", date: "2024-10-27", hour: "05", description: "Verificar temperatura", type: "Observação", isCompleted: false, frequency: "QID" },
+    //   { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-28", hour: "10", description: "Trocar curativo", type: "Medicação", isCompleted: false, frequency: "SID" },
+    //   { id: generateUniqueActionId(), patientId: "INT001", date: "2024-10-28", hour: "10", description: "Passeio", type: "Outro", isCompleted: false, frequency: "Outro" },
+    // ];
+    setPatientActions([]); // Inicializa com um array vazio
   }, []);
 
   const handleAddInternment = (data: InternmentFormValues) => {
