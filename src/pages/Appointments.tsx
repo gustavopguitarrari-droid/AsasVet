@@ -222,7 +222,11 @@ const Appointments = () => {
               <TableHead>Paciente</TableHead>
               <TableHead>Tutor</TableHead>
               <TableHead>Serviço</TableHead>
-              {activeTab !== "em-espera" && <TableHead>Veterinário</TableHead>} {/* Condicional para Veterinário */}
+              {activeTab === "em-espera" ? (
+                <TableHead>Tempo de Espera</TableHead>
+              ) : (
+                <TableHead>Veterinário</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -231,7 +235,7 @@ const Appointments = () => {
                 const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
                 const isCancelled = activeTab === "finalizadas" && appointment.status === "Cancelada";
                 const isRealizada = activeTab === "finalizadas" && appointment.status === "Realizada";
-                const isEmAndamento = activeTab === "em-andamento" && appointment.status === "Em Andamento"; // Nova condição
+                const isEmAndamento = activeTab === "em-andamento" && appointment.status === "Em Andamento";
                 return (
                   <TableRow
                     key={appointment.id}
@@ -246,9 +250,21 @@ const Appointments = () => {
                     </TableCell>
                     <TableCell>{appointment.client}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
-                    {activeTab !== "em-espera" && ( // Condicional para Veterinário
+                    {activeTab === "em-espera" ? (
+                      <TableCell>
+                        <AppointmentChronometer date={appointment.date} time={appointment.time} />
+                      </TableCell>
+                    ) : (
                       <TableCell className="flex items-center">
                         {appointment.veterinarian}
+                        {isEmAndamento && (
+                          <>
+                            <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
+                              Iniciada
+                            </Badge>
+                            <AppointmentChronometer date={appointment.date} time={appointment.time} />
+                          </>
+                        )}
                         {isCancelled && (
                           <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
                             Cancelada
@@ -259,14 +275,6 @@ const Appointments = () => {
                             Concluída
                           </Badge>
                         )}
-                        {isEmAndamento && ( // Badge e Cronômetro para 'Em Andamento'
-                          <>
-                            <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
-                              Iniciada
-                            </Badge>
-                            <AppointmentChronometer date={appointment.date} time={appointment.time} />
-                          </>
-                        )}
                       </TableCell>
                     )}
                   </TableRow>
@@ -274,7 +282,7 @@ const Appointments = () => {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={activeTab === "em-espera" ? 3 : 4} className="h-24 text-center"> {/* Ajuste do colSpan */}
+                <TableCell colSpan={4} className="h-24 text-center">
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
