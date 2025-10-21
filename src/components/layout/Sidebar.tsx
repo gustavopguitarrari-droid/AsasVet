@@ -92,7 +92,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         )}
       >
         {!isCollapsed && "AsasVet"}{" "}
-        <PawPrint className={cn("h-9 w-9 text-white", !isCollapsed && "ml-2")} strokeWidth={2.5} />
+        <PawPrint className={cn("h-10 w-10 text-white", !isCollapsed && "ml-2")} strokeWidth={2.5} />
       </div>
       <nav className="flex-1 space-y-2">
         {navItems.map((item) => (
@@ -118,7 +118,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                       location.pathname === item.path && "bg-sidebar-primary" // Usando cores dinâmicas
                     )}
                   >
-                    <item.icon className="h-6 w-6" strokeWidth={2.5} />
+                    <item.icon className="h-8 w-8" strokeWidth={2.5} />
                   </div>
                   {!isCollapsed && (
                     <span className={cn(location.pathname === item.path && "text-sidebar-primary-foreground")}>
