@@ -54,7 +54,6 @@ const Internacao = () => {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
   const [selectedPatient, setSelectedPatient] = React.useState<InternedPatient | null>(null);
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
-  const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]); // Novo estado para histórico
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
 
   React.useEffect(() => {
@@ -115,43 +114,13 @@ const Internacao = () => {
         species: "Peixe",
         risk: "Sem risco",
       },
-      {
-        id: "INT006",
-        petName: "Rocky",
-        ownerName: "Laura Martins",
-        reason: "Recuperação de cirurgia",
-        admissionDate: "2024-10-15",
-        expectedDischargeDate: "2024-10-20",
-        veterinarian: "Dra. Beatriz Lima",
-        status: "Alta", // Exemplo de paciente no histórico
-        species: "Cachorro",
-        risk: "Baixo",
-      },
-      {
-        id: "INT007",
-        petName: "Shadow",
-        ownerName: "Gabriel Nunes",
-        reason: "Doença terminal",
-        admissionDate: "2024-10-10",
-        expectedDischargeDate: "2024-10-12",
-        veterinarian: "Dr. Ana Paula",
-        status: "Óbito", // Exemplo de paciente no histórico
-        species: "Gato",
-        risk: "Emergência",
-      },
     ];
-
-    // Separar pacientes ativos e históricos
-    const active = mockPatients.filter(p => p.status !== "Alta" && p.status !== "Óbito");
-    const history = mockPatients.filter(p => p.status === "Alta" || p.status === "Óbito");
-
-    setInternedPatients(active);
-    setHistoryPatients(history);
+    setInternedPatients(mockPatients);
   }, []);
 
   const handleAddInternment = (data: InternmentFormValues) => {
     const newPatient: InternedPatient = {
-      id: `INT${(internedPatients.length + historyPatients.length + 1).toString().padStart(3, '0')}`,
+      id: `INT${(internedPatients.length + 1).toString().padStart(3, '0')}`,
       petName: data.petName,
       ownerName: data.ownerName,
       reason: data.reason,
@@ -170,45 +139,6 @@ const Internacao = () => {
     setInternedPatients((prev) =>
       prev.map((patient) => (patient.id === updatedPatient.id ? updatedPatient : patient))
     );
-    setHistoryPatients((prev) =>
-      prev.map((patient) => (patient.id === updatedPatient.id ? updatedPatient : patient))
-    );
-  };
-
-  const handleRegisterDischarge = (patientId: string) => {
-    setInternedPatients(prev => {
-      const patientToMove = prev.find(p => p.id === patientId);
-      if (patientToMove) {
-        const updatedPatient = {
-          ...patientToMove,
-          status: "Alta" as const,
-          expectedDischargeDate: format(new Date(), "yyyy-MM-dd"),
-        };
-        setHistoryPatients(prevHistory => [...prevHistory, updatedPatient]);
-        setIsDetailsDialogOpen(false);
-        setActiveTab("historico-internados"); // Mudar para a aba de histórico
-        return prev.filter(p => p.id !== patientId);
-      }
-      return prev;
-    });
-  };
-
-  const handleRegisterObito = (patientId: string) => {
-    setInternedPatients(prev => {
-      const patientToMove = prev.find(p => p.id === patientId);
-      if (patientToMove) {
-        const updatedPatient = {
-          ...patientToMove,
-          status: "Óbito" as const,
-          expectedDischargeDate: format(new Date(), "yyyy-MM-dd"),
-        };
-        setHistoryPatients(prevHistory => [...prevHistory, updatedPatient]);
-        setIsDetailsDialogOpen(false);
-        setActiveTab("historico-internados"); // Mudar para a aba de histórico
-        return prev.filter(p => p.id !== patientId);
-      }
-      return prev;
-    });
   };
 
   const handleCardClick = (patient: InternedPatient) => {
@@ -236,10 +166,10 @@ const Internacao = () => {
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+        <TabsList className="grid w-full grid-cols-3 h-auto p-1"> {/* Alterado para grid-cols-3 */}
           <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
           <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
-          <TabsTrigger value="historico-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Histórico de Internados</TabsTrigger>
+          <TabsTrigger value="historico-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Histórico de Internados</TabsTrigger> {/* Nova aba */}
         </TabsList>
 
         <TabsContent value="pacientes-internados" className="mt-4">
@@ -287,43 +217,10 @@ const Internacao = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="historico-internados" className="mt-4">
-          <div className="mt-8">
+        <TabsContent value="historico-internados" className="mt-4"> {/* Novo TabsContent */}
+          <div className="p-4 border rounded-md bg-background">
             <h3 className="text-2xl font-semibold mb-4">Histórico de Pacientes Internados</h3>
-            {historyPatients.length > 0 ? (
-              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {historyPatients.map((patient) => {
-                  const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
-                  const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
-                  const riskStripeColorClass = riskColorMap[patient.risk];
-
-                  return (
-                    <li
-                      key={patient.id}
-                      className="relative p-3 border rounded-md bg-white dark:bg-gray-800 shadow-md overflow-hidden"
-                    >
-                      {/* Faixa lateral de risco */}
-                      <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
-                      
-                      <p className="font-bold text-lg flex items-center">
-                        <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
-                        {patient.petName}
-                      </p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.ownerName}</p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Entrada:</span> {patient.admissionDate}</p>
-                      {patient.expectedDischargeDate && (
-                        <p className="text-base text-muted-foreground"><span className="font-bold">Saída:</span> {patient.expectedDischargeDate}</p>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <p className="text-muted-foreground">Nenhum paciente no histórico.</p>
-            )}
+            <p className="text-muted-foreground">Esta aba exibirá o histórico de pacientes que já receberam alta ou foram a óbito.</p>
           </div>
         </TabsContent>
       </Tabs>
@@ -333,8 +230,6 @@ const Internacao = () => {
         isOpen={isDetailsDialogOpen}
         onClose={() => setIsDetailsDialogOpen(false)}
         onUpdate={handleUpdateInternment}
-        onRegisterDischarge={handleRegisterDischarge}
-        onRegisterObito={handleRegisterObito}
       />
     </div>
   );

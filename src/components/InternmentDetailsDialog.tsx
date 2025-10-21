@@ -37,8 +37,6 @@ interface InternmentDetailsDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onUpdate: (updatedPatient: InternedPatient) => void;
-  onRegisterDischarge: (patientId: string) => void; // Nova prop
-  onRegisterObito: (patientId: string) => void;     // Nova prop
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -63,8 +61,6 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
   isOpen,
   onClose,
   onUpdate,
-  onRegisterDischarge, // Usar a nova prop
-  onRegisterObito,     // Usar a nova prop
 }) => {
   const [isEditing, setIsEditing] = React.useState(false);
 
@@ -108,18 +104,30 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
     };
     onUpdate(updatedPatient);
     setIsEditing(false);
-    // onClose(); // Não fechar aqui, a atualização pode não mover o paciente para o histórico
+    onClose();
   };
 
-  const handleDischargeClick = () => {
+  const handleRegisterDischarge = () => {
     if (window.confirm(`Tem certeza que deseja registrar a alta de ${patient.petName}?`)) {
-      onRegisterDischarge(patient.id); // Chamar a função passada via prop
+      const updatedPatient: InternedPatient = {
+        ...patient,
+        status: "Alta",
+        expectedDischargeDate: format(new Date(), "yyyy-MM-dd"),
+      };
+      onUpdate(updatedPatient);
+      onClose();
     }
   };
 
-  const handleObitoClick = () => {
+  const handleRegisterObito = () => {
     if (window.confirm(`Tem certeza que deseja registrar o óbito de ${patient.petName}? Esta ação não pode ser desfeita.`)) {
-      onRegisterObito(patient.id); // Chamar a função passada via prop
+      const updatedPatient: InternedPatient = {
+        ...patient,
+        status: "Óbito",
+        expectedDischargeDate: format(new Date(), "yyyy-MM-dd"),
+      };
+      onUpdate(updatedPatient);
+      onClose();
     }
   };
 
@@ -144,10 +152,10 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
 
         {!isEditing && !isFinalized && (
           <div className="flex justify-end space-x-2 mb-4">
-            <Button variant="default" onClick={handleDischargeClick} className="bg-green-600 hover:bg-green-700 text-white">
+            <Button variant="default" onClick={handleRegisterDischarge} className="bg-green-600 hover:bg-green-700 text-white">
               <CheckCircle className="mr-2 h-4 w-4" /> Registrar Alta
             </Button>
-            <Button variant="destructive" onClick={handleObitoClick}>
+            <Button variant="destructive" onClick={handleRegisterObito}>
               <XCircle className="mr-2 h-4 w-4" /> Registrar Óbito
             </Button>
             <Button variant="outline" onClick={() => setIsEditing(true)}>
@@ -229,6 +237,8 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
             </div>
           </div>
         )}
+
+        {/* O DialogFooter foi removido para o botão de editar, pois ele foi movido para cima. */}
       </DialogContent>
     </Dialog>
   );
