@@ -54,7 +54,7 @@ const Internacao = () => {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
   const [selectedPatient, setSelectedPatient] = React.useState<InternedPatient | null>(null);
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
-  const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados"); // Estado para a aba ativa
+  const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
 
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
@@ -198,7 +198,7 @@ const Internacao = () => {
                       <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
                       <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
                       <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Admissão:</span> {patient.admissionDate}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Entrada:</span> {patient.admissionDate}</p>
                     </li>
                   );
                 })}
