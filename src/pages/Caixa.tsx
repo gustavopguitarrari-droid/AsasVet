@@ -16,8 +16,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { format, isToday, parseISO } from "date-fns";
 
 import ProductSelector from "@/components/cashier/ProductSelector";
-import CheckoutCart from "@/components/cashier/CheckoutCart";
-import PaymentSection from "@/components/cashier/PaymentSection";
+import SalePanel from "@/components/cashier/SalePanel"; // Importa o novo SalePanel
 import { Product, SaleItem, Transaction } from "@/types/cashier";
 import { showSuccess } from "@/utils/toast";
 
@@ -175,19 +174,15 @@ const Caixa = () => {
         <TabsContent value="nova-venda" className="mt-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <ProductSelector onAddProduct={handleAddItemToSale} />
-            <div className="space-y-6">
-              <CheckoutCart
-                items={currentSaleItems}
-                onUpdateQuantity={handleUpdateItemQuantity}
-                onRemoveItem={handleRemoveItem}
-              />
-              <PaymentSection
-                totalAmount={totalSaleAmount}
-                onFinalizeSale={handleFinalizeSale}
-                onCancelSale={handleCancelSale}
-                hasItemsInCart={currentSaleItems.length > 0}
-              />
-            </div>
+            <SalePanel
+              items={currentSaleItems}
+              onUpdateQuantity={handleUpdateItemQuantity}
+              onRemoveItem={handleRemoveItem}
+              totalAmount={totalSaleAmount}
+              onFinalizeSale={handleFinalizeSale}
+              onCancelSale={handleCancelSale}
+              hasItemsInCart={currentSaleItems.length > 0}
+            />
           </div>
         </TabsContent>
 
