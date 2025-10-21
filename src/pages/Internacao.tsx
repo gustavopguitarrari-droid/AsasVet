@@ -178,7 +178,7 @@ const Internacao = () => {
               return (
                 <li
                   key={patient.id}
-                  className="relative p-3 border rounded-md bg-gray-100 dark:bg-gray-800 shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                  className="relative p-3 border rounded-md bg-white dark:bg-gray-800 shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                   onClick={() => handleCardClick(patient)}
                 >
                   {/* Faixa lateral de risco */}
