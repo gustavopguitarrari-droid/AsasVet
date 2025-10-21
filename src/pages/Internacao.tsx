@@ -1,16 +1,18 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History } from "lucide-react"; // Adicionado History icon
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
-import InternmentHistoryDialog from "@/components/InternmentHistoryDialog"; // Importa o novo componente
-import ExecutionMapTable from "@/components/ExecutionMapTable"; // Importa o novo componente
-import { format } from "date-fns";
+import InternmentHistoryDialog from "@/components/InternmentHistoryDialog";
+import ExecutionMapTable from "@/components/ExecutionMapTable";
+import { format, isSameDay, parseISO, isBefore, isAfter, isEqual } from "date-fns"; // Importar isBefore, isAfter, isEqual
+import { ptBR } from "date-fns/locale"; // Importar locale
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar"; // Importar Calendar
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -64,12 +66,12 @@ const statusBadgeColorMap: Record<InternedPatient["status"], string> = {
 const Internacao = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
-  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState(false); // Novo estado para o diálogo de histórico
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState(false);
   const [selectedPatient, setSelectedPatient] = React.useState<InternedPatient | null>(null);
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
   const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
-  // const [searchTerm, setSearchTerm] = React.useState<string>(""); // Search term agora é gerenciado dentro do InternmentHistoryDialog
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date()); // Novo estado para a data do calendário
 
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
@@ -195,19 +197,30 @@ const Internacao = () => {
     setIsDetailsDialogOpen(true);
   };
 
-  // const filteredHistoryPatients = historyPatients.filter(patient =>
-  //   patient.petName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //   patient.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //   patient.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //   patient.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //   patient.species.toLowerCase().includes(searchTerm.toLowerCase())
-  // ); // Removido, pois a busca agora é interna ao InternmentHistoryDialog
+  // Filtra os pacientes para o mapa de execução com base na data selecionada
+  const patientsForExecutionMap = React.useMemo(() => {
+    if (!selectedDate) return [];
+
+    return internedPatients.filter(patient => {
+      const admission = parseISO(patient.admissionDate);
+      const discharge = patient.expectedDischargeDate ? parseISO(patient.expectedDischargeDate) : null;
+
+      // Paciente está internado se:
+      // 1. A data de admissão é anterior ou igual à data selecionada
+      // 2. E (a data de alta esperada é posterior ou igual à data selecionada OU não há data de alta esperada)
+      // 3. E o status não é "Alta" nem "Óbito" (já filtrado em internedPatients, mas bom reforçar)
+      const isAdmittedOnOrBeforeSelectedDate = isBefore(admission, selectedDate) || isEqual(admission, selectedDate);
+      const isNotDischargedOnOrBeforeSelectedDate = !discharge || isAfter(discharge, selectedDate) || isEqual(discharge, selectedDate);
+
+      return isAdmittedOnOrBeforeSelectedDate && isNotDischargedOnOrBeforeSelectedDate;
+    });
+  }, [internedPatients, selectedDate]);
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Internação</h2>
-        <div className="flex space-x-2"> {/* Agrupa os botões */}
+        <div className="flex space-x-2">
           <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
             <History className="mr-2 h-4 w-4" /> Ver Histórico
           </Button>
@@ -228,10 +241,9 @@ const Internacao = () => {
       </div>
       
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-auto p-1"> {/* Reduzido para 2 colunas */}
+        <TabsList className="grid w-full grid-cols-2 h-auto p-1">
           <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
           <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
-          {/* <TabsTrigger value="historico-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Histórico de Internados</TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="pacientes-internados" className="mt-4">
@@ -250,7 +262,6 @@ const Internacao = () => {
                       className="relative p-3 border rounded-md bg-white dark:bg-gray-800 shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                       onClick={() => handleCardClick(patient)}
                     >
-                      {/* Faixa lateral de risco */}
                       <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
                       
                       <p className="font-bold text-lg flex items-center">
@@ -273,13 +284,20 @@ const Internacao = () => {
         </TabsContent>
 
         <TabsContent value="mapa-execucao" className="mt-4">
-          <div className="p-4 border rounded-md bg-background">
+          <div className="p-4 border rounded-md bg-background space-y-4">
             <h3 className="text-2xl font-semibold mb-4">Mapa de Execução Diário</h3>
-            <ExecutionMapTable patients={internedPatients} />
+            <div className="flex justify-center">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                locale={ptBR}
+                className="rounded-md border shadow-md"
+              />
+            </div>
+            <ExecutionMapTable patients={patientsForExecutionMap} />
           </div>
         </TabsContent>
-
-        {/* O conteúdo do histórico foi movido para o InternmentHistoryDialog */}
       </Tabs>
 
       <InternmentDetailsDialog
