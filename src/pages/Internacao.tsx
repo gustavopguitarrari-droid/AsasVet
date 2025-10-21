@@ -16,8 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import AddMultiplePatientActionsDialog, { SinglePatientActionFormValue } from "@/components/AddMultiplePatientActionsDialog"; // Importar o novo diálogo de múltiplas ações
-import ViewPatientActionsDialog from "@/components/ViewPatientActionsDialog"; // Importar o novo diálogo de visualização
+import AddPatientActionDialog, { PatientActionFormValues } from "@/components/AddPatientActionDialog"; // Importar o novo diálogo
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -35,6 +34,7 @@ interface InternedPatient {
   risk: RiskLevel;
 }
 
+// Novo tipo para as ações dos pacientes
 export interface PatientAction {
   id: string;
   patientId: string;
@@ -86,24 +86,16 @@ const Internacao = () => {
   const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
   const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
-  const [selectedDate, setSelectedDate] = React.useState<Date>(new Date());
+  const [selectedDate, setSelectedDate] = React.useState<Date>(new Date()); // Alterado para sempre ser Date
   const [patientSearchTerm, setPatientSearchTerm] = React.useState<string>("");
 
-  // Estados para o diálogo de adicionar múltiplas ações
-  const [isAddMultipleActionsDialogOpen, setIsAddMultipleActionsDialogOpen] = React.useState(false);
-  const [addActionPatientId, setAddActionPatientId] = React.useState<string | null>(null);
-  const [addActionPatientName, setAddActionPatientName] = React.useState<string | null>(null);
-  const [addActionDate, setAddActionDate] = React.useState<Date | null>(null);
-  const [addActionHour, setAddActionHour] = React.useState<string | null>(null);
-
-  // Estados para o diálogo de visualizar ações
-  const [isViewActionsDialogOpen, setIsViewActionsDialogOpen] = React.useState(false);
-  const [viewActionsPatientName, setViewActionsPatientName] = React.useState<string | null>(null);
-  const [viewActionsDate, setViewActionsDate] = React.useState<Date | null>(null);
-  const [viewActionsHour, setViewActionsHour] = React.useState<string | null>(null);
-  const [actionsToDisplay, setActionsToDisplay] = React.useState<PatientAction[]>([]);
-
-  const [patientActions, setPatientActions] = React.useState<PatientAction[]>([]);
+  // Estados para o diálogo de adicionar ação
+  const [isAddActionDialogOpen, setIsAddActionDialogOpen] = React.useState(false);
+  const [actionPatientId, setActionPatientId] = React.useState<string | null>(null);
+  const [actionPatientName, setActionPatientName] = React.useState<string | null>(null);
+  const [actionDate, setActionDate] = React.useState<Date | null>(null);
+  const [actionHour, setActionHour] = React.useState<string | null>(null);
+  const [patientActions, setPatientActions] = React.useState<PatientAction[]>([]); // Novo estado para as ações
 
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
@@ -201,11 +193,11 @@ const Internacao = () => {
     setInternedPatients(active);
     setHistoryPatients(history);
 
+    // Mock de ações iniciais
     const mockActions: PatientAction[] = [
       { id: "ACT001", patientId: "INT001", date: "2024-10-27", hour: "10", description: "Administrar antibiótico", type: "Medicação" },
-      { id: "ACT002", patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação" },
-      { id: "ACT003", patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação" },
-      { id: "ACT004", patientId: "INT001", date: "2024-10-27", hour: "10", description: "Verificar curativo", type: "Observação" }, // Adicionando mais uma ação para o mesmo slot
+      { id: "ACT001", patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação" },
+      { id: "ACT002", patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação" },
     ];
     setPatientActions(mockActions);
 
@@ -250,11 +242,11 @@ const Internacao = () => {
   }, [internedPatients]);
 
   const handlePreviousDay = () => {
-    setSelectedDate((prevDate) => subDays(prevDate, 1));
+    setSelectedDate((prevDate) => subDays(prevDate, 1)); // Não precisa de verificação de undefined
   };
 
   const handleNextDay = () => {
-    setSelectedDate((prevDate) => addDays(prevDate, 1));
+    setSelectedDate((prevDate) => addDays(prevDate, 1)); // Não precisa de verificação de undefined
   };
 
   const filteredInternedPatients = internedPatients.filter(patient =>
@@ -267,44 +259,33 @@ const Internacao = () => {
     patient.risk.toLowerCase().includes(patientSearchTerm.toLowerCase())
   );
 
-  // Funções para o diálogo de adicionar múltiplas ações
-  const handleOpenAddMultipleActionsDialog = (patientId: string, patientName: string, date: Date, hour: string) => {
-    setAddActionPatientId(patientId);
-    setAddActionPatientName(patientName);
-    setAddActionDate(date);
-    setAddActionHour(hour);
-    setIsAddMultipleActionsDialogOpen(true);
-  };
-
-  const handleAddMultiplePatientActions = (newActionsData: SinglePatientActionFormValue[]) => {
-    if (addActionPatientId && addActionDate && addActionHour) {
-      const newActions: PatientAction[] = newActionsData.map((data, index) => ({
-        id: `ACT${(patientActions.length + index + 1).toString().padStart(3, '0')}`, // Unique ID for each new action
-        patientId: addActionPatientId,
-        date: format(addActionDate, "yyyy-MM-dd"),
-        hour: addActionHour,
-        description: data.description,
-        type: data.type,
-      }));
-      setPatientActions((prev) => [...prev, ...newActions]);
-      setIsAddMultipleActionsDialogOpen(false);
+  // Funções para o diálogo de adicionar ação
+  const handleOpenAddActionDialog = (patientId: string, patientName: string, date: Date, hour: string) => {
+    try {
+      setActionPatientId(patientId);
+      setActionPatientName(patientName);
+      setActionDate(date);
+      setActionHour(hour);
+      setIsAddActionDialogOpen(true);
+    } catch (error) {
+      console.error("Erro ao abrir o diálogo de adicionar ação:", error);
+      // Adicione um toast de erro aqui se desejar
     }
   };
 
-  // Funções para o diálogo de visualizar ações
-  const handleOpenViewActionsDialog = (patientId: string, patientName: string, date: Date, hour: string) => {
-    const formattedDate = format(date, "yyyy-MM-dd");
-    const actionsForSlot = patientActions.filter(
-      (action) =>
-        action.patientId === patientId &&
-        action.date === formattedDate &&
-        action.hour === hour
-    );
-    setViewActionsPatientName(patientName);
-    setViewActionsDate(date);
-    setViewActionsHour(hour);
-    setActionsToDisplay(actionsForSlot);
-    setIsViewActionsDialogOpen(true);
+  const handleAddPatientAction = (data: PatientActionFormValues) => {
+    if (actionPatientId && actionDate && actionHour) {
+      const newAction: PatientAction = {
+        id: `ACT${(patientActions.length + 1).toString().padStart(3, '0')}`,
+        patientId: actionPatientId,
+        date: format(actionDate, "yyyy-MM-dd"),
+        hour: actionHour,
+        description: data.description,
+        type: data.type,
+      };
+      setPatientActions((prev) => [...prev, newAction]);
+      setIsAddActionDialogOpen(false);
+    }
   };
 
   const getPageTitle = () => {
@@ -322,7 +303,7 @@ const Internacao = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">{getPageTitle()}</h2>
-        <div className="flex space-x-2">
+        <div className="flex space-x-2"> {/* Este div agora agrupa os botões e o calendário */}
           {activeTab === "pacientes-internados" && (
             <>
               <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
@@ -344,7 +325,7 @@ const Internacao = () => {
             </>
           )}
           {activeTab === "mapa-execucao" && (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2"> {/* Bloco do calendário */}
               <Button variant="default" size="icon" onClick={handlePreviousDay}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -365,7 +346,7 @@ const Internacao = () => {
                   <Calendar
                     mode="single"
                     selected={selectedDate}
-                    onSelect={(day) => setSelectedDate(day || new Date())}
+                    onSelect={(day) => setSelectedDate(day || new Date())} // Garante que selectedDate seja sempre Date
                     initialFocus
                     locale={ptBR}
                   />
@@ -387,7 +368,7 @@ const Internacao = () => {
 
         <TabsContent value="pacientes-internados" className="mt-4">
           <div className="mt-8">
-            <div className="flex flex-wrap gap-4 mb-6">
+            <div className="flex flex-wrap gap-4 mb-6"> {/* Container para a legenda */}
               {Object.entries(riskColorMap).map(([risk, colorClass]) => (
                 <div key={risk} className="flex items-center space-x-2">
                   <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
@@ -444,12 +425,12 @@ const Internacao = () => {
 
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
+            {/* O bloco do calendário foi movido para cima */}
             <ExecutionMapTable
               patients={patientsForExecutionMap}
               selectedDate={selectedDate}
               patientActions={patientActions}
-              onAddActionClick={handleOpenAddMultipleActionsDialog} // Usar o novo handler
-              onViewActionsClick={handleOpenViewActionsDialog} // Novo handler para visualizar ações
+              onAddActionClick={handleOpenAddActionDialog}
             />
           </div>
         </TabsContent>
@@ -468,29 +449,19 @@ const Internacao = () => {
         historyPatients={historyPatients}
       />
 
-      {/* Diálogo para adicionar múltiplas ações */}
-      {isAddMultipleActionsDialogOpen && addActionPatientId && addActionPatientName && addActionDate && addActionHour && (
-        <AddMultiplePatientActionsDialog
-          isOpen={isAddMultipleActionsDialogOpen}
-          onClose={() => setIsAddMultipleActionsDialogOpen(false)}
-          onSubmit={handleAddMultiplePatientActions}
-          patientName={addActionPatientName}
-          date={addActionDate}
-          hour={addActionHour}
-        />
-      )}
-
-      {/* Diálogo para visualizar ações */}
-      {isViewActionsDialogOpen && viewActionsPatientName && viewActionsDate && viewActionsHour && (
-        <ViewPatientActionsDialog
-          isOpen={isViewActionsDialogOpen}
-          onClose={() => setIsViewActionsDialogOpen(false)}
-          patientName={viewActionsPatientName}
-          date={viewActionsDate}
-          hour={viewActionsHour}
-          actions={actionsToDisplay}
-        />
-      )}
+      {/* Diálogo para adicionar ação, agora com controle explícito de Dialog */}
+      <Dialog open={isAddActionDialogOpen} onOpenChange={setIsAddActionDialogOpen}>
+        {actionPatientId && actionPatientName && actionDate && actionHour && (
+          <AddPatientActionDialog
+            isOpen={isAddActionDialogOpen}
+            onClose={() => setIsAddActionDialogOpen(false)}
+            onSubmit={handleAddPatientAction}
+            patientName={actionPatientName}
+            date={actionDate}
+            hour={actionHour}
+          />
+        )}
+      </Dialog>
     </div>
   );
 };
