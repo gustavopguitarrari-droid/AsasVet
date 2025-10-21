@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import AddPatientActionDialog, { PatientActionFormValues } from "@/components/AddPatientActionDialog"; // Importar o novo diálogo
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -29,6 +30,16 @@ interface InternedPatient {
   status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
   species: string;
   risk: RiskLevel;
+}
+
+// Novo tipo para as ações dos pacientes
+export interface PatientAction {
+  id: string;
+  patientId: string;
+  date: string; // YYYY-MM-DD
+  hour: string; // HH
+  description: string;
+  type: "Medicação" | "Alimentação" | "Observação" | "Outro";
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -75,6 +86,14 @@ const Internacao = () => {
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
   const [patientSearchTerm, setPatientSearchTerm] = React.useState<string>("");
+
+  // Estados para o diálogo de adicionar ação
+  const [isAddActionDialogOpen, setIsAddActionDialogOpen] = React.useState(false);
+  const [actionPatientId, setActionPatientId] = React.useState<string | null>(null);
+  const [actionPatientName, setActionPatientName] = React.useState<string | null>(null);
+  const [actionDate, setActionDate] = React.useState<Date | null>(null);
+  const [actionHour, setActionHour] = React.useState<string | null>(null);
+  const [patientActions, setPatientActions] = React.useState<PatientAction[]>([]); // Novo estado para as ações
 
   React.useEffect(() => {
     const mockPatients: InternedPatient[] = [
@@ -171,6 +190,15 @@ const Internacao = () => {
     const history = mockPatients.filter(p => p.status === "Alta" || p.status === "Óbito");
     setInternedPatients(active);
     setHistoryPatients(history);
+
+    // Mock de ações iniciais
+    const mockActions: PatientAction[] = [
+      { id: "ACT001", patientId: "INT001", date: "2024-10-27", hour: "10", description: "Administrar antibiótico", type: "Medicação" },
+      { id: "ACT001", patientId: "INT001", date: "2024-10-27", hour: "14", description: "Alimentação", type: "Alimentação" },
+      { id: "ACT002", patientId: "INT002", date: "2024-10-27", hour: "11", description: "Verificar temperatura", type: "Observação" },
+    ];
+    setPatientActions(mockActions);
+
   }, []);
 
   const handleAddInternment = (data: InternmentFormValues) => {
@@ -239,6 +267,30 @@ const Internacao = () => {
     patient.risk.toLowerCase().includes(patientSearchTerm.toLowerCase())
   );
 
+  // Funções para o diálogo de adicionar ação
+  const handleOpenAddActionDialog = (patientId: string, patientName: string, date: Date, hour: string) => {
+    setActionPatientId(patientId);
+    setActionPatientName(patientName);
+    setActionDate(date);
+    setActionHour(hour);
+    setIsAddActionDialogOpen(true);
+  };
+
+  const handleAddPatientAction = (data: PatientActionFormValues) => {
+    if (actionPatientId && actionDate && actionHour) {
+      const newAction: PatientAction = {
+        id: `ACT${(patientActions.length + 1).toString().padStart(3, '0')}`,
+        patientId: actionPatientId,
+        date: format(actionDate, "yyyy-MM-dd"),
+        hour: actionHour,
+        description: data.description,
+        type: data.type,
+      };
+      setPatientActions((prev) => [...prev, newAction]);
+      setIsAddActionDialogOpen(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -265,8 +317,6 @@ const Internacao = () => {
         )}
       </div>
       
-      {/* O seletor de data foi movido para dentro do TabsContent de 'mapa-execucao' */}
-
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
           <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
@@ -332,7 +382,6 @@ const Internacao = () => {
 
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="p-4 border rounded-md bg-background space-y-4">
-            {/* Seletor de data agora está aqui, dentro do TabsContent */}
             <div className="flex justify-end items-center space-x-2 mb-4">
               <Button variant="default" size="icon" onClick={handlePreviousDay}>
                 <ChevronLeft className="h-4 w-4" />
@@ -364,7 +413,12 @@ const Internacao = () => {
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
-            <ExecutionMapTable patients={patientsForExecutionMap} />
+            <ExecutionMapTable
+              patients={patientsForExecutionMap}
+              selectedDate={selectedDate}
+              patientActions={patientActions}
+              onAddActionClick={handleOpenAddActionDialog}
+            />
           </div>
         </TabsContent>
       </Tabs>
@@ -381,6 +435,17 @@ const Internacao = () => {
         onClose={() => setIsHistoryDialogOpen(false)}
         historyPatients={historyPatients}
       />
+
+      {isAddActionDialogOpen && actionPatientId && actionPatientName && actionDate && actionHour && (
+        <AddPatientActionDialog
+          isOpen={isAddActionDialogOpen}
+          onClose={() => setIsAddActionDialogOpen(false)}
+          onSubmit={handleAddPatientAction}
+          patientName={actionPatientName}
+          date={actionDate}
+          hour={actionHour}
+        />
+      )}
     </div>
   );
 };

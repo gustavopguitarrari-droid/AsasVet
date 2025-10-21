@@ -10,10 +10,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
+import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Syringe, Utensils, Eye, FlaskConical } from "lucide-react"; // Adicionado ícones para tipos de ação
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge"; // Importar Badge
+import { format } from "date-fns";
+import { PatientAction } from "@/pages/Internacao"; // Importar o tipo PatientAction
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -33,6 +35,9 @@ interface InternedPatient {
 
 interface ExecutionMapTableProps {
   patients: InternedPatient[];
+  selectedDate: Date | undefined;
+  patientActions: PatientAction[]; // Receber as ações
+  onAddActionClick: (patientId: string, patientName: string, date: Date, hour: string) => void; // Callback para adicionar ação
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -62,13 +67,12 @@ const riskColorMap: Record<RiskLevel, string> = {
   "Emergência": "bg-red-500",
 };
 
-// Mapeamento de cores para o badge de status (mantido, mas não usado diretamente aqui)
-const statusBadgeColorMap: Record<InternedPatient["status"], string> = {
-  "Em Observação": "bg-blue-500",
-  "Estável": "bg-green-500",
-  "Crítico": "bg-red-500",
-  "Alta": "bg-green-500",
-  "Óbito": "bg-red-500",
+// Mapeamento de ícones para tipos de ação
+const actionTypeIconMap: Record<PatientAction["type"], React.ElementType> = {
+  Medicação: Syringe,
+  Alimentação: Utensils,
+  Observação: Eye,
+  Outro: FlaskConical,
 };
 
 const generateHourlySlots = () => {
@@ -81,11 +85,14 @@ const generateHourlySlots = () => {
 
 const hourlySlots = generateHourlySlots();
 
-const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
-  const handleAddAction = (patientId: string, hour: string) => {
-    console.log(`Adicionar ação para o paciente ${patientId} no horário ${hour}:00`);
-    // Lógica para adicionar ação (medicação, alimentação, etc.)
+const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selectedDate, patientActions, onAddActionClick }) => {
+  const handleAddAction = (patient: InternedPatient, hour: string) => {
+    if (selectedDate) {
+      onAddActionClick(patient.id, patient.petName, selectedDate, hour);
+    }
   };
+
+  const formattedSelectedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
 
   return (
     <div className="overflow-x-auto rounded-md border">
@@ -106,7 +113,6 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
               const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
               const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
               const riskStripeColorClass = riskColorMap[patient.risk];
-              // const statusBadgeClass = statusBadgeColorMap[patient.status]; // Não é mais necessário aqui
 
               return (
                 <TableRow key={patient.id} className="hover:bg-muted/50 transition-colors duration-150">
@@ -121,29 +127,72 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients }) => {
                     <p className="text-xs text-muted-foreground ml-7">Baia: {patient.bayName}</p> {/* Exibindo o nome da baia */}
                     <p className="text-xs text-muted-foreground ml-7">Tutor: {patient.ownerName}</p>
                     <p className="text-xs text-muted-foreground ml-7">Vet: {patient.veterinarian}</p>
-                    {/* O Badge de status foi removido daqui */}
                   </TableCell>
-                  {hourlySlots.map((hour) => (
-                    <TableCell key={`${patient.id}-${hour}`} className="text-center p-1.5">
-                      <Tooltip delayDuration={0}>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            className="h-8 w-8 group relative rounded-md border-dashed border-muted-foreground/50 bg-background hover:bg-accent/50 transition-colors duration-200"
-                            onClick={() => handleAddAction(patient.id, hour)}
-                          >
-                            <Plus className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                            <span className="sr-only">Adicionar Ação</span>
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">
-                          Adicionar ação para {patient.petName} às {hour}:00
-                        </TooltipContent>
-                      </Tooltip>
-                      {/* Aqui você pode renderizar ações existentes para este paciente e horário */}
-                    </TableCell>
-                  ))}
+                  {hourlySlots.map((hour) => {
+                    const actionsForSlot = patientActions.filter(
+                      (action) =>
+                        action.patientId === patient.id &&
+                        action.date === formattedSelectedDate &&
+                        action.hour === hour
+                    );
+
+                    return (
+                      <TableCell key={`${patient.id}-${hour}`} className="text-center p-1.5 relative">
+                        {actionsForSlot.length > 0 ? (
+                          <div className="flex flex-col items-center justify-center space-y-1">
+                            {actionsForSlot.map((action) => {
+                              const ActionIcon = actionTypeIconMap[action.type] || FlaskConical;
+                              return (
+                                <Tooltip key={action.id} delayDuration={0}>
+                                  <TooltipTrigger asChild>
+                                    <Badge variant="secondary" className="h-6 w-6 p-0 flex items-center justify-center">
+                                      <ActionIcon className="h-4 w-4" />
+                                    </Badge>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">
+                                    {action.type}: {action.description}
+                                  </TooltipContent>
+                                </Tooltip>
+                              );
+                            })}
+                            <Tooltip delayDuration={0}>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 group relative rounded-md border-dashed border-muted-foreground/50 bg-background hover:bg-accent/50 transition-colors duration-200"
+                                  onClick={() => handleAddAction(patient, hour)}
+                                >
+                                  <Plus className="h-3 w-3 text-primary opacity-100 group-hover:opacity-100 transition-opacity duration-200" />
+                                  <span className="sr-only">Adicionar Ação</span>
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                Adicionar mais ações para {patient.petName} às {hour}:00
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        ) : (
+                          <Tooltip delayDuration={0}>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                className="h-8 w-8 group relative rounded-md border-dashed border-muted-foreground/50 bg-background hover:bg-accent/50 transition-colors duration-200"
+                                onClick={() => handleAddAction(patient, hour)}
+                              >
+                                <Plus className="h-4 w-4 text-primary opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                                <span className="sr-only">Adicionar Ação</span>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">
+                              Adicionar ação para {patient.petName} às {hour}:00
+                            </TooltipContent>
+                          </Tooltip>
+                        )}
+                      </TableCell>
+                    );
+                  })}
                 </TableRow>
               );
             })
