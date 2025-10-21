@@ -49,10 +49,36 @@ const Dashboard = () => {
   const { user } = useUser();
 
   React.useEffect(() => {
-    const savedConfig = localStorage.getItem("dashboardConfig");
-    if (savedConfig) {
-      setDashboardConfig(JSON.parse(savedConfig));
+    const savedConfigString = localStorage.getItem("dashboardConfig");
+    let savedConfig: DashboardItemConfig[] = [];
+    if (savedConfigString) {
+      try {
+        savedConfig = JSON.parse(savedConfigString);
+      } catch (error) {
+        console.error("Erro ao analisar a configuração salva do painel:", error);
+        // Se houver um erro, usaremos a configuração inicial
+      }
     }
+
+    // Crie um mapa para fácil acesso às configurações salvas
+    const savedConfigMap = new Map(savedConfig.map(item => [item.id, item]));
+
+    // Mescle a configuração inicial com a salva
+    const mergedConfig = initialDashboardConfig.map(initialItem => {
+      const savedItem = savedConfigMap.get(initialItem.id);
+      if (savedItem) {
+        // Se o item existe na configuração salva, use suas propriedades isVisible e category
+        return {
+          ...initialItem, // Mantém id e name do initialConfig (para pegar novos nomes se atualizados)
+          isVisible: savedItem.isVisible,
+          category: savedItem.category,
+        };
+      }
+      // Se não existe na configuração salva, use o item do initialConfig
+      return initialItem;
+    });
+
+    setDashboardConfig(mergedConfig);
   }, []);
 
   const handleSaveConfig = (newConfig: DashboardItemConfig[]) => {
