@@ -237,41 +237,38 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                                 {items.map((item, index) => (
                                   <Draggable key={item.id} draggableId={item.id} index={index}>
                                     {(provided, snapshot) => (
+                                      // Outer div for DND props and style
                                       <div
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
-                                        // Aplicar estilos diretamente para garantir que o transform seja respeitado
-                                        style={{
-                                          ...provided.draggableProps.style,
-                                          boxSizing: 'border-box', // Garante o modelo de caixa consistente
-                                          ...(snapshot.isDragging ? {
-                                            zIndex: 9999, // Traz o item para a frente quando arrastando
-                                          } : {}),
-                                        }}
-                                        className={cn(
-                                          "flex items-center justify-between space-x-2 p-2 rounded-md border bg-card",
-                                          snapshot.isDragging && "shadow-lg bg-accent"
-                                        )}
+                                        {...provided.dragHandleProps} // Apply drag handle props here
+                                        style={provided.draggableProps.style}
                                       >
-                                        <div className="flex items-center space-x-2 flex-1">
-                                          <span {...provided.dragHandleProps}>
+                                        {/* Inner div for visual styling */}
+                                        <div
+                                          className={cn(
+                                            "flex items-center justify-between space-x-2 p-2 rounded-md border bg-card",
+                                            snapshot.isDragging && "shadow-lg bg-accent z-[9999]"
+                                          )}
+                                        >
+                                          <div className="flex items-center space-x-2 flex-1">
                                             <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
-                                          </span>
-                                          <div className="flex flex-col flex-1">
-                                            <Label className="text-sm font-medium">{item.name}</Label>
-                                            <p className="text-xs text-muted-foreground mt-1">Categoria: {categoryNames[item.category]}</p>
+                                            <div className="flex flex-col flex-1">
+                                              <Label className="text-sm font-medium">{item.name}</Label>
+                                              <p className="text-xs text-muted-foreground mt-1">Categoria: {categoryNames[item.category]}</p>
+                                            </div>
                                           </div>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                          <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            onClick={() => handleRemoveCardFromPanel(item.id)}
-                                            className="h-8 w-8 text-red-600 hover:bg-red-100"
-                                          >
-                                            <MinusCircle className="h-4 w-4" />
-                                            <span className="sr-only">Remover do Painel</span>
-                                          </Button>
+                                          <div className="flex items-center space-x-2">
+                                            <Button
+                                              variant="ghost"
+                                              size="icon"
+                                              onClick={() => handleRemoveCardFromPanel(item.id)}
+                                              className="h-8 w-8 text-red-600 hover:bg-red-100"
+                                            >
+                                              <MinusCircle className="h-4 w-4" />
+                                              <span className="sr-only">Remover do Painel</span>
+                                            </Button>
+                                          </div>
                                         </div>
                                       </div>
                                     )}
