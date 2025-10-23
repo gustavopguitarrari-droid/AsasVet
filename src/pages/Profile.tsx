@@ -1,20 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react"; // Removed useState as it's now handled by individual fields
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
-import { User as UserIcon, Mail, Briefcase, Cake, Clock, Edit } from "lucide-react";
+import { User as UserIcon, Mail, Briefcase, Cake, Clock } from "lucide-react"; // Removed Edit icon
 import { useUser } from "@/context/UserContext";
-import ProfileForm, { ProfileFormValues } from "@/components/ProfileForm";
 import { format, parseISO, differenceInMonths, differenceInYears } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 
+// Import new editable components
+import EditableField from "@/components/EditableField";
+import EditableRoleField from "@/components/EditableRoleField";
+import EditableBirthdayField from "@/components/EditableBirthdayField";
+
 const Profile = () => {
   const { user, setUser } = useUser();
-  const [isEditing, setIsEditing] = useState(false); // Estado para controlar o modo de edição
+  // Removed isEditing state
 
   if (!user) {
     return (
@@ -24,25 +26,27 @@ const Profile = () => {
     );
   }
 
-  const handleSaveProfile = (data: ProfileFormValues) => {
-    setUser({
-      ...user,
-      name: data.name,
-      lastName: data.lastName,
-      email: data.email,
-      avatarUrl: data.avatarUrl || undefined,
-      role: data.role,
-      birthday: data.birthday ? format(data.birthday, "yyyy-MM-dd") : undefined,
-    });
-    setIsEditing(false); // Sai do modo de edição após salvar
+  // Handlers for individual field saves
+  const handleSaveName = (newName: string) => {
+    setUser({ ...user, name: newName });
   };
 
-  const handleCancelEdit = () => {
-    setIsEditing(false); // Sai do modo de edição sem salvar
+  const handleSaveLastName = (newLastName: string) => {
+    setUser({ ...user, lastName: newLastName });
   };
 
-  const formattedBirthday = user.birthday ? format(parseISO(user.birthday), "dd/MM/yyyy", { locale: ptBR }) : "N/A";
-  
+  const handleSaveEmail = (newEmail: string) => {
+    setUser({ ...user, email: newEmail });
+  };
+
+  const handleSaveRole = (newRole: string) => {
+    setUser({ ...user, role: newRole });
+  };
+
+  const handleSaveBirthday = (newBirthday?: string) => {
+    setUser({ ...user, birthday: newBirthday });
+  };
+
   let timeInCompany = "N/A";
   if (user.registeredTime) {
     const registrationDate = parseISO(user.registeredTime);
@@ -62,15 +66,14 @@ const Profile = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto"> {/* Aumentado para max-w-4xl */}
+    <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Meu Perfil</h2>
-        {/* O botão "Editar Perfil" foi removido. A edição é ativada ao clicar nas informações. */}
       </div>
 
-      <Card className="overflow-hidden"> {/* Adicionado overflow-hidden para cantos arredondados */}
+      <Card className="overflow-hidden">
         <CardHeader className="profile-header-art-bg text-primary-foreground p-6 flex flex-col items-center text-center">
-          <Avatar className="h-28 w-28 mb-3 border-4 border-primary-foreground shadow-lg"> {/* Avatar maior, com borda */}
+          <Avatar className="h-28 w-28 mb-3 border-4 border-primary-foreground shadow-lg">
             {user.avatarUrl ? (
               <AvatarImage src={user.avatarUrl} alt={user.name} />
             ) : (
@@ -83,97 +86,45 @@ const Profile = () => {
           <p className="text-primary-foreground/80 text-lg">{user.email}</p>
         </CardHeader>
         <CardContent className="p-6">
-          {isEditing ? (
-            <ProfileForm
-              initialData={{
-                name: user.name,
-                lastName: user.lastName,
-                email: user.email,
-                avatarUrl: user.avatarUrl || "",
-                role: user.role,
-                birthday: user.birthday ? parseISO(user.birthday) : undefined,
-              }}
-              onSubmit={handleSaveProfile}
-              onCancel={handleCancelEdit}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+            <EditableField
+              label="Nome"
+              value={user.name}
+              onSave={handleSaveName}
+              icon={UserIcon}
             />
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-              {/* Nome Completo */}
-              <div
-                className="group flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors cursor-pointer"
-                onClick={() => setIsEditing(true)}
-              >
-                <div className="flex items-center space-x-4">
-                  <UserIcon className="h-5 w-5 text-primary" />
-                  <p className="text-base font-medium text-muted-foreground">Nome:</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <p className="text-base font-semibold">{user.name} {user.lastName}</p>
-                  <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
+            <EditableField
+              label="Sobrenome"
+              value={user.lastName}
+              onSave={handleSaveLastName}
+              icon={UserIcon}
+            />
+            <EditableField
+              label="E-mail"
+              value={user.email}
+              onSave={handleSaveEmail}
+              icon={Mail}
+              type="email"
+            />
+            <EditableRoleField
+              label="Cargo"
+              value={user.role}
+              onSave={handleSaveRole}
+            />
+            <EditableBirthdayField
+              label="Aniversário"
+              value={user.birthday}
+              onSave={handleSaveBirthday}
+            />
+            {/* Time in Company is not editable, so it remains a static display */}
+            <div className="flex items-center justify-between p-3 border rounded-md">
+              <div className="flex items-center space-x-4">
+                <Clock className="h-5 w-5 text-primary" />
+                <p className="text-base font-medium text-muted-foreground">Tempo na Empresa:</p>
               </div>
-
-              {/* E-mail */}
-              <div
-                className="group flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors cursor-pointer"
-                onClick={() => setIsEditing(true)}
-              >
-                <div className="flex items-center space-x-4">
-                  <Mail className="h-5 w-5 text-primary" />
-                  <p className="text-base font-medium text-muted-foreground">E-mail:</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <p className="text-base font-semibold">{user.email}</p>
-                  <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              </div>
-
-              {/* Cargo */}
-              <div
-                className="group flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors cursor-pointer"
-                onClick={() => setIsEditing(true)}
-              >
-                <div className="flex items-center space-x-4">
-                  <Briefcase className="h-5 w-5 text-primary" />
-                  <p className="text-base font-medium text-muted-foreground">Cargo:</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <p className="text-base font-semibold">{user.role}</p>
-                  <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              </div>
-
-              {/* Aniversário */}
-              <div
-                className="group flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors cursor-pointer"
-                onClick={() => setIsEditing(true)}
-              >
-                <div className="flex items-center space-x-4">
-                  <Cake className="h-5 w-5 text-primary" />
-                  <p className="text-base font-medium text-muted-foreground">Aniversário:</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <p className="text-base font-semibold">{formattedBirthday}</p>
-                  <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              </div>
-
-              {/* Tempo na Empresa */}
-              <div
-                className="group flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors cursor-pointer"
-                onClick={() => setIsEditing(true)}
-              >
-                <div className="flex items-center space-x-4">
-                  <Clock className="h-5 w-5 text-primary" />
-                  <p className="text-base font-medium text-muted-foreground">Tempo na Empresa:</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <p className="text-base font-semibold">{timeInCompany}</p>
-                  <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-              </div>
+              <p className="text-base font-semibold">{timeInCompany}</p>
             </div>
-          )}
+          </div>
         </CardContent>
       </Card>
     </div>
