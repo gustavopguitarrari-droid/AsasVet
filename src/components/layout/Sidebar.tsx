@@ -2,8 +2,8 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  Users, // Usado para o novo item 'Cadastro'
-  PawPrint,
+  Users, 
+  PawPrint, // Ícone de pata de animal
   CalendarDays, // Usado para Agenda
   ClipboardList, // Ícone para Consultas
   DollarSign,
@@ -13,7 +13,6 @@ import {
   ArrowRightToLine,
   ReceiptText,
   Package,
-  // BookUser, // Ícone para o novo item 'Cadastro' - Removido
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -43,7 +42,7 @@ const navItems: NavItem[] = [
   },
   {
     name: "Cadastro", // Item de navegação para a página combinada
-    icon: Users, // Ícone alterado para Users
+    icon: PawPrint, // Ícone alterado para PawPrint
     path: "/cadastro",
   },
   {
