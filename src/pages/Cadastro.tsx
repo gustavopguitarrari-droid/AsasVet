@@ -11,20 +11,19 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Mail, Phone, Home, IdCard } from "lucide-react";
+import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SpeciesFilter from "@/components/SpeciesFilter";
 import PetDetailsDialog from "@/components/PetDetailsDialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import ClientForm, { ClientFormValues } from "@/components/ClientForm";
-import PetForm, { PetFormValues } from "@/components/PetForm"; // Importar o novo PetForm
-import { Client, Pet } from "@/types/cadastro";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"; // Importar Dialog
+import ClientForm, { ClientFormValues } from "@/components/ClientForm"; // Importar o novo ClientForm
+import { Client, Pet } from "@/types/cadastro"; // Importar as novas interfaces
 
 // Mock de dados para Tutores
 const initialMockClients: Client[] = [
-  { id: "CL001", name: "João Silva", email: "joao.silva@example.com", phone: "(11) 98765-4321", cpf: "111.222.333-44", address: "Rua A, 100", gender: "Masculino" },
-  { id: "CL002", name: "Maria Souza", email: "maria.souza@example.com", phone: "(21) 91234-5678", cpf: "555.666.777-88", address: "Av. B, 200", gender: "Feminino" },
-  { id: "CL003", name: "Pedro Santos", email: "pedro.santos@example.com", phone: "(31) 99876-1234", cpf: "999.000.111-22", address: "Travessa C, 300", gender: "Masculino" },
+  { id: "CL001", name: "João Silva", email: "joao.silva@example.com", phone: "(11) 98765-4321" },
+  { id: "CL002", name: "Maria Souza", email: "maria.souza@example.com", phone: "(21) 91234-5678" },
+  { id: "CL003", name: "Pedro Santos", email: "pedro.santos@example.com", phone: "(31) 99876-1234" },
 ];
 
 // Mock de dados para Animais
@@ -63,8 +62,6 @@ const Cadastro = () => {
   // Estados para a aba de Tutores
   const [clientSearchTerm, setClientSearchTerm] = React.useState<string>("");
   const [isAddClientDialogOpen, setIsAddClientDialogOpen] = React.useState<boolean>(false);
-  const [isAddPetDialogOpen, setIsAddPetDialogOpen] = React.useState<boolean>(false); // Novo estado para o diálogo de adicionar animal
-  const [currentClientForPetRegistration, setCurrentClientForPetRegistration] = React.useState<Client | null>(null); // Armazena o tutor recém-cadastrado
 
   const handleSelectSpecies = (species: string) => {
     setSelectedSpecies(species);
@@ -77,43 +74,28 @@ const Cadastro = () => {
       name: data.name,
       email: data.email,
       phone: data.phone,
-      cpf: data.cpf,
-      address: data.address,
-      gender: data.gender,
     };
     setClients((prev) => [...prev, newClient]);
-    setCurrentClientForPetRegistration(newClient); // Define o tutor para o próximo passo
-    setIsAddClientDialogOpen(false); // Fecha o diálogo do tutor
-    setIsAddPetDialogOpen(true); // Abre o diálogo para adicionar animais
-  };
 
-  const handleAddPet = (data: PetFormValues) => {
-    if (!currentClientForPetRegistration) return;
-
-    const newPetId = `A${(pets.length + 1).toString().padStart(3, '0')}`;
-    const newPet: Pet = {
-      id: newPetId,
-      name: data.name,
-      species: data.species,
-      breed: data.breed,
-      ownerId: currentClientForPetRegistration.id,
-    };
-    setPets((prev) => [...prev, newPet]);
-    // O diálogo de adicionar animal permanece aberto para permitir adicionar mais animais
-  };
-
-  const handleFinishPetRegistration = () => {
-    setIsAddPetDialogOpen(false);
-    setCurrentClientForPetRegistration(null);
+    // Atualiza os pets selecionados para terem o novo ownerId
+    if (data.associatedPetIds && data.associatedPetIds.length > 0) {
+      setPets((prevPets) =>
+        prevPets.map((pet) =>
+          data.associatedPetIds?.includes(pet.id)
+            ? { ...pet, ownerId: newClientId } // Associa o pet ao novo tutor
+            : pet
+        )
+      );
+    }
+    setIsAddClientDialogOpen(false);
   };
 
   const filteredPets = pets.filter((pet) => {
     const matchesSpecies = selectedSpecies === "all" || pet.species === selectedSpecies;
-    const owner = clients.find(client => client.id === pet.ownerId);
     const matchesSearch =
       pet.name.toLowerCase().includes(petSearchTerm.toLowerCase()) ||
       pet.breed.toLowerCase().includes(petSearchTerm.toLowerCase()) ||
-      (owner && owner.name.toLowerCase().includes(petSearchTerm.toLowerCase())); // Busca pelo nome do tutor
+      clients.find(client => client.id === pet.ownerId)?.name.toLowerCase().includes(petSearchTerm.toLowerCase()); // Busca pelo nome do tutor
     return matchesSpecies && matchesSearch;
   });
 
@@ -125,9 +107,7 @@ const Cadastro = () => {
   const filteredClients = clients.filter((client) =>
     client.name.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
     client.email.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
-    client.phone.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
-    client.cpf.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
-    client.address.toLowerCase().includes(clientSearchTerm.toLowerCase())
+    client.phone.toLowerCase().includes(clientSearchTerm.toLowerCase())
   );
 
   return (
@@ -148,20 +128,13 @@ const Cadastro = () => {
               <ClientForm
                 onSubmit={handleAddClient}
                 onCancel={() => setIsAddClientDialogOpen(false)}
+                allPets={pets} // Passa todos os pets para seleção
               />
             </DialogContent>
           </Dialog>
         )}
         {activeTab === "animais" && (
-          <Button className="font-bold" onClick={() => {
-            // Para adicionar um animal diretamente, precisaríamos de um seletor de tutor
-            // Por simplicidade, vamos abrir o formulário de tutor primeiro se nenhum estiver selecionado
-            if (!currentClientForPetRegistration) {
-              setIsAddClientDialogOpen(true);
-            } else {
-              setIsAddPetDialogOpen(true);
-            }
-          }}>
+          <Button className="font-bold">
             <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
           </Button>
         )}
@@ -191,12 +164,9 @@ const Cadastro = () => {
                 <TableRow>
                   <TableHead>ID</TableHead>
                   <TableHead>Nome</TableHead>
-                  <TableHead>CPF</TableHead> {/* Nova coluna */}
                   <TableHead>Email</TableHead>
                   <TableHead>Telefone</TableHead>
-                  <TableHead>Endereço</TableHead> {/* Nova coluna */}
-                  <TableHead>Gênero</TableHead> {/* Nova coluna */}
-                  <TableHead>Animais</TableHead>
+                  <TableHead>Animais</TableHead> {/* Nova coluna para animais */}
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -208,11 +178,8 @@ const Cadastro = () => {
                       <TableRow key={client.id}>
                         <TableCell className="font-medium">{client.id}</TableCell>
                         <TableCell>{client.name}</TableCell>
-                        <TableCell>{client.cpf}</TableCell> {/* Exibe CPF */}
                         <TableCell>{client.email}</TableCell>
                         <TableCell>{client.phone}</TableCell>
-                        <TableCell>{client.address}</TableCell> {/* Exibe Endereço */}
-                        <TableCell>{client.gender}</TableCell> {/* Exibe Gênero */}
                         <TableCell>
                           {associatedPets.length > 0 ? (
                             <ul className="list-disc list-inside text-sm text-muted-foreground">
@@ -232,7 +199,7 @@ const Cadastro = () => {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-24 text-center">
+                    <TableCell colSpan={6} className="h-24 text-center">
                       Nenhum tutor encontrado.
                     </TableCell>
                   </TableRow>
@@ -266,7 +233,7 @@ const Cadastro = () => {
                   <TableHead>Nome</TableHead>
                   <TableHead>Espécie</TableHead>
                   <TableHead>Raça</TableHead>
-                  <TableHead>Tutor</TableHead>
+                  <TableHead>Tutor</TableHead> {/* Alterado para Tutor */}
                   <TableHead>ID</TableHead>
                 </TableRow>
               </TableHeader>
@@ -283,7 +250,7 @@ const Cadastro = () => {
                           {pet.species}
                         </TableCell>
                         <TableCell>{pet.breed}</TableCell>
-                        <TableCell>{owner ? owner.name : "N/A"}</TableCell>
+                        <TableCell>{owner ? owner.name : "N/A"}</TableCell> {/* Exibe o nome do tutor */}
                         <TableCell>{pet.id}</TableCell>
                       </TableRow>
                     );
@@ -300,28 +267,12 @@ const Cadastro = () => {
           </div>
 
           <PetDetailsDialog
-            pet={selectedPet ? { ...selectedPet, owner: clients.find(c => c.id === selectedPet.ownerId)?.name || "N/A" } : null}
+            pet={selectedPet ? { ...selectedPet, owner: clients.find(c => c.id === selectedPet.ownerId)?.name || "N/A" } : null} // Passa o nome do tutor
             isOpen={isPetDetailsDialogOpen}
             onClose={() => setIsPetDetailsDialogOpen(false)}
           />
         </TabsContent>
       </Tabs>
-
-      {/* Diálogo para adicionar animais após o cadastro do tutor */}
-      {currentClientForPetRegistration && (
-        <Dialog open={isAddPetDialogOpen} onOpenChange={setIsAddPetDialogOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Adicionar Animal</DialogTitle>
-            </DialogHeader>
-            <PetForm
-              onSubmit={handleAddPet}
-              onCancel={handleFinishPetRegistration}
-              ownerName={currentClientForPetRegistration.name}
-            />
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 };
