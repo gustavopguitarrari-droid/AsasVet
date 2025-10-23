@@ -30,6 +30,8 @@ const Header = () => {
         return "Estoque";
       case "/profile": // Novo título para Perfil
         return "Perfil";
+      case "/settings": // Novo título para Configurações
+        return "Configurações";
       default:
         return "Simples Vet";
     }

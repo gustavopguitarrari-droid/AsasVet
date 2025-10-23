@@ -15,6 +15,7 @@ import Internacao from "./pages/Internacao";
 import Veterinarios from "./pages/Veterinarios";
 import Estoque from "./pages/Estoque"; // Importação da nova página de Estoque
 import Profile from "./pages/Profile"; // Importação da nova página de Perfil
+import Settings from "./pages/Settings"; // Importação da nova página de Configurações
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -119,6 +120,14 @@ const App = () => (
             element={
               <Layout>
                 <Profile />
+              </Layout>
+            }
+          />
+          <Route
+            path="/settings" // Nova rota para Configurações
+            element={
+              <Layout>
+                <Settings />
               </Layout>
             }
           />
