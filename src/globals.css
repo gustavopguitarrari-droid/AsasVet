@@ -64,6 +64,11 @@
     --event-color-outros: 40 40% 50%;
 
     --green-500: 142.1 76.2% 36.3%; /* Default green for success */
+
+    /* Profile Header Art Background - Light Mode */
+    --profile-header-gradient-start: 222.2 47.4% 15%; /* Darker blue */
+    --profile-header-gradient-end: 222.2 47.4% 45%;   /* Lighter blue */
+    --profile-header-pattern-color: 210 40% 98%; /* primary-foreground */
   }
 
   .dark {
@@ -125,6 +130,11 @@
     --event-color-outros: 40 40% 60%;
 
     --green-500: 142.1 76.2% 36.3%; /* Default green for success */
+
+    /* Profile Header Art Background - Dark Mode */
+    --profile-header-gradient-start: 222.2 47.4% 25%; /* Darker blue in dark mode */
+    --profile-header-gradient-end: 222.2 47.4% 55%;   /* Lighter blue in dark mode */
+    --profile-header-pattern-color: 210 40% 98%; /* primary-foreground */
   }
 
   /* Custom Color Themes - Light Mode Overrides */
@@ -169,6 +179,11 @@
     --event-color-outros: 170 60% 50%;
 
     --green-500: 142.1 76.2% 36.3%;
+
+    /* Profile Header Art Background - Green Theme Light Mode */
+    --profile-header-gradient-start: 142.1 76.2% 15%;
+    --profile-header-gradient-end: 142.1 76.2% 45%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 
   /* Purple Theme */
@@ -210,6 +225,11 @@
     --event-color-outros: 290 60% 50%;
 
     --green-500: 142.1 76.2% 36.3%;
+
+    /* Profile Header Art Background - Purple Theme Light Mode */
+    --profile-header-gradient-start: 262.1 83.3% 15%;
+    --profile-header-gradient-end: 262.1 83.3% 45%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 
   /* Orange Theme */
@@ -251,6 +271,11 @@
     --event-color-outros: 50 70% 50%;
 
     --green-500: 142.1 76.2% 36.3%;
+
+    /* Profile Header Art Background - Orange Theme Light Mode */
+    --profile-header-gradient-start: 28.1 91.2% 15%;
+    --profile-header-gradient-end: 28.1 91.2% 45%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 
   /* Teal Theme */
@@ -292,6 +317,11 @@
     --event-color-outros: 200 60% 50%;
 
     --green-500: 142.1 76.2% 36.3%;
+
+    /* Profile Header Art Background - Teal Theme Light Mode */
+    --profile-header-gradient-start: 177.1 70% 15%;
+    --profile-header-gradient-end: 177.1 70% 45%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 
   /* Pink Theme */
@@ -323,7 +353,7 @@
     --sidebar-item-bg-6: 310 80% 50%;
     --sidebar-item-bg-7: 300 70% 60%;
     --sidebar-item-bg-8: 290 60% 65%;
-    --sidebar-item-bg-9: 280 50% 50%;
+    --sidebar-item-bg-9: 280 50% 60%;
 
     --event-color-consulta: 330 80% 60%;
     --event-color-cirurgia: 0 84.2% 60.2%;
@@ -333,6 +363,11 @@
     --event-color-outros: 10 60% 60%;
 
     --green-500: 142.1 76.2% 36.3%;
+
+    /* Profile Header Art Background - Pink Theme Light Mode */
+    --profile-header-gradient-start: 330 80% 15%;
+    --profile-header-gradient-end: 330 80% 45%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 
   /* Brown Theme */
@@ -374,6 +409,11 @@
     --event-color-outros: 60 30% 35%;
 
     --green-500: 142.1 76.2% 36.3%;
+
+    /* Profile Header Art Background - Brown Theme Light Mode */
+    --profile-header-gradient-start: 30 40% 15%;
+    --profile-header-gradient-end: 30 40% 45%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 
   /* Custom Color Themes - Dark Mode Overrides */
@@ -418,6 +458,11 @@
     --event-color-outros: 170 60% 60%;
 
     --green-500: 142.1 76.2% 60%;
+
+    /* Profile Header Art Background - Green Theme Dark Mode */
+    --profile-header-gradient-start: 142.1 76.2% 25%;
+    --profile-header-gradient-end: 142.1 76.2% 55%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 
   /* Purple Theme (Dark Mode) */
@@ -459,6 +504,11 @@
     --event-color-outros: 290 60% 60%;
 
     --green-500: 142.1 76.2% 60%;
+
+    /* Profile Header Art Background - Purple Theme Dark Mode */
+    --profile-header-gradient-start: 262.1 83.3% 25%;
+    --profile-header-gradient-end: 262.1 83.3% 55%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 
   /* Orange Theme (Dark Mode) */
@@ -500,6 +550,11 @@
     --event-color-outros: 50 70% 60%;
 
     --green-500: 142.1 76.2% 60%;
+
+    /* Profile Header Art Background - Orange Theme Dark Mode */
+    --profile-header-gradient-start: 28.1 91.2% 25%;
+    --profile-header-gradient-end: 28.1 91.2% 55%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 
   /* Teal Theme (Dark Mode) */
@@ -541,6 +596,11 @@
     --event-color-outros: 200 60% 60%;
 
     --green-500: 142.1 76.2% 60%;
+
+    /* Profile Header Art Background - Teal Theme Dark Mode */
+    --profile-header-gradient-start: 177.1 70% 25%;
+    --profile-header-gradient-end: 177.1 70% 55%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 
   /* Pink Theme (Dark Mode) */
@@ -582,6 +642,11 @@
     --event-color-outros: 10 60% 70%;
 
     --green-500: 142.1 76.2% 60%;
+
+    /* Profile Header Art Background - Pink Theme Dark Mode */
+    --profile-header-gradient-start: 330 80% 25%;
+    --profile-header-gradient-end: 330 80% 55%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 
   /* Brown Theme (Dark Mode) */
@@ -623,6 +688,11 @@
     --event-color-outros: 60 30% 45%;
 
     --green-500: 142.1 76.2% 60%;
+
+    /* Profile Header Art Background - Brown Theme Dark Mode */
+    --profile-header-gradient-start: 30 40% 25%;
+    --profile-header-gradient-end: 30 40% 55%;
+    --profile-header-pattern-color: 210 40% 98%;
   }
 }
 
@@ -638,6 +708,16 @@
 .bg-event-exame { background-color: hsl(var(--event-color-exame)); }
 .bg-event-retorno { background-color: hsl(var(--event-color-retorno)); }
 .bg-event-outros { background-color: hsl(var(--event-color-outros)); }
+
+/* Nova classe para o fundo artístico do cabeçalho do perfil */
+.profile-header-art-bg {
+  background: linear-gradient(135deg, hsl(var(--profile-header-gradient-start)), hsl(var(--profile-header-gradient-end)));
+  background-image: linear-gradient(135deg, hsl(var(--profile-header-gradient-start)), hsl(var(--profile-header-gradient-end))),
+                    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='20' cy='20' r='8' fill='hsl(var(--profile-header-pattern-color))' opacity='0.1'/><circle cx='80' cy='50' r='6' fill='hsl(var(--profile-header-pattern-color))' opacity='0.08'/><circle cx='50' cy='80' r='7' fill='hsl(var(--profile-header-pattern-color))' opacity='0.12'/><rect x='45' y='10' width='10' height='10' fill='hsl(var(--profile-header-pattern-color))' opacity='0.05' transform='rotate(45 50 15)'/><rect x='45' y='45' width='10' height='10' fill='hsl(var(--profile-header-pattern-color))' opacity='0.05' transform='rotate(45 50 50)'/></svg>"); /* Círculos e quadrados rotacionados para um 'plus' abstrato */
+  background-size: cover, 100px 100px; /* Cover para o gradiente, 100x100 para o padrão */
+  background-repeat: no-repeat, repeat;
+  background-position: center center, 0 0;
+}
 
 
 @layer base {

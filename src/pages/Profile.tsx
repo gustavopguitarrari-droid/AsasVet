@@ -69,7 +69,7 @@ const Profile = () => {
       </div>
 
       <Card className="overflow-hidden"> {/* Adicionado overflow-hidden para cantos arredondados */}
-        <CardHeader className="bg-primary text-primary-foreground p-6 flex flex-col items-center text-center">
+        <CardHeader className="profile-header-art-bg text-primary-foreground p-6 flex flex-col items-center text-center">
           <Avatar className="h-28 w-28 mb-3 border-4 border-primary-foreground shadow-lg"> {/* Avatar maior, com borda */}
             {user.avatarUrl ? (
               <AvatarImage src={user.avatarUrl} alt={user.name} />
@@ -97,61 +97,79 @@ const Profile = () => {
               onCancel={handleCancelEdit}
             />
           ) : (
-            <div className="space-y-4">
-              {/* Área clicável para entrar no modo de edição */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+              {/* Nome Completo */}
               <div
-                className="group cursor-pointer rounded-md transition-colors duration-200"
+                className="group flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors cursor-pointer"
                 onClick={() => setIsEditing(true)}
               >
-                <div className="flex items-center justify-between p-3 border-b border-border group-hover:bg-accent/50">
-                  <div className="flex items-center space-x-4">
-                    <UserIcon className="h-5 w-5 text-primary" />
-                    <p className="text-base font-medium text-muted-foreground">Nome Completo:</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-base font-semibold">{user.name} {user.lastName}</p>
-                    <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
+                <div className="flex items-center space-x-4">
+                  <UserIcon className="h-5 w-5 text-primary" />
+                  <p className="text-base font-medium text-muted-foreground">Nome:</p>
                 </div>
-                <div className="flex items-center justify-between p-3 border-b border-border group-hover:bg-accent/50">
-                  <div className="flex items-center space-x-4">
-                    <Mail className="h-5 w-5 text-primary" />
-                    <p className="text-base font-medium text-muted-foreground">E-mail:</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-base font-semibold">{user.email}</p>
-                    <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
+                <div className="flex items-center space-x-2">
+                  <p className="text-base font-semibold">{user.name} {user.lastName}</p>
+                  <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <div className="flex items-center justify-between p-3 border-b border-border group-hover:bg-accent/50">
-                  <div className="flex items-center space-x-4">
-                    <Briefcase className="h-5 w-5 text-primary" />
-                    <p className="text-base font-medium text-muted-foreground">Cargo:</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-base font-semibold">{user.role}</p>
-                    <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
+              </div>
+
+              {/* E-mail */}
+              <div
+                className="group flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors cursor-pointer"
+                onClick={() => setIsEditing(true)}
+              >
+                <div className="flex items-center space-x-4">
+                  <Mail className="h-5 w-5 text-primary" />
+                  <p className="text-base font-medium text-muted-foreground">E-mail:</p>
                 </div>
-                <div className="flex items-center justify-between p-3 border-b border-border group-hover:bg-accent/50">
-                  <div className="flex items-center space-x-4">
-                    <Cake className="h-5 w-5 text-primary" />
-                    <p className="text-base font-medium text-muted-foreground">Aniversário:</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-base font-semibold">{formattedBirthday}</p>
-                    <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
+                <div className="flex items-center space-x-2">
+                  <p className="text-base font-semibold">{user.email}</p>
+                  <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                <div className="flex items-center justify-between p-3 group-hover:bg-accent/50"> {/* Sem borda inferior para o último item */}
-                  <div className="flex items-center space-x-4">
-                    <Clock className="h-5 w-5 text-primary" />
-                    <p className="text-base font-medium text-muted-foreground">Tempo na Empresa:</p>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <p className="text-base font-semibold">{timeInCompany}</p>
-                    <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
+              </div>
+
+              {/* Cargo */}
+              <div
+                className="group flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors cursor-pointer"
+                onClick={() => setIsEditing(true)}
+              >
+                <div className="flex items-center space-x-4">
+                  <Briefcase className="h-5 w-5 text-primary" />
+                  <p className="text-base font-medium text-muted-foreground">Cargo:</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <p className="text-base font-semibold">{user.role}</p>
+                  <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </div>
+
+              {/* Aniversário */}
+              <div
+                className="group flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors cursor-pointer"
+                onClick={() => setIsEditing(true)}
+              >
+                <div className="flex items-center space-x-4">
+                  <Cake className="h-5 w-5 text-primary" />
+                  <p className="text-base font-medium text-muted-foreground">Aniversário:</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <p className="text-base font-semibold">{formattedBirthday}</p>
+                  <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </div>
+
+              {/* Tempo na Empresa */}
+              <div
+                className="group flex items-center justify-between p-3 border rounded-md hover:bg-accent/50 transition-colors cursor-pointer"
+                onClick={() => setIsEditing(true)}
+              >
+                <div className="flex items-center space-x-4">
+                  <Clock className="h-5 w-5 text-primary" />
+                  <p className="text-base font-medium text-muted-foreground">Tempo na Empresa:</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <p className="text-base font-semibold">{timeInCompany}</p>
+                  <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </div>
             </div>
