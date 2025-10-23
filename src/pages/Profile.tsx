@@ -91,8 +91,8 @@ const Profile = () => {
                 </AvatarFallback>
               )}
             </Avatar>
-            <div className="absolute inset-0 flex items-center justify-center bg-primary/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-              <Plus className="h-8 w-8 text-primary-foreground" /> {/* Ícone Plus aqui */}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+              <Plus className="h-8 w-8 text-white" /> {/* Ícone Plus aqui */}
             </div>
           </div>
           <CardTitle className="text-3xl font-bold">{user.name} {user.lastName}</CardTitle>
