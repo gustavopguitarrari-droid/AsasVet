@@ -33,6 +33,9 @@ const UserProfile = () => {
     );
   }
 
+  // Calcular as iniciais
+  const initials = `${user.name.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -41,8 +44,8 @@ const UserProfile = () => {
             {user.avatarUrl ? (
               <AvatarImage src={user.avatarUrl} alt={user.name} />
             ) : (
-              <AvatarFallback>
-                <UserIcon className="h-5 w-5" />
+              <AvatarFallback className="bg-muted text-muted-foreground text-sm font-bold">
+                {initials} {/* Exibe as iniciais aqui */}
               </AvatarFallback>
             )}
           </Avatar>
