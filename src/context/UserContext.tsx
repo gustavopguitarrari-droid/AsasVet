@@ -1,12 +1,17 @@
 "use client";
 
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { format } from 'date-fns'; // Importar format para a data de registro
 
 interface User {
   name: string;
+  lastName: string; // Novo campo
   email: string;
   gender: 'masculino' | 'feminino';
   avatarUrl?: string;
+  role: string; // Novo campo
+  birthday?: string; // Novo campo (formato YYYY-MM-DD)
+  registeredTime: string; // Novo campo (formato YYYY-MM-DD HH:mm)
 }
 
 interface UserContextType {
@@ -16,13 +21,17 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider = ({ children }: { children: ReactNode }) => {
+export const UserProvider = ({ children }: { ReactNode }) => {
   // Dados de usuário mock para demonstração inicial
   const [user, setUser] = useState<User | null>({
     name: "João",
+    lastName: "Silva", // Adicionado
     email: "joao.silva@example.com",
     gender: "masculino",
     avatarUrl: "https://github.com/shadcn.png",
+    role: "Veterinário", // Adicionado
+    birthday: "1990-05-15", // Adicionado
+    registeredTime: format(new Date(), "yyyy-MM-dd HH:mm"), // Adicionado
   });
 
   return (

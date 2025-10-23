@@ -23,17 +23,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Reintroduzido
-import { User as UserIcon, Upload } from "lucide-react"; // Reintroduzido ícone Upload
-import { Label } from "@/components/ui/label"; // Reintroduzido Label
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { User as UserIcon, Upload } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import BirthdayPicker from "./BirthdayPicker"; // Importar o novo componente
+import RoleSelect from "./RoleSelect"; // Importar o novo componente
 
 const formSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório."),
+  lastName: z.string().min(1, "O sobrenome é obrigatório."), // Novo campo
   email: z.string().email("E-mail inválido.").min(1, "O e-mail é obrigatório."),
   gender: z.enum(["masculino", "feminino"], {
     required_error: "O gênero é obrigatório.",
   }),
-  avatarUrl: z.string().optional().or(z.literal("")), // Mantido para Data URLs
+  avatarUrl: z.string().optional().or(z.literal("")),
+  role: z.string().min(1, "O cargo é obrigatório."), // Novo campo
+  birthday: z.date().optional().nullable(), // Novo campo (Date para o formulário)
 });
 
 export type ProfileFormValues = z.infer<typeof formSchema>;
@@ -41,7 +46,7 @@ export type ProfileFormValues = z.infer<typeof formSchema>;
 interface ProfileEditDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  initialData: ProfileFormValues;
+  initialData: Omit<ProfileFormValues, "birthday"> & { birthday?: Date | undefined }; // Ajusta initialData para aceitar Date
   onSave: (data: ProfileFormValues) => void;
 }
 
@@ -53,10 +58,13 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
 }) => {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData,
+    defaultValues: {
+      ...initialData,
+      birthday: initialData.birthday || undefined, // Garante que seja Date ou undefined
+    },
   });
 
-  const avatarUrlWatch = form.watch("avatarUrl"); // Observar o valor do avatarUrl
+  const avatarUrlWatch = form.watch("avatarUrl");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -67,7 +75,7 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
       };
       reader.readAsDataURL(file);
     } else {
-      form.setValue("avatarUrl", ""); // Limpa se nenhum arquivo for selecionado
+      form.setValue("avatarUrl", "");
     }
   };
 
@@ -78,7 +86,7 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Perfil</DialogTitle>
           <DialogDescription>
@@ -110,7 +118,7 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
                           type="file"
                           accept="image/*"
                           onChange={handleFileChange}
-                          className="hidden" // Esconde o input de arquivo padrão
+                          className="hidden"
                         />
                         <Label htmlFor="avatar-upload" className="flex-1">
                           <Button asChild variant="outline" className="w-full cursor-pointer">
@@ -127,7 +135,7 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
                             onClick={() => form.setValue("avatarUrl", "")}
                             className="text-destructive hover:text-destructive-foreground"
                           >
-                            <UserIcon className="h-4 w-4" /> {/* Ícone para remover */}
+                            <UserIcon className="h-4 w-4" />
                             <span className="sr-only">Remover Foto</span>
                           </Button>
                         )}
@@ -147,6 +155,19 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
                   <FormLabel>Nome</FormLabel>
                   <FormControl>
                     <Input placeholder="Seu nome" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Sobrenome</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Seu sobrenome" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -182,6 +203,28 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
                       <SelectItem value="feminino">Feminino</SelectItem>
                     </SelectContent>
                   </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cargo</FormLabel>
+                  <RoleSelect value={field.value} onValueChange={field.onChange} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="birthday"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Aniversário</FormLabel>
+                  <BirthdayPicker value={field.value || undefined} onChange={field.onChange} />
                   <FormMessage />
                 </FormItem>
               )}

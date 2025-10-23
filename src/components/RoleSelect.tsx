@@ -1,0 +1,46 @@
+"use client";
+
+import React from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { FormControl } from "@/components/ui/form";
+
+interface RoleSelectProps {
+  value: string;
+  onValueChange: (value: string) => void;
+}
+
+const mockRoles = [
+  "Veterinário",
+  "Enfermeiro",
+  "Recepcionista",
+  "Gerente",
+  "Estagiário",
+  "Outro",
+];
+
+const RoleSelect: React.FC<RoleSelectProps> = ({ value, onValueChange }) => {
+  return (
+    <Select onValueChange={onValueChange} defaultValue={value}>
+      <FormControl>
+        <SelectTrigger>
+          <SelectValue placeholder="Selecione o cargo" />
+        </SelectTrigger>
+      </FormControl>
+      <SelectContent>
+        {mockRoles.map((role) => (
+          <SelectItem key={role} value={role}>
+            {role}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+};
+
+export default RoleSelect;
