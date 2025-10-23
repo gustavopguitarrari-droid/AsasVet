@@ -15,28 +15,30 @@ import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SpeciesFilter from "@/components/SpeciesFilter";
 import PetDetailsDialog from "@/components/PetDetailsDialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"; // Importar Dialog
+import ClientForm, { ClientFormValues } from "@/components/ClientForm"; // Importar o novo ClientForm
+import { Client, Pet } from "@/types/cadastro"; // Importar as novas interfaces
 
-// Mock de dados para Animais (copiado de src/pages/Pets.tsx)
-interface Pet {
-  id: string;
-  name: string;
-  species: string;
-  breed: string;
-  owner: string;
-}
-
-const mockPets: Pet[] = [
-  { id: "A001", name: "Rex", species: "Cachorro", breed: "Labrador", owner: "João Silva" },
-  { id: "A002", name: "Miau", species: "Gato", breed: "Siamês", owner: "Maria Souza" },
-  { id: "A003", name: "Pingo", species: "Pássaro", breed: "Periquito", owner: "Pedro Santos" },
-  { id: "A004", name: "Fido", species: "Cachorro", breed: "Poodle", owner: "Ana Costa" },
-  { id: "A005", name: "Whiskers", species: "Gato", breed: "Persa", owner: "Carlos Lima" },
-  { id: "A006", name: "Pipoca", species: "Roedor", breed: "Hamster", owner: "Fernanda Reis" },
-  { id: "A007", name: "Nemo", species: "Peixe", breed: "Peixe-palhaço", owner: "Lucas Mendes" },
-  { id: "A008", name: "Bolt", species: "Cachorro", breed: "Golden Retriever", owner: "Mariana Santos" },
+// Mock de dados para Tutores
+const initialMockClients: Client[] = [
+  { id: "CL001", name: "João Silva", email: "joao.silva@example.com", phone: "(11) 98765-4321" },
+  { id: "CL002", name: "Maria Souza", email: "maria.souza@example.com", phone: "(21) 91234-5678" },
+  { id: "CL003", name: "Pedro Santos", email: "pedro.santos@example.com", phone: "(31) 99876-1234" },
 ];
 
-// Mapeamento de espécies para ícones (copiado de src/pages/Pets.tsx)
+// Mock de dados para Animais
+const initialMockPets: Pet[] = [
+  { id: "A001", name: "Rex", species: "Cachorro", breed: "Labrador", ownerId: "CL001" },
+  { id: "A002", name: "Miau", species: "Gato", breed: "Siamês", ownerId: "CL002" },
+  { id: "A003", name: "Pingo", species: "Pássaro", breed: "Periquito", ownerId: "CL003" },
+  { id: "A004", name: "Fido", species: "Cachorro", breed: "Poodle", ownerId: "CL001" },
+  { id: "A005", name: "Whiskers", species: "Gato", breed: "Persa", ownerId: "CL002" },
+  { id: "A006", name: "Pipoca", species: "Roedor", breed: "Hamster", ownerId: "CL003" },
+  { id: "A007", name: "Nemo", species: "Peixe", breed: "Peixe-palhaço", ownerId: "CL001" },
+  { id: "A008", name: "Bolt", species: "Cachorro", breed: "Golden Retriever", ownerId: "CL002" },
+];
+
+// Mapeamento de espécies para ícones
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
   Gato: Cat,
@@ -46,22 +48,10 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Outros: MoreHorizontal,
 };
 
-// Mock de dados para Tutores (copiado de src/pages/Clients.tsx)
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-}
-
-const mockClients: Client[] = [
-  { id: "1", name: "João Silva", email: "joao.silva@example.com", phone: "(11) 98765-4321" },
-  { id: "2", name: "Maria Souza", email: "maria.souza@example.com", phone: "(21) 91234-5678" },
-  { id: "3", name: "Pedro Santos", email: "pedro.santos@example.com", phone: "(31) 99876-1234" },
-];
-
 const Cadastro = () => {
-  const [activeTab, setActiveTab] = React.useState<string>("tutores"); // Estado para controlar a aba ativa
+  const [activeTab, setActiveTab] = React.useState<string>("tutores");
+  const [clients, setClients] = React.useState<Client[]>(initialMockClients);
+  const [pets, setPets] = React.useState<Pet[]>(initialMockPets);
 
   // Estados para a aba de Animais
   const [selectedSpecies, setSelectedSpecies] = React.useState<string>("all");
@@ -71,17 +61,41 @@ const Cadastro = () => {
 
   // Estados para a aba de Tutores
   const [clientSearchTerm, setClientSearchTerm] = React.useState<string>("");
+  const [isAddClientDialogOpen, setIsAddClientDialogOpen] = React.useState<boolean>(false);
 
   const handleSelectSpecies = (species: string) => {
     setSelectedSpecies(species);
   };
 
-  const filteredPets = mockPets.filter((pet) => {
+  const handleAddClient = (data: ClientFormValues) => {
+    const newClientId = `CL${(clients.length + 1).toString().padStart(3, '0')}`;
+    const newClient: Client = {
+      id: newClientId,
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+    };
+    setClients((prev) => [...prev, newClient]);
+
+    // Atualiza os pets selecionados para terem o novo ownerId
+    if (data.associatedPetIds && data.associatedPetIds.length > 0) {
+      setPets((prevPets) =>
+        prevPets.map((pet) =>
+          data.associatedPetIds?.includes(pet.id)
+            ? { ...pet, ownerId: newClientId } // Associa o pet ao novo tutor
+            : pet
+        )
+      );
+    }
+    setIsAddClientDialogOpen(false);
+  };
+
+  const filteredPets = pets.filter((pet) => {
     const matchesSpecies = selectedSpecies === "all" || pet.species === selectedSpecies;
     const matchesSearch =
       pet.name.toLowerCase().includes(petSearchTerm.toLowerCase()) ||
       pet.breed.toLowerCase().includes(petSearchTerm.toLowerCase()) ||
-      pet.owner.toLowerCase().includes(petSearchTerm.toLowerCase());
+      clients.find(client => client.id === pet.ownerId)?.name.toLowerCase().includes(petSearchTerm.toLowerCase()); // Busca pelo nome do tutor
     return matchesSpecies && matchesSearch;
   });
 
@@ -90,7 +104,7 @@ const Cadastro = () => {
     setIsPetDetailsDialogOpen(true);
   };
 
-  const filteredClients = mockClients.filter((client) =>
+  const filteredClients = clients.filter((client) =>
     client.name.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
     client.email.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
     client.phone.toLowerCase().includes(clientSearchTerm.toLowerCase())
@@ -100,11 +114,24 @@ const Cadastro = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Cadastro de novos tutores e animais</h2>
-        {/* Botões de adicionar movidos para cá, exibidos condicionalmente */}
         {activeTab === "tutores" && (
-          <Button className="font-bold">
-            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
-          </Button>
+          <Dialog open={isAddClientDialogOpen} onOpenChange={setIsAddClientDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="font-bold">
+                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px]">
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Tutor</DialogTitle>
+              </DialogHeader>
+              <ClientForm
+                onSubmit={handleAddClient}
+                onCancel={() => setIsAddClientDialogOpen(false)}
+                allPets={pets} // Passa todos os pets para seleção
+              />
+            </DialogContent>
+          </Dialog>
         )}
         {activeTab === "animais" && (
           <Button className="font-bold">
@@ -124,13 +151,11 @@ const Cadastro = () => {
         </TabsList>
 
         <TabsContent value="tutores" className="mt-4">
-          {/* O botão "Adicionar Tutor" foi movido para cima */}
           <div className="flex items-center space-x-2 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input placeholder="Buscar tutores..." className="pl-9" value={clientSearchTerm} onChange={(e) => setClientSearchTerm(e.target.value)} />
             </div>
-            {/* Botão Filtrar removido */}
           </div>
 
           <div className="rounded-md border">
@@ -141,27 +166,40 @@ const Cadastro = () => {
                   <TableHead>Nome</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Telefone</TableHead>
+                  <TableHead>Animais</TableHead> {/* Nova coluna para animais */}
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredClients.length > 0 ? (
-                  filteredClients.map((client) => (
-                    <TableRow key={client.id}>
-                      <TableCell className="font-medium">{client.id}</TableCell>
-                      <TableCell>{client.name}</TableCell>
-                      <TableCell>{client.email}</TableCell>
-                      <TableCell>{client.phone}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
-                          Ver Detalhes
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                  filteredClients.map((client) => {
+                    const associatedPets = pets.filter(pet => pet.ownerId === client.id);
+                    return (
+                      <TableRow key={client.id}>
+                        <TableCell className="font-medium">{client.id}</TableCell>
+                        <TableCell>{client.name}</TableCell>
+                        <TableCell>{client.email}</TableCell>
+                        <TableCell>{client.phone}</TableCell>
+                        <TableCell>
+                          {associatedPets.length > 0 ? (
+                            <ul className="list-disc list-inside text-sm text-muted-foreground">
+                              {associatedPets.map(pet => <li key={pet.id}>{pet.name} ({pet.species})</li>)}
+                            </ul>
+                          ) : (
+                            <span className="text-muted-foreground text-sm">Nenhum animal</span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="sm">
+                            Ver Detalhes
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
+                    <TableCell colSpan={6} className="h-24 text-center">
                       Nenhum tutor encontrado.
                     </TableCell>
                   </TableRow>
@@ -172,7 +210,6 @@ const Cadastro = () => {
         </TabsContent>
 
         <TabsContent value="animais" className="mt-4">
-          {/* O botão "Adicionar Animal" foi movido para cima */}
           <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
             <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
           </div>
@@ -187,7 +224,6 @@ const Cadastro = () => {
                 onChange={(e) => setPetSearchTerm(e.target.value)}
               />
             </div>
-            {/* Botão Filtrar removido */}
           </div>
 
           <div className="rounded-md border">
@@ -197,7 +233,7 @@ const Cadastro = () => {
                   <TableHead>Nome</TableHead>
                   <TableHead>Espécie</TableHead>
                   <TableHead>Raça</TableHead>
-                  <TableHead>Dono</TableHead>
+                  <TableHead>Tutor</TableHead> {/* Alterado para Tutor */}
                   <TableHead>ID</TableHead>
                 </TableRow>
               </TableHeader>
@@ -205,6 +241,7 @@ const Cadastro = () => {
                 {filteredPets.length > 0 ? (
                   filteredPets.map((pet) => {
                     const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
+                    const owner = clients.find(client => client.id === pet.ownerId);
                     return (
                       <TableRow key={pet.id} onClick={() => handlePetRowClick(pet)} className="cursor-pointer hover:bg-muted/50">
                         <TableCell className="font-bold">{pet.name}</TableCell>
@@ -213,7 +250,7 @@ const Cadastro = () => {
                           {pet.species}
                         </TableCell>
                         <TableCell>{pet.breed}</TableCell>
-                        <TableCell>{pet.owner}</TableCell>
+                        <TableCell>{owner ? owner.name : "N/A"}</TableCell> {/* Exibe o nome do tutor */}
                         <TableCell>{pet.id}</TableCell>
                       </TableRow>
                     );
@@ -230,7 +267,7 @@ const Cadastro = () => {
           </div>
 
           <PetDetailsDialog
-            pet={selectedPet}
+            pet={selectedPet ? { ...selectedPet, owner: clients.find(c => c.id === selectedPet.ownerId)?.name || "N/A" } : null} // Passa o nome do tutor
             isOpen={isPetDetailsDialogOpen}
             onClose={() => setIsPetDetailsDialogOpen(false)}
           />

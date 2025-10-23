@@ -10,17 +10,14 @@ import {
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
 import { Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
+import { Pet } from "@/types/cadastro"; // Importa a interface Pet
 
-interface Pet {
-  id: string;
-  name: string;
-  species: string;
-  breed: string;
-  owner: string;
+interface PetWithOwnerName extends Pet {
+  owner: string; // Adiciona o nome do tutor para exibição
 }
 
 interface PetDetailsDialogProps {
-  pet: Pet | null;
+  pet: PetWithOwnerName | null; // Usa a nova interface
   isOpen: boolean;
   onClose: () => void;
 }
@@ -75,7 +72,7 @@ const PetDetailsDialog: React.FC<PetDetailsDialogProps> = ({ pet, isOpen, onClos
           <Separator />
           <div className="grid grid-cols-3 items-center gap-4">
             <p className="text-sm font-medium text-muted-foreground">Tutor:</p>
-            <p className="col-span-2 text-sm">{pet.owner}</p>
+            <p className="col-span-2 text-sm">{pet.owner}</p> {/* Exibe o nome do tutor */}
           </div>
           {/* Adicione mais detalhes aqui conforme necessário */}
         </div>
