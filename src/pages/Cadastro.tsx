@@ -96,7 +96,12 @@ const Cadastro = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold">Cadastro</h2>
+      <div className="flex items-center justify-between"> {/* Novo div para alinhar título e botão */}
+        <h2 className="text-3xl font-bold">Cadastro</h2>
+        <Button className="font-bold">
+          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
+        </Button>
+      </div>
 
       <Tabs defaultValue="animais" className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
@@ -111,9 +116,7 @@ const Cadastro = () => {
         <TabsContent value="animais" className="mt-4">
           <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
             <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
-            <Button className="font-bold">
-              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
-            </Button>
+            {/* O botão "Adicionar Animal" foi movido para cima */}
           </div>
 
           <div className="flex items-center space-x-2 mb-6">
