@@ -5,12 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { User as UserIcon, Mail, Edit, Briefcase, Cake, Clock } from "lucide-react";
+import { User as UserIcon, Mail, Briefcase, Cake, Clock, Edit } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import ProfileForm, { ProfileFormValues } from "@/components/ProfileForm";
 import { format, parseISO, differenceInMonths, differenceInYears } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { cn } from "@/lib/utils"; // Importar cn para classes condicionais
+import { cn } from "@/lib/utils";
 
 const Profile = () => {
   const { user, setUser } = useUser();
@@ -68,21 +68,21 @@ const Profile = () => {
         {/* O botão "Editar Perfil" foi removido. A edição é ativada ao clicar nas informações. */}
       </div>
 
-      <Card>
-        <CardHeader className="flex flex-col items-center text-center pt-8">
-          <Avatar className="h-32 w-32 mb-4">
+      <Card className="overflow-hidden"> {/* Adicionado overflow-hidden para cantos arredondados */}
+        <CardHeader className="bg-primary text-primary-foreground p-6 flex flex-col items-center text-center">
+          <Avatar className="h-28 w-28 mb-3 border-4 border-primary-foreground shadow-lg"> {/* Avatar maior, com borda */}
             {user.avatarUrl ? (
               <AvatarImage src={user.avatarUrl} alt={user.name} />
             ) : (
-              <AvatarFallback className="bg-muted">
-                <UserIcon className="h-16 w-16 text-muted-foreground" />
+              <AvatarFallback className="bg-primary-foreground text-primary">
+                <UserIcon className="h-14 w-14" />
               </AvatarFallback>
             )}
           </Avatar>
-          <CardTitle className="text-2xl font-bold">{user.name} {user.lastName}</CardTitle>
-          <p className="text-muted-foreground">{user.email}</p>
+          <CardTitle className="text-3xl font-bold">{user.name} {user.lastName}</CardTitle>
+          <p className="text-primary-foreground/80 text-lg">{user.email}</p>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="p-6">
           {isEditing ? (
             <ProfileForm
               initialData={{
@@ -97,68 +97,64 @@ const Profile = () => {
               onCancel={handleCancelEdit}
             />
           ) : (
-            <>
-              <Separator />
+            <div className="space-y-4">
+              {/* Área clicável para entrar no modo de edição */}
               <div
-                className={cn(
-                  "flex items-center space-x-4 p-2 rounded-md",
-                  !isEditing && "cursor-pointer hover:bg-muted/50 transition-colors"
-                )}
+                className="group cursor-pointer rounded-md transition-colors duration-200"
                 onClick={() => setIsEditing(true)}
               >
-                <UserIcon className="h-5 w-5 text-muted-foreground" />
-                <p className="text-lg font-medium">Nome Completo:</p>
-                <p className="flex-1 text-lg">{user.name} {user.lastName}</p>
+                <div className="flex items-center justify-between p-3 border-b border-border group-hover:bg-accent/50">
+                  <div className="flex items-center space-x-4">
+                    <UserIcon className="h-5 w-5 text-primary" />
+                    <p className="text-base font-medium text-muted-foreground">Nome Completo:</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-base font-semibold">{user.name} {user.lastName}</p>
+                    <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 border-b border-border group-hover:bg-accent/50">
+                  <div className="flex items-center space-x-4">
+                    <Mail className="h-5 w-5 text-primary" />
+                    <p className="text-base font-medium text-muted-foreground">E-mail:</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-base font-semibold">{user.email}</p>
+                    <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 border-b border-border group-hover:bg-accent/50">
+                  <div className="flex items-center space-x-4">
+                    <Briefcase className="h-5 w-5 text-primary" />
+                    <p className="text-base font-medium text-muted-foreground">Cargo:</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-base font-semibold">{user.role}</p>
+                    <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 border-b border-border group-hover:bg-accent/50">
+                  <div className="flex items-center space-x-4">
+                    <Cake className="h-5 w-5 text-primary" />
+                    <p className="text-base font-medium text-muted-foreground">Aniversário:</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-base font-semibold">{formattedBirthday}</p>
+                    <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 group-hover:bg-accent/50"> {/* Sem borda inferior para o último item */}
+                  <div className="flex items-center space-x-4">
+                    <Clock className="h-5 w-5 text-primary" />
+                    <p className="text-base font-medium text-muted-foreground">Tempo na Empresa:</p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <p className="text-base font-semibold">{timeInCompany}</p>
+                    <Edit className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </div>
+                </div>
               </div>
-              <Separator />
-              <div
-                className={cn(
-                  "flex items-center space-x-4 p-2 rounded-md",
-                  !isEditing && "cursor-pointer hover:bg-muted/50 transition-colors"
-                )}
-                onClick={() => setIsEditing(true)}
-              >
-                <Mail className="h-5 w-5 text-muted-foreground" />
-                <p className="text-lg font-medium">E-mail:</p>
-                <p className="flex-1 text-lg">{user.email}</p>
-              </div>
-              <Separator />
-              <div
-                className={cn(
-                  "flex items-center space-x-4 p-2 rounded-md",
-                  !isEditing && "cursor-pointer hover:bg-muted/50 transition-colors"
-                )}
-                onClick={() => setIsEditing(true)}
-              >
-                <Briefcase className="h-5 w-5 text-muted-foreground" />
-                <p className="text-lg font-medium">Cargo:</p>
-                <p className="flex-1 text-lg">{user.role}</p>
-              </div>
-              <Separator />
-              <div
-                className={cn(
-                  "flex items-center space-x-4 p-2 rounded-md",
-                  !isEditing && "cursor-pointer hover:bg-muted/50 transition-colors"
-                )}
-                onClick={() => setIsEditing(true)}
-              >
-                <Cake className="h-5 w-5 text-muted-foreground" />
-                <p className="text-lg font-medium">Aniversário:</p>
-                <p className="flex-1 text-lg">{formattedBirthday}</p>
-              </div>
-              <Separator />
-              <div
-                className={cn(
-                  "flex items-center space-x-4 p-2 rounded-md",
-                  !isEditing && "cursor-pointer hover:bg-muted/50 transition-colors"
-                )}
-                onClick={() => setIsEditing(true)}
-              >
-                <Clock className="h-5 w-5 text-muted-foreground" />
-                <p className="text-lg font-medium">Tempo na Empresa:</p>
-                <p className="flex-1 text-lg">{timeInCompany}</p>
-              </div>
-            </>
+            </div>
           )}
         </CardContent>
       </Card>
