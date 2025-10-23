@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react"; // Removed useState as it's now handled by individual fields
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Mail, Briefcase, Cake, Clock } from "lucide-react"; // Removed Edit icon
+import { User as UserIcon, Mail, Briefcase, Cake, Clock } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { format, parseISO, differenceInMonths, differenceInYears } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -13,10 +13,11 @@ import { cn } from "@/lib/utils";
 import EditableField from "@/components/EditableField";
 import EditableRoleField from "@/components/EditableRoleField";
 import EditableBirthdayField from "@/components/EditableBirthdayField";
+import ProfilePictureUploadDialog from "@/components/ProfilePictureUploadDialog"; // Importar o novo diálogo
 
 const Profile = () => {
   const { user, setUser } = useUser();
-  // Removed isEditing state
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false); // Novo estado para o diálogo de upload
 
   if (!user) {
     return (
@@ -47,6 +48,10 @@ const Profile = () => {
     setUser({ ...user, birthday: newBirthday });
   };
 
+  const handleSaveAvatar = (newAvatarUrl: string) => {
+    setUser({ ...user, avatarUrl: newAvatarUrl || undefined }); // Define como undefined se a URL for vazia
+  };
+
   let timeInCompany = "N/A";
   if (user.registeredTime) {
     const registrationDate = parseISO(user.registeredTime);
@@ -73,15 +78,23 @@ const Profile = () => {
 
       <Card className="overflow-hidden">
         <CardHeader className="profile-header-art-bg text-primary-foreground p-6 flex flex-col items-center text-center">
-          <Avatar className="h-28 w-28 mb-3 border-4 border-primary-foreground shadow-lg">
-            {user.avatarUrl ? (
-              <AvatarImage src={user.avatarUrl} alt={user.name} />
-            ) : (
-              <AvatarFallback className="bg-primary-foreground text-primary">
-                <UserIcon className="h-14 w-14" />
-              </AvatarFallback>
-            )}
-          </Avatar>
+          <div
+            className="relative group cursor-pointer"
+            onClick={() => setIsUploadDialogOpen(true)} // Abre o diálogo de upload ao clicar no avatar
+          >
+            <Avatar className="h-28 w-28 mb-3 border-4 border-primary-foreground shadow-lg">
+              {user.avatarUrl ? (
+                <AvatarImage src={user.avatarUrl} alt={user.name} />
+              ) : (
+                <AvatarFallback className="bg-primary-foreground text-primary">
+                  <UserIcon className="h-14 w-14" />
+                </AvatarFallback>
+              )}
+            </Avatar>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+              <UserIcon className="h-8 w-8 text-white" />
+            </div>
+          </div>
           <CardTitle className="text-3xl font-bold">{user.name} {user.lastName}</CardTitle>
           <p className="text-primary-foreground/80 text-lg">{user.email}</p>
         </CardHeader>
@@ -127,6 +140,13 @@ const Profile = () => {
           </div>
         </CardContent>
       </Card>
+
+      <ProfilePictureUploadDialog
+        isOpen={isUploadDialogOpen}
+        onClose={() => setIsUploadDialogOpen(false)}
+        currentAvatarUrl={user.avatarUrl}
+        onSave={handleSaveAvatar}
+      />
     </div>
   );
 };
