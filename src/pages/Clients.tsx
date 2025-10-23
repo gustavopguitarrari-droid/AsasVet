@@ -17,7 +17,7 @@ const mockClients = [
   { id: "3", name: "Pedro Santos", email: "pedro.santos@example.com", phone: "(31) 99876-1234" },
 ];
 
-const Clientes = () => { // Renomeado de Clients para Clientes
+const Clients = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -67,4 +67,4 @@ const Clientes = () => { // Renomeado de Clients para Clientes
   );
 };
 
-export default Clientes; // Exportação renomeada
+export default Clients;

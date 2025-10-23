@@ -1,8 +1,8 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import UserProfile from "@/components/UserProfile";
-import ThemeToggle from "@/components/ThemeToggle";
-import ColorThemeToggle from "@/components/ColorThemeToggle";
+import ThemeToggle from "@/components/ThemeToggle"; // Importar o ThemeToggle existente
+import ColorThemeToggle from "@/components/ColorThemeToggle"; // Importar o novo ColorThemeToggle
 
 const Header = () => {
   const location = useLocation();
@@ -10,14 +10,14 @@ const Header = () => {
     switch (location.pathname) {
       case "/painel":
         return "Painel";
-      case "/clientes": // Rota atualizada para /clientes
-        return "Clientes"; // Título atualizado
+      case "/clients":
+        return "Clientes";
       case "/pets":
-        return "Cadastro de animais";
+        return "Cadastro de animais"; // Título atualizado aqui
       case "/appointments":
         return "Consultas";
       case "/medical-records":
-        return "Agenda";
+        return "Agenda"; // Título atualizado
       case "/financeiro":
         return "Financeiro";
       case "/caixa":
@@ -25,8 +25,8 @@ const Header = () => {
       case "/internacao":
         return "Internação";
       case "/veterinarios":
-        return "Equipe";
-      case "/estoque":
+        return "Equipe"; // Título atualizado
+      case "/estoque": // Novo título para Estoque
         return "Estoque";
       default:
         return "Simples Vet";
@@ -37,8 +37,8 @@ const Header = () => {
     <header className="flex items-center justify-between border-b bg-background p-4 shadow-sm">
       <h1 className="text-2xl font-semibold">{getTitle()}</h1>
       <div className="flex items-center space-x-2">
-        <ColorThemeToggle />
-        <ThemeToggle />
+        <ColorThemeToggle /> {/* Adicionado o seletor de tema de cor */}
+        <ThemeToggle /> {/* Mantido o alternador de modo claro/escuro */}
         <UserProfile />
       </div>
     </header>

@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
-import Clientes from "./pages/Clientes"; // Renomeado de Clients para Clientes
+import Clients from "./pages/Clients";
 import Pets from "./pages/Pets";
 import Appointments from "./pages/Appointments";
 import AgendamentosMedicos from "./pages/AgendamentosMedicos";
@@ -13,7 +13,7 @@ import Financeiro from "./pages/Financeiro";
 import Caixa from "./pages/Caixa";
 import Internacao from "./pages/Internacao";
 import Veterinarios from "./pages/Veterinarios";
-import Estoque from "./pages/Estoque";
+import Estoque from "./pages/Estoque"; // Importação da nova página de Estoque
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,10 +42,10 @@ const App = () => (
             }
           />
           <Route
-            path="/clientes" {/* Rota atualizada para /clientes */}
+            path="/clients"
             element={
               <Layout>
-                <Clientes />
+                <Clients />
               </Layout>
             }
           />
@@ -106,7 +106,7 @@ const App = () => (
             }
           />
           <Route
-            path="/estoque"
+            path="/estoque" // Nova rota para Estoque
             element={
               <Layout>
                 <Estoque />
