@@ -51,7 +51,7 @@ const UserProfile = () => {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-56" align="end"> {/* Removido forceMount */}
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{user.name}</p>
@@ -67,7 +67,7 @@ const UserProfile = () => {
             Perfil
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild> {/* Adicionado asChild para o Link */}
+        <DropdownMenuItem asChild>
           <Link to="/settings" className="flex items-center">
             <Settings className="mr-2 h-4 w-4" />
             Configurações
