@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import {
   DropdownMenu,
@@ -9,21 +11,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { User as UserIcon } from "lucide-react"; // Renomeado para evitar conflito
-import { useUser } from "@/context/UserContext"; // Importa o hook useUser
-import { Link } from "react-router-dom"; // Importar Link para navegação
+import { User as UserIcon, LogOut, Settings, UserCircle } from "lucide-react"; // Adicionado UserCircle para o link de perfil
+import { useUser } from "@/context/UserContext";
+import { Link, useNavigate } from "react-router-dom"; // Importar useNavigate
 
 const UserProfile = () => {
-  const { user, setUser } = useUser(); // Usa o contexto do usuário
+  const { user, setUser } = useUser();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
     console.log("Usuário deslogado!");
-    setUser(null); // Limpa os dados do usuário ao deslogar
-    // Lógica de logout aqui (redirecionar para login, limpar tokens, etc.)
+    setUser(null);
+    navigate("/"); // Redireciona para a página inicial após o logout
   };
 
   if (!user) {
-    // Renderiza um botão de login ou um placeholder se não houver usuário
     return (
       <Button variant="ghost" onClick={() => console.log("Login clicked")}>
         Login
@@ -57,13 +59,18 @@ const UserProfile = () => {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link to="/profile">Perfil</Link> {/* Link para a nova página de perfil */}
+          <Link to="/profile" className="flex items-center">
+            <UserCircle className="mr-2 h-4 w-4" />
+            Perfil
+          </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem className="flex items-center">
+          <Settings className="mr-2 h-4 w-4" />
           Configurações
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>
+        <DropdownMenuItem onClick={handleLogout} className="flex items-center">
+          <LogOut className="mr-2 h-4 w-4" />
           Sair
         </DropdownMenuItem>
       </DropdownMenuContent>
