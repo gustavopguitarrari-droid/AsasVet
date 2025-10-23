@@ -12,10 +12,18 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-// Removendo importações de componentes de formulário e ícones para simplificar
-// import { Input } from "@/components/ui/input";
-// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// Removendo importações de Avatar e ícones de upload por enquanto
 // import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 // import { User as UserIcon, Upload } from "lucide-react";
 
@@ -48,10 +56,6 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     defaultValues: initialData,
   });
 
-  // Funções de manipulação de arquivo e watch de avatarUrl removidas para simplificação
-  // const avatarUrlWatch = form.watch("avatarUrl");
-  // const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => { /* ... */ };
-
   const handleSubmit = (data: ProfileFormValues) => {
     onSave(data);
     onClose();
@@ -61,21 +65,68 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Editar Perfil (Simplificado)</DialogTitle>
+          <DialogTitle>Editar Perfil</DialogTitle>
           <DialogDescription>
-            Este é um teste para verificar a funcionalidade do diálogo.
+            Faça alterações no seu perfil aqui. Clique em salvar quando terminar.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
-          <p>Conteúdo simplificado do diálogo.</p>
-          <p>Nome inicial: {initialData.name}</p>
-        </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} type="button">
-            Cancelar
-          </Button>
-          <Button type="submit" onClick={form.handleSubmit(handleSubmit)}>Salvar Alterações</Button>
-        </DialogFooter>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Seu nome" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>E-mail</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="seu.email@exemplo.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="gender"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gênero</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione seu gênero" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="masculino">Masculino</SelectItem>
+                      <SelectItem value="feminino">Feminino</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <DialogFooter>
+              <Button variant="outline" onClick={onClose} type="button">
+                Cancelar
+              </Button>
+              <Button type="submit">Salvar Alterações</Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
