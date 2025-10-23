@@ -26,6 +26,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
 
 interface DashboardItemConfig {
   id: string;
@@ -55,6 +56,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
   onSave,
 }) => {
   const [tempConfig, setTempConfig] = React.useState<DashboardItemConfig[]>(config);
+  const [cardToAddId, setCardToAddId] = React.useState<string | null>(null); // Estado para o card sendo adicionado
 
   React.useEffect(() => {
     setTempConfig(config);
@@ -74,6 +76,15 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
         item.id === id ? { ...item, category: newCategory } : item
       )
     );
+  };
+
+  const handleConfirmAddCardToCategory = (id: string, category: DashboardItemConfig["category"]) => {
+    setTempConfig((prevConfig) =>
+      prevConfig.map((item) =>
+        item.id === id ? { ...item, isVisible: true, category: category } : item
+      )
+    );
+    setCardToAddId(null); // Fecha o popover
   };
 
   const moveItem = (id: string, direction: "up" | "down") => {
@@ -200,15 +211,38 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                       className="flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
                     >
                       <Label className="text-sm font-medium">{item.name}</Label>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleToggleVisibility(item.id, true)} // Add to visible
-                        className="h-8 w-8 text-green-600 hover:bg-green-100"
-                      >
-                        <PlusCircle className="h-4 w-4" />
-                        <span className="sr-only">Adicionar</span>
-                      </Button>
+                      <Popover open={cardToAddId === item.id} onOpenChange={(isOpen) => !isOpen && setCardToAddId(null)}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setCardToAddId(item.id)}
+                            className="h-8 w-8 text-green-600 hover:bg-green-100"
+                          >
+                            <PlusCircle className="h-4 w-4" />
+                            <span className="sr-only">Adicionar</span>
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[200px] p-2">
+                          <p className="text-sm font-medium mb-2">Adicionar a qual categoria?</p>
+                          <Select
+                            onValueChange={(value: DashboardItemConfig["category"]) =>
+                              handleConfirmAddCardToCategory(item.id, value)
+                            }
+                          >
+                            <SelectTrigger className="w-full h-8 text-sm">
+                              <SelectValue placeholder="Selecionar Categoria" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.entries(categoryNames).map(([val, name]) => (
+                                <SelectItem key={val} value={val}>
+                                  {name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </PopoverContent>
+                      </Popover>
                     </div>
                   ))}
                 </div>
