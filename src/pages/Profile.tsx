@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Mail, Briefcase, Cake, Clock } from "lucide-react";
+import { User as UserIcon, Mail, Briefcase, Cake, Clock, Plus } from "lucide-react"; // Importar Plus
 import { useUser } from "@/context/UserContext";
 import { format, parseISO, differenceInMonths, differenceInYears } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -87,12 +87,12 @@ const Profile = () => {
                 <AvatarImage src={user.avatarUrl} alt={user.name} />
               ) : (
                 <AvatarFallback className="bg-primary-foreground text-primary">
-                  <UserIcon className="h-14 w-14" />
+                  <Plus className="h-14 w-14" /> {/* Ícone Plus aqui */}
                 </AvatarFallback>
               )}
             </Avatar>
             <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-              <UserIcon className="h-8 w-8 text-white" />
+              <Plus className="h-8 w-8 text-white" /> {/* Ícone Plus aqui */}
             </div>
           </div>
           <CardTitle className="text-3xl font-bold">{user.name} {user.lastName}</CardTitle>
