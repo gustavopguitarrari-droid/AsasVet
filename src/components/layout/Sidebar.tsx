@@ -2,10 +2,10 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  Users,
+  Users, // Ícone para Clientes
   PawPrint,
-  CalendarDays, // Usado para Agenda
-  ClipboardList, // Novo ícone para Consultas
+  CalendarDays,
+  ClipboardList,
   DollarSign,
   Plus,
   Stethoscope,
@@ -32,8 +32,14 @@ const navItems = [
     // activeBgClass: "bg-sidebar-item-bg-1", // Removido
   },
   {
+    name: "Clientes", // Nome atualizado
+    icon: Users, // Ícone para Clientes
+    path: "/clientes", // Rota atualizada para /clientes
+    // activeBgClass: "bg-sidebar-item-bg-4", // Removido
+  },
+  {
     name: "Consultas",
-    icon: ClipboardList, // Ícone atualizado para ClipboardList
+    icon: ClipboardList,
     path: "/appointments",
     // activeBgClass: "bg-sidebar-item-bg-4", // Removido
   },
@@ -57,7 +63,7 @@ const navItems = [
   },
   {
     name: "Agenda",
-    icon: CalendarDays, // Ícone atualizado para CalendarDays
+    icon: CalendarDays,
     path: "/medical-records",
     // activeBgClass: "bg-sidebar-item-bg-5", // Removido
   },
@@ -101,20 +107,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                   "text-sidebar-foreground",
                   "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   isCollapsed
-                    ? "h-14 w-14 rounded-full flex items-center justify-center" // Aumentado para h-14 w-14
+                    ? "h-14 w-14 rounded-full flex items-center justify-center"
                     : "w-full justify-start text-xl",
-                  location.pathname === item.path && "bg-sidebar-primary text-sidebar-primary-foreground" // Usando cores dinâmicas
+                  location.pathname === item.path && "bg-sidebar-primary text-sidebar-primary-foreground"
                 )}
               >
                 <Link to={item.path} className="flex items-center">
                   <div
                     className={cn(
                       "flex items-center justify-center",
-                      !isCollapsed && "w-14 h-14 rounded-full mr-3", // Aumentado para w-14 h-14
-                      location.pathname === item.path && "bg-sidebar-primary" // Usando cores dinâmicas
+                      !isCollapsed && "w-14 h-14 rounded-full mr-3",
+                      location.pathname === item.path && "bg-sidebar-primary"
                     )}
                   >
-                    <item.icon className="h-8 w-8" strokeWidth={3.5} /> {/* Aumentado para h-8 w-8 e strokeWidth={3.5} */}
+                    <item.icon className="h-8 w-8" strokeWidth={3.5} />
                   </div>
                   {!isCollapsed && (
                     <span className={cn(location.pathname === item.path && "text-sidebar-primary-foreground")}>
@@ -136,7 +142,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         )}
       >
         <Button
-          variant="default" // Usará a cor --primary do tema
+          variant="default"
           size="icon"
           onClick={onToggleCollapse}
           className={cn(
