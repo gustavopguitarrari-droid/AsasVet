@@ -25,7 +25,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { ScrollArea } from "@/components/ui/scroll-area"; // Importar ScrollArea
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface DashboardItemConfig {
   id: string;
@@ -156,29 +156,23 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     onOpenChange(false);
   };
 
-  const groupedVisible = React.useMemo(() => {
-    return tempConfig
-      .filter((item) => item.isVisible)
-      .reduce((acc, item) => {
-        if (!acc[item.category]) {
-          acc[item.category] = [];
-        }
-        acc[item.category].push(item);
-        return acc;
-      }, {} as Record<DashboardItemConfig["category"], DashboardItemConfig[]>);
+  const availableCards = React.useMemo(() => {
+    return tempConfig.filter((item) => !item.isVisible);
   }, [tempConfig]);
 
-  const groupedHidden = React.useMemo(() => {
-    return tempConfig
-      .filter((item) => !item.isVisible)
-      .reduce((acc, item) => {
-        if (!acc[item.category]) {
-          acc[item.category] = [];
-        }
-        acc[item.category].push(item);
-        return acc;
-      }, {} as Record<DashboardItemConfig["category"], DashboardItemConfig[]>);
+  const configuredCards = React.useMemo(() => {
+    return tempConfig.filter((item) => item.isVisible);
   }, [tempConfig]);
+
+  const groupedConfigured = React.useMemo(() => {
+    return configuredCards.reduce((acc, item) => {
+      if (!acc[item.category]) {
+        acc[item.category] = [];
+      }
+      acc[item.category].push(item);
+      return acc;
+    }, {} as Record<DashboardItemConfig["category"], DashboardItemConfig[]>);
+  }, [configuredCards]);
 
   const allCategories = Object.keys(categoryNames) as DashboardItemConfig["category"][];
 
@@ -188,155 +182,124 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
         <DialogHeader>
           <DialogTitle>Configurar Painel</DialogTitle>
           <DialogDescription>
-            Selecione quais cards você deseja ver no painel e reordene-os.
+            Adicione cards da esquerda para o painel e organize-os na direita.
           </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 overflow-hidden">
-          {/* Seção de Cards Visíveis */}
+          {/* Left side: Available Cards (sem local definido) */}
           <div className="flex flex-col space-y-4 overflow-y-auto pr-2">
-            <h3 className="text-lg font-semibold">Cards Visíveis</h3>
+            <h3 className="text-lg font-semibold">Cards Disponíveis</h3>
             <ScrollArea className="flex-1 pr-2">
-              {allCategories.map((category) => {
-                const items = groupedVisible[category] || [];
-                if (items.length === 0) return null;
-                return (
-                  <Collapsible key={category} className="space-y-2 border rounded-md p-2 mb-4">
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" className="w-full justify-between text-base font-medium">
-                        {categoryNames[category]} ({items.length})
-                        <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+              {availableCards.length === 0 ? (
+                <p className="text-muted-foreground text-center py-4">Todos os cards estão no painel.</p>
+              ) : (
+                <div className="space-y-2">
+                  {availableCards.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
+                    >
+                      <Label className="text-sm font-medium">{item.name}</Label>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleToggleVisibility(item.id, true)} // Add to visible
+                        className="h-8 w-8 text-green-600 hover:bg-green-100"
+                      >
+                        <PlusCircle className="h-4 w-4" />
+                        <span className="sr-only">Adicionar</span>
                       </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-2 pt-2">
-                      {items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
-                        >
-                          <div className="flex items-center space-x-2 flex-1">
-                            <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
-                            <div className="flex flex-col flex-1">
-                              <Label className="text-sm font-medium">{item.name}</Label>
-                              <Select
-                                value={item.category}
-                                onValueChange={(value: DashboardItemConfig["category"]) =>
-                                  handleCategoryChange(item.id, value)
-                                }
-                              >
-                                <SelectTrigger className="w-[180px] h-8 text-sm mt-1">
-                                  <SelectValue placeholder="Selecionar Categoria" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {Object.entries(categoryNames).map(([val, name]) => (
-                                    <SelectItem key={val} value={val}>
-                                      {name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <div className="flex flex-col items-center">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => moveItem(item.id, "up")}
-                                disabled={!canMoveUp(item.id)}
-                                className="h-8 w-8"
-                              >
-                                <ChevronUp className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => moveItem(item.id, "down")}
-                                disabled={!canMoveDown(item.id)}
-                                className="h-8 w-8"
-                              >
-                                <ChevronDown className="h-4 w-4" />
-                              </Button>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleToggleVisibility(item.id, false)}
-                              className="h-8 w-8 text-red-600 hover:bg-red-100"
-                            >
-                              <MinusCircle className="h-4 w-4" />
-                              <span className="sr-only">Remover</span>
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </CollapsibleContent>
-                  </Collapsible>
-                );
-              })}
-              {Object.values(groupedVisible).flat().length === 0 && (
-                <p className="text-muted-foreground text-center py-4">Nenhum card visível. Adicione cards da seção 'Cards Ocultos'.</p>
+                    </div>
+                  ))}
+                </div>
               )}
             </ScrollArea>
           </div>
 
-          {/* Seção de Cards Ocultos */}
+          {/* Right side: Configured Cards (quando for definido) */}
           <div className="flex flex-col space-y-4 overflow-y-auto pl-2">
-            <h3 className="text-lg font-semibold">Cards Ocultos</h3>
+            <h3 className="text-lg font-semibold">Cards no Painel</h3>
             <ScrollArea className="flex-1 pl-2">
-              {allCategories.map((category) => {
-                const items = groupedHidden[category] || [];
-                if (items.length === 0) return null;
-                return (
-                  <Collapsible key={category} className="space-y-2 border rounded-md p-2 mb-4">
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" className="w-full justify-between text-base font-medium">
-                        {categoryNames[category]} ({items.length})
-                        <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
-                      </Button>
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="space-y-2 pt-2">
-                      {items.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
-                        >
-                          <div className="flex flex-col flex-1">
-                            <Label className="text-sm font-medium">{item.name}</Label>
-                            <Select
-                              value={item.category}
-                              onValueChange={(value: DashboardItemConfig["category"]) =>
-                                handleCategoryChange(item.id, value)
-                              }
-                            >
-                              <SelectTrigger className="w-[180px] h-8 text-sm mt-1">
-                                <SelectValue placeholder="Selecionar Categoria" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {Object.entries(categoryNames).map(([val, name]) => (
-                                  <SelectItem key={val} value={val}>
-                                    {name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleToggleVisibility(item.id, true)}
-                            className="h-8 w-8 text-green-600 hover:bg-green-100"
+              {configuredCards.length === 0 ? (
+                <p className="text-muted-foreground text-center py-4">Nenhum card no painel. Adicione cards da seção 'Cards Disponíveis'.</p>
+              ) : (
+                allCategories.map((category) => {
+                  const items = groupedConfigured[category] || [];
+                  if (items.length === 0) return null;
+                  return (
+                    <Collapsible key={category} className="space-y-2 border rounded-md p-2 mb-4">
+                      <CollapsibleTrigger asChild>
+                        <Button variant="ghost" className="w-full justify-between text-base font-medium">
+                          {categoryNames[category]} ({items.length})
+                          <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="space-y-2 pt-2">
+                        {items.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
                           >
-                            <PlusCircle className="h-4 w-4" />
-                            <span className="sr-only">Adicionar</span>
-                          </Button>
-                        </div>
-                      ))}
-                    </CollapsibleContent>
-                  </Collapsible>
-                );
-              })}
-              {Object.values(groupedHidden).flat().length === 0 && (
-                <p className="text-muted-foreground text-center py-4">Todos os cards estão visíveis.</p>
+                            <div className="flex items-center space-x-2 flex-1">
+                              <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+                              <div className="flex flex-col flex-1">
+                                <Label className="text-sm font-medium">{item.name}</Label>
+                                <Select
+                                  value={item.category}
+                                  onValueChange={(value: DashboardItemConfig["category"]) =>
+                                    handleCategoryChange(item.id, value)
+                                  }
+                                >
+                                  <SelectTrigger className="w-[180px] h-8 text-sm mt-1">
+                                    <SelectValue placeholder="Selecionar Categoria" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {Object.entries(categoryNames).map(([val, name]) => (
+                                      <SelectItem key={val} value={val}>
+                                        {name}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <div className="flex flex-col items-center">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => moveItem(item.id, "up")}
+                                  disabled={!canMoveUp(item.id)}
+                                  className="h-8 w-8"
+                                >
+                                  <ChevronUp className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => moveItem(item.id, "down")}
+                                  disabled={!canMoveDown(item.id)}
+                                  className="h-8 w-8"
+                                >
+                                  <ChevronDown className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleToggleVisibility(item.id, false)} // Remove from visible
+                                className="h-8 w-8 text-red-600 hover:bg-red-100"
+                              >
+                                <MinusCircle className="h-4 w-4" />
+                                <span className="sr-only">Remover</span>
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </CollapsibleContent>
+                    </Collapsible>
+                  );
+                })
               )}
             </ScrollArea>
           </div>
