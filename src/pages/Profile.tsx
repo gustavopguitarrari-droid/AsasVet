@@ -71,10 +71,11 @@ const Profile = () => {
     }
   }
 
+  // Calcular as iniciais
+  const initials = `${user.name.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      {/* O div com o h2 "Meu Perfil" foi removido daqui */}
-
       <Card className="overflow-hidden">
         <CardHeader className="profile-header-art-bg text-primary-foreground p-6 flex flex-col items-center text-center">
           <Tooltip delayDuration={0}> {/* Adicionado Tooltip */}
@@ -87,8 +88,8 @@ const Profile = () => {
                   {user.avatarUrl ? (
                     <AvatarImage src={user.avatarUrl} alt={user.name} />
                   ) : (
-                    <AvatarFallback className="bg-primary-foreground text-primary">
-                      <Plus className="h-14 w-14" /> {/* Ícone Plus aqui */}
+                    <AvatarFallback className="bg-primary-foreground text-primary text-4xl font-bold">
+                      {initials} {/* Exibe as iniciais aqui */}
                     </AvatarFallback>
                   )}
                 </Avatar>
