@@ -61,6 +61,8 @@ const mockClients: Client[] = [
 ];
 
 const Cadastro = () => {
+  const [activeTab, setActiveTab] = React.useState<string>("tutores"); // Estado para controlar a aba ativa
+
   // Estados para a aba de Animais
   const [selectedSpecies, setSelectedSpecies] = React.useState<string>("all");
   const [petSearchTerm, setPetSearchTerm] = React.useState<string>("");
@@ -98,24 +100,22 @@ const Cadastro = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Cadastro de novos tutores e animais</h2>
-        <Button className="font-bold">
-          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
-        </Button>
+        {/* Botões de adicionar foram movidos para dentro das abas */}
       </div>
 
-      <Tabs defaultValue="tutores" className="w-full"> {/* Alterado defaultValue para "tutores" */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full"> {/* Adicionado onValueChange */}
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
-          <TabsTrigger value="tutores" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold"> {/* Aba Tutores primeiro */}
+          <TabsTrigger value="tutores" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">
             <UsersIcon className="h-5 w-5 mr-2" /> Tutores
           </TabsTrigger>
-          <TabsTrigger value="animais" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold"> {/* Aba Animais segundo */}
+          <TabsTrigger value="animais" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">
             <Dog className="h-5 w-5 mr-2" /> Animais
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="tutores" className="mt-4"> {/* Conteúdo de Tutores primeiro */}
+        <TabsContent value="tutores" className="mt-4">
           <div className="flex items-center justify-end mb-4">
-            <Button>
+            <Button className="font-bold"> {/* Botão Adicionar Tutor */}
               <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
             </Button>
           </div>
@@ -166,7 +166,12 @@ const Cadastro = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="animais" className="mt-4"> {/* Conteúdo de Animais segundo */}
+        <TabsContent value="animais" className="mt-4">
+          <div className="flex items-center justify-end mb-4">
+            <Button className="font-bold"> {/* Botão Adicionar Animal */}
+              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
+            </Button>
+          </div>
           <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
             <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
           </div>
