@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { ChevronUp, ChevronDown, GripVertical, PlusCircle, MinusCircle } from "lucide-react";
+import { ChevronDown, GripVertical, PlusCircle, MinusCircle } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -26,7 +26,8 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd"; // Importar componentes de DND
 
 interface DashboardItemConfig {
   id: string;
@@ -56,7 +57,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
   onSave,
 }) => {
   const [tempConfig, setTempConfig] = React.useState<DashboardItemConfig[]>(config);
-  const [cardToAddId, setCardToAddId] = React.useState<string | null>(null); // Estado para o card sendo adicionado
+  const [cardToAddId, setCardToAddId] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     setTempConfig(config);
@@ -70,98 +71,65 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     );
   };
 
-  // A função handleCategoryChange não será mais usada para cards no painel direito,
-  // mas é mantida para o Popover de adição.
-  const handleCategoryChange = (id: string, newCategory: DashboardItemConfig["category"]) => {
-    setTempConfig((prevConfig) =>
-      prevConfig.map((item) =>
-        item.id === id ? { ...item, category: newCategory } : item
-      )
-    );
-  };
-
   const handleConfirmAddCardToCategory = (id: string, category: DashboardItemConfig["category"]) => {
     setTempConfig((prevConfig) =>
       prevConfig.map((item) =>
         item.id === id ? { ...item, isVisible: true, category: category } : item
       )
     );
-    setCardToAddId(null); // Fecha o popover
+    setCardToAddId(null);
   };
 
-  const moveItem = (id: string, direction: "up" | "down") => {
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination } = result;
+
+    if (!destination) {
+      return;
+    }
+
+    if (source.droppableId !== destination.droppableId) {
+      // Dragging between different categories is not allowed in this setup
+      // The UI prevents this by having separate droppables per category
+      return;
+    }
+
+    if (source.index === destination.index) {
+      return;
+    }
+
     setTempConfig((prevConfig) => {
       const newConfig = Array.from(prevConfig);
-      const currentIndex = newConfig.findIndex((item) => item.id === id);
+      const category = source.droppableId as DashboardItemConfig["category"];
 
-      if (currentIndex === -1 || !newConfig[currentIndex].isVisible) return prevConfig;
-
-      const currentItem = newConfig[currentIndex];
-      const itemsInSameCategoryAndVisible = newConfig.filter(
-        (item) => item.isVisible && item.category === currentItem.category
-      );
-      const currentItemIndexInCategory = itemsInSameCategoryAndVisible.findIndex(
-        (item) => item.id === id
+      // Filter items belonging to the current category and are visible
+      const itemsInCurrentCategory = newConfig.filter(
+        (item) => item.isVisible && item.category === category
       );
 
-      if (currentItemIndexInCategory === -1) return prevConfig;
+      // Reorder items within this filtered list
+      const [reorderedItem] = itemsInCurrentCategory.splice(source.index, 1);
+      itemsInCurrentCategory.splice(destination.index, 0, reorderedItem);
 
-      let targetItemIndexInCategory = -1;
-      if (direction === "up") {
-        if (currentItemIndexInCategory > 0) {
-          targetItemIndexInCategory = currentItemIndexInCategory - 1;
+      // Reconstruct the full config array, maintaining order of other categories and invisible items
+      const updatedConfig = newConfig.map(item => {
+        const reordered = itemsInCurrentCategory.find(reordered => reordered.id === item.id);
+        return reordered || item;
+      });
+
+      // To ensure the order within the category is preserved correctly in the main array,
+      // we need to place the reordered items back into their original positions relative to other categories.
+      // A simpler approach is to sort the entire tempConfig based on the new order of itemsInCurrentCategory.
+      const finalConfig = newConfig.sort((a, b) => {
+        if (a.category === category && b.category === category && a.isVisible && b.isVisible) {
+          const aIndex = itemsInCurrentCategory.findIndex(item => item.id === a.id);
+          const bIndex = itemsInCurrentCategory.findIndex(item => item.id === b.id);
+          return aIndex - bIndex;
         }
-      } else {
-        // direction === "down"
-        if (currentItemIndexInCategory < itemsInSameCategoryAndVisible.length - 1) {
-          targetItemIndexInCategory = currentItemIndexInCategory + 1;
-        }
-      }
+        return 0; // Maintain original relative order for items not in this category or not visible
+      });
 
-      if (targetItemIndexInCategory !== -1) {
-        const itemToSwapWith = itemsInSameCategoryAndVisible[targetItemIndexInCategory];
-        const originalIndexToSwapWith = newConfig.findIndex(
-          (item) => item.id === itemToSwapWith.id
-        );
-
-        // Perform the swap in the main newConfig array
-        [newConfig[currentIndex], newConfig[originalIndexToSwapWith]] = [
-          newConfig[originalIndexToSwapWith],
-          newConfig[currentIndex],
-        ];
-      }
-      return newConfig;
+      return finalConfig;
     });
-  };
-
-  const canMoveUp = (id: string) => {
-    const currentIndex = tempConfig.findIndex((item) => item.id === id);
-    if (currentIndex === -1 || !tempConfig[currentIndex].isVisible) return false;
-
-    const currentItem = tempConfig[currentIndex];
-    const itemsInSameCategoryAndVisible = tempConfig.filter(
-      (item) => item.isVisible && item.category === currentItem.category
-    );
-    const currentItemIndexInCategory = itemsInSameCategoryAndVisible.findIndex(
-      (item) => item.id === id
-    );
-
-    return currentItemIndexInCategory > 0;
-  };
-
-  const canMoveDown = (id: string) => {
-    const currentIndex = tempConfig.findIndex((item) => item.id === id);
-    if (currentIndex === -1 || !tempConfig[currentIndex].isVisible) return false;
-
-    const currentItem = tempConfig[currentIndex];
-    const itemsInSameCategoryAndVisible = tempConfig.filter(
-      (item) => item.isVisible && item.category === currentItem.category
-    );
-    const currentItemIndexInCategory = itemsInSameCategoryAndVisible.findIndex(
-      (item) => item.id === id
-    );
-
-    return currentItemIndexInCategory < itemsInSameCategoryAndVisible.length - 1;
   };
 
   const handleSave = () => {
@@ -259,68 +227,70 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
               {configuredCards.length === 0 ? (
                 <p className="text-muted-foreground text-center py-4">Nenhum card no painel. Adicione cards da seção 'Cards Disponíveis'.</p>
               ) : (
-                allCategories.map((category) => {
-                  const items = groupedConfigured[category] || [];
-                  if (items.length === 0) return null;
-                  return (
-                    <Collapsible key={category} className="space-y-2 border rounded-md p-2 mb-4">
-                      <CollapsibleTrigger asChild>
-                        <Button variant="ghost" className="w-full justify-between text-base font-medium">
-                          {categoryNames[category]} ({items.length})
-                          <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
-                        </Button>
-                      </CollapsibleTrigger>
-                      <CollapsibleContent className="space-y-2 pt-2">
-                        {items.map((item) => (
-                          <div
-                            key={item.id}
-                            className="flex items-center justify-between space-x-2 p-2 rounded-md border bg-card"
-                          >
-                            <div className="flex items-center space-x-2 flex-1">
-                              <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
-                              <div className="flex flex-col flex-1">
-                                <Label className="text-sm font-medium">{item.name}</Label>
-                                {/* Exibe a categoria atual sem a opção de alterá-la */}
-                                <p className="text-xs text-muted-foreground mt-1">Categoria: {categoryNames[item.category]}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <div className="flex flex-col items-center">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => moveItem(item.id, "up")}
-                                  disabled={!canMoveUp(item.id)}
-                                  className="h-8 w-8"
-                                >
-                                  <ChevronUp className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  onClick={() => moveItem(item.id, "down")}
-                                  disabled={!canMoveDown(item.id)}
-                                  className="h-8 w-8"
-                                >
-                                  <ChevronDown className="h-4 w-4" />
-                                </Button>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleRemoveCardFromPanel(item.id)}
-                                className="h-8 w-8 text-red-600 hover:bg-red-100"
+                <DragDropContext onDragEnd={onDragEnd}>
+                  {allCategories.map((category) => {
+                    const items = groupedConfigured[category] || [];
+                    if (items.length === 0) return null;
+                    return (
+                      <Collapsible key={category} className="space-y-2 border rounded-md p-2 mb-4">
+                        <CollapsibleTrigger asChild>
+                          <Button variant="ghost" className="w-full justify-between text-base font-medium">
+                            {categoryNames[category]} ({items.length})
+                            <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                          </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-2 pt-2">
+                          <Droppable droppableId={category}>
+                            {(provided) => (
+                              <div
+                                {...provided.droppableProps}
+                                ref={provided.innerRef}
+                                className="space-y-2"
                               >
-                                <MinusCircle className="h-4 w-4" />
-                                <span className="sr-only">Remover do Painel</span>
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </CollapsibleContent>
-                    </Collapsible>
-                  );
-                })
+                                {items.map((item, index) => (
+                                  <Draggable key={item.id} draggableId={item.id} index={index}>
+                                    {(provided, snapshot) => (
+                                      <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        className={cn(
+                                          "flex items-center justify-between space-x-2 p-2 rounded-md border bg-card",
+                                          snapshot.isDragging && "shadow-lg bg-accent"
+                                        )}
+                                      >
+                                        <div className="flex items-center space-x-2 flex-1">
+                                          <span {...provided.dragHandleProps}>
+                                            <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
+                                          </span>
+                                          <div className="flex flex-col flex-1">
+                                            <Label className="text-sm font-medium">{item.name}</Label>
+                                            <p className="text-xs text-muted-foreground mt-1">Categoria: {categoryNames[item.category]}</p>
+                                          </div>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                          <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => handleRemoveCardFromPanel(item.id)}
+                                            className="h-8 w-8 text-red-600 hover:bg-red-100"
+                                          >
+                                            <MinusCircle className="h-4 w-4" />
+                                            <span className="sr-only">Remover do Painel</span>
+                                          </Button>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ))}
+                                {provided.placeholder}
+                              </div>
+                            )}
+                          </Droppable>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    );
+                  })}
+                </DragDropContext>
               )}
             </ScrollArea>
           </div>
