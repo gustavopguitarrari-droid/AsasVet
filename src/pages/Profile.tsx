@@ -5,11 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { User as UserIcon, Mail, Edit, Briefcase, Cake, Clock } from "lucide-react"; // Novos ícones
+import { User as UserIcon, Mail, Edit, Briefcase, Cake, Clock } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import ProfileEditDialog, { ProfileFormValues } from "@/components/ProfileEditDialog";
-import { format, parseISO } from "date-fns"; // Importar format e parseISO
-import { ptBR } from "date-fns/locale"; // Importar locale
+import { format, parseISO, differenceInMonths, differenceInYears } from "date-fns"; // Importar differenceInMonths e differenceInYears
+import { ptBR } from "date-fns/locale";
 
 const Profile = () => {
   const { user, setUser } = useUser();
@@ -25,19 +25,37 @@ const Profile = () => {
 
   const handleSaveProfile = (data: ProfileFormValues) => {
     setUser({
-      ...user, // Mantém o registeredTime e outros campos não editáveis
+      ...user,
       name: data.name,
-      lastName: data.lastName, // Salva o sobrenome
+      lastName: data.lastName,
       email: data.email,
       gender: data.gender,
       avatarUrl: data.avatarUrl || undefined,
-      role: data.role, // Salva o cargo
-      birthday: data.birthday ? format(data.birthday, "yyyy-MM-dd") : undefined, // Salva o aniversário
+      role: data.role,
+      birthday: data.birthday ? format(data.birthday, "yyyy-MM-dd") : undefined,
     });
   };
 
   const formattedBirthday = user.birthday ? format(parseISO(user.birthday), "dd/MM/yyyy", { locale: ptBR }) : "N/A";
-  const formattedRegisteredTime = user.registeredTime ? format(parseISO(user.registeredTime), "dd/MM/yyyy HH:mm", { locale: ptBR }) : "N/A";
+  
+  // Calcular o tempo na empresa
+  let timeInCompany = "N/A";
+  if (user.registeredTime) {
+    const registrationDate = parseISO(user.registeredTime);
+    const now = new Date();
+    const years = differenceInYears(now, registrationDate);
+    const months = differenceInMonths(now, registrationDate) % 12;
+
+    if (years > 0 && months > 0) {
+      timeInCompany = `${years} ano${years > 1 ? 's' : ''} e ${months} mês${months > 1 ? 'es' : ''}`;
+    } else if (years > 0) {
+      timeInCompany = `${years} ano${years > 1 ? 's' : ''}`;
+    } else if (months > 0) {
+      timeInCompany = `${months} mês${months > 1 ? 'es' : ''}`;
+    } else {
+      timeInCompany = "Menos de um mês";
+    }
+  }
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
@@ -96,8 +114,8 @@ const Profile = () => {
           <Separator />
           <div className="flex items-center space-x-4">
             <Clock className="h-5 w-5 text-muted-foreground" />
-            <p className="text-lg font-medium">Tempo na Empresa:</p> {/* Alterado aqui */}
-            <p className="flex-1 text-lg">{formattedRegisteredTime}</p>
+            <p className="text-lg font-medium">Tempo na Empresa:</p>
+            <p className="flex-1 text-lg">{timeInCompany}</p>
           </div>
         </CardContent>
       </Card>
@@ -107,12 +125,12 @@ const Profile = () => {
         onClose={() => setIsEditDialogOpen(false)}
         initialData={{
           name: user.name,
-          lastName: user.lastName, // Passa o sobrenome
+          lastName: user.lastName,
           email: user.email,
           gender: user.gender,
           avatarUrl: user.avatarUrl || "",
-          role: user.role, // Passa o cargo
-          birthday: user.birthday ? parseISO(user.birthday) : undefined, // Passa o aniversário como Date
+          role: user.role,
+          birthday: user.birthday ? parseISO(user.birthday) : undefined,
         }}
         onSave={handleSaveProfile}
       />
