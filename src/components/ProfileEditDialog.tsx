@@ -23,9 +23,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-// Removendo importações de Avatar e ícones de upload por enquanto
-// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import { User as UserIcon, Upload } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Reintroduzido
+import { User as UserIcon, Upload } from "lucide-react"; // Reintroduzido ícone Upload
+import { Label } from "@/components/ui/label"; // Reintroduzido Label
 
 const formSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório."),
@@ -33,7 +33,7 @@ const formSchema = z.object({
   gender: z.enum(["masculino", "feminino"], {
     required_error: "O gênero é obrigatório.",
   }),
-  avatarUrl: z.string().optional().or(z.literal("")),
+  avatarUrl: z.string().optional().or(z.literal("")), // Mantido para Data URLs
 });
 
 export type ProfileFormValues = z.infer<typeof formSchema>;
@@ -56,6 +56,21 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     defaultValues: initialData,
   });
 
+  const avatarUrlWatch = form.watch("avatarUrl"); // Observar o valor do avatarUrl
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        form.setValue("avatarUrl", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      form.setValue("avatarUrl", ""); // Limpa se nenhum arquivo for selecionado
+    }
+  };
+
   const handleSubmit = (data: ProfileFormValues) => {
     onSave(data);
     onClose();
@@ -72,6 +87,58 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4">
+            <div className="flex flex-col items-center space-y-4">
+              <Avatar className="h-24 w-24">
+                {avatarUrlWatch ? (
+                  <AvatarImage src={avatarUrlWatch} alt="Avatar do Usuário" />
+                ) : (
+                  <AvatarFallback className="bg-muted">
+                    <UserIcon className="h-12 w-12 text-muted-foreground" />
+                  </AvatarFallback>
+                )}
+              </Avatar>
+              <FormField
+                control={form.control}
+                name="avatarUrl"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Foto de Perfil</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          id="avatar-upload"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="hidden" // Esconde o input de arquivo padrão
+                        />
+                        <Label htmlFor="avatar-upload" className="flex-1">
+                          <Button asChild variant="outline" className="w-full cursor-pointer">
+                            <span>
+                              <Upload className="mr-2 h-4 w-4" />
+                              {avatarUrlWatch ? "Mudar Foto" : "Carregar Foto"}
+                            </span>
+                          </Button>
+                        </Label>
+                        {avatarUrlWatch && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => form.setValue("avatarUrl", "")}
+                            className="text-destructive hover:text-destructive-foreground"
+                          >
+                            <UserIcon className="h-4 w-4" /> {/* Ícone para remover */}
+                            <span className="sr-only">Remover Foto</span>
+                          </Button>
+                        )}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
               name="name"
