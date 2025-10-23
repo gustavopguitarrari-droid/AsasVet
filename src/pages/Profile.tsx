@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { User as UserIcon, Mail, Edit } from "lucide-react"; // Removido GenderFemale e GenderMale
+import { User as UserIcon, Mail, Edit } from "lucide-react"; // Importação limpa, usando UserIcon
 import { useUser } from "@/context/UserContext";
 import ProfileEditDialog, { ProfileFormValues } from "@/components/ProfileEditDialog";
 
@@ -30,7 +30,7 @@ const Profile = () => {
     });
   };
 
-  // Usando UserIcon como um ícone genérico para gênero, pois GenderFemale e GenderMale não estão disponíveis.
+  // Usando UserIcon como um ícone genérico para gênero
   const GenderDisplayIcon = UserIcon; 
 
   return (
