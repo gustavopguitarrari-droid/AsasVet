@@ -28,7 +28,7 @@ export const UserProvider = ({ children }: { ReactNode }) => {
     lastName: "Silva", // Adicionado
     email: "joao.silva@example.com",
     // gender: "masculino", // Removido
-    avatarUrl: "https://github.com/shadcn.png",
+    avatarUrl: undefined, // Alterado para undefined
     role: "Veterinário", // Adicionado
     birthday: "1990-05-15", // Adicionado
     registeredTime: format(new Date(), "yyyy-MM-dd HH:mm"), // Adicionado
