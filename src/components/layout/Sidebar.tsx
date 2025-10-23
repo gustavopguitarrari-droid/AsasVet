@@ -14,12 +14,10 @@ import {
   ReceiptText,
   Package,
   BookUser, // Ícone para o novo item 'Cadastro'
-  // ChevronDown, // Removido: Não há mais menus expansíveis
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-// Removido: import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface NavItem {
   name: string;
@@ -34,12 +32,6 @@ const navItems: NavItem[] = [
     path: "/painel",
   },
   {
-    name: "Cadastro", // Novo item de navegação para a página combinada
-    icon: BookUser, // Ícone para a nova página de Cadastro
-    path: "/cadastro",
-  },
-  // Os itens "Animais" e "Tutores" foram movidos para dentro da página "Cadastro"
-  {
     name: "Consultas",
     icon: ClipboardList,
     path: "/consultas",
@@ -50,31 +42,35 @@ const navItems: NavItem[] = [
     path: "/internacao",
   },
   {
-    name: "Agenda",
+    name: "Cadastro", // Item de navegação para a página combinada
+    icon: BookUser,
+    path: "/cadastro",
+  },
+  {
+    name: "Agenda", // Assumindo que "Agendar" se refere a "Agenda"
     icon: CalendarDays,
     path: "/medical-records",
   },
+  { name: "Equipe", icon: Stethoscope, path: "/veterinarios" },
   {
     name: "Estoque",
     icon: Package,
     path: "/estoque",
   },
   {
-    name: "Financeiro",
-    icon: DollarSign,
-    path: "/financeiro",
-  },
-  {
     name: "Caixa",
     icon: ReceiptText,
     path: "/caixa",
   },
-  { name: "Equipe", icon: Stethoscope, path: "/veterinarios" }, // Mantido no nível superior
+  {
+    name: "Financeiro",
+    icon: DollarSign,
+    path: "/financeiro",
+  },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
-  // Lógica de Collapsible removida, pois não há mais menus expansíveis.
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
