@@ -13,76 +13,91 @@ import {
   ArrowRightToLine,
   ReceiptText,
   Package,
+  FolderOpen, // NOVO: Ícone para a categoria Cadastros
+  ChevronDown, // NOVO: Ícone para o menu expansível
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-// import ThemeToggle from "@/components/ThemeToggle"; // Removido
+import {
+  Collapsible, // NOVO: Componentes para menu expansível
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
-interface SidebarProps {
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
+interface NavItem {
+  name: string;
+  icon: React.ElementType;
+  path?: string; // Path é opcional para itens pai (como 'Cadastros')
+  subItems?: NavItem[]; // Sub-itens para menus aninhados
 }
 
-const navItems = [
+const navItems: NavItem[] = [
   {
     name: "Painel",
     icon: LayoutDashboard,
     path: "/painel",
-    // activeBgClass: "bg-sidebar-item-bg-1", // Removido
+  },
+  {
+    name: "Cadastros", // Nova categoria
+    icon: FolderOpen,
+    subItems: [
+      { name: "Animais", icon: PawPrint, path: "/pets" },
+      { name: "Equipe", icon: Stethoscope, path: "/veterinarios" },
+      { name: "Clientes", icon: Users, path: "/clients" },
+    ],
   },
   {
     name: "Consultas",
-    icon: ClipboardList, // Ícone atualizado para ClipboardList
+    icon: ClipboardList,
     path: "/consultas",
-    // activeBgClass: "bg-sidebar-item-bg-4", // Removido
   },
   {
     name: "Internação",
     icon: Plus,
     path: "/internacao",
-    // activeBgClass: "bg-sidebar-item-bg-6", // Removido
-  },
-  {
-    name: "Animais",
-    icon: PawPrint,
-    path: "/pets",
-    // activeBgClass: "bg-sidebar-item-bg-3", // Removido
-  },
-  {
-    name: "Equipe",
-    icon: Stethoscope,
-    path: "/veterinarios",
-    // activeBgClass: "bg-sidebar-item-bg-9", // Removido
   },
   {
     name: "Agenda",
-    icon: CalendarDays, // Ícone atualizado para CalendarDays
+    icon: CalendarDays,
     path: "/medical-records",
-    // activeBgClass: "bg-sidebar-item-bg-5", // Removido
   },
   {
     name: "Estoque",
     icon: Package,
     path: "/estoque",
-    // activeBgClass: "bg-sidebar-item-bg-8", // Pode ser ajustado conforme a paleta
   },
   {
     name: "Financeiro",
     icon: DollarSign,
     path: "/financeiro",
-    // activeBgClass: "bg-sidebar-item-bg-2", // Removido
   },
   {
     name: "Caixa",
     icon: ReceiptText,
     path: "/caixa",
-    // activeBgClass: "bg-sidebar-item-bg-7", // Removido
   },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
+  // Estado para gerenciar a abertura/fechamento do menu "Cadastros"
+  const [isCadastrosOpen, setIsCadastrosOpen] = React.useState(false);
+
+  // Verifica se algum sub-item de "Cadastros" está ativo
+  const isCadastrosParentActive = navItems.find(item => item.name === "Cadastros")?.subItems?.some(
+    subItem => location.pathname === subItem.path
+  );
+
+  // Efeito para abrir o menu "Cadastros" se um de seus sub-itens estiver ativo
+  React.useEffect(() => {
+    if (isCadastrosParentActive && !isCollapsed) {
+      setIsCadastrosOpen(true);
+    } else if (!isCadastrosParentActive && !isCollapsed) {
+      // Opcionalmente, fechar se nenhum sub-item estiver ativo e não estiver recolhido
+      // setIsCadastrosOpen(false);
+    }
+  }, [location.pathname, isCadastrosParentActive, isCollapsed]);
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
@@ -91,42 +106,122 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         <PawPrint className={cn("h-10 w-10 text-white", !isCollapsed && "ml-2")} strokeWidth={2.5} />
       </Link>
       <nav className="flex-1 space-y-2">
-        {navItems.map((item) => (
-          <Tooltip key={item.name} delayDuration={0}>
-            <TooltipTrigger asChild>
-              <Button
-                asChild
-                variant="ghost"
-                className={cn(
-                  "text-sidebar-foreground",
-                  "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  isCollapsed
-                    ? "h-14 w-14 rounded-full flex items-center justify-center" // Aumentado para h-14 w-14
-                    : "w-full justify-start text-xl",
-                  location.pathname === item.path && "bg-sidebar-primary text-sidebar-primary-foreground" // Usando cores dinâmicas
-                )}
+        {navItems.map((item) => {
+          // Determina se o item atual (ou qualquer um de seus sub-itens) está ativo
+          const isActive = item.path
+            ? location.pathname === item.path
+            : item.subItems?.some(sub => location.pathname === sub.path);
+
+          if (item.subItems) {
+            return (
+              <Collapsible
+                key={item.name}
+                open={isCadastrosOpen && !isCollapsed} // Abre apenas se não estiver recolhido
+                onOpenChange={setIsCadastrosOpen}
+                className="space-y-2"
               >
-                <Link to={item.path} className="flex items-center">
-                  <div
+                <Tooltip delayDuration={0}>
+                  <CollapsibleTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className={cn(
+                        "text-sidebar-foreground",
+                        "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                        isCollapsed
+                          ? "h-14 w-14 rounded-full flex items-center justify-center"
+                          : "w-full justify-start text-xl",
+                        isActive && "bg-sidebar-primary text-sidebar-primary-foreground"
+                      )}
+                      // Permite alternar apenas se o sidebar não estiver recolhido
+                      onClick={() => !isCollapsed && setIsCadastrosOpen(!isCadastrosOpen)}
+                    >
+                      <div
+                        className={cn(
+                          "flex items-center justify-center",
+                          !isCollapsed && "w-14 h-14 rounded-full mr-3",
+                          isActive && "bg-sidebar-primary"
+                        )}
+                      >
+                        <item.icon className="h-8 w-8" strokeWidth={3.5} />
+                      </div>
+                      {!isCollapsed && (
+                        <>
+                          <span className={cn(isActive && "text-sidebar-primary-foreground")}>
+                            {item.name}
+                          </span>
+                          <ChevronDown className={cn("ml-auto h-4 w-4 transition-transform", isCadastrosOpen && "rotate-180")} />
+                        </>
+                      )}
+                    </Button>
+                  </CollapsibleTrigger>
+                  {isCollapsed && <TooltipContent side="right">{item.name}</TooltipContent>}
+                </Tooltip>
+                {!isCollapsed && ( // Renderiza o conteúdo apenas se o sidebar não estiver recolhido
+                  <CollapsibleContent className="space-y-1 pl-10"> {/* Recuo para sub-itens */}
+                    {item.subItems.map((subItem) => (
+                      <Button
+                        key={subItem.name}
+                        asChild
+                        variant="ghost"
+                        className={cn(
+                          "text-sidebar-foreground",
+                          "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                          "w-full justify-start text-lg", // Fonte ligeiramente menor para sub-itens
+                          location.pathname === subItem.path && "bg-sidebar-primary text-sidebar-primary-foreground"
+                        )}
+                      >
+                        <Link to={subItem.path!} className="flex items-center">
+                          <subItem.icon className="h-6 w-6 mr-2" strokeWidth={2.5} /> {/* Ícone menor para sub-itens */}
+                          <span className={cn(location.pathname === subItem.path && "text-sidebar-primary-foreground")}>
+                            {subItem.name}
+                          </span>
+                        </Link>
+                      </Button>
+                    ))}
+                  </CollapsibleContent>
+                )}
+              </Collapsible>
+            );
+          } else {
+            // Renderiza itens normais (sem sub-itens)
+            return (
+              <Tooltip key={item.name} delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Button
+                    asChild
+                    variant="ghost"
                     className={cn(
-                      "flex items-center justify-center",
-                      !isCollapsed && "w-14 h-14 rounded-full mr-3", // Aumentado para w-14 h-14
-                      location.pathname === item.path && "bg-sidebar-primary" // Usando cores dinâmicas
+                      "text-sidebar-foreground",
+                      "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                      isCollapsed
+                        ? "h-14 w-14 rounded-full flex items-center justify-center"
+                        : "w-full justify-start text-xl",
+                      isActive && "bg-sidebar-primary text-sidebar-primary-foreground"
                     )}
                   >
-                    <item.icon className="h-8 w-8" strokeWidth={3.5} /> {/* Aumentado para h-8 w-8 e strokeWidth={3.5} */}
-                  </div>
-                  {!isCollapsed && (
-                    <span className={cn(location.pathname === item.path && "text-sidebar-primary-foreground")}>
-                      {item.name}
-                    </span>
-                  )}
-                </Link>
-              </Button>
-            </TooltipTrigger>
-            {isCollapsed && <TooltipContent side="right">{item.name}</TooltipContent>}
-          </Tooltip>
-        ))}
+                    <Link to={item.path!} className="flex items-center">
+                      <div
+                        className={cn(
+                          "flex items-center justify-center",
+                          !isCollapsed && "w-14 h-14 rounded-full mr-3",
+                          isActive && "bg-sidebar-primary"
+                        )}
+                      >
+                        <item.icon className="h-8 w-8" strokeWidth={3.5} />
+                      </div>
+                      {!isCollapsed && (
+                        <span className={cn(isActive && "text-sidebar-primary-foreground")}>
+                          {item.name}
+                        </span>
+                      )}
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
+                {isCollapsed && <TooltipContent side="right">{item.name}</TooltipContent>}
+              </Tooltip>
+            );
+          }
+        })}
       </nav>
 
       <div
