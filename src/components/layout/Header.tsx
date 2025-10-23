@@ -10,14 +10,12 @@ const Header = () => {
     switch (location.pathname) {
       case "/painel":
         return "Painel";
-      case "/clients":
-        return "Tutores"; // Renomeado de 'Clientes' para 'Tutores'
-      case "/pets":
-        return "Cadastro de animais"; // Título atualizado aqui
+      case "/cadastro": // Novo título para Cadastro
+        return "Cadastro";
       case "/consultas":
         return "Consultas";
       case "/medical-records":
-        return "Agenda"; // Título atualizado
+        return "Agenda";
       case "/financeiro":
         return "Financeiro";
       case "/caixa":
@@ -25,12 +23,12 @@ const Header = () => {
       case "/internacao":
         return "Internação";
       case "/veterinarios":
-        return "Equipe"; // Título atualizado
-      case "/estoque": // Novo título para Estoque
+        return "Equipe";
+      case "/estoque":
         return "Estoque";
-      case "/profile": // Novo título para Perfil
+      case "/profile":
         return "Perfil";
-      case "/settings": // Novo título para Configurações
+      case "/settings":
         return "Configurações";
       default:
         return "Simples Vet";
@@ -41,8 +39,8 @@ const Header = () => {
     <header className="flex items-center justify-between border-b bg-background p-4 shadow-sm">
       <h1 className="text-2xl font-semibold">{getTitle()}</h1>
       <div className="flex items-center space-x-2">
-        <ColorThemeToggle /> {/* Adicionado o seletor de tema de cor */}
-        <ThemeToggle /> {/* Mantido o alternador de modo claro/escuro */}
+        <ColorThemeToggle />
+        <ThemeToggle />
         <UserProfile />
       </div>
     </header>

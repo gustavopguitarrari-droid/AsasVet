@@ -2,10 +2,10 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
-  Users,
+  Users, // Usado para o novo item 'Cadastro'
   PawPrint,
   CalendarDays, // Usado para Agenda
-  ClipboardList, // Novo ícone para Consultas
+  ClipboardList, // Ícone para Consultas
   DollarSign,
   Plus,
   Stethoscope,
@@ -13,8 +13,8 @@ import {
   ArrowRightToLine,
   ReceiptText,
   Package,
-  // BookUser, // Removido: Ícone para a categoria Cadastros
-  // ChevronDown, // Removido: Ícone para o menu expansível
+  BookUser, // Ícone para o novo item 'Cadastro'
+  // ChevronDown, // Removido: Não há mais menus expansíveis
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -24,8 +24,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 interface NavItem {
   name: string;
   icon: React.ElementType;
-  path: string; // Path agora é obrigatório para todos os itens
-  // subItems?: NavItem[]; // Removido: Não há mais sub-itens neste nível
+  path: string;
 }
 
 const navItems: NavItem[] = [
@@ -34,9 +33,12 @@ const navItems: NavItem[] = [
     icon: LayoutDashboard,
     path: "/painel",
   },
-  { name: "Animais", icon: PawPrint, path: "/pets" }, // Movido de volta para o nível superior
-  { name: "Equipe", icon: Stethoscope, path: "/veterinarios" }, // Movido de volta para o nível superior
-  { name: "Tutores", icon: Users, path: "/clients" }, // Movido de volta para o nível superior
+  {
+    name: "Cadastro", // Novo item de navegação para a página combinada
+    icon: BookUser, // Ícone para a nova página de Cadastro
+    path: "/cadastro",
+  },
+  // Os itens "Animais" e "Tutores" foram movidos para dentro da página "Cadastro"
   {
     name: "Consultas",
     icon: ClipboardList,
@@ -67,11 +69,12 @@ const navItems: NavItem[] = [
     icon: ReceiptText,
     path: "/caixa",
   },
+  { name: "Equipe", icon: Stethoscope, path: "/veterinarios" }, // Mantido no nível superior
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
-  // Estados e efeitos relacionados a Collapsible foram removidos, pois não há mais menus expansíveis.
+  // Lógica de Collapsible removida, pois não há mais menus expansíveis.
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
@@ -83,7 +86,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
 
-          // Agora todos os itens são renderizados como links diretos
           return (
             <Tooltip key={item.name} delayDuration={0}>
               <TooltipTrigger asChild>

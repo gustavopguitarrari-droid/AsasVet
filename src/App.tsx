@@ -5,17 +5,18 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import Dashboard from "./pages/Dashboard";
-import Clients from "./pages/Clients";
-import Pets from "./pages/Pets";
+// import Clients from "./pages/Clients"; // Removido
+// import Pets from "./pages/Pets"; // Removido
+import Cadastro from "./pages/Cadastro"; // Importação da nova página de Cadastro
 import Appointments from "./pages/Appointments";
 import AgendamentosMedicos from "./pages/AgendamentosMedicos";
 import Financeiro from "./pages/Financeiro";
 import Caixa from "./pages/Caixa";
 import Internacao from "./pages/Internacao";
 import Veterinarios from "./pages/Veterinarios";
-import Estoque from "./pages/Estoque"; // Importação da nova página de Estoque
-import Profile from "./pages/Profile"; // Importação da nova página de Perfil
-import Settings from "./pages/Settings"; // Importação da nova página de Configurações
+import Estoque from "./pages/Estoque";
+import Profile from "./pages/Profile";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,21 +45,14 @@ const App = () => (
             }
           />
           <Route
-            path="/clients"
+            path="/cadastro" // Nova rota para Cadastro
             element={
               <Layout>
-                <Clients />
+                <Cadastro />
               </Layout>
             }
           />
-          <Route
-            path="/pets"
-            element={
-              <Layout>
-                <Pets />
-              </Layout>
-            }
-          />
+          {/* Rotas /clients e /pets foram removidas */}
           <Route
             path="/consultas"
             element={
@@ -108,7 +102,7 @@ const App = () => (
             }
           />
           <Route
-            path="/estoque" // Nova rota para Estoque
+            path="/estoque"
             element={
               <Layout>
                 <Estoque />
@@ -116,7 +110,7 @@ const App = () => (
             }
           />
           <Route
-            path="/profile" // Nova rota para Perfil
+            path="/profile"
             element={
               <Layout>
                 <Profile />
@@ -124,7 +118,7 @@ const App = () => (
             }
           />
           <Route
-            path="/settings" // Nova rota para Configurações
+            path="/settings"
             element={
               <Layout>
                 <Settings />
