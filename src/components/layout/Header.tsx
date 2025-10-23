@@ -11,7 +11,7 @@ const Header = () => {
       case "/painel":
         return "Painel";
       case "/clients":
-        return "Clientes";
+        return "Tutores"; // Renomeado de 'Clientes' para 'Tutores'
       case "/pets":
         return "Cadastro de animais"; // Título atualizado aqui
       case "/consultas":

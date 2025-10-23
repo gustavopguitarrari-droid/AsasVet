@@ -21,16 +21,16 @@ const Clients = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Clientes</h2>
+        <h2 className="text-3xl font-bold">Tutores</h2> {/* Renomeado de 'Clientes' para 'Tutores' */}
         <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Cliente
+          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor {/* Renomeado de 'Cliente' para 'Tutor' */}
         </Button>
       </div>
 
       <div className="flex items-center space-x-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Buscar clientes..." className="pl-9" />
+          <Input placeholder="Buscar tutores..." className="pl-9" /> {/* Renomeado de 'clientes' para 'tutores' */}
         </div>
         <Button variant="outline">Filtrar</Button>
       </div>

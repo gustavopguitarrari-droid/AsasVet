@@ -44,7 +44,7 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Animais", icon: PawPrint, path: "/pets" },
       { name: "Equipe", icon: Stethoscope, path: "/veterinarios" },
-      { name: "Clientes", icon: Users, path: "/clients" },
+      { name: "Tutores", icon: Users, path: "/clients" }, // Renomeado de 'Clientes' para 'Tutores'
     ],
   },
   {

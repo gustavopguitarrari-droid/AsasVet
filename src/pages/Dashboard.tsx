@@ -24,7 +24,7 @@ interface DashboardItemConfig {
 }
 
 const initialDashboardConfig: DashboardItemConfig[] = [
-  { id: "totalClients", name: "Total de Clientes", isVisible: true, category: "overview" },
+  { id: "totalClients", name: "Total de Tutores", isVisible: true, category: "overview" }, // Renomeado de 'Total de Clientes' para 'Total de Tutores'
   { id: "totalPets", name: "Total de Animais", isVisible: true, category: "overview" },
   { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview" },
   { id: "averageWaitingTime", name: "Média de Tempo de Espera", isVisible: true, category: "overview" },
@@ -99,7 +99,7 @@ const Dashboard = () => {
         return (
           <Card key={item.id} className={cn("bg-blue-600", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Clientes</CardTitle>
+              <CardTitle className="text-sm font-medium">Total de Tutores</CardTitle> {/* Renomeado aqui */}
               <Users className={iconClasses} />
             </CardHeader>
             <CardContent>
