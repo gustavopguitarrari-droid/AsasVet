@@ -130,7 +130,7 @@ const Cadastro = () => {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input placeholder="Buscar tutores..." className="pl-9" value={clientSearchTerm} onChange={(e) => setClientSearchTerm(e.target.value)} />
             </div>
-            <Button variant="outline">Filtrar</Button>
+            {/* Botão Filtrar removido */}
           </div>
 
           <div className="rounded-md border">
@@ -187,7 +187,7 @@ const Cadastro = () => {
                 onChange={(e) => setPetSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline">Filtrar</Button>
+            {/* Botão Filtrar removido */}
           </div>
 
           <div className="rounded-md border">
