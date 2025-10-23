@@ -19,6 +19,7 @@ import ProductSelector from "@/components/cashier/ProductSelector";
 import SalePanel from "@/components/cashier/SalePanel"; // Importa o novo SalePanel
 import { Product, SaleItem, Transaction } from "@/types/cashier";
 import { showSuccess } from "@/utils/toast";
+import { cn } from "@/lib/utils"; // Importar cn para classes condicionais
 
 const initialMockCaixa: Transaction[] = [
   { id: "CX001", description: "Pagamento Consulta Rex", type: "Entrada", amount: 150.00, date: "2024-10-26", time: "10:15" },
@@ -126,14 +127,14 @@ const Caixa = () => {
       {/* O título "Caixa" foi removido daqui */}
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
+        <Card className={cn("text-white shadow-md", totalBalance >= 0 ? "bg-green-700" : "bg-red-700")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1"> {/* Alterado para pb-1 */}
             <CardTitle className="text-xs font-medium">Saldo Atual</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-4 w-4 text-white" /> {/* Ícone branco */}
           </CardHeader>
           <CardContent className="p-3 pt-0"> {/* Adicionado p-3 pt-0 */}
             <div className="text-xl font-bold">R$ {totalBalance.toFixed(2).replace('.', ',')}</div>
-            <p className="text-xs text-muted-foreground">Total de todas as transações</p>
+            <p className="text-xs text-white/80">Total de todas as transações</p> {/* Texto branco/80 */}
           </CardContent>
         </Card>
         <Card>
