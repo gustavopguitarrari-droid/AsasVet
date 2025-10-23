@@ -73,9 +73,7 @@ const Profile = () => {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Meu Perfil</h2>
-      </div>
+      {/* O div com o h2 "Meu Perfil" foi removido daqui */}
 
       <Card className="overflow-hidden">
         <CardHeader className="profile-header-art-bg text-primary-foreground p-6 flex flex-col items-center text-center">
