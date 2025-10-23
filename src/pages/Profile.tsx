@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { User as UserIcon, Mail, Venus, Mars, Edit } from "lucide-react";
+import { User as UserIcon, Mail, GenderFemale, GenderMale, Edit } from "lucide-react"; // Importações corrigidas
 import { useUser } from "@/context/UserContext";
 import ProfileEditDialog, { ProfileFormValues } from "@/components/ProfileEditDialog";
 
@@ -30,7 +30,7 @@ const Profile = () => {
     });
   };
 
-  const GenderIcon = user.gender === "feminino" ? Venus : Mars;
+  const GenderIcon = user.gender === "feminino" ? GenderFemale : GenderMale; // Uso dos ícones corrigido
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
