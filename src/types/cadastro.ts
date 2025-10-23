@@ -3,6 +3,9 @@ export interface Client {
   name: string;
   email: string;
   phone: string;
+  cpf: string; // Novo campo
+  address: string; // Novo campo
+  gender: 'Masculino' | 'Feminino' | 'Outro'; // Novo campo
 }
 
 export interface Pet {
