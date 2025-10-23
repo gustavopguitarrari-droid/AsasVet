@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User as UserIcon, Mail, Briefcase, Cake, Clock, Plus } from "lucide-react"; // Importar Plus
+import { User as UserIcon, Mail, Briefcase, Cake, Clock, Plus } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import { format, parseISO, differenceInMonths, differenceInYears } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -82,7 +82,7 @@ const Profile = () => {
             className="relative group cursor-pointer"
             onClick={() => setIsUploadDialogOpen(true)} // Abre o diálogo de upload ao clicar no avatar
           >
-            <Avatar className="h-28 w-28 mb-3 border-4 border-primary-foreground shadow-lg">
+            <Avatar className="h-28 w-28 mb-3 border-4 border-primary-foreground shadow-lg group-hover:border-primary transition-colors">
               {user.avatarUrl ? (
                 <AvatarImage src={user.avatarUrl} alt={user.name} />
               ) : (
@@ -91,9 +91,7 @@ const Profile = () => {
                 </AvatarFallback>
               )}
             </Avatar>
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-              <Plus className="h-8 w-8 text-white" /> {/* Ícone Plus aqui */}
-            </div>
+            {/* O div de sobreposição foi removido daqui */}
           </div>
           <CardTitle className="text-3xl font-bold">{user.name} {user.lastName}</CardTitle>
           <p className="text-primary-foreground/80 text-lg">{user.email}</p>
