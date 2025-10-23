@@ -97,7 +97,7 @@ const Cadastro = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between"> {/* Novo div para alinhar título e botão */}
-        <h2 className="text-3xl font-bold">Cadastro</h2>
+        <h2 className="text-3xl font-bold">Cadastro de novos tutores e animais</h2>
         <Button className="font-bold">
           <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
         </Button>
