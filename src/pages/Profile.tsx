@@ -62,7 +62,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto"> {/* Aumentado para max-w-4xl */}
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Meu Perfil</h2>
         {/* O botão "Editar Perfil" foi removido. A edição é ativada ao clicar nas informações. */}
