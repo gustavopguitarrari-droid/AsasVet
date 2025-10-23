@@ -11,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User as UserIcon } from "lucide-react"; // Renomeado para evitar conflito
 import { useUser } from "@/context/UserContext"; // Importa o hook useUser
+import { Link } from "react-router-dom"; // Importar Link para navegação
 
 const UserProfile = () => {
   const { user, setUser } = useUser(); // Usa o contexto do usuário
@@ -55,8 +56,8 @@ const UserProfile = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          Perfil
+        <DropdownMenuItem asChild>
+          <Link to="/profile">Perfil</Link> {/* Link para a nova página de perfil */}
         </DropdownMenuItem>
         <DropdownMenuItem>
           Configurações

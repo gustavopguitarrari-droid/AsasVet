@@ -28,6 +28,8 @@ const Header = () => {
         return "Equipe"; // Título atualizado
       case "/estoque": // Novo título para Estoque
         return "Estoque";
+      case "/profile": // Novo título para Perfil
+        return "Perfil";
       default:
         return "Simples Vet";
     }

@@ -14,6 +14,7 @@ import Caixa from "./pages/Caixa";
 import Internacao from "./pages/Internacao";
 import Veterinarios from "./pages/Veterinarios";
 import Estoque from "./pages/Estoque"; // Importação da nova página de Estoque
+import Profile from "./pages/Profile"; // Importação da nova página de Perfil
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -110,6 +111,14 @@ const App = () => (
             element={
               <Layout>
                 <Estoque />
+              </Layout>
+            }
+          />
+          <Route
+            path="/profile" // Nova rota para Perfil
+            element={
+              <Layout>
+                <Profile />
               </Layout>
             }
           />
