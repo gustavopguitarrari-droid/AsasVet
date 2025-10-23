@@ -34,7 +34,7 @@ const App = () => (
             }
           />
           <Route
-            path="/dashboard"
+            path="/painel"
             element={
               <Layout>
                 <Dashboard />

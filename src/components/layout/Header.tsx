@@ -8,7 +8,7 @@ const Header = () => {
   const location = useLocation();
   const getTitle = () => {
     switch (location.pathname) {
-      case "/dashboard":
+      case "/painel":
         return "Painel";
       case "/clients":
         return "Clientes";

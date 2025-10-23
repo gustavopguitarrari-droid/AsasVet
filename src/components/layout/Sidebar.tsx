@@ -28,7 +28,7 @@ const navItems = [
   {
     name: "Painel",
     icon: LayoutDashboard,
-    path: "/dashboard",
+    path: "/painel",
     // activeBgClass: "bg-sidebar-item-bg-1", // Removido
   },
   {
@@ -86,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
-      <Link to="/dashboard" className="mb-6 flex items-center justify-center text-4xl font-bold text-white cursor-pointer">
+      <Link to="/painel" className="mb-6 flex items-center justify-center text-4xl font-bold text-white cursor-pointer">
         {!isCollapsed && "AsasVet"}{" "}
         <PawPrint className={cn("h-10 w-10 text-white", !isCollapsed && "ml-2")} strokeWidth={2.5} />
       </Link>
