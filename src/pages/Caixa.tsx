@@ -129,12 +129,12 @@ const Caixa = () => {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className={cn("text-white shadow-md", totalBalance >= 0 ? "bg-green-700" : "bg-red-700")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-xs font-medium">Lucro bruto do dia</CardTitle> {/* Título alterado aqui */}
+            <CardTitle className="text-xs font-medium">Lucro bruto Diário</CardTitle> {/* Título alterado aqui */}
             <DollarSign className="h-4 w-4 text-white" />
           </CardHeader>
           <CardContent className="p-3 pt-0">
             <div className="text-xl font-bold">R$ {totalBalance.toFixed(2).replace('.', ',')}</div>
-            <p className="text-xs text-white/80">Total de entradas menos saídas do dia</p> {/* Descrição alterada aqui */}
+            <p className="text-xs text-white/80">Total de entradas menos saídas do dia</p>
           </CardContent>
         </Card>
         <Card>
