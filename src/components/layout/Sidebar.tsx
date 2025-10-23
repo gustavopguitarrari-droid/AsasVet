@@ -13,7 +13,7 @@ import {
   ArrowRightToLine,
   ReceiptText,
   Package,
-  BookUser, // Ícone para o novo item 'Cadastro'
+  // BookUser, // Ícone para o novo item 'Cadastro' - Removido
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -43,7 +43,7 @@ const navItems: NavItem[] = [
   },
   {
     name: "Cadastro", // Item de navegação para a página combinada
-    icon: BookUser,
+    icon: Users, // Ícone alterado para Users
     path: "/cadastro",
   },
   {
