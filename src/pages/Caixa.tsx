@@ -127,32 +127,32 @@ const Caixa = () => {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Saldo Atual</CardTitle> {/* Reduzido para text-xs */}
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1"> {/* Alterado para pb-1 */}
+            <CardTitle className="text-xs font-medium">Saldo Atual</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">R$ {totalBalance.toFixed(2).replace('.', ',')}</div> {/* Reduzido para text-xl */}
+          <CardContent className="p-3 pt-0"> {/* Adicionado p-3 pt-0 */}
+            <div className="text-xl font-bold">R$ {totalBalance.toFixed(2).replace('.', ',')}</div>
             <p className="text-xs text-muted-foreground">Total de todas as transações</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Entradas Hoje</CardTitle> {/* Reduzido para text-xs */}
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1"> {/* Alterado para pb-1 */}
+            <CardTitle className="text-xs font-medium">Entradas Hoje</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">R$ {entriesToday.toFixed(2).replace('.', ',')}</div> {/* Reduzido para text-xl */}
+          <CardContent className="p-3 pt-0"> {/* Adicionado p-3 pt-0 */}
+            <div className="text-xl font-bold">R$ {entriesToday.toFixed(2).replace('.', ',')}</div>
             <p className="text-xs text-muted-foreground">{transactionsToday.filter(t => t.type === "Entrada").length} transações</p>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-xs font-medium">Saídas Hoje</CardTitle> {/* Reduzido para text-xs */}
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1"> {/* Alterado para pb-1 */}
+            <CardTitle className="text-xs font-medium">Saídas Hoje</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-xl font-bold">R$ {exitsToday.toFixed(2).replace('.', ',')}</div> {/* Reduzido para text-xl */}
+          <CardContent className="p-3 pt-0"> {/* Adicionado p-3 pt-0 */}
+            <div className="text-xl font-bold">R$ {exitsToday.toFixed(2).replace('.', ',')}</div>
             <p className="text-xs text-muted-foreground">{transactionsToday.filter(t => t.type === "Saída").length} transações</p>
           </CardContent>
         </Card>
