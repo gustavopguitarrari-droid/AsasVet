@@ -70,6 +70,8 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     );
   };
 
+  // A função handleCategoryChange não será mais usada para cards no painel direito,
+  // mas é mantida para o Popover de adição.
   const handleCategoryChange = (id: string, newCategory: DashboardItemConfig["category"]) => {
     setTempConfig((prevConfig) =>
       prevConfig.map((item) =>
@@ -278,23 +280,8 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                               <GripVertical className="h-5 w-5 text-muted-foreground cursor-grab" />
                               <div className="flex flex-col flex-1">
                                 <Label className="text-sm font-medium">{item.name}</Label>
-                                <Select
-                                  value={item.category}
-                                  onValueChange={(value: DashboardItemConfig["category"]) =>
-                                    handleCategoryChange(item.id, value)
-                                  }
-                                >
-                                  <SelectTrigger className="w-[180px] h-8 text-sm mt-1">
-                                    <SelectValue placeholder="Selecionar Categoria" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {Object.entries(categoryNames).map(([val, name]) => (
-                                      <SelectItem key={val} value={val}>
-                                        {name}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
+                                {/* Exibe a categoria atual sem a opção de alterá-la */}
+                                <p className="text-xs text-muted-foreground mt-1">Categoria: {categoryNames[item.category]}</p>
                               </div>
                             </div>
                             <div className="flex items-center space-x-2">
