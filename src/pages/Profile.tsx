@@ -8,6 +8,7 @@ import { useUser } from "@/context/UserContext";
 import { format, parseISO, differenceInMonths, differenceInYears } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // Importar Tooltip components
 
 // Import new editable components
 import EditableField from "@/components/EditableField";
@@ -78,21 +79,27 @@ const Profile = () => {
 
       <Card className="overflow-hidden">
         <CardHeader className="profile-header-art-bg text-primary-foreground p-6 flex flex-col items-center text-center">
-          <div
-            className="relative group cursor-pointer"
-            onClick={() => setIsUploadDialogOpen(true)} // Abre o diálogo de upload ao clicar no avatar
-          >
-            <Avatar className="h-28 w-28 mb-3 border-4 border-primary-foreground shadow-lg group-hover:border-primary transition-colors">
-              {user.avatarUrl ? (
-                <AvatarImage src={user.avatarUrl} alt={user.name} />
-              ) : (
-                <AvatarFallback className="bg-primary-foreground text-primary">
-                  <Plus className="h-14 w-14" /> {/* Ícone Plus aqui */}
-                </AvatarFallback>
-              )}
-            </Avatar>
-            {/* O div de sobreposição foi removido daqui */}
-          </div>
+          <Tooltip delayDuration={0}> {/* Adicionado Tooltip */}
+            <TooltipTrigger asChild>
+              <div
+                className="relative group cursor-pointer"
+                onClick={() => setIsUploadDialogOpen(true)} // Abre o diálogo de upload ao clicar no avatar
+              >
+                <Avatar className="h-28 w-28 mb-3 border-4 border-primary-foreground shadow-lg group-hover:border-primary transition-colors">
+                  {user.avatarUrl ? (
+                    <AvatarImage src={user.avatarUrl} alt={user.name} />
+                  ) : (
+                    <AvatarFallback className="bg-primary-foreground text-primary">
+                      <Plus className="h-14 w-14" /> {/* Ícone Plus aqui */}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              Adicionar/Mudar foto
+            </TooltipContent>
+          </Tooltip>
           <CardTitle className="text-3xl font-bold">{user.name} {user.lastName}</CardTitle>
           <p className="text-primary-foreground/80 text-lg">{user.email}</p>
         </CardHeader>
