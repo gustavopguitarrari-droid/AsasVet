@@ -26,16 +26,16 @@ const SalePanel: React.FC<SalePanelProps> = ({
 }) => {
   return (
     <div className="space-y-6">
-      <CheckoutCart
-        items={items}
-        onUpdateQuantity={onUpdateQuantity}
-        onRemoveItem={onRemoveItem}
-      />
       <PaymentSection
         totalAmount={totalAmount}
         onFinalizeSale={onFinalizeSale}
         onCancelSale={onCancelSale}
         hasItemsInCart={hasItemsInCart}
+      />
+      <CheckoutCart
+        items={items}
+        onUpdateQuantity={onUpdateQuantity}
+        onRemoveItem={onRemoveItem}
       />
     </div>
   );

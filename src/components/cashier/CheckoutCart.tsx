@@ -20,7 +20,7 @@ const CheckoutCart: React.FC<CheckoutCartProps> = ({ items, onUpdateQuantity, on
   return (
     <div className="space-y-4">
       <h3 className="text-xl font-semibold">Itens da Venda</h3>
-      <ScrollArea className="h-[300px] rounded-md border p-4">
+      <ScrollArea className="h-[200px] rounded-md border p-4"> {/* Altura reduzida aqui */}
         {items.length === 0 ? (
           <p className="text-center text-muted-foreground">Nenhum item no carrinho.</p>
         ) : (
