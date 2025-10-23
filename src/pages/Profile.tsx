@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { User as UserIcon, Mail, Edit, Briefcase, Cake, Clock } from "lucide-react";
 import { useUser } from "@/context/UserContext";
 import ProfileEditDialog, { ProfileFormValues } from "@/components/ProfileEditDialog";
-import { format, parseISO, differenceInMonths, differenceInYears } from "date-fns"; // Importar differenceInMonths e differenceInYears
+import { format, parseISO, differenceInMonths, differenceInYears } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 const Profile = () => {
@@ -29,7 +29,7 @@ const Profile = () => {
       name: data.name,
       lastName: data.lastName,
       email: data.email,
-      gender: data.gender,
+      // gender: data.gender, // Removido
       avatarUrl: data.avatarUrl || undefined,
       role: data.role,
       birthday: data.birthday ? format(data.birthday, "yyyy-MM-dd") : undefined,
@@ -93,12 +93,7 @@ const Profile = () => {
             <p className="text-lg font-medium">E-mail:</p>
             <p className="flex-1 text-lg">{user.email}</p>
           </div>
-          <Separator />
-          <div className="flex items-center space-x-4">
-            <UserIcon className="h-5 w-5 text-muted-foreground" />
-            <p className="text-lg font-medium">Gênero:</p>
-            <p className="flex-1 text-lg capitalize">{user.gender}</p>
-          </div>
+          {/* Gênero removido */}
           <Separator />
           <div className="flex items-center space-x-4">
             <Briefcase className="h-5 w-5 text-muted-foreground" />
@@ -127,7 +122,7 @@ const Profile = () => {
           name: user.name,
           lastName: user.lastName,
           email: user.email,
-          gender: user.gender,
+          // gender: user.gender, // Removido
           avatarUrl: user.avatarUrl || "",
           role: user.role,
           birthday: user.birthday ? parseISO(user.birthday) : undefined,

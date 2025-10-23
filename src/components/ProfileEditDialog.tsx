@@ -26,19 +26,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User as UserIcon, Upload } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import BirthdayPicker from "./BirthdayPicker"; // Importar o novo componente
-import RoleSelect from "./RoleSelect"; // Importar o novo componente
+import BirthdayPicker from "./BirthdayPicker";
+import RoleSelect from "./RoleSelect";
 
 const formSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório."),
-  lastName: z.string().min(1, "O sobrenome é obrigatório."), // Novo campo
+  lastName: z.string().min(1, "O sobrenome é obrigatório."),
   email: z.string().email("E-mail inválido.").min(1, "O e-mail é obrigatório."),
-  gender: z.enum(["masculino", "feminino"], {
-    required_error: "O gênero é obrigatório.",
-  }),
+  // gender: z.enum(["masculino", "feminino"], { // Removido
+  //   required_error: "O gênero é obrigatório.",
+  // }),
   avatarUrl: z.string().optional().or(z.literal("")),
-  role: z.string().min(1, "O cargo é obrigatório."), // Novo campo
-  birthday: z.date().optional().nullable(), // Novo campo (Date para o formulário)
+  role: z.string().min(1, "O cargo é obrigatório."),
+  birthday: z.date().optional().nullable(),
 });
 
 export type ProfileFormValues = z.infer<typeof formSchema>;
@@ -46,7 +46,7 @@ export type ProfileFormValues = z.infer<typeof formSchema>;
 interface ProfileEditDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  initialData: Omit<ProfileFormValues, "birthday"> & { birthday?: Date | undefined }; // Ajusta initialData para aceitar Date
+  initialData: Omit<ProfileFormValues, "birthday"> & { birthday?: Date | undefined };
   onSave: (data: ProfileFormValues) => void;
 }
 
@@ -60,7 +60,7 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       ...initialData,
-      birthday: initialData.birthday || undefined, // Garante que seja Date ou undefined
+      birthday: initialData.birthday || undefined,
     },
   });
 
@@ -186,27 +186,7 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="gender"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Gênero</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione seu gênero" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="masculino">Masculino</SelectItem>
-                      <SelectItem value="feminino">Feminino</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Gênero removido */}
             <FormField
               control={form.control}
               name="role"

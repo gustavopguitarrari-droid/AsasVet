@@ -7,7 +7,7 @@ interface User {
   name: string;
   lastName: string; // Novo campo
   email: string;
-  gender: 'masculino' | 'feminino';
+  // gender: 'masculino' | 'feminino'; // Removido
   avatarUrl?: string;
   role: string; // Novo campo
   birthday?: string; // Novo campo (formato YYYY-MM-DD)
@@ -27,7 +27,7 @@ export const UserProvider = ({ children }: { ReactNode }) => {
     name: "João",
     lastName: "Silva", // Adicionado
     email: "joao.silva@example.com",
-    gender: "masculino",
+    // gender: "masculino", // Removido
     avatarUrl: "https://github.com/shadcn.png",
     role: "Veterinário", // Adicionado
     birthday: "1990-05-15", // Adicionado
