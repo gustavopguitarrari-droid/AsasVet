@@ -30,8 +30,8 @@ const Profile = () => {
     });
   };
 
-  // Usando UserIcon como um ícone genérico para gênero
-  const GenericGenderIcon = UserIcon; 
+  // Usando UserIcon como um ícone genérico para gênero, pois GenderFemale e GenderMale não estão disponíveis.
+  const GenderDisplayIcon = UserIcon; 
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
@@ -71,7 +71,7 @@ const Profile = () => {
           </div>
           <Separator />
           <div className="flex items-center space-x-4">
-            <GenericGenderIcon className="h-5 w-5 text-muted-foreground" /> {/* Usando o ícone genérico */}
+            <GenderDisplayIcon className="h-5 w-5 text-muted-foreground" /> {/* Usando o ícone genérico */}
             <p className="text-lg font-medium">Gênero:</p>
             <p className="flex-1 text-lg capitalize">{user.gender}</p>
           </div>
