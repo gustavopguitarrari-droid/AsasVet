@@ -13,14 +13,14 @@ import {
   ArrowRightToLine,
   ReceiptText,
   Package,
-  FolderOpen, // NOVO: Ícone para a categoria Cadastros
-  ChevronDown, // NOVO: Ícone para o menu expansível
+  BookUser, // NOVO: Ícone para a categoria Cadastros (substitui FolderOpen)
+  ChevronDown, // Ícone para o menu expansível
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import {
-  Collapsible, // NOVO: Componentes para menu expansível
+  Collapsible, // Componentes para menu expansível
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
@@ -40,11 +40,11 @@ const navItems: NavItem[] = [
   },
   {
     name: "Cadastros", // Nova categoria
-    icon: FolderOpen,
+    icon: BookUser, // Ícone atualizado
     subItems: [
       { name: "Animais", icon: PawPrint, path: "/pets" },
       { name: "Equipe", icon: Stethoscope, path: "/veterinarios" },
-      { name: "Tutores", icon: Users, path: "/clients" }, // Renomeado de 'Clientes' para 'Tutores'
+      { name: "Tutores", icon: Users, path: "/clients" },
     ],
   },
   {
