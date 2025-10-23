@@ -96,27 +96,79 @@ const Cadastro = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between"> {/* Novo div para alinhar título e botão */}
+      <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Cadastro de novos tutores e animais</h2>
         <Button className="font-bold">
           <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
         </Button>
       </div>
 
-      <Tabs defaultValue="animais" className="w-full">
+      <Tabs defaultValue="tutores" className="w-full"> {/* Alterado defaultValue para "tutores" */}
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
-          <TabsTrigger value="animais" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">
-            <Dog className="h-5 w-5 mr-2" /> Animais
-          </TabsTrigger>
-          <TabsTrigger value="tutores" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">
+          <TabsTrigger value="tutores" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold"> {/* Aba Tutores primeiro */}
             <UsersIcon className="h-5 w-5 mr-2" /> Tutores
+          </TabsTrigger>
+          <TabsTrigger value="animais" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold"> {/* Aba Animais segundo */}
+            <Dog className="h-5 w-5 mr-2" /> Animais
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="animais" className="mt-4">
+        <TabsContent value="tutores" className="mt-4"> {/* Conteúdo de Tutores primeiro */}
+          <div className="flex items-center justify-end mb-4">
+            <Button>
+              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
+            </Button>
+          </div>
+
+          <div className="flex items-center space-x-2 mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input placeholder="Buscar tutores..." className="pl-9" value={clientSearchTerm} onChange={(e) => setClientSearchTerm(e.target.value)} />
+            </div>
+            <Button variant="outline">Filtrar</Button>
+          </div>
+
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Telefone</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredClients.length > 0 ? (
+                  filteredClients.map((client) => (
+                    <TableRow key={client.id}>
+                      <TableCell className="font-medium">{client.id}</TableCell>
+                      <TableCell>{client.name}</TableCell>
+                      <TableCell>{client.email}</TableCell>
+                      <TableCell>{client.phone}</TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="sm">
+                          Ver Detalhes
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={5} className="h-24 text-center">
+                      Nenhum tutor encontrado.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="animais" className="mt-4"> {/* Conteúdo de Animais segundo */}
           <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
             <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
-            {/* O botão "Adicionar Animal" foi movido para cima */}
           </div>
 
           <div className="flex items-center space-x-2 mb-6">
@@ -176,59 +228,6 @@ const Cadastro = () => {
             isOpen={isPetDetailsDialogOpen}
             onClose={() => setIsPetDetailsDialogOpen(false)}
           />
-        </TabsContent>
-
-        <TabsContent value="tutores" className="mt-4">
-          <div className="flex items-center justify-end mb-4">
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
-            </Button>
-          </div>
-
-          <div className="flex items-center space-x-2 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Buscar tutores..." className="pl-9" value={clientSearchTerm} onChange={(e) => setClientSearchTerm(e.target.value)} />
-            </div>
-            <Button variant="outline">Filtrar</Button>
-          </div>
-
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Telefone</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredClients.length > 0 ? (
-                  filteredClients.map((client) => (
-                    <TableRow key={client.id}>
-                      <TableCell className="font-medium">{client.id}</TableCell>
-                      <TableCell>{client.name}</TableCell>
-                      <TableCell>{client.email}</TableCell>
-                      <TableCell>{client.phone}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
-                          Ver Detalhes
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
-                      Nenhum tutor encontrado.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
         </TabsContent>
       </Tabs>
     </div>
