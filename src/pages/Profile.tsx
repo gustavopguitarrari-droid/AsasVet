@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { User as UserIcon, Mail, Edit } from "lucide-react"; // Importação limpa, usando UserIcon
+import { User as UserIcon, Mail, Edit } from "lucide-react"; // Usando UserIcon genérico
 import { useUser } from "@/context/UserContext";
 import ProfileEditDialog, { ProfileFormValues } from "@/components/ProfileEditDialog";
 
@@ -29,9 +29,6 @@ const Profile = () => {
       avatarUrl: data.avatarUrl || undefined,
     });
   };
-
-  // Usando UserIcon como um ícone genérico para gênero
-  const GenderDisplayIcon = UserIcon; 
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
@@ -71,7 +68,7 @@ const Profile = () => {
           </div>
           <Separator />
           <div className="flex items-center space-x-4">
-            <GenderDisplayIcon className="h-5 w-5 text-muted-foreground" /> {/* Usando o ícone genérico */}
+            <UserIcon className="h-5 w-5 text-muted-foreground" /> {/* Usando UserIcon genérico para gênero */}
             <p className="text-lg font-medium">Gênero:</p>
             <p className="flex-1 text-lg capitalize">{user.gender}</p>
           </div>
