@@ -5,15 +5,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { User as UserIcon, Mail, Edit, Briefcase, Cake, Clock } from "lucide-react";
+import { User as UserIcon, Mail, Edit, Briefcase, Cake, Clock, XCircle } from "lucide-react"; // Adicionado XCircle para cancelar
 import { useUser } from "@/context/UserContext";
-import ProfileEditDialog, { ProfileFormValues } from "@/components/ProfileEditDialog";
+import ProfileForm, { ProfileFormValues } from "@/components/ProfileForm"; // Importar o novo ProfileForm
 import { format, parseISO, differenceInMonths, differenceInYears } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 const Profile = () => {
   const { user, setUser } = useUser();
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false); // Novo estado para controlar o modo de edição
 
   if (!user) {
     return (
@@ -29,16 +29,19 @@ const Profile = () => {
       name: data.name,
       lastName: data.lastName,
       email: data.email,
-      // gender: data.gender, // Removido
       avatarUrl: data.avatarUrl || undefined,
       role: data.role,
       birthday: data.birthday ? format(data.birthday, "yyyy-MM-dd") : undefined,
     });
+    setIsEditing(false); // Sai do modo de edição após salvar
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false); // Sai do modo de edição sem salvar
   };
 
   const formattedBirthday = user.birthday ? format(parseISO(user.birthday), "dd/MM/yyyy", { locale: ptBR }) : "N/A";
   
-  // Calcular o tempo na empresa
   let timeInCompany = "N/A";
   if (user.registeredTime) {
     const registrationDate = parseISO(user.registeredTime);
@@ -61,9 +64,11 @@ const Profile = () => {
     <div className="space-y-6 max-w-2xl mx-auto">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Meu Perfil</h2>
-        <Button onClick={() => setIsEditDialogOpen(true)}>
-          <Edit className="mr-2 h-4 w-4" /> Editar Perfil
-        </Button>
+        {!isEditing && (
+          <Button onClick={() => setIsEditing(true)}>
+            <Edit className="mr-2 h-4 w-4" /> Editar Perfil
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -81,54 +86,55 @@ const Profile = () => {
           <p className="text-muted-foreground">{user.email}</p>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Separator />
-          <div className="flex items-center space-x-4">
-            <UserIcon className="h-5 w-5 text-muted-foreground" />
-            <p className="text-lg font-medium">Nome Completo:</p>
-            <p className="flex-1 text-lg">{user.name} {user.lastName}</p>
-          </div>
-          <Separator />
-          <div className="flex items-center space-x-4">
-            <Mail className="h-5 w-5 text-muted-foreground" />
-            <p className="text-lg font-medium">E-mail:</p>
-            <p className="flex-1 text-lg">{user.email}</p>
-          </div>
-          {/* Gênero removido */}
-          <Separator />
-          <div className="flex items-center space-x-4">
-            <Briefcase className="h-5 w-5 text-muted-foreground" />
-            <p className="text-lg font-medium">Cargo:</p>
-            <p className="flex-1 text-lg">{user.role}</p>
-          </div>
-          <Separator />
-          <div className="flex items-center space-x-4">
-            <Cake className="h-5 w-5 text-muted-foreground" />
-            <p className="text-lg font-medium">Aniversário:</p>
-            <p className="flex-1 text-lg">{formattedBirthday}</p>
-          </div>
-          <Separator />
-          <div className="flex items-center space-x-4">
-            <Clock className="h-5 w-5 text-muted-foreground" />
-            <p className="text-lg font-medium">Tempo na Empresa:</p>
-            <p className="flex-1 text-lg">{timeInCompany}</p>
-          </div>
+          {isEditing ? (
+            <ProfileForm
+              initialData={{
+                name: user.name,
+                lastName: user.lastName,
+                email: user.email,
+                avatarUrl: user.avatarUrl || "",
+                role: user.role,
+                birthday: user.birthday ? parseISO(user.birthday) : undefined,
+              }}
+              onSubmit={handleSaveProfile}
+              onCancel={handleCancelEdit}
+            />
+          ) : (
+            <>
+              <Separator />
+              <div className="flex items-center space-x-4">
+                <UserIcon className="h-5 w-5 text-muted-foreground" />
+                <p className="text-lg font-medium">Nome Completo:</p>
+                <p className="flex-1 text-lg">{user.name} {user.lastName}</p>
+              </div>
+              <Separator />
+              <div className="flex items-center space-x-4">
+                <Mail className="h-5 w-5 text-muted-foreground" />
+                <p className="text-lg font-medium">E-mail:</p>
+                <p className="flex-1 text-lg">{user.email}</p>
+              </div>
+              <Separator />
+              <div className="flex items-center space-x-4">
+                <Briefcase className="h-5 w-5 text-muted-foreground" />
+                <p className="text-lg font-medium">Cargo:</p>
+                <p className="flex-1 text-lg">{user.role}</p>
+              </div>
+              <Separator />
+              <div className="flex items-center space-x-4">
+                <Cake className="h-5 w-5 text-muted-foreground" />
+                <p className="text-lg font-medium">Aniversário:</p>
+                <p className="flex-1 text-lg">{formattedBirthday}</p>
+              </div>
+              <Separator />
+              <div className="flex items-center space-x-4">
+                <Clock className="h-5 w-5 text-muted-foreground" />
+                <p className="text-lg font-medium">Tempo na Empresa:</p>
+                <p className="flex-1 text-lg">{timeInCompany}</p>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
-
-      <ProfileEditDialog
-        isOpen={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
-        initialData={{
-          name: user.name,
-          lastName: user.lastName,
-          email: user.email,
-          // gender: user.gender, // Removido
-          avatarUrl: user.avatarUrl || "",
-          role: user.role,
-          birthday: user.birthday ? parseISO(user.birthday) : undefined,
-        }}
-        onSave={handleSaveProfile}
-      />
     </div>
   );
 };
