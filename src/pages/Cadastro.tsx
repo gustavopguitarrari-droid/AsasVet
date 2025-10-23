@@ -100,10 +100,20 @@ const Cadastro = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Cadastro de novos tutores e animais</h2>
-        {/* Botões de adicionar foram movidos para dentro das abas */}
+        {/* Botões de adicionar movidos para cá, exibidos condicionalmente */}
+        {activeTab === "tutores" && (
+          <Button className="font-bold">
+            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
+          </Button>
+        )}
+        {activeTab === "animais" && (
+          <Button className="font-bold">
+            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
+          </Button>
+        )}
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full"> {/* Adicionado onValueChange */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
           <TabsTrigger value="tutores" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">
             <UsersIcon className="h-5 w-5 mr-2" /> Tutores
@@ -114,12 +124,7 @@ const Cadastro = () => {
         </TabsList>
 
         <TabsContent value="tutores" className="mt-4">
-          <div className="flex items-center justify-end mb-4">
-            <Button className="font-bold"> {/* Botão Adicionar Tutor */}
-              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
-            </Button>
-          </div>
-
+          {/* O botão "Adicionar Tutor" foi movido para cima */}
           <div className="flex items-center space-x-2 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -167,11 +172,7 @@ const Cadastro = () => {
         </TabsContent>
 
         <TabsContent value="animais" className="mt-4">
-          <div className="flex items-center justify-end mb-4">
-            <Button className="font-bold"> {/* Botão Adicionar Animal */}
-              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
-            </Button>
-          </div>
+          {/* O botão "Adicionar Animal" foi movido para cima */}
           <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
             <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
           </div>
