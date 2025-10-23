@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd"; // Importar componentes de DND
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 
 interface DashboardItemConfig {
   id: string;
@@ -88,8 +88,6 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     }
 
     if (source.droppableId !== destination.droppableId) {
-      // Dragging between different categories is not allowed in this setup
-      // The UI prevents this by having separate droppables per category
       return;
     }
 
@@ -101,31 +99,20 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
       const newConfig = Array.from(prevConfig);
       const category = source.droppableId as DashboardItemConfig["category"];
 
-      // Filter items belonging to the current category and are visible
       const itemsInCurrentCategory = newConfig.filter(
         (item) => item.isVisible && item.category === category
       );
 
-      // Reorder items within this filtered list
       const [reorderedItem] = itemsInCurrentCategory.splice(source.index, 1);
       itemsInCurrentCategory.splice(destination.index, 0, reorderedItem);
 
-      // Reconstruct the full config array, maintaining order of other categories and invisible items
-      const updatedConfig = newConfig.map(item => {
-        const reordered = itemsInCurrentCategory.find(reordered => reordered.id === item.id);
-        return reordered || item;
-      });
-
-      // To ensure the order within the category is preserved correctly in the main array,
-      // we need to place the reordered items back into their original positions relative to other categories.
-      // A simpler approach is to sort the entire tempConfig based on the new order of itemsInCurrentCategory.
       const finalConfig = newConfig.sort((a, b) => {
         if (a.category === category && b.category === category && a.isVisible && b.isVisible) {
           const aIndex = itemsInCurrentCategory.findIndex(item => item.id === a.id);
           const bIndex = itemsInCurrentCategory.findIndex(item => item.id === b.id);
           return aIndex - bIndex;
         }
-        return 0; // Maintain original relative order for items not in this category or not visible
+        return 0;
       });
 
       return finalConfig;
@@ -253,6 +240,14 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                                       <div
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
+                                        // Aplicar estilos diretamente para garantir que o transform seja respeitado
+                                        style={{
+                                          ...provided.draggableProps.style,
+                                          boxSizing: 'border-box', // Garante o modelo de caixa consistente
+                                          ...(snapshot.isDragging ? {
+                                            zIndex: 9999, // Traz o item para a frente quando arrastando
+                                          } : {}),
+                                        }}
                                         className={cn(
                                           "flex items-center justify-between space-x-2 p-2 rounded-md border bg-card",
                                           snapshot.isDragging && "shadow-lg bg-accent"
