@@ -34,7 +34,7 @@ const navItems = [
   {
     name: "Consultas",
     icon: ClipboardList, // Ícone atualizado para ClipboardList
-    path: "/appointments",
+    path: "/consultas",
     // activeBgClass: "bg-sidebar-item-bg-4", // Removido
   },
   {

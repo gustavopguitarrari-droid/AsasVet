@@ -58,7 +58,7 @@ const App = () => (
             }
           />
           <Route
-            path="/appointments"
+            path="/consultas"
             element={
               <Layout>
                 <Appointments />

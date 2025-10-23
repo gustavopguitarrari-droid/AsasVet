@@ -14,7 +14,7 @@ const Header = () => {
         return "Clientes";
       case "/pets":
         return "Cadastro de animais"; // Título atualizado aqui
-      case "/appointments":
+      case "/consultas":
         return "Consultas";
       case "/medical-records":
         return "Agenda"; // Título atualizado
