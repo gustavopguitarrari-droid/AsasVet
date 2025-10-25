@@ -39,14 +39,14 @@ const Profile = () => {
       return data;
     },
     onSuccess: (data) => {
-      // Atualiza o contexto do usuário com os novos dados
+      // Atualiza o contexto do usuário com os novos dados, convertendo null para undefined
       setUser((prevUser) => ({
         ...prevUser!,
-        name: data.first_name,
-        lastName: data.last_name,
-        email: data.email,
+        name: data.first_name || undefined,
+        lastName: data.last_name || undefined,
+        email: data.email || undefined,
         avatarUrl: data.avatar_url || undefined,
-        role: data.role,
+        role: data.role || undefined,
         birthday: data.birthday || undefined,
       }));
       queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] }); // Invalida o cache para rebuscar se necessário
@@ -108,8 +108,10 @@ const Profile = () => {
     }
   }
 
-  // Calcular as iniciais
-  const initials = `${user.name.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+  // Calcular as iniciais de forma mais robusta
+  const firstNameInitial = user.name ? user.name.charAt(0) : '';
+  const lastNameInitial = user.lastName ? user.lastName.charAt(0) : '';
+  const initials = `${firstNameInitial}${lastNameInitial}`.toUpperCase();
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -143,26 +145,26 @@ const Profile = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
             <EditableField
               label="Nome"
-              value={user.name}
+              value={user.name || ''} // Fornecer string vazia como fallback
               onSave={handleSaveName}
               icon={UserIcon}
             />
             <EditableField
               label="Sobrenome"
-              value={user.lastName}
+              value={user.lastName || ''} // Fornecer string vazia como fallback
               onSave={handleSaveLastName}
               icon={UserIcon}
             />
             <EditableField
               label="E-mail"
-              value={user.email}
+              value={user.email || ''} // Fornecer string vazia como fallback
               onSave={handleSaveEmail}
               icon={Mail}
               type="email"
             />
             <EditableRoleField
               label="Cargo"
-              value={user.role}
+              value={user.role || ''} // Fornecer string vazia como fallback
               onSave={handleSaveRole}
             />
             <EditableBirthdayField

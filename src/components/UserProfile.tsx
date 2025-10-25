@@ -39,8 +39,10 @@ const UserProfile = () => {
     );
   }
 
-  // Calcular as iniciais
-  const initials = `${user.name.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+  // Calcular as iniciais de forma mais robusta
+  const firstNameInitial = user.name ? user.name.charAt(0) : '';
+  const lastNameInitial = user.lastName ? user.lastName.charAt(0) : '';
+  const initials = `${firstNameInitial}${lastNameInitial}`.toUpperCase();
 
   return (
     <DropdownMenu>

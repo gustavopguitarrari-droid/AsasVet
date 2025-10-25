@@ -5,11 +5,11 @@ import { format } from 'date-fns';
 
 interface User {
   id?: string; // Adicionado ID do usuário
-  name: string;
-  lastName: string;
-  email: string;
+  name?: string; // Tornar opcional
+  lastName?: string; // Tornar opcional
+  email?: string; // Tornar opcional
   avatarUrl?: string;
-  role: string;
+  role?: string; // Tornar opcional
   birthday?: string;
   registeredTime: string;
 }
