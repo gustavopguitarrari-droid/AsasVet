@@ -116,7 +116,9 @@ const SubusersSettings: React.FC = () => {
 
       if (error) {
         let errorMessage = error.message;
+        console.error("Raw error object from invoke:", error); // Added log
         if (error.context && error.context.data) {
+          console.error("error.context.data:", error.context.data); // Added log
           try {
             const errorData = JSON.parse(error.context.data);
             if (errorData.error) {
@@ -148,7 +150,6 @@ const SubusersSettings: React.FC = () => {
     },
     onError: (err: any) => {
       console.error("updateSubuserRoleMutation: onError callback triggered. Full error object:", err);
-      // The mutationFn is already throwing an Error with the specific message, so we can use it directly.
       showError(`Erro ao atualizar cargo: ${err.message || "Erro desconhecido."}`);
     },
   });

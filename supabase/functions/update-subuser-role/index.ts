@@ -7,12 +7,14 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  console.log('Edge Function: Request received for update-subuser-role.'); // Added log
+
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Edge Function: update-subuser-role started.');
+    console.log('Edge Function: update-subuser-role started within try block.'); // Added log
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -123,8 +125,8 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Edge Function: Unhandled error:', error);
-    // Return the actual error message for better debugging
+    console.error('Edge Function: Unhandled error in catch block:', error); // Improved log
+    // Ensure consistent JSON error response with correct status and headers
     return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
