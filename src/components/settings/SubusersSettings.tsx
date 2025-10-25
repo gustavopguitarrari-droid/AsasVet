@@ -134,8 +134,23 @@ const SubusersSettings: React.FC = () => {
       setTempRole("");
     },
     onError: (err: any) => {
-      console.error("Erro ao atualizar cargo:", err.message);
-      showError(`Erro ao atualizar cargo: ${err.message}`);
+      console.error("Erro ao atualizar cargo:", err); // Log the full error object
+      let userFriendlyMessage = "Erro ao atualizar cargo. Por favor, tente novamente.";
+
+      // Attempt to parse the detailed error from the Edge Function response
+      if (err.context && err.context.data) {
+        try {
+          const errorData = JSON.parse(err.context.data);
+          if (errorData.error) {
+            userFriendlyMessage = `Erro ao atualizar cargo: ${errorData.error}`;
+          }
+        } catch (parseError) {
+          console.error("Failed to parse Edge Function error response data:", parseAerror);
+        }
+      } else if (err.message) {
+        userFriendlyMessage = `Erro ao atualizar cargo: ${err.message}`;
+      }
+      showError(userFriendlyMessage);
     },
   });
 
