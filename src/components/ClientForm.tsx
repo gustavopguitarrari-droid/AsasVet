@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -20,20 +20,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { DialogFooter } from "@/components/ui/dialog";
 import MultiSelectPets from "./MultiSelectPets";
-import BirthdayPicker from "./BirthdayPicker"; // Importar BirthdayPicker
+import BirthdayPicker from "./BirthdayPicker";
 import { Client, Pet } from "@/types/cadastro";
-import { lookupCep } from "@/utils/cepLookup"; // Importar a função de busca de CEP
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
-import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
+import { lookupCep } from "@/utils/cepLookup";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { showError, showSuccess } from "@/utils/toast";
 
+// Esquema de validação do formulário com Zod
 const formSchema = z.object({
   name: z.string().min(1, "O nome do tutor é obrigatório."),
   email: z.string().email("E-mail inválido.").min(1, "O e-mail é obrigatório."),
   phone: z.string().min(1, "O telefone é obrigatório."),
-  cpf: z.string().min(11, "O CPF deve ter 11 dígitos.").max(14, "O CPF deve ter no máximo 14 dígitos (com formatação)."), // Novo campo
+  cpf: z.string().min(11, "O CPF deve ter 11 dígitos.").max(14, "O CPF deve ter no máximo 14 dígitos (com formatação)."),
   dateOfBirth: z.date({
     required_error: "A data de nascimento é obrigatória.",
-  }), // Novo campo
+  }),
   address: z.object({
     cep: z.string().min(8, "O CEP deve ter 8 dígitos.").max(9, "O CEP deve ter no máximo 9 dígitos (com formatação)."),
     street: z.string().min(1, "A rua é obrigatória."),
@@ -43,7 +44,7 @@ const formSchema = z.object({
     city: z.string().min(1, "A cidade é obrigatória."),
     state: z.string().min(2, "O estado é obrigatório.").max(2, "O estado deve ter 2 letras."),
   }),
-  photoUrl: z.string().optional(), // Novo campo para URL da foto
+  photoUrl: z.string().optional(),
   associatedPetIds: z.array(z.string()).optional(),
 });
 
@@ -57,7 +58,7 @@ interface ClientFormProps {
 }
 
 const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData, allPets }) => {
-  // Helper para analisar strings de data com segurança
+  // Função auxiliar para analisar strings de data com segurança
   const safeParseDate = (dateString?: string | null): Date => {
     if (dateString) {
       const parsed = parseISO(dateString);
@@ -75,7 +76,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
       email: initialData?.email || "",
       phone: initialData?.phone || "",
       cpf: initialData?.cpf || "",
-      dateOfBirth: safeParseDate(initialData?.dateOfBirth), // Usa a função safeParseDate
+      dateOfBirth: safeParseDate(initialData?.dateOfBirth),
       address: {
         cep: initialData?.address?.cep || "",
         street: initialData?.address?.street || "",
@@ -86,16 +87,42 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
         state: initialData?.address?.state || "",
       },
       photoUrl: initialData?.photoUrl || undefined,
-      associatedPetIds: initialData?.associatedPetIds || [], // Garante que seja um array
+      associatedPetIds: initialData?.associatedPetIds || [],
     },
   });
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialData?.photoUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Efeito para resetar o formulário e o preview da imagem quando o diálogo é aberto/fechado
+  useEffect(() => {
+    form.reset({
+      name: initialData?.name || "",
+      email: initialData?.email || "",
+      phone: initialData?.phone || "",
+      cpf: initialData?.cpf || "",
+      dateOfBirth: safeParseDate(initialData?.dateOfBirth),
+      address: {
+        cep: initialData?.address?.cep || "",
+        street: initialData?.address?.street || "",
+        number: initialData?.address?.number || "",
+        complement: initialData?.address?.complement || "",
+        neighborhood: initialData?.address?.neighborhood || "",
+        city: initialData?.address?.city || "",
+        state: initialData?.address?.state || "",
+      },
+      photoUrl: initialData?.photoUrl || undefined,
+      associatedPetIds: initialData?.associatedPetIds || [],
+    });
+    setPreviewUrl(initialData?.photoUrl || null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Limpa o input de arquivo
+    }
+  }, [initialData, form]); // Depende de initialData para resetar quando os dados mudam (ou o formulário é 'reaberto' sem initialData)
+
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const cep = e.target.value;
-    form.setValue("address.cep", cep); // Atualiza o valor do CEP no formulário
+    form.setValue("address.cep", cep);
     if (cep.replace(/\D/g, '').length === 8) {
       const addressData = await lookupCep(cep);
       if (addressData) {
@@ -122,7 +149,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
         setPreviewUrl(initialData?.photoUrl || null);
         return;
       }
-      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+      if (file.size > 2 * 1024 * 1024) { // Limite de 2MB
         showError("A imagem é muito grande. O tamanho máximo permitido é 2MB.");
         setPreviewUrl(initialData?.photoUrl || null);
         return;
@@ -148,12 +175,13 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
     setPreviewUrl(null);
     form.setValue("photoUrl", undefined);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ''; // Clear file input
+      fileInputRef.current.value = '';
     }
     showSuccess("Foto de perfil removida.");
   };
 
-  const initials = `${form.watch("name").charAt(0)}${form.watch("name").split(' ').pop()?.charAt(0) || ''}`.toUpperCase();
+  const currentName = form.watch("name");
+  const initials = `${currentName.charAt(0)}${currentName.split(' ').pop()?.charAt(0) || ''}`.toUpperCase();
 
   return (
     <Form {...form}>
