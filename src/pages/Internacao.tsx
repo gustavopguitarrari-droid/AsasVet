@@ -230,17 +230,21 @@ const Internacao = () => {
       // Invalidate history to ensure it picks up the new patient
       await queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
 
-      // If the patient was marked as Alta or Óbito, force a refetch of the active patients list
-      // This will re-run the query with the `not('status', 'in', ...)` filter
+      // If the patient was marked as Alta or Óbito, remove it from the active patients cache immediately
       if (data.status === "Alta" || data.status === "Óbito") {
-        console.log("Patient status is Alta/Óbito, refetching interned_patients.");
-        await queryClient.refetchQueries({ queryKey: ['interned_patients', userId] });
+        queryClient.setQueryData<InternedPatient[]>(['interned_patients', userId], (oldData) => {
+          return oldData ? oldData.filter(patient => patient.id !== data.id) : [];
+        });
+        console.log("Patient status is Alta/Óbito, removed from interned_patients cache.");
       } else {
         // If status is not Alta/Óbito, update the patient in the active list cache
         queryClient.setQueryData<InternedPatient[]>(['interned_patients', userId], (oldData) => {
           return oldData ? oldData.map(patient => patient.id === data.id ? data : patient) : [];
         });
       }
+      // Regardless of status, invalidate and refetch the active patients query in the background
+      // to ensure full consistency with the backend.
+      await queryClient.refetchQueries({ queryKey: ['interned_patients', userId] });
 
       showSuccess("Paciente atualizado com sucesso!");
       setIsDetailsDialogOpen(false); // Close dialog AFTER cache update
@@ -611,7 +615,7 @@ const Internacao = () => {
           patientName={actionPatientName}
           date={actionDate}
           initialHour={actionHour}
-          allActionsForPatient={allActionsForCurrentPatient}
+          allActionsForCurrentPatient={allActionsForCurrentPatient}
         />
       )}
 
