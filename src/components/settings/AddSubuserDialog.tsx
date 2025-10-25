@@ -57,7 +57,7 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
       lastName: "",
       email: "",
       password: "",
-      role: "Veterinário",
+      role: "Veterinário", // Definido como 'Veterinário' por padrão
       // Gênero removido
     },
   });

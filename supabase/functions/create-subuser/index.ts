@@ -53,11 +53,19 @@ serve(async (req) => {
       });
     }
 
-    const { email, password, first_name, last_name, role } = await req.json(); // Gênero removido
+    const { email, password, first_name, last_name, role } = await req.json();
 
-    if (!email || !password || !first_name || !last_name || !role) { // Gênero removido da validação
+    if (!email || !password || !first_name || !last_name || !role) {
       return new Response(JSON.stringify({ error: 'Missing required fields: email, password, first_name, last_name, role' }), {
         status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // IMPORTANT: Prevent creating a sub-user with 'Administrador' role
+    if (role === 'Administrador') {
+      return new Response(JSON.stringify({ error: 'Forbidden: Cannot create a sub-user with Administrator role.' }), {
+        status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
@@ -71,7 +79,6 @@ serve(async (req) => {
         first_name,
         last_name,
         role,
-        // Gênero removido do user_metadata
       },
     });
 

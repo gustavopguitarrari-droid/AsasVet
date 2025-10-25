@@ -76,6 +76,14 @@ serve(async (req) => {
       });
     }
 
+    // IMPORTANT: Prevent promoting any user to 'Administrador'
+    if (newRole === 'Administrador') {
+      return new Response(JSON.stringify({ error: 'Forbidden: Cannot assign Administrator role to a sub-user.' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const { data: targetProfile, error: targetProfileError } = await supabaseAdmin
       .from('profiles')
       .select('id')

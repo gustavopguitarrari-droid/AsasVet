@@ -15,8 +15,8 @@ interface RoleSelectProps {
   onValueChange: (value: string) => void;
 }
 
+// Removido 'Administrador' da lista de cargos disponíveis para seleção
 const mockRoles = [
-  "Administrador", // Adicionado o cargo de Administrador
   "Veterinário",
   "Enfermeiro",
   "Recepcionista",
