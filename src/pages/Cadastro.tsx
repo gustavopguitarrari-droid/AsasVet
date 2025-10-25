@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin, Eye } from "lucide-react";
+import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin, Eye, Edit, Trash2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SpeciesFilter from "@/components/SpeciesFilter";
 import PetDetailsDialog from "@/components/PetDetailsDialog";
@@ -21,57 +21,13 @@ import PetForm, { PetFormValues } from "@/components/PetForm"; // Importar PetFo
 import { Client, Pet } from "@/types/cadastro";
 import { format, parseISO, isValid } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area"; // Importar ScrollArea
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@/context/UserContext";
+import { showError, showSuccess } from "@/utils/toast";
+import { uploadImageToSupabase, deleteImageFromSupabase } from "@/utils/supabaseStorage";
+import ClientDetailsDialog from "@/components/ClientDetailsDialog"; // Importar o novo ClientDetailsDialog
 
-// Mock de dados iniciais
-const initialMockClients: Client[] = [
-  {
-    id: "CL001",
-    name: "João Silva",
-    email: "joao.silva@example.com",
-    phone: "(11) 98765-4321",
-    cpf: "123.456.789-00",
-    dateOfBirth: "1985-03-10",
-    address: {
-      cep: "01001-000",
-      street: "Praça da Sé",
-      number: "S/N",
-      complement: "lado ímpar",
-      neighborhood: "Sé",
-      city: "São Paulo",
-      state: "SP",
-    },
-    observations: "Tutor muito atencioso, sempre busca o melhor para seus pets.",
-    photoUrl: undefined,
-  },
-  {
-    id: "CL002",
-    name: "Maria Souza",
-    email: "maria.souza@example.com",
-    phone: "(21) 91234-5678",
-    cpf: "987.654.321-00",
-    dateOfBirth: "1990-07-22",
-    address: {
-      cep: "20040-009",
-      street: "Rua da Assembleia",
-      number: "10",
-      complement: "sala 1001",
-      neighborhood: "Centro",
-      city: "Rio de Janeiro",
-      state: "RJ",
-    },
-    observations: "Prefere contato por e-mail. Tem 2 gatos.",
-    photoUrl: undefined,
-  },
-];
-
-const initialMockPets: Pet[] = [
-  { id: "A001", name: "Rex", species: "Cachorro", breed: "Labrador", age: "5 anos", gender: "Macho", color: "Dourado", observations: "Muito brincalhão, adora passear.", photoUrl: undefined, ownerId: "CL001" },
-  { id: "A002", name: "Miau", species: "Gato", breed: "Siamês", age: "2 anos", gender: "Fêmea", color: "Creme e Marrom", observations: "Um pouco arisca com estranhos.", photoUrl: undefined, ownerId: "CL002" },
-  { id: "A003", name: "Pingo", species: "Pássaro", breed: "Periquito", age: "1 ano", gender: "Macho", color: "Verde", observations: "Canta bastante pela manhã.", photoUrl: undefined, ownerId: "CL001" },
-  { id: "A004", name: "Fido", species: "Cachorro", breed: "Poodle", age: "8 meses", gender: "Macho", color: "Branco", observations: "Filhote, em fase de adestramento.", photoUrl: undefined, ownerId: "CL001" },
-];
-
-// Mapeamento de espécies para ícones
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
   Gato: Cat,
@@ -82,9 +38,11 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
 };
 
 const Cadastro = () => {
+  const queryClient = useQueryClient();
+  const { user: appUser } = useUser();
+  const userId = appUser?.id;
+
   const [activeTab, setActiveTab] = useState<string>("tutores");
-  const [clients, setClients] = useState<Client[]>(initialMockClients);
-  const [pets, setPets] = useState<Pet[]>(initialMockPets);
 
   // Estados para a aba de Animais
   const [selectedSpecies, setSelectedSpecies] = useState<string>("all");
@@ -92,54 +50,421 @@ const Cadastro = () => {
   const [isPetDetailsDialogOpen, setIsPetDetailsDialogOpen] = useState<boolean>(false);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
   const [isAddPetDialogOpen, setIsAddPetDialogOpen] = useState<boolean>(false);
+  const [isEditPetDialogOpen, setIsEditPetDialogOpen] = useState<boolean>(false);
+  const [petToEdit, setPetToEdit] = useState<Pet | undefined>(undefined);
   const [defaultOwnerIdForPet, setDefaultOwnerIdForPet] = useState<string | undefined>(undefined);
 
   // Estados para a aba de Tutores
   const [clientSearchTerm, setClientSearchTerm] = useState<string>("");
   const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState<boolean>(false);
+  const [isEditClientDialogOpen, setIsEditClientDialogOpen] = useState<boolean>(false);
+  const [clientToEdit, setClientToEdit] = useState<Client | undefined>(undefined);
+  const [isClientDetailsDialogOpen, setIsClientDetailsDialogOpen] = useState<boolean>(false); // Novo estado para detalhes do cliente
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null); // Novo estado para cliente selecionado
   const [isClientPetsDialogOpen, setIsClientPetsDialogOpen] = useState<boolean>(false);
   const [clientToViewPets, setClientToViewPets] = useState<Client | null>(null);
 
+  // --- Queries ---
+  const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
+    queryKey: ['clients', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('user_id', userId);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
+
+  const { data: pets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
+    queryKey: ['pets', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      // RLS on 'pets' table ensures only pets belonging to the user's clients are returned
+      const { data, error } = await supabase
+        .from('pets')
+        .select('*');
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
+
+  // --- Mutations ---
+  const addClientMutation = useMutation({
+    mutationFn: async (data: ClientFormValues) => {
+      if (!userId) throw new Error("User not authenticated.");
+
+      let photoUrl: string | null = null;
+      let newClientId: string | undefined;
+
+      // First, insert client without photo_url to get an ID
+      const { data: insertedClient, error: insertError } = await supabase
+        .from('clients')
+        .insert({
+          user_id: userId,
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          cpf: data.cpf,
+          date_of_birth: format(data.dateOfBirth, "yyyy-MM-dd"),
+          address_cep: data.address.cep,
+          address_street: data.address.street,
+          address_number: data.address.number,
+          address_complement: data.address.complement,
+          address_neighborhood: data.address.neighborhood,
+          address_city: data.address.city,
+          address_state: data.address.state,
+          observations: data.observations,
+          photo_url: null,
+        })
+        .select('id')
+        .single();
+
+      if (insertError || !insertedClient) {
+        throw insertError || new Error("Failed to create client.");
+      }
+      newClientId = insertedClient.id;
+
+      if (data.photoUrl) {
+        photoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'clients', newClientId);
+        if (!photoUrl) {
+          // If photo upload fails, delete the newly created client and throw error
+          await supabase.from('clients').delete().eq('id', newClientId);
+          throw new Error("Failed to upload client photo.");
+        }
+
+        // Update the client with the photo URL
+        const { data: updatedClient, error: updateError } = await supabase
+          .from('clients')
+          .update({ photo_url: photoUrl })
+          .eq('id', newClientId)
+          .select()
+          .single();
+        if (updateError) throw updateError;
+        return updatedClient;
+      }
+      return insertedClient; // Return the client even if no photo was uploaded
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients', userId] });
+      showSuccess("Tutor adicionado com sucesso!");
+      setIsAddClientDialogOpen(false);
+    },
+    onError: (error) => {
+      showError(`Erro ao adicionar tutor: ${error.message}`);
+    },
+  });
+
+  const updateClientMutation = useMutation({
+    mutationFn: async (data: ClientFormValues & { id: string }) => {
+      if (!userId) throw new Error("User not authenticated.");
+
+      const oldClient = clients.find(c => c.id === data.id);
+      let newPhotoUrl: string | null | undefined = data.photoUrl; // Can be Base64, public URL, or undefined (removed)
+
+      // If photo changed (new Base64 or removed)
+      if (data.photoUrl !== oldClient?.photoUrl) {
+        // Delete old image if it existed
+        if (oldClient?.photoUrl) {
+          await deleteImageFromSupabase(oldClient.photoUrl);
+        }
+        // Upload new image if it's a Base64 string
+        if (data.photoUrl && data.photoUrl.startsWith('data:image')) {
+          newPhotoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'clients', data.id);
+          if (!newPhotoUrl) throw new Error("Failed to upload new client photo.");
+        } else if (!data.photoUrl) {
+          newPhotoUrl = null; // Photo was explicitly removed
+        }
+      } else {
+        newPhotoUrl = oldClient?.photoUrl; // Photo didn't change, keep existing URL
+      }
+
+      const { data: updatedClient, error } = await supabase
+        .from('clients')
+        .update({
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          cpf: data.cpf,
+          date_of_birth: format(data.dateOfBirth, "yyyy-MM-dd"),
+          address_cep: data.address.cep,
+          address_street: data.address.street,
+          address_number: data.address.number,
+          address_complement: data.address.complement,
+          address_neighborhood: data.address.neighborhood,
+          address_city: data.address.city,
+          address_state: data.address.state,
+          observations: data.observations,
+          photo_url: newPhotoUrl,
+        })
+        .eq('id', data.id)
+        .eq('user_id', userId)
+        .select()
+        .single();
+      if (error) throw error;
+      return updatedClient;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients', userId] });
+      showSuccess("Tutor atualizado com sucesso!");
+      setIsEditClientDialogOpen(false);
+      setIsClientDetailsDialogOpen(false); // Close details dialog if open
+    },
+    onError: (error) => {
+      showError(`Erro ao atualizar tutor: ${error.message}`);
+    },
+  });
+
+  const deleteClientMutation = useMutation({
+    mutationFn: async (clientId: string) => {
+      if (!userId) throw new Error("User not authenticated.");
+
+      // First, get the client to delete their photo
+      const { data: clientToDelete, error: fetchError } = await supabase
+        .from('clients')
+        .select('photo_url')
+        .eq('id', clientId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Delete client's photo from storage if it exists
+      if (clientToDelete?.photo_url) {
+        await deleteImageFromSupabase(clientToDelete.photo_url);
+      }
+
+      // Get all pets associated with this client to delete their photos
+      const { data: petsToDelete, error: fetchPetsError } = await supabase
+        .from('pets')
+        .select('id, photo_url')
+        .eq('owner_id', clientId);
+
+      if (fetchPetsError) throw fetchPetsError;
+
+      // Delete each pet's photo
+      for (const pet of petsToDelete || []) {
+        if (pet.photo_url) {
+          await deleteImageFromSupabase(pet.photo_url);
+        }
+      }
+
+      // Deleting the client will cascade delete associated pets due to foreign key ON DELETE CASCADE
+      const { error } = await supabase
+        .from('clients')
+        .delete()
+        .eq('id', clientId)
+        .eq('user_id', userId);
+      if (error) throw error;
+      return clientId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['clients', userId] });
+      queryClient.invalidateQueries({ queryKey: ['pets', userId] }); // Pets also affected
+      showSuccess("Tutor e seus animais excluídos com sucesso!");
+      setIsClientDetailsDialogOpen(false); // Close details dialog
+    },
+    onError: (error) => {
+      showError(`Erro ao excluir tutor: ${error.message}`);
+    },
+  });
+
+  const addPetMutation = useMutation({
+    mutationFn: async (data: PetFormValues) => {
+      if (!userId) throw new Error("User not authenticated.");
+
+      let photoUrl: string | null = null;
+      let newPetId: string | undefined;
+
+      // First, insert pet without photo_url to get an ID
+      const { data: insertedPet, error: insertError } = await supabase
+        .from('pets')
+        .insert({
+          owner_id: data.ownerId,
+          name: data.name,
+          species: data.species,
+          breed: data.breed,
+          age: data.age,
+          gender: data.gender,
+          color: data.color,
+          observations: data.observations,
+          photo_url: null,
+        })
+        .select('id')
+        .single();
+
+      if (insertError || !insertedPet) {
+        throw insertError || new Error("Failed to create pet.");
+      }
+      newPetId = insertedPet.id;
+
+      if (data.photoUrl) {
+        photoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'pets', newPetId);
+        if (!photoUrl) {
+          // If photo upload fails, delete the newly created pet and throw error
+          await supabase.from('pets').delete().eq('id', newPetId);
+          throw new Error("Failed to upload pet photo.");
+        }
+
+        // Update the pet with the photo URL
+        const { data: updatedPet, error: updateError } = await supabase
+          .from('pets')
+          .update({ photo_url: photoUrl })
+          .eq('id', newPetId)
+          .select()
+          .single();
+        if (updateError) throw updateError;
+        return updatedPet;
+      }
+      return insertedPet; // Return the pet even if no photo was uploaded
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pets', userId] });
+      showSuccess("Animal adicionado com sucesso!");
+      setIsAddPetDialogOpen(false);
+      setIsClientPetsDialogOpen(false); // Close client pets dialog if open
+    },
+    onError: (error) => {
+      showError(`Erro ao adicionar animal: ${error.message}`);
+    },
+  });
+
+  const updatePetMutation = useMutation({
+    mutationFn: async (data: PetFormValues & { id: string }) => {
+      if (!userId) throw new Error("User not authenticated.");
+
+      const oldPet = pets.find(p => p.id === data.id);
+      let newPhotoUrl: string | null | undefined = data.photoUrl;
+
+      if (data.photoUrl !== oldPet?.photoUrl) {
+        if (oldPet?.photoUrl) {
+          await deleteImageFromSupabase(oldPet.photoUrl);
+        }
+        if (data.photoUrl && data.photoUrl.startsWith('data:image')) {
+          newPhotoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'pets', data.id);
+          if (!newPhotoUrl) throw new Error("Failed to upload new pet photo.");
+        } else if (!data.photoUrl) {
+          newPhotoUrl = null;
+        }
+      } else {
+        newPhotoUrl = oldPet?.photoUrl;
+      }
+
+      const { data: updatedPet, error } = await supabase
+        .from('pets')
+        .update({
+          owner_id: data.ownerId,
+          name: data.name,
+          species: data.species,
+          breed: data.breed,
+          age: data.age,
+          gender: data.gender,
+          color: data.color,
+          observations: data.observations,
+          photo_url: newPhotoUrl,
+        })
+        .eq('id', data.id)
+        .select()
+        .single();
+      if (error) throw error;
+      return updatedPet;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pets', userId] });
+      showSuccess("Animal atualizado com sucesso!");
+      setIsEditPetDialogOpen(false);
+      setIsPetDetailsDialogOpen(false); // Close details dialog if open
+    },
+    onError: (error) => {
+      showError(`Erro ao atualizar animal: ${error.message}`);
+    },
+  });
+
+  const deletePetMutation = useMutation({
+    mutationFn: async (petId: string) => {
+      if (!userId) throw new Error("User not authenticated.");
+
+      const { data: petToDelete, error: fetchError } = await supabase
+        .from('pets')
+        .select('photo_url')
+        .eq('id', petId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      if (petToDelete?.photo_url) {
+        await deleteImageFromSupabase(petToDelete.photo_url);
+      }
+
+      const { error } = await supabase
+        .from('pets')
+        .delete()
+        .eq('id', petId);
+      if (error) throw error;
+      return petId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['pets', userId] });
+      showSuccess("Animal excluído com sucesso!");
+      setIsPetDetailsDialogOpen(false); // Close details dialog
+    },
+    onError: (error) => {
+      showError(`Erro ao excluir animal: ${error.message}`);
+    },
+  });
+
+  // --- Handlers ---
   const handleSelectSpecies = (species: string) => {
     setSelectedSpecies(species);
   };
 
   const handleAddClient = (data: ClientFormValues) => {
-    const newClientId = `CL${(clients.length + 1).toString().padStart(3, '0')}`;
-    const newClient: Client = {
-      id: newClientId,
-      name: data.name,
-      email: data.email,
-      phone: data.phone,
-      cpf: data.cpf,
-      dateOfBirth: format(data.dateOfBirth, "yyyy-MM-dd"),
-      address: data.address,
-      observations: data.observations,
-      photoUrl: data.photoUrl,
-    };
-    setClients((prev) => [...prev, newClient]);
-    setIsAddClientDialogOpen(false);
+    addClientMutation.mutate(data);
+  };
+
+  const handleEditClient = (client: Client) => {
+    setClientToEdit(client);
+    setIsEditClientDialogOpen(true);
+    setIsClientDetailsDialogOpen(false); // Close details dialog before opening edit
+  };
+
+  const handleUpdateClient = (data: ClientFormValues) => {
+    if (!clientToEdit) return;
+    updateClientMutation.mutate({ ...data, id: clientToEdit.id });
+  };
+
+  const handleDeleteClient = (clientId: string, clientName: string) => {
+    if (window.confirm(`Tem certeza que deseja excluir o tutor ${clientName} e todos os seus animais? Esta ação não pode ser desfeita.`)) {
+      deleteClientMutation.mutate(clientId);
+    }
+  };
+
+  const handleClientRowClick = (client: Client) => {
+    setSelectedClient(client);
+    setIsClientDetailsDialogOpen(true);
   };
 
   const handleAddPet = (data: PetFormValues) => {
-    const newPetId = `A${(pets.length + 1).toString().padStart(3, '0')}`;
-    const newPet: Pet = {
-      id: newPetId,
-      name: data.name,
-      species: data.species,
-      breed: data.breed,
-      age: data.age,
-      gender: data.gender,
-      color: data.color,
-      observations: data.observations,
-      photoUrl: data.photoUrl,
-      ownerId: data.ownerId,
-    };
-    setPets((prev) => [...prev, newPet]);
-    setIsAddPetDialogOpen(false);
-    // Se o diálogo de pets do cliente estiver aberto, atualiza-o
-    if (isClientPetsDialogOpen && clientToViewPets?.id === data.ownerId) {
-      setClientToViewPets(prev => prev ? { ...prev } : null); // Força a re-renderização para atualizar a lista de pets
+    addPetMutation.mutate(data);
+  };
+
+  const handleEditPet = (pet: Pet) => {
+    setPetToEdit(pet);
+    setIsEditPetDialogOpen(true);
+    setIsPetDetailsDialogOpen(false); // Close details dialog before opening edit
+  };
+
+  const handleUpdatePet = (data: PetFormValues) => {
+    if (!petToEdit) return;
+    updatePetMutation.mutate({ ...data, id: petToEdit.id });
+  };
+
+  const handleDeletePet = (petId: string, petName: string) => {
+    if (window.confirm(`Tem certeza que deseja excluir o animal ${petName}? Esta ação não pode ser desfeita.`)) {
+      deletePetMutation.mutate(petId);
     }
   };
 
@@ -177,6 +502,22 @@ const Cadastro = () => {
     setIsAddPetDialogOpen(true);
     setIsClientPetsDialogOpen(false); // Fecha o diálogo de pets do cliente
   };
+
+  if (isLoadingClients || isLoadingPets) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">Carregando dados de cadastro...</p>
+      </div>
+    );
+  }
+
+  if (clientsError || petsError) {
+    return (
+      <div className="flex items-center justify-center h-full text-destructive">
+        <p>Erro ao carregar dados: {clientsError?.message || petsError?.message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -258,26 +599,32 @@ const Cadastro = () => {
                 {filteredClients.length > 0 ? (
                   filteredClients.map((client) => {
                     return (
-                      <TableRow key={client.id}>
-                        <TableCell className="font-medium">{client.name}</TableCell>
-                        <TableCell>{client.cpf}</TableCell>
-                        <TableCell>
+                      <TableRow key={client.id} className="cursor-pointer hover:bg-muted/50">
+                        <TableCell className="font-medium" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>{client.name}</TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>{client.cpf}</TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
                           {client.dateOfBirth && isValid(parseISO(client.dateOfBirth))
                             ? format(parseISO(client.dateOfBirth), "dd/MM/yyyy")
                             : "N/A"}
                         </TableCell>
-                        <TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
                           <p className="flex items-center text-sm"><Mail className="h-3 w-3 mr-1 text-muted-foreground" /> {client.email}</p>
                           <p className="flex items-center text-sm"><Phone className="h-3 w-3 mr-1 text-muted-foreground" /> {client.phone}</p>
                         </TableCell>
-                        <TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
                           <p className="flex items-center text-sm"><Home className="h-3 w-3 mr-1 text-muted-foreground" /> {client.address.street}, {client.address.number} {client.address.complement}</p>
                           <p className="flex items-center text-sm"><MapPin className="h-3 w-3 mr-1 text-muted-foreground" /> {client.address.neighborhood}, {client.address.city} - {client.address.state}</p>
                           <p className="text-xs text-muted-foreground ml-4">CEP: {client.address.cep}</p>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" onClick={() => handleViewClientPets(client)}>
-                            <Eye className="h-4 w-4 mr-2" /> Ver Animais
+                          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleViewClientPets(client); }}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleEditClient(client); }}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="destructive" size="sm" onClick={(e) => { e.stopPropagation(); handleDeleteClient(client.id, client.name); }}>
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -332,20 +679,26 @@ const Cadastro = () => {
                     const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
                     const owner = clients.find(client => client.id === pet.ownerId);
                     return (
-                      <TableRow key={pet.id} onClick={() => handlePetRowClick(pet)} className="cursor-pointer hover:bg-muted/50">
-                        <TableCell className="font-bold flex items-center">
+                      <TableRow key={pet.id} className="cursor-pointer hover:bg-muted/50">
+                        <TableCell className="font-bold flex items-center" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
                           <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
                           {pet.name}
                         </TableCell>
-                        <TableCell>{pet.species}</TableCell>
-                        <TableCell>{pet.breed}</TableCell>
-                        <TableCell>{owner ? owner.name : "N/A"}</TableCell>
-                        <TableCell>{pet.age}</TableCell>
-                        <TableCell>{pet.gender}</TableCell>
-                        <TableCell>{pet.color}</TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.species}</TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.breed}</TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{owner ? owner.name : "N/A"}</TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.age}</TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.gender}</TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.color}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
                             <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleEditPet(pet); }}>
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="destructive" size="sm" onClick={(e) => { e.stopPropagation(); handleDeletePet(pet.id, pet.name); }}>
+                            <Trash2 className="h-4 w-4" />
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -366,6 +719,8 @@ const Cadastro = () => {
             pet={selectedPet ? { ...selectedPet, owner: clients.find(c => c.id === selectedPet.ownerId)?.name || "N/A" } : null}
             isOpen={isPetDetailsDialogOpen}
             onClose={() => setIsPetDetailsDialogOpen(false)}
+            onEdit={handleEditPet}
+            onDelete={handleDeletePet}
           />
         </TabsContent>
       </Tabs>
@@ -396,9 +751,17 @@ const Cadastro = () => {
                               <p className="text-sm text-muted-foreground">Raça: {pet.breed} | Idade: {pet.age}</p>
                             </div>
                           </div>
-                          <Button variant="ghost" size="sm" onClick={() => handlePetRowClick(pet)}>
-                            <Eye className="h-4 w-4 mr-2" /> Detalhes
-                          </Button>
+                          <div>
+                            <Button variant="ghost" size="sm" onClick={() => handlePetRowClick(pet)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" onClick={() => handleEditPet(pet)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="destructive" size="sm" onClick={() => handleDeletePet(pet.id, pet.name)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       );
                     })}
@@ -417,6 +780,51 @@ const Cadastro = () => {
               <PlusCircle className="h-4 w-4 mr-2" /> Adicionar Animal para {clientToViewPets?.name}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo de Detalhes do Tutor */}
+      <ClientDetailsDialog
+        client={selectedClient}
+        isOpen={isClientDetailsDialogOpen}
+        onClose={() => setIsClientDetailsDialogOpen(false)}
+        onEdit={handleEditClient}
+        onDelete={handleDeleteClient}
+        onViewPets={handleViewClientPets}
+      />
+
+      {/* Diálogo de Edição de Tutor */}
+      <Dialog open={isEditClientDialogOpen} onOpenChange={setIsEditClientDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Editar Tutor</DialogTitle>
+          </DialogHeader>
+          {clientToEdit && (
+            <ClientForm
+              key={clientToEdit.id} // Key para forçar re-renderização com novos dados
+              onSubmit={handleUpdateClient}
+              onCancel={() => setIsEditClientDialogOpen(false)}
+              initialData={clientToEdit}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo de Edição de Animal */}
+      <Dialog open={isEditPetDialogOpen} onOpenChange={setIsEditPetDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Editar Animal</DialogTitle>
+          </DialogHeader>
+          {petToEdit && (
+            <PetForm
+              key={petToEdit.id} // Key para forçar re-renderização com novos dados
+              onSubmit={handleUpdatePet}
+              onCancel={() => setIsEditPetDialogOpen(false)}
+              initialData={petToEdit}
+              allClients={clients}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>

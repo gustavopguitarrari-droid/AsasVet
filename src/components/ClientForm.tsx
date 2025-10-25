@@ -46,7 +46,7 @@ const formSchema = z.object({
     state: z.string().min(2, "O estado é obrigatório.").max(2, "O estado deve ter 2 letras."),
   }),
   observations: z.string().optional(),
-  photoUrl: z.string().optional(),
+  photoUrl: z.string().optional(), // Pode ser Base64 ou URL pública
 });
 
 export type ClientFormValues = z.infer<typeof formSchema>;
@@ -159,7 +159,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
       reader.onloadend = () => {
         if (typeof reader.result === 'string') {
           setPreviewUrl(reader.result);
-          form.setValue("photoUrl", reader.result);
+          form.setValue("photoUrl", reader.result); // Define o Base64 no formulário
         }
       };
       reader.onerror = () => {
@@ -174,7 +174,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
 
   const handleCapturePhoto = (imageDataUrl: string) => {
     setPreviewUrl(imageDataUrl);
-    form.setValue("photoUrl", imageDataUrl);
+    form.setValue("photoUrl", imageDataUrl); // Define o Base64 no formulário
     if (fileInputRef.current) {
       fileInputRef.current.value = ''; // Limpa o input de arquivo se uma foto da câmera for usada
     }
@@ -183,7 +183,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
 
   const handleRemovePhoto = () => {
     setPreviewUrl(null);
-    form.setValue("photoUrl", undefined);
+    form.setValue("photoUrl", undefined); // Define como undefined para indicar remoção
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }

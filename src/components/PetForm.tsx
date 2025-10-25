@@ -37,7 +37,7 @@ const formSchema = z.object({
   }),
   color: z.string().min(1, "A cor é obrigatória."),
   observations: z.string().optional(),
-  photoUrl: z.string().optional(),
+  photoUrl: z.string().optional(), // Pode ser Base64 ou URL pública
   ownerId: z.string().min(1, "O tutor é obrigatório."),
 });
 
@@ -106,7 +106,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
       reader.onloadend = () => {
         if (typeof reader.result === 'string') {
           setPreviewUrl(reader.result);
-          form.setValue("photoUrl", reader.result);
+          form.setValue("photoUrl", reader.result); // Define o Base64 no formulário
         }
       };
       reader.onerror = () => {
@@ -121,7 +121,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
 
   const handleCapturePhoto = (imageDataUrl: string) => {
     setPreviewUrl(imageDataUrl);
-    form.setValue("photoUrl", imageDataUrl);
+    form.setValue("photoUrl", imageDataUrl); // Define o Base64 no formulário
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -130,7 +130,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
 
   const handleRemovePhoto = () => {
     setPreviewUrl(null);
-    form.setValue("photoUrl", undefined);
+    form.setValue("photoUrl", undefined); // Define como undefined para indicar remoção
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }

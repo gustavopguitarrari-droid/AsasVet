@@ -7,11 +7,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, User, Calendar, Palette, Heart, Info } from "lucide-react"; // Novos ícones
+import { Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, User, Calendar, Palette, Heart, Info, Edit, Trash2 } from "lucide-react"; // Novos ícones
 import { Pet } from "@/types/cadastro"; // Importa a interface Pet
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
+import { Button } from "@/components/ui/button"; // Importar Button
 
 interface PetWithOwnerName extends Pet {
   owner: string; // Adiciona o nome do tutor para exibição
@@ -21,6 +23,8 @@ interface PetDetailsDialogProps {
   pet: PetWithOwnerName | null; // Usa a nova interface
   isOpen: boolean;
   onClose: () => void;
+  onEdit: (pet: Pet) => void; // Nova prop para editar
+  onDelete: (petId: string, petName: string) => void; // Nova prop para deletar
 }
 
 // Mapeamento de espécies para ícones
@@ -33,11 +37,18 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Outros: MoreHorizontal,
 };
 
-const PetDetailsDialog: React.FC<PetDetailsDialogProps> = ({ pet, isOpen, onClose }) => {
+const PetDetailsDialog: React.FC<PetDetailsDialogProps> = ({ pet, isOpen, onClose, onEdit, onDelete }) => {
   if (!pet) return null;
 
   const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
   const initials = pet.name.charAt(0).toUpperCase();
+
+  const handleDeleteClick = () => {
+    if (window.confirm(`Tem certeza que deseja excluir o animal ${pet.name}? Esta ação não pode ser desfeita.`)) {
+      onDelete(pet.id, pet.name);
+      onClose();
+    }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -127,6 +138,14 @@ const PetDetailsDialog: React.FC<PetDetailsDialogProps> = ({ pet, isOpen, onClos
             </>
           )}
         </div>
+        <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+          <Button variant="outline" onClick={() => onEdit(pet)} className="w-full sm:w-auto mb-2 sm:mb-0">
+            <Edit className="mr-2 h-4 w-4" /> Editar
+          </Button>
+          <Button variant="destructive" onClick={handleDeleteClick} className="w-full sm:w-auto">
+            <Trash2 className="mr-2 h-4 w-4" /> Excluir
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
