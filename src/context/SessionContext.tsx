@@ -22,7 +22,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
   useEffect(() => {
     const handleAuthStateChange = async (event: string, currentSession: Session | null) => {
       console.log('Auth state change event:', event, 'Session:', currentSession);
-      setIsLoading(true); // Inicia o estado de carregamento para qualquer mudança de autenticação
+      // Não definir isLoading(true) aqui. isLoading deve refletir apenas o carregamento inicial.
 
       setSession(currentSession);
       setUserState(currentSession?.user || null);
@@ -47,7 +47,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
             avatarUrl: profileData?.avatar_url || currentSession.user.user_metadata.avatar_url || undefined,
             role: profileData?.role || currentSession.user.user_metadata.role || 'Usuário',
             birthday: profileData?.birthday || currentSession.user.user_metadata.birthday || undefined,
-            gender: profileData?.gender || currentSession.user.user_metadata.gender || undefined, // NOVO: Carregar gênero
+            gender: profileData?.gender || currentSession.user.user_metadata.gender || undefined,
             registeredTime: profileData?.registered_time || currentSession.user.created_at,
           });
           console.log('User profile set after SIGNED_IN.');
@@ -55,17 +55,15 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
           console.error('Unhandled error during profile fetch on SIGNED_IN:', error);
         }
       } else if (event === 'SIGNED_OUT') {
-        setAppUser(null); // Limpa o usuário do contexto primeiro
+        setAppUser(null); // Limpa o usuário do contexto
         console.log('User signed out, appUser cleared.');
       }
-      setIsLoading(false); // Finaliza o estado de carregamento após todas as atualizações
-      console.log('Auth state change processed, isLoading set to false.');
+      // Não definir isLoading(false) aqui. Isso é tratado pelo bloco finally de checkInitialSession.
+      console.log('Auth state change processed.');
     };
 
-    // Configura o listener de mudança de estado de autenticação
     const { data: authListener } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
-    // Verifica a sessão inicial
     const checkInitialSession = async () => {
       try {
         const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
@@ -96,7 +94,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
                 avatarUrl: profileData?.avatar_url || initialSession.user.user_metadata.avatar_url || undefined,
                 role: profileData?.role || initialSession.user.user_metadata.role || 'Usuário',
                 birthday: profileData?.birthday || initialSession.user.user_metadata.birthday || undefined,
-                gender: profileData?.gender || initialSession.user.user_metadata.gender || undefined, // NOVO: Carregar gênero
+                gender: profileData?.gender || initialSession.user.user_metadata.gender || undefined,
                 registeredTime: profileData?.registered_time || initialSession.user.created_at,
               });
               console.log('Initial session user profile set.');
@@ -104,7 +102,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
               console.error('Unhandled error during profile fetch on initial session:', error);
             }
           } else {
-            setAppUser(null); // Garante que o usuário do contexto seja nulo se não houver sessão inicial
+            setAppUser(null); // Garante que appUser seja nulo se não houver sessão inicial
             console.log('No initial session, appUser cleared.');
           }
         }
@@ -121,7 +119,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []); // Removido setAppUser das dependências
+  }, []);
 
   return (
     <SessionContext.Provider value={{ session, user, isLoading }}>

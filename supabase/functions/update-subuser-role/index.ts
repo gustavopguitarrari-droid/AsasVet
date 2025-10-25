@@ -70,6 +70,22 @@ serve(async (req) => {
       });
     }
 
+    // NEW CHECK: Verify if the target profile exists
+    const { data: targetProfile, error: targetProfileError } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .eq('id', userIdToUpdate)
+      .single();
+
+    if (targetProfileError || !targetProfile) {
+      console.error('Target profile not found or error fetching:', targetProfileError?.message);
+      return new Response(JSON.stringify({ error: 'Target user profile not found.' }), {
+        status: 404, // Not Found
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    // END NEW CHECK
+
     // Update the role in the profiles table
     const { error: updateProfileError } = await supabaseAdmin
       .from('profiles')
