@@ -10,35 +10,21 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Syringe, Utensils, Eye, FlaskConical, Check } from "lucide-react"; // Adicionado ícones para tipos de ação e o ícone Check
+import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Syringe, Utensils, Eye, FlaskConical, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge"; // Importar Badge
+import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { PatientAction } from "@/pages/Internacao"; // Importar o tipo PatientAction
+import { InternedPatient, PatientAction } from "@/pages/Internacao"; // Importar as interfaces atualizadas
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
-
-interface InternedPatient {
-  id: string;
-  bayName: string; // Novo campo
-  petName: string;
-  ownerName: string;
-  reason: string;
-  admissionDate: string;
-  expectedDischargeDate?: string;
-  veterinarian: string;
-  status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
-  species: string;
-  risk: RiskLevel;
-}
 
 interface ExecutionMapTableProps {
   patients: InternedPatient[];
   selectedDate: Date | undefined;
-  patientActions: PatientAction[]; // Receber as ações
-  onAddActionClick: (patientId: string, patientName: string, date: Date, hour: string) => void; // Callback para adicionar ação
-  onOpenConfirmActionsDialog: (patientId: string, patientName: string, date: Date, hour: string, actions: PatientAction[]) => void; // Nova callback para abrir o diálogo de confirmação
+  patientActions: PatientAction[];
+  onAddActionClick: (patientId: string, patientName: string, date: Date, hour: string) => void;
+  onOpenConfirmActionsDialog: (patientId: string, patientName: string, date: Date, hour: string, actions: PatientAction[]) => void;
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -59,7 +45,6 @@ const speciesColorMap: { [key: string]: string } = {
   Outros: "text-sidebar-item-bg-9",
 };
 
-// Mapeamento de cores para o nível de risco
 const riskColorMap: Record<RiskLevel, string> = {
   "Sem risco": "bg-blue-500",
   "Baixo": "bg-green-500",
@@ -68,7 +53,6 @@ const riskColorMap: Record<RiskLevel, string> = {
   "Emergência": "bg-red-500",
 };
 
-// Mapeamento de ícones para tipos de ação
 const actionTypeIconMap: Record<PatientAction["type"], React.ElementType> = {
   Medicação: Syringe,
   Alimentação: Utensils,
@@ -89,7 +73,7 @@ const hourlySlots = generateHourlySlots();
 const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selectedDate, patientActions, onAddActionClick, onOpenConfirmActionsDialog }) => {
   const handleAddAction = (patient: InternedPatient, hour: string) => {
     if (selectedDate) {
-      onAddActionClick(patient.id, patient.petName, selectedDate, hour);
+      onAddActionClick(patient.id, patient.pet_name, selectedDate, hour);
     }
   };
 
@@ -113,30 +97,29 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
             patients.map((patient) => {
               const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
               const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
-              const riskStripeColorClass = riskColorMap[patient.risk];
+              const riskStripeColorClass = riskColorMap[patient.risk as RiskLevel];
 
               return (
                 <TableRow key={patient.id} className="hover:bg-muted/50 transition-colors duration-150">
                   <TableCell className="sticky left-0 bg-card z-10 font-semibold py-4 w-[250px] border-r relative pl-6">
-                    {/* Faixa de risco */}
                     <div className={cn("absolute top-0 left-0 h-full w-2 rounded-l-md", riskStripeColorClass)}></div>
 
                     <div className="flex items-center mb-1">
                       <IconComponent className={cn("h-5 w-5 mr-2", speciesTextColorClass)} />
-                      <span className="font-bold text-base">{patient.petName}</span>
+                      <span className="font-bold text-base">{patient.pet_name}</span>
                     </div>
-                    <p className="text-xs text-muted-foreground ml-7">Baia: {patient.bayName}</p>
-                    <p className="text-xs text-muted-foreground ml-7">Tutor: {patient.ownerName}</p>
+                    <p className="text-xs text-muted-foreground ml-7">Baia: {patient.bay_name}</p>
+                    <p className="text-xs text-muted-foreground ml-7">Tutor: {patient.owner_name}</p>
                     <p className="text-xs text-muted-foreground ml-7">Vet: {patient.veterinarian}</p>
                   </TableCell>
                   {hourlySlots.map((hour) => {
                     const actionsForSlot = patientActions.filter(
                       (action) =>
-                        action.patientId === patient.id &&
+                        action.patient_id === patient.id &&
                         action.date === formattedSelectedDate &&
                         action.hour === hour
                     );
-                    const completedActionsCount = actionsForSlot.filter(action => action.isCompleted).length;
+                    const completedActionsCount = actionsForSlot.filter(action => action.is_completed).length;
                     const totalActionsCount = actionsForSlot.length;
                     const pendingActionsCount = totalActionsCount - completedActionsCount;
                     const allActionsCompleted = totalActionsCount > 0 && pendingActionsCount === 0;
@@ -153,17 +136,17 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                                     "cursor-pointer",
                                     allActionsCompleted ? "bg-green-600 text-white" : "bg-primary text-primary-foreground"
                                   )}
-                                  onClick={() => onOpenConfirmActionsDialog(patient.id, patient.petName, selectedDate!, hour, actionsForSlot)}
+                                  onClick={() => onOpenConfirmActionsDialog(patient.id, patient.pet_name, selectedDate!, hour, actionsForSlot)}
                                 >
                                   {allActionsCompleted ? <Check className="h-4 w-4" /> : pendingActionsCount}
                                 </Badge>
                               </TooltipTrigger>
                               <TooltipContent side="bottom" className="max-w-xs">
-                                <p className="font-semibold mb-1">Ações para {patient.petName} às {hour}:00</p>
+                                <p className="font-semibold mb-1">Ações para {patient.pet_name} às {hour}:00</p>
                                 {actionsForSlot.map((action) => {
                                   const ActionIcon = actionTypeIconMap[action.type] || FlaskConical;
                                   return (
-                                    <div key={action.id} className={cn("flex items-center text-sm mt-1", action.isCompleted && "line-through text-muted-foreground")}>
+                                    <div key={action.id} className={cn("flex items-center text-sm mt-1", action.is_completed && "line-through text-muted-foreground")}>
                                       <ActionIcon className="h-4 w-4 mr-2 text-muted-foreground" />
                                       <span>
                                         {action.description}
@@ -194,7 +177,7 @@ const ExecutionMapTable: React.FC<ExecutionMapTableProps> = ({ patients, selecte
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent side="bottom">
-                              Adicionar ação para {patient.petName} às {hour}:00
+                              Adicionar ação para {patient.pet_name} às {hour}:00
                             </TooltipContent>
                           </Tooltip>
                         )}

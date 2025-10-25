@@ -33,8 +33,8 @@ const formSchema = z.object({
   }),
   frequency: z.enum(["SID", "BID", "TID", "QID", "Outro"]).optional(),
   durationInDays: z.number().min(1, "A duração deve ser de pelo menos 1 dia.").default(1),
-  quantity: z.string().optional(), // NOVO: Quantidade
-  route: z.string().optional(), // NOVO: Via de administração
+  quantity: z.string().optional(),
+  route: z.string().optional(),
 }).superRefine((data, ctx) => {
   if (data.type === "Medicação") {
     if (!data.quantity || data.quantity.trim() === "") {
@@ -62,9 +62,9 @@ interface AddPatientActionDialogProps {
   onSaveAllActions: (actions: PatientAction[]) => void;
   patientId: string;
   patientName: string;
-  date: Date; // This is the STARTING date for new actions
-  initialHour: string; // This is the STARTING hour for new actions
-  allActionsForPatient: PatientAction[]; // All actions for this patient, across all dates
+  date: Date;
+  initialHour: string;
+  allActionsForPatient: PatientAction[];
 }
 
 const actionTypeIconMap: Record<PatientActionFormValues["type"], React.ElementType> = {
@@ -120,8 +120,8 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
       type: "Medicação",
       frequency: "SID",
       durationInDays: 1,
-      quantity: "", // Default para os novos campos
-      route: "",    // Default para os novos campos
+      quantity: "",
+      route: "",
     },
   });
 
@@ -142,7 +142,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
   }, [isOpen, form, allActionsForPatient]);
 
   const frequencyWatch = form.watch("frequency");
-  const typeWatch = form.watch("type"); // Observar o tipo de ação
+  const typeWatch = form.watch("type");
 
   const handleAddAction = (data: PatientActionFormValues) => {
     const duration = data.frequency === "Outro" ? 1 : data.durationInDays;
@@ -156,28 +156,27 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
       scheduledHours.forEach(hour => {
         newActions.push({
           id: generateUniqueActionId(),
-          patientId: patientId,
+          user_id: "", // Will be filled by mutation
+          patient_id: patientId,
           date: formattedCurrentDate,
           hour: hour,
           description: data.description,
           type: data.type,
-          isCompleted: false,
+          is_completed: false,
           frequency: data.frequency,
-          quantity: data.type === "Medicação" ? data.quantity : undefined, // Inclui condicionalmente
-          route: data.type === "Medicação" ? data.route : undefined,       // Inclui condicionalmente
+          quantity: data.type === "Medicação" ? data.quantity : null,
+          route: data.type === "Medicação" ? data.route : null,
+          created_at: new Date().toISOString(),
         });
       });
     }
 
     setEditedActions(prevActions => {
-      // Filter out existing actions that match the patientId, type, and frequency
-      // within the newly defined date range to avoid duplicates if user is "updating" a series
       const existingActionsToKeep = prevActions.filter(action => {
-        const isSamePatient = action.patientId === patientId;
+        const isSamePatient = action.patient_id === patientId;
         const isSameType = action.type === data.type;
         const isSameFrequency = action.frequency === data.frequency;
-        
-        // Check if the existing action falls within the date range of the new series
+
         const actionDateObj = parseISO(action.date);
         const startDate = date;
         const endDate = addDays(date, duration - 1);
@@ -185,7 +184,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
         const isWithinNewSeriesRange = isSamePatient && isSameType && isSameFrequency &&
                                        (isEqual(actionDateObj, startDate) || isAfter(actionDateObj, startDate)) &&
                                        (isEqual(actionDateObj, endDate) || isBefore(actionDateObj, endDate));
-        
+
         return !isWithinNewSeriesRange;
       });
 
@@ -208,17 +207,15 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
 
   const handleSaveAndClose = () => {
     onSaveAllActions(editedActions);
-    onClose();
   };
 
   const handleCancelAndClose = () => {
     onClose();
   };
 
-  // Group actions by date, then by hour for display
   const actionsGroupedByDateAndHour = editedActions.reduce((acc, action) => {
-    const dateKey = action.date; // YYYY-MM-DD
-    const hourKey = action.hour; // HH
+    const dateKey = action.date;
+    const hourKey = action.hour;
 
     if (!acc[dateKey]) {
       acc[dateKey] = {};
@@ -244,7 +241,6 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
           </DialogHeader>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 overflow-hidden">
-            {/* Left side: Form to add new action */}
             <div className="space-y-4 overflow-y-auto pr-2">
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleAddAction)} className="space-y-4">
@@ -368,7 +364,6 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
               </Form>
             </div>
 
-            {/* Right side: Actions in cart */}
             <div className="space-y-4 flex flex-col">
               <h3 className="text-lg font-semibold">Ações Agendadas para o Paciente</h3>
               <ScrollArea className="flex-1 rounded-md border p-4">

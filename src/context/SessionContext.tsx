@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from './UserContext'; // Importar o UserContext
+import { useUser } from './UserContext';
 
 interface SessionContextType {
   session: Session | null;
@@ -19,7 +19,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
   const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  const { setUser: setAppUser } = useUser(); // Renomear para evitar conflito
+  const { setUser: setAppUser } = useUser();
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
@@ -29,18 +29,18 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         setIsLoading(false);
 
         if (event === 'SIGNED_IN' && currentSession?.user) {
-          // Fetch profile data and update UserContext
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', currentSession.user.id)
             .single();
 
-          if (profileError && profileError.code !== 'PGRST116') { // PGRST116 means "no rows found"
+          if (profileError && profileError.code !== 'PGRST116') {
             console.error('Error fetching profile:', profileError);
           }
 
           setAppUser({
+            id: currentSession.user.id, // Passando o ID do usuário
             name: profileData?.first_name || currentSession.user.user_metadata.first_name || '',
             lastName: profileData?.last_name || currentSession.user.user_metadata.last_name || '',
             email: currentSession.user.email || '',
@@ -49,17 +49,16 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
             birthday: profileData?.birthday || currentSession.user.user_metadata.birthday || undefined,
             registeredTime: profileData?.registered_time || currentSession.user.created_at,
           });
-          navigate('/painel'); // Redirect authenticated users to dashboard
+          navigate('/painel');
         } else if (event === 'SIGNED_OUT') {
-          setAppUser(null); // Clear user from app context
-          navigate('/login'); // Redirect unauthenticated users to login
+          setAppUser(null);
+          navigate('/login');
         } else if (event === 'INITIAL_SESSION' && !currentSession) {
-          navigate('/login'); // Redirect to login if no initial session
+          navigate('/login');
         }
       }
     );
 
-    // Initial check for session
     supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
       setSession(initialSession);
       setUserState(initialSession?.user || null);
@@ -67,7 +66,6 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       if (!initialSession) {
         navigate('/login');
       } else {
-        // Fetch profile data for initial session
         supabase
           .from('profiles')
           .select('*')
@@ -78,6 +76,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
               console.error('Error fetching profile on initial session:', profileError);
             }
             setAppUser({
+              id: initialSession.user.id, // Passando o ID do usuário
               name: profileData?.first_name || initialSession.user.user_metadata.first_name || '',
               lastName: profileData?.last_name || initialSession.user.user_metadata.last_name || '',
               email: initialSession.user.email || '',

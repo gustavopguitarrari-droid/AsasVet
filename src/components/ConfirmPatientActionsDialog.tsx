@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { format, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Syringe, Utensils, Eye, FlaskConical, CheckCircle, Edit } from "lucide-react"; // Importar o ícone Edit
+import { Syringe, Utensils, Eye, FlaskConical, CheckCircle, Edit } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { PatientAction } from "@/pages/Internacao"; // Importar o tipo PatientAction
 
@@ -27,11 +27,10 @@ interface ConfirmPatientActionsDialogProps {
   date: Date;
   hour: string;
   actionsForSlot: PatientAction[];
-  onEditActionsClick: (patientId: string, patientName: string, date: Date, hour: string, initialActions: PatientAction[]) => void; // Nova prop
-  patientId: string; // Adicionado para passar ao onEditActionsClick
+  onEditActionsClick: (patientId: string, patientName: string, date: Date, hour: string) => void;
+  patientId: string;
 }
 
-// Mapeamento de ícones para tipos de ação
 const actionTypeIconMap: Record<PatientAction["type"], React.ElementType> = {
   Medicação: Syringe,
   Alimentação: Utensils,
@@ -47,8 +46,8 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
   date,
   hour,
   actionsForSlot,
-  onEditActionsClick, // Recebe a nova prop
-  patientId, // Recebe o ID do paciente
+  onEditActionsClick,
+  patientId,
 }) => {
   const [currentActionsStatus, setCurrentActionsStatus] = useState<PatientAction[]>([]);
 
@@ -61,7 +60,7 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
   const handleCheckboxChange = (actionId: string, checked: boolean) => {
     setCurrentActionsStatus((prevStatus) =>
       prevStatus.map((action) =>
-        action.id === actionId ? { ...action, isCompleted: checked } : action
+        action.id === actionId ? { ...action, is_completed: checked } : action
       )
     );
   };
@@ -72,11 +71,11 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
   };
 
   const handleEditClick = () => {
-    onEditActionsClick(patientId, patientName, date, hour, actionsForSlot); // Chama a função de edição
-    onClose(); // Fecha o diálogo atual
+    onEditActionsClick(patientId, patientName, date, hour);
+    onClose();
   };
 
-  const allActionsCompleted = currentActionsStatus.every(action => action.isCompleted);
+  const allActionsCompleted = currentActionsStatus.every(action => action.is_completed);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -111,13 +110,13 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
                     key={action.id}
                     className={cn(
                       "flex items-center justify-between p-3 rounded-md border",
-                      action.isCompleted ? "bg-green-50 text-green-800 border-green-200" : "bg-card"
+                      action.is_completed ? "bg-green-50 text-green-800 border-green-200" : "bg-card"
                     )}
                   >
                     <div className="flex items-center flex-1">
                       <Checkbox
                         id={`action-${action.id}`}
-                        checked={action.isCompleted}
+                        checked={action.is_completed}
                         onCheckedChange={(checked) => handleCheckboxChange(action.id, checked as boolean)}
                         className="mr-3"
                       />
@@ -126,7 +125,7 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
                         htmlFor={`action-${action.id}`}
                         className={cn(
                           "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
-                          action.isCompleted && "line-through text-muted-foreground"
+                          action.is_completed && "line-through text-muted-foreground"
                         )}
                       >
                         {action.description}

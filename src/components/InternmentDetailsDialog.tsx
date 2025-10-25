@@ -16,22 +16,9 @@ import { Edit, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, Steth
 import InternmentEditForm, { InternmentEditFormValues } from "./InternmentEditForm";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { InternedPatient } from "@/pages/Internacao"; // Importar a interface atualizada
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
-
-interface InternedPatient {
-  id: string;
-  bayName: string; // Novo campo
-  petName: string;
-  ownerName: string;
-  reason: string;
-  admissionDate: string;
-  expectedDischargeDate?: string;
-  veterinarian: string;
-  status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
-  species: string;
-  risk: RiskLevel;
-}
 
 interface InternmentDetailsDialogProps {
   patient: InternedPatient | null;
@@ -93,12 +80,12 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
   const handleFormSubmit = (data: InternmentEditFormValues) => {
     const updatedPatient: InternedPatient = {
       ...patient,
-      bayName: data.bayName, // Incluindo o nome da baia
-      petName: data.petName,
-      ownerName: data.ownerName,
+      bay_name: data.bayName,
+      pet_name: data.petName,
+      owner_name: data.ownerName,
       reason: data.reason,
-      admissionDate: format(data.admissionDate, "yyyy-MM-dd"),
-      expectedDischargeDate: data.expectedDischargeDate ? format(data.expectedDischargeDate, "yyyy-MM-dd") : undefined,
+      admission_date: format(data.admissionDate, "yyyy-MM-dd"),
+      expected_discharge_date: data.expectedDischargeDate ? format(data.expectedDischargeDate, "yyyy-MM-dd") : null,
       veterinarian: data.veterinarian,
       status: data.status,
       species: data.species,
@@ -110,11 +97,11 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
   };
 
   const handleRegisterDischarge = () => {
-    if (window.confirm(`Tem certeza que deseja registrar a alta de ${patient.petName}?`)) {
+    if (window.confirm(`Tem certeza que deseja registrar a alta de ${patient.pet_name}?`)) {
       const updatedPatient: InternedPatient = {
         ...patient,
         status: "Alta",
-        expectedDischargeDate: format(new Date(), "yyyy-MM-dd"),
+        expected_discharge_date: format(new Date(), "yyyy-MM-dd"),
       };
       onUpdate(updatedPatient);
       onClose();
@@ -122,11 +109,11 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
   };
 
   const handleRegisterObito = () => {
-    if (window.confirm(`Tem certeza que deseja registrar o óbito de ${patient.petName}? Esta ação não pode ser desfeita.`)) {
+    if (window.confirm(`Tem certeza que deseja registrar o óbito de ${patient.pet_name}? Esta ação não pode ser desfeita.`)) {
       const updatedPatient: InternedPatient = {
         ...patient,
         status: "Óbito",
-        expectedDischargeDate: format(new Date(), "yyyy-MM-dd"),
+        expected_discharge_date: format(new Date(), "yyyy-MM-dd"),
       };
       onUpdate(updatedPatient);
       onClose();
@@ -143,12 +130,12 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <IconComponent className="h-6 w-6 mr-2 text-muted-foreground" />
-            {isEditing ? "Editar Paciente Internado" : `Detalhes do Paciente: ${patient.petName}`}
+            {isEditing ? "Editar Paciente Internado" : `Detalhes do Paciente: ${patient.pet_name}`}
           </DialogTitle>
           <DialogDescription>
             {isEditing
               ? "Faça as alterações necessárias e salve."
-              : `Informações completas sobre ${patient.petName}.`}
+              : `Informações completas sobre ${patient.pet_name}.`}
           </DialogDescription>
         </DialogHeader>
 
@@ -167,7 +154,14 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
         )}
 
         {isEditing ? (
-          <InternmentEditForm initialData={patient} onSubmit={handleFormSubmit} onCancel={() => setIsEditing(false)} />
+          <InternmentEditForm initialData={{
+            ...patient,
+            bayName: patient.bay_name,
+            petName: patient.pet_name,
+            ownerName: patient.owner_name,
+            admissionDate: patient.admission_date,
+            expectedDischargeDate: patient.expected_discharge_date,
+          }} onSubmit={handleFormSubmit} onCancel={() => setIsEditing(false)} />
         ) : (
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-3 items-center gap-4">
@@ -176,20 +170,20 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
             </div>
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
-              <p className="text-sm font-medium text-muted-foreground">Baia:</p> {/* Exibindo o nome da baia */}
-              <p className="col-span-2 text-sm font-bold">{patient.bayName}</p>
+              <p className="text-sm font-medium text-muted-foreground">Baia:</p>
+              <p className="col-span-2 text-sm font-bold">{patient.bay_name}</p>
             </div>
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Nome do Animal:</p>
-              <p className="col-span-2 text-sm font-bold">{patient.petName}</p>
+              <p className="col-span-2 text-sm font-bold">{patient.pet_name}</p>
             </div>
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Tutor:</p>
               <p className="col-span-2 text-sm flex items-center">
                 <User className="h-4 w-4 mr-2 text-muted-foreground" />
-                {patient.ownerName}
+                {patient.owner_name}
               </p>
             </div>
             <Separator />
@@ -218,17 +212,17 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
               <p className="text-sm font-medium text-muted-foreground">Admissão:</p>
               <p className="col-span-2 text-sm flex items-center">
                 <CalendarDays className="h-4 w-4 mr-2 text-muted-foreground" />
-                {patient.admissionDate}
+                {patient.admission_date}
               </p>
             </div>
-            {patient.expectedDischargeDate && (
+            {patient.expected_discharge_date && (
               <>
                 <Separator />
                 <div className="grid grid-cols-3 items-center gap-4">
                   <p className="text-sm font-medium text-muted-foreground">Previsão Alta:</p>
                   <p className="col-span-2 text-sm flex items-center">
                     <CalendarDays className="h-4 w-4 mr-2 text-muted-foreground" />
-                    {patient.expectedDischargeDate}
+                    {patient.expected_discharge_date}
                   </p>
                 </div>
               </>
@@ -237,15 +231,13 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Risco:</p>
               <p className="col-span-2 text-sm">
-                <Badge className={cn(riskColorMap[patient.risk], "text-white")}>
+                <Badge className={cn(riskColorMap[patient.risk as RiskLevel], "text-white")}>
                   {patient.risk}
                 </Badge>
               </p>
             </div>
           </div>
         )}
-
-        {/* O DialogFooter foi removido para o botão de editar, pois ele foi movido para cima. */}
       </DialogContent>
     </Dialog>
   );

@@ -16,38 +16,45 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import AddPatientActionDialog, { PatientActionFormValues } from "@/components/AddPatientActionDialog"; // Importar o novo diálogo
-import ConfirmPatientActionsDialog from "@/components/ConfirmPatientActionsDialog"; // Importar o novo diálogo de confirmação
-import ExecutionMapLegend from "@/components/ExecutionMapLegend"; // Importar o novo componente de legenda
+import AddPatientActionDialog from "@/components/AddPatientActionDialog";
+import ConfirmPatientActionsDialog from "@/components/ConfirmPatientActionsDialog";
+import ExecutionMapLegend from "@/components/ExecutionMapLegend";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@/context/UserContext";
+import { showError, showSuccess } from "@/utils/toast";
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
-interface InternedPatient {
+export interface InternedPatient {
   id: string;
-  bayName: string;
-  petName: string;
-  ownerName: string;
+  user_id: string;
+  bay_name: string;
+  pet_name: string;
+  owner_name: string;
   reason: string;
-  admissionDate: string;
-  expectedDischargeDate?: string;
+  admission_date: string;
+  expected_discharge_date?: string | null;
   veterinarian: string;
   status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
   species: string;
   risk: RiskLevel;
+  created_at: string;
 }
 
-// Novo tipo para as ações dos pacientes
 export interface PatientAction {
   id: string;
-  patientId: string;
+  user_id: string;
+  patient_id: string;
   date: string; // YYYY-MM-DD
   hour: string; // HH
   description: string;
   type: "Medicação" | "Alimentação" | "Observação" | "Outro";
-  isCompleted: boolean; // Adicionado status de conclusão
-  frequency?: "SID" | "BID" | "TID" | "QID" | "Outro"; // Novo campo de frequência
-  quantity?: string; // NOVO: Quantidade a ser administrada
-  route?: string; // NOVO: Via de administração
+  is_completed: boolean;
+  frequency?: "SID" | "BID" | "TID" | "QID" | "Outro" | null;
+  quantity?: string | null;
+  route?: string | null;
+  created_at: string;
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -84,30 +91,26 @@ const statusBadgeColorMap: Record<InternedPatient["status"], string> = {
   "Óbito": "bg-red-500",
 };
 
-// Helper para gerar IDs únicos
-const generateUniqueActionId = () => `ACT-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-
 const Internacao = () => {
+  const queryClient = useQueryClient();
+  const { user: appUser } = useUser();
+  const userId = appUser?.id; // Assuming user ID is available from context
+
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState(false);
   const [selectedPatient, setSelectedPatient] = React.useState<InternedPatient | null>(null);
-  const [internedPatients, setInternedPatients] = React.useState<InternedPatient[]>([]);
-  const [historyPatients, setHistoryPatients] = React.useState<InternedPatient[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
-  const [selectedDate, setSelectedDate] = React.useState<Date>(new Date()); // Alterado para sempre ser Date
+  const [selectedDate, setSelectedDate] = React.useState<Date>(new Date());
   const [patientSearchTerm, setPatientSearchTerm] = React.useState<string>("");
 
-  // Estados para o diálogo de adicionar/editar ação
   const [isAddActionDialogOpen, setIsAddActionDialogOpen] = React.useState(false);
   const [actionPatientId, setActionPatientId] = React.useState<string | null>(null);
   const [actionPatientName, setActionPatientName] = React.useState<string | null>(null);
   const [actionDate, setActionDate] = React.useState<Date | null>(null);
   const [actionHour, setActionHour] = React.useState<string | null>(null);
-  const [allActionsForCurrentPatient, setAllActionsForCurrentPatient] = React.useState<PatientAction[]>([]); // Renamed state
-  const [patientActions, setPatientActions] = React.useState<PatientAction[]>([]); // Novo estado para as ações
+  const [allActionsForCurrentPatient, setAllActionsForCurrentPatient] = React.useState<PatientAction[]>([]);
 
-  // Estados para o novo diálogo de confirmação de ações
   const [isConfirmActionsDialogOpen, setIsConfirmActionsDialogOpen] = React.useState(false);
   const [confirmActionsPatientId, setConfirmActionsPatientId] = React.useState<string | null>(null);
   const [confirmActionsPatientName, setConfirmActionsPatientName] = React.useState<string | null>(null);
@@ -115,132 +118,209 @@ const Internacao = () => {
   const [confirmActionsHour, setConfirmActionsHour] = React.useState<string | null>(null);
   const [confirmActionsForSlot, setConfirmActionsForSlot] = React.useState<PatientAction[]>([]);
 
-  React.useEffect(() => {
-    const mockPatients: InternedPatient[] = [
-      {
-        id: "INT001",
-        bayName: "Baia 1",
-        petName: "Buddy",
-        ownerName: "Alice Smith",
-        reason: "Fratura na pata",
-        admissionDate: "2024-10-20",
-        expectedDischargeDate: "2024-10-28",
-        veterinarian: "Dr. Ana Paula",
-        status: "Estável",
-        species: "Cachorro",
-        risk: "Médio",
-      },
-      {
-        id: "INT002",
-        bayName: "UTI 2",
-        petName: "Mittens",
-        ownerName: "Bob Johnson",
-        reason: "Infecção respiratória",
-        admissionDate: "2024-10-25",
-        veterinarian: "Dr. Carlos Eduardo",
-        status: "Em Observação",
-        species: "Gato",
-        risk: "Alto",
-      },
-      {
-        id: "INT003",
-        bayName: "Baia 3",
-        petName: "Chico",
-        ownerName: "Carlos Pereira",
-        reason: "Check-up de rotina",
-        admissionDate: "2024-10-26",
-        veterinarian: "Dra. Beatriz Lima",
-        status: "Em Observação",
-        species: "Pássaro",
-        risk: "Baixo",
-      },
-      {
-        id: "INT004",
-        bayName: "Emergência",
-        petName: "Max",
-        ownerName: "Fernanda Reis",
-        reason: "Emergência - atropelamento",
-        admissionDate: "2024-10-27",
-        veterinarian: "Dr. Ana Paula",
-        status: "Crítico",
-        species: "Cachorro",
-        risk: "Emergência",
-      },
-      {
-        id: "INT005",
-        bayName: "Baia 4",
-        petName: "Dory",
-        ownerName: "Lucas Mendes",
-        reason: "Observação pós-cirúrgica",
-        admissionDate: "2024-10-28",
-        veterinarian: "Dr. Carlos Eduardo",
-        status: "Estável",
-        species: "Peixe",
-        risk: "Sem risco",
-      },
-      {
-        id: "INT006",
-        bayName: "Baia 5",
-        petName: "Rocky",
-        ownerName: "Gabriel Santos",
-        reason: "Recuperação de cirurgia",
-        admissionDate: "2024-09-10",
-        expectedDischargeDate: "2024-09-15",
-        veterinarian: "Dr. Ana Paula",
-        status: "Alta",
-        species: "Cachorro",
-        risk: "Baixo",
-      },
-      {
-        id: "INT007",
-        bayName: "UTI 1",
-        petName: "Shadow",
-        ownerName: "Isabela Oliveira",
-        reason: "Doença crônica",
-        admissionDate: "2024-08-01",
-        expectedDischargeDate: "2024-08-05",
-        veterinarian: "Dr. Carlos Eduardo",
-        status: "Óbito",
-        species: "Gato",
-        risk: "Emergência",
-      },
-    ];
+  // Fetch interned patients
+  const { data: internedPatients = [], isLoading: isLoadingPatients, error: patientsError } = useQuery<InternedPatient[]>({
+    queryKey: ['interned_patients', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('interned_patients')
+        .select('*')
+        .eq('user_id', userId)
+        .not('status', 'in', '("Alta", "Óbito")'); // Filter out discharged/deceased patients
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
 
-    const active = mockPatients.filter(p => p.status !== "Alta" && p.status !== "Óbito");
-    const history = mockPatients.filter(p => p.status === "Alta" || p.status === "Óbito");
-    setInternedPatients(active);
-    setHistoryPatients(history);
+  // Fetch history patients
+  const { data: historyPatients = [], isLoading: isLoadingHistory, error: historyError } = useQuery<InternedPatient[]>({
+    queryKey: ['history_patients', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('interned_patients')
+        .select('*')
+        .eq('user_id', userId)
+        .in('status', ['Alta', 'Óbito']); // Only discharged/deceased patients
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
 
-    setPatientActions([]); // Inicializa com um array vazio
-  }, []);
+  // Fetch patient actions
+  const { data: patientActions = [], isLoading: isLoadingActions, error: actionsError } = useQuery<PatientAction[]>({
+    queryKey: ['patient_actions', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('patient_actions')
+        .select('*')
+        .eq('user_id', userId);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
+
+  // Mutation for adding a new patient
+  const addPatientMutation = useMutation({
+    mutationFn: async (newPatientData: InternmentFormValues) => {
+      if (!userId) throw new Error("User not authenticated.");
+      const { data, error } = await supabase
+        .from('interned_patients')
+        .insert({
+          user_id: userId,
+          bay_name: newPatientData.bayName,
+          pet_name: newPatientData.petName,
+          owner_name: newPatientData.ownerName,
+          reason: newPatientData.reason,
+          admission_date: format(newPatientData.admissionDate, "yyyy-MM-dd"),
+          expected_discharge_date: newPatientData.expectedDischargeDate ? format(newPatientData.expectedDischargeDate, "yyyy-MM-dd") : null,
+          veterinarian: newPatientData.veterinarian,
+          status: "Em Observação",
+          species: newPatientData.species,
+          risk: newPatientData.risk,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['interned_patients'] });
+      showSuccess("Paciente internado com sucesso!");
+      setIsAddDialogOpen(false);
+    },
+    onError: (error) => {
+      showError(`Erro ao internar paciente: ${error.message}`);
+    },
+  });
+
+  // Mutation for updating a patient
+  const updatePatientMutation = useMutation({
+    mutationFn: async (updatedPatient: InternedPatient) => {
+      if (!userId) throw new Error("User not authenticated.");
+      const { data, error } = await supabase
+        .from('interned_patients')
+        .update({
+          bay_name: updatedPatient.bay_name,
+          pet_name: updatedPatient.pet_name,
+          owner_name: updatedPatient.owner_name,
+          reason: updatedPatient.reason,
+          admission_date: updatedPatient.admission_date,
+          expected_discharge_date: updatedPatient.expected_discharge_date,
+          veterinarian: updatedPatient.veterinarian,
+          status: updatedPatient.status,
+          species: updatedPatient.species,
+          risk: updatedPatient.risk,
+        })
+        .eq('id', updatedPatient.id)
+        .eq('user_id', userId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['interned_patients'] });
+      queryClient.invalidateQueries({ queryKey: ['history_patients'] });
+      showSuccess("Paciente atualizado com sucesso!");
+      setIsDetailsDialogOpen(false);
+    },
+    onError: (error) => {
+      showError(`Erro ao atualizar paciente: ${error.message}`);
+    },
+  });
+
+  // Mutation for saving all patient actions (inserting new, updating existing, deleting removed)
+  const saveAllActionsMutation = useMutation({
+    mutationFn: async (actionsToSave: PatientAction[]) => {
+      if (!userId) throw new Error("User not authenticated.");
+
+      const existingActionsForPatient = allActionsForCurrentPatient.filter(a => a.patient_id === actionPatientId);
+      const newActions = actionsToSave.filter(action => !existingActionsForPatient.some(ea => ea.id === action.id));
+      const updatedActions = actionsToSave.filter(action => existingActionsForPatient.some(ea => ea.id === action.id));
+      const deletedActions = existingActionsForPatient.filter(ea => !actionsToSave.some(action => action.id === ea.id));
+
+      const promises = [];
+
+      if (newActions.length > 0) {
+        promises.push(supabase.from('patient_actions').insert(newActions.map(action => ({
+          ...action,
+          user_id: userId,
+          frequency: action.frequency || null, // Ensure null for optional fields
+          quantity: action.quantity || null,
+          route: action.route || null,
+        }))));
+      }
+
+      for (const action of updatedActions) {
+        promises.push(supabase.from('patient_actions').update({
+          description: action.description,
+          type: action.type,
+          is_completed: action.is_completed,
+          frequency: action.frequency || null,
+          quantity: action.quantity || null,
+          route: action.route || null,
+        }).eq('id', action.id).eq('user_id', userId));
+      }
+
+      if (deletedActions.length > 0) {
+        promises.push(supabase.from('patient_actions').delete().in('id', deletedActions.map(a => a.id)).eq('user_id', userId));
+      }
+
+      const results = await Promise.all(promises);
+      for (const result of results) {
+        if (result.error) throw result.error;
+      }
+      return results;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['patient_actions'] });
+      showSuccess("Ações do paciente salvas com sucesso!");
+      setIsAddActionDialogOpen(false);
+    },
+    onError: (error) => {
+      showError(`Erro ao salvar ações do paciente: ${error.message}`);
+    },
+  });
+
+  // Mutation for updating completion status of actions
+  const updateActionsCompletionMutation = useMutation({
+    mutationFn: async (actionsToUpdate: PatientAction[]) => {
+      if (!userId) throw new Error("User not authenticated.");
+      const promises = actionsToUpdate.map(action =>
+        supabase
+          .from('patient_actions')
+          .update({ is_completed: action.is_completed })
+          .eq('id', action.id)
+          .eq('user_id', userId)
+      );
+      const results = await Promise.all(promises);
+      for (const result of results) {
+        if (result.error) throw result.error;
+      }
+      return results;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['patient_actions'] });
+      showSuccess("Status das ações atualizado!");
+      setIsConfirmActionsDialogOpen(false);
+    },
+    onError: (error) => {
+      showError(`Erro ao atualizar status das ações: ${error.message}`);
+    },
+  });
 
   const handleAddInternment = (data: InternmentFormValues) => {
-    const newPatient: InternedPatient = {
-      id: `INT${(internedPatients.length + historyPatients.length + 1).toString().padStart(3, '0')}`,
-      bayName: data.bayName,
-      petName: data.petName,
-      ownerName: data.ownerName,
-      reason: data.reason,
-      admissionDate: format(data.admissionDate, "yyyy-MM-dd"),
-      expectedDischargeDate: data.expectedDischargeDate ? format(data.expectedDischargeDate, "yyyy-MM-dd") : undefined,
-      veterinarian: data.veterinarian,
-      status: "Em Observação",
-      species: data.species,
-      risk: data.risk,
-    };
-    setInternedPatients((prev) => [...prev, newPatient]);
-    setIsAddDialogOpen(false);
+    addPatientMutation.mutate(data);
   };
 
   const handleUpdateInternment = (updatedPatient: InternedPatient) => {
-    if (updatedPatient.status === "Alta" || updatedPatient.status === "Óbito") {
-      setInternedPatients((prev) => prev.filter((p) => p.id !== updatedPatient.id));
-      setHistoryPatients((prev) => [...prev, updatedPatient]);
-    } else {
-      setInternedPatients((prev) =>
-        prev.map((patient) => (patient.id === updatedPatient.id ? updatedPatient : patient))
-      );
-    }
+    updatePatientMutation.mutate(updatedPatient);
   };
 
   const handleCardClick = (patient: InternedPatient) => {
@@ -261,16 +341,15 @@ const Internacao = () => {
   };
 
   const filteredInternedPatients = internedPatients.filter(patient =>
-    patient.petName.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
-    patient.ownerName.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
-    patient.bayName.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
+    patient.pet_name.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
+    patient.owner_name.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
+    patient.bay_name.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
     patient.veterinarian.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
     patient.species.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
     patient.status.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
     patient.risk.toLowerCase().includes(patientSearchTerm.toLowerCase())
   );
 
-  // Funções para o diálogo de adicionar/editar ação
   const openAddEditActionDialog = (
     patientId: string,
     patientName: string,
@@ -281,29 +360,17 @@ const Internacao = () => {
     setActionPatientName(patientName);
     setActionDate(date);
     setActionHour(hour);
-    // Filtra TODAS as ações para este paciente, independentemente da data
     const actionsForThisPatient = patientActions.filter(
-      (action) => action.patientId === patientId
+      (action) => action.patient_id === patientId
     );
-    setAllActionsForCurrentPatient(actionsForThisPatient); // Renamed state
+    setAllActionsForCurrentPatient(actionsForThisPatient);
     setIsAddActionDialogOpen(true);
   };
 
   const handleSaveAllPatientActions = (updatedActionsForPatient: PatientAction[]) => {
-    if (actionPatientId) {
-      // Remove todas as ações existentes para este paciente
-      const otherPatientsActions = patientActions.filter(
-        (action) => action.patientId !== actionPatientId
-      );
-
-      // Adiciona as ações atualizadas (com IDs únicos)
-      // Note: IDs are generated in AddPatientActionDialog, so we just add them here.
-      setPatientActions([...otherPatientsActions, ...updatedActionsForPatient]);
-      setIsAddActionDialogOpen(false);
-    }
+    saveAllActionsMutation.mutate(updatedActionsForPatient);
   };
 
-  // Funções para o novo diálogo de confirmação de ações
   const handleOpenConfirmActionsDialog = (
     patientId: string,
     patientName: string,
@@ -320,18 +387,7 @@ const Internacao = () => {
   };
 
   const handleConfirmPatientActions = (updatedActions: PatientAction[]) => {
-    setPatientActions((prevActions) => {
-      const otherActions = prevActions.filter(
-        (action) =>
-          !(
-            action.patientId === confirmActionsPatientId &&
-            action.date === format(confirmActionsDate!, "yyyy-MM-dd") &&
-            action.hour === confirmActionsHour
-          )
-      );
-      return [...otherActions, ...updatedActions];
-    });
-    setIsConfirmActionsDialogOpen(false);
+    updateActionsCompletionMutation.mutate(updatedActions);
   };
 
   const getPageTitle = () => {
@@ -344,6 +400,22 @@ const Internacao = () => {
         return "Internação";
     }
   };
+
+  if (isLoadingPatients || isLoadingHistory || isLoadingActions) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">Carregando dados de internação...</p>
+      </div>
+    );
+  }
+
+  if (patientsError || historyError || actionsError) {
+    return (
+      <div className="flex items-center justify-center h-full text-destructive">
+        <p>Erro ao carregar dados: {patientsError?.message || historyError?.message || actionsError?.message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -405,7 +477,7 @@ const Internacao = () => {
           )}
         </div>
       </div>
-      
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
           <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
@@ -436,7 +508,7 @@ const Internacao = () => {
                 {filteredInternedPatients.map((patient) => {
                   const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
                   const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
-                  const riskStripeColorClass = riskColorMap[patient.risk];
+                  const riskStripeColorClass = riskColorMap[patient.risk as RiskLevel];
 
                   return (
                     <li
@@ -445,20 +517,16 @@ const Internacao = () => {
                       onClick={() => handleCardClick(patient)}
                     >
                       <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
-                      
-                      <div className="absolute top-2 right-6 text-base font-bold text-muted-foreground">
-                        {patient.bayName}
-                      </div>
 
                       <p className="font-bold text-lg flex items-center">
                         <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
-                        {patient.petName}
+                        {patient.pet_name}
                       </p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.ownerName}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.owner_name}</p>
                       <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
                       <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
                       <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Entrada:</span> {patient.admissionDate}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Entrada:</span> {patient.admission_date}</p>
                     </li>
                   );
                 })}
@@ -470,14 +538,14 @@ const Internacao = () => {
         </TabsContent>
 
         <TabsContent value="mapa-execucao" className="mt-4">
-          <ExecutionMapLegend /> {/* Adicionado o componente de legenda aqui */}
-          <div className="p-4 border rounded-md bg-background space-y-4 mt-4"> {/* Adicionado mt-4 para espaçamento */}
+          <ExecutionMapLegend />
+          <div className="p-4 border rounded-md bg-background space-y-4 mt-4">
             <ExecutionMapTable
               patients={patientsForExecutionMap}
               selectedDate={selectedDate}
               patientActions={patientActions}
               onAddActionClick={openAddEditActionDialog}
-              onOpenConfirmActionsDialog={handleOpenConfirmActionsDialog} // Passa a nova função
+              onOpenConfirmActionsDialog={handleOpenConfirmActionsDialog}
             />
           </div>
         </TabsContent>
@@ -505,7 +573,7 @@ const Internacao = () => {
           patientName={actionPatientName}
           date={actionDate}
           initialHour={actionHour}
-          allActionsForPatient={allActionsForCurrentPatient} // Pass all actions for the patient
+          allActionsForPatient={allActionsForCurrentPatient}
         />
       )}
 
@@ -518,7 +586,7 @@ const Internacao = () => {
           date={confirmActionsDate}
           hour={confirmActionsHour}
           actionsForSlot={confirmActionsForSlot}
-          onEditActionsClick={(pId, pName, dt, hr, initialActs) => {
+          onEditActionsClick={(pId, pName, dt, hr) => {
             setIsConfirmActionsDialogOpen(false);
             openAddEditActionDialog(pId, pName, dt, hr);
           }}

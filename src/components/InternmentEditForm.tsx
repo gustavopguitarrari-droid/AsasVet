@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format, parseISO, isValid } from "date-fns"; // Importar isValid
+import { format, parseISO, isValid } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { ptBR } from "date-fns/locale";
 
@@ -26,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter } from "@/components/ui/dialog";
 import RiskSelector from "./RiskSelector";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { InternedPatient } from "@/pages/Internacao"; // Importar a interface atualizada
 
 // Mock de veterinários (reutilizando do AppointmentForm)
 const mockVeterinarians = [
@@ -35,14 +36,14 @@ const mockVeterinarians = [
 ];
 
 const formSchema = z.object({
-  bayName: z.string().min(1, "O nome da baia é obrigatório."), // Novo campo
+  bayName: z.string().min(1, "O nome da baia é obrigatório."),
   petName: z.string().min(1, "O nome do animal é obrigatório."),
   ownerName: z.string().min(1, "O nome do tutor é obrigatório."),
   reason: z.string().min(1, "O motivo da internação é obrigatório."),
   admissionDate: z.date({
     required_error: "A data de admissão é obrigatória.",
   }),
-  expectedDischargeDate: z.date().nullable().optional(), // Permitir null para data opcional
+  expectedDischargeDate: z.date().nullable().optional(),
   veterinarian: z.string().min(1, "O veterinário responsável é obrigatório."),
   species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
     required_error: "A espécie do animal é obrigatória.",
@@ -60,15 +61,16 @@ export type InternmentEditFormValues = z.infer<typeof formSchema>;
 interface InternmentEditFormProps {
   onSubmit: (data: InternmentEditFormValues) => void;
   onCancel: () => void;
-  initialData: Omit<InternmentEditFormValues, "admissionDate" | "expectedDischargeDate"> & {
+  initialData: Omit<InternedPatient, "user_id" | "created_at" | "admission_date" | "expected_discharge_date" | "bay_name" | "pet_name" | "owner_name"> & {
     admissionDate: string;
-    expectedDischargeDate?: string | null; // Permitir null ou undefined para a string da data opcional
-    bayName: string; // Adicionado
+    expectedDischargeDate?: string | null;
+    bayName: string;
+    petName: string;
+    ownerName: string;
   };
 }
 
 const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCancel, initialData }) => {
-  // Função auxiliar para analisar strings de data com segurança
   const safeParseDate = (dateString?: string | null): Date | undefined => {
     if (!dateString) return undefined;
     const parsed = parseISO(dateString);
@@ -78,11 +80,11 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
   const form = useForm<InternmentEditFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      bayName: initialData.bayName || "", // Valor padrão para o novo campo
+      bayName: initialData.bayName || "",
       petName: initialData.petName || "",
       ownerName: initialData.ownerName || "",
       reason: initialData.reason || "",
-      admissionDate: safeParseDate(initialData.admissionDate) || new Date(), // Fallback para a data atual se inválida
+      admissionDate: safeParseDate(initialData.admissionDate) || new Date(),
       expectedDischargeDate: safeParseDate(initialData.expectedDischargeDate),
       veterinarian: initialData.veterinarian || mockVeterinarians[0]?.name || "",
       species: initialData.species || "Cachorro",
@@ -171,7 +173,7 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="reason"

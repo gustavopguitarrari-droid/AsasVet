@@ -12,22 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { InternedPatient } from "@/pages/Internacao"; // Importar a interface atualizada
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
-
-interface InternedPatient {
-  id: string;
-  bayName: string; // Novo campo
-  petName: string;
-  ownerName: string;
-  reason: string;
-  admissionDate: string;
-  expectedDischargeDate?: string;
-  veterinarian: string;
-  status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
-  species: string;
-  risk: RiskLevel;
-}
 
 interface InternmentHistoryDialogProps {
   isOpen: boolean;
@@ -69,12 +56,12 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
   const [searchTerm, setSearchTerm] = React.useState<string>("");
 
   const filteredHistoryPatients = historyPatients.filter(patient =>
-    patient.petName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.ownerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.pet_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    patient.owner_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.species.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.bayName.toLowerCase().includes(searchTerm.toLowerCase()) // Incluindo busca por nome da baia
+    patient.bay_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -100,15 +87,15 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
             {filteredHistoryPatients.map((patient) => {
               const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
               const statusColorClass = statusBadgeColorMap[patient.status] || "bg-gray-500";
-              const finalDate = patient.expectedDischargeDate || patient.admissionDate;
+              const finalDate = patient.expected_discharge_date || patient.admission_date;
 
               return (
                 <li key={patient.id} className="flex items-center p-4 border rounded-md shadow-sm bg-card text-card-foreground">
                   <IconComponent className={cn("h-6 w-6 mr-4", speciesColorMap[patient.species])} />
                   <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
-                    <p className="font-bold text-lg">{patient.petName}</p>
+                    <p className="font-bold text-lg">{patient.pet_name}</p>
                     <p className="text-muted-foreground flex items-center">
-                      <User className="h-4 w-4 mr-2" /> {patient.ownerName}
+                      <User className="h-4 w-4 mr-2" /> {patient.owner_name}
                     </p>
                     <p className="text-muted-foreground flex items-center">
                       <Stethoscope className="h-4 w-4 mr-2" /> {patient.veterinarian}
@@ -121,7 +108,7 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
                     <span className="text-sm text-muted-foreground flex items-center">
                       <CalendarDays className="h-4 w-4 mr-1" /> {finalDate}
                     </span>
-                    <span className="text-xs text-muted-foreground mt-1">Baia: {patient.bayName}</span> {/* Exibindo o nome da baia */}
+                    <span className="text-xs text-muted-foreground mt-1">Baia: {patient.bay_name}</span>
                   </div>
                 </li>
               );
