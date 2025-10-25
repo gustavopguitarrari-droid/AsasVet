@@ -14,20 +14,26 @@ import { Button } from "@/components/ui/button";
 import { User as UserIcon, LogOut, Settings, UserCircle } from "lucide-react"; // Adicionado UserCircle para o link de perfil
 import { useUser } from "@/context/UserContext";
 import { Link, useNavigate } from "react-router-dom"; // Importar useNavigate
+import { supabase } from "@/integrations/supabase/client"; // Importar o cliente Supabase
 
 const UserProfile = () => {
   const { user, setUser } = useUser();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    console.log("Usuário deslogado!");
-    setUser(null);
-    navigate("/"); // Redireciona para a página inicial após o logout
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Erro ao deslogar:", error.message);
+      // Opcional: mostrar um toast de erro
+    } else {
+      console.log("Usuário deslogado!");
+      // O SessionContext já lida com setUser(null) e o redirecionamento para /login
+    }
   };
 
   if (!user) {
     return (
-      <Button variant="ghost" onClick={() => console.log("Login clicked")}>
+      <Button variant="ghost" onClick={() => navigate("/login")}>
         Login
       </Button>
     );
