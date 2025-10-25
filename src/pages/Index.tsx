@@ -7,19 +7,16 @@ const Index = () => {
   const { session, isLoading } = useSession(); // Usar useSession para verificar o estado de autenticação
 
   useEffect(() => {
-    console.log('Index Page - useEffect triggered. isLoading:', isLoading, 'session:', session);
+    // Se ainda está carregando a sessão inicial, não faz nada.
+    // O redirecionamento ocorrerá assim que isLoading for false.
     if (isLoading) {
-      // Ainda carregando a sessão inicial, aguarde.
-      // O componente não renderizará nada visualmente neste estado.
       return;
     }
 
     // A verificação inicial da sessão foi concluída
     if (session) {
-      console.log('Index Page - Session found, redirecting to /painel.');
       navigate("/painel", { replace: true }); // Redireciona para o painel se houver sessão
     } else {
-      console.log('Index Page - No session, redirecting to /login.');
       navigate("/login", { replace: true }); // Redireciona para o login se não houver sessão
     }
   }, [navigate, session, isLoading]);

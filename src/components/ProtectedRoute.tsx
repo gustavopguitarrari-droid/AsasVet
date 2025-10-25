@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useSession } from '@/context/SessionContext';
-import { useUser } from '@/context/UserContext'; // Importar useUser
+import { useUser } from '@/context/UserContext';
 import Layout from './layout/Layout';
 
 interface ProtectedRouteProps {
@@ -22,41 +22,28 @@ const allowedVeterinarioPaths = [
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { session, isLoading } = useSession();
-  const { user: appUser } = useUser(); // Obter o usuário com o cargo do UserContext
+  const { user: appUser } = useUser();
   const location = useLocation();
 
-  // 1. Se a sessão ainda está sendo carregada (primeira carga da aplicação), mostre um loader.
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-        <p className="text-lg text-gray-600 dark:text-gray-300">Carregando sessão...</p>
-      </div>
-    );
+  // Se a sessão ainda está sendo carregada, ou se o perfil do usuário não está disponível
+  // (o que não deveria acontecer se SessionContext estiver funcionando corretamente e Index.tsx esperar),
+  // simplesmente não renderiza nada e espera. O redirecionamento inicial é feito por Index.tsx.
+  if (isLoading || !appUser) {
+    return null;
   }
 
-  // 2. Se a sessão não existe (não autenticado ou deslogado), redirecione para o login.
-  // Isso deve acontecer imediatamente após isLoading ser false, ou após um logout.
+  // Se não há sessão (usuário não autenticado), redirecione para o login.
   if (!session) {
     return <Navigate to="/login" replace />;
   }
 
-  // 3. Se há uma sessão, mas o perfil do usuário ainda não foi carregado, mostre um loader para o perfil.
-  // Isso pode acontecer se o fetch do perfil for assíncrono e levar um tempo.
-  if (!appUser) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
-        <p className="text-lg text-gray-600 dark:text-gray-300">Carregando perfil do usuário...</p>
-      </div>
-    );
-  }
-
-  // 4. Se o usuário for um "Veterinário" e a rota atual não estiver na lista de permitidas, redireciona para o Painel
+  // Se o usuário for um "Veterinário" e a rota atual não estiver na lista de permitidas, redireciona para o Painel
   if (appUser.role === "Veterinário" && !allowedVeterinarioPaths.includes(location.pathname)) {
     console.log(`ProtectedRoute - Veterinário tentando acessar caminho proibido: ${location.pathname}. Redirecionando para /painel.`);
     return <Navigate to="/painel" replace />;
   }
 
-  // 5. Se estiver logado e autorizado, renderiza o layout e o conteúdo da rota
+  // Se estiver logado e autorizado, renderiza o layout e o conteúdo da rota
   return <Layout>{children}</Layout>;
 };
 
