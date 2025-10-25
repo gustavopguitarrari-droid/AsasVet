@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ProtectedRoute from "./components/ProtectedRoute"; // Importar ProtectedRoute
+import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Cadastro from "./pages/Cadastro";
 import Appointments from "./pages/Appointments";
@@ -17,7 +17,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
-import Index from "./pages/Index"; // Importar a página Index
+// REMOVIDO: import Index from "./pages/Index";
 import { SessionContextProvider } from "./context/SessionContext";
 
 const queryClient = new QueryClient();
@@ -31,7 +31,7 @@ const App = () => (
         <SessionContextProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Index />} /> {/* Rota inicial que redireciona */}
+            <Route path="/" element={<Login />} /> {/* A rota raiz agora é a página de Login */}
             
             {/* Rotas Protegidas */}
             <Route
