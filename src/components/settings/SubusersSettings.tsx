@@ -40,7 +40,7 @@ interface SubuserProfile {
   last_name: string;
   email: string;
   role: string;
-  gender: string;
+  // Gênero removido
 }
 
 const SubusersSettings: React.FC = () => {
@@ -59,7 +59,7 @@ const SubusersSettings: React.FC = () => {
       if (!user?.id) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, role, gender')
+        .select('id, first_name, last_name, email, role') // Gênero removido da seleção
         .neq('id', user.id); // Exclude the current admin user
       if (error) throw error;
       return data;
@@ -249,7 +249,7 @@ const SubusersSettings: React.FC = () => {
                     <TableHead>Nome</TableHead>
                     <TableHead>E-mail</TableHead>
                     <TableHead>Cargo</TableHead>
-                    <TableHead>Gênero</TableHead>
+                    {/* Gênero removido */}
                     <TableHead className="text-right">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -309,7 +309,7 @@ const SubusersSettings: React.FC = () => {
                           </div>
                         )}
                       </TableCell>
-                      <TableCell>{subuser.gender}</TableCell>
+                      {/* Gênero removido */}
                       <TableCell className="text-right">
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
