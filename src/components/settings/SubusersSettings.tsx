@@ -117,19 +117,15 @@ const SubusersSettings: React.FC = () => {
       if (error) {
         let errorMessage = error.message;
         console.error("Raw error object from invoke:", error); // Added log
-        if (error.context) {
-          console.error("Full error.context object:", error.context); // Log the full context
-          if (error.context.errors && error.context.errors.length > 0) {
-            errorMessage = error.context.errors[0].message; // Try to get message from errors array
-          } else if (error.context.data) {
-            try {
-              const errorData = JSON.parse(error.context.data);
-              if (errorData.error) {
-                errorMessage = errorData.error;
-              }
-            } catch (parseError) {
-              console.error("Failed to parse Edge Function error response context data:", parseError);
+        if (error.context && error.context.data) {
+          console.error("error.context.data:", error.context.data); // Added log
+          try {
+            const errorData = JSON.parse(error.context.data);
+            if (errorData.error) {
+              errorMessage = errorData.error;
             }
+          } catch (parseError) {
+            console.error("Failed to parse Edge Function error response context data:", parseError);
           }
         }
         console.error("Error from supabase.functions.invoke:", errorMessage);
