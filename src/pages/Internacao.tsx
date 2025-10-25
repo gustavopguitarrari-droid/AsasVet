@@ -123,12 +123,17 @@ const Internacao = () => {
     queryKey: ['interned_patients', userId],
     queryFn: async () => {
       if (!userId) return [];
+      console.log("Fetching interned_patients from Supabase...");
       const { data, error } = await supabase
         .from('interned_patients')
         .select('*')
         .eq('user_id', userId)
         .not('status', 'in', '("Alta", "Óbito")'); // Filter out discharged/deceased patients
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching interned_patients:", error);
+        throw error;
+      }
+      console.log("interned_patients fetched:", data);
       return data;
     },
     enabled: !!userId,
@@ -139,12 +144,17 @@ const Internacao = () => {
     queryKey: ['history_patients', userId],
     queryFn: async () => {
       if (!userId) return [];
+      console.log("Fetching history_patients from Supabase...");
       const { data, error } = await supabase
         .from('interned_patients')
         .select('*')
         .eq('user_id', userId)
         .in('status', ['Alta', 'Óbito']); // Only discharged/deceased patients
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching history_patients:", error);
+        throw error;
+      }
+      console.log("history_patients fetched:", data);
       return data;
     },
     enabled: !!userId,
@@ -155,11 +165,16 @@ const Internacao = () => {
     queryKey: ['patient_actions', userId],
     queryFn: async () => {
       if (!userId) return [];
+      console.log("Fetching patient_actions from Supabase...");
       const { data, error } = await supabase
         .from('patient_actions')
         .select('*')
         .eq('user_id', userId);
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching patient_actions:", error);
+        throw error;
+      }
+      console.log("patient_actions fetched:", data);
       return data;
     },
     enabled: !!userId,
@@ -169,6 +184,7 @@ const Internacao = () => {
   const addPatientMutation = useMutation({
     mutationFn: async (newPatientData: InternmentFormValues) => {
       if (!userId) throw new Error("User not authenticated.");
+      console.log("Attempting to insert new patient:", newPatientData);
       const { data, error } = await supabase
         .from('interned_patients')
         .insert({
@@ -186,7 +202,11 @@ const Internacao = () => {
         })
         .select()
         .single();
-      if (error) throw error;
+      if (error) {
+        console.error("Error inserting new patient:", error);
+        throw error;
+      }
+      console.log("New patient inserted successfully:", data);
       return data;
     },
     onSuccess: () => {
@@ -203,6 +223,7 @@ const Internacao = () => {
   const updatePatientMutation = useMutation({
     mutationFn: async (updatedPatient: InternedPatient) => {
       if (!userId) throw new Error("User not authenticated.");
+      console.log("Attempting to update patient:", updatedPatient);
       const { data, error } = await supabase
         .from('interned_patients')
         .update({
@@ -221,31 +242,30 @@ const Internacao = () => {
         .eq('user_id', userId)
         .select()
         .single();
-      if (error) throw error;
+      if (error) {
+        console.error("Error updating patient:", error);
+        throw error;
+      }
+      console.log("Patient updated successfully (from DB response):", data);
       return data;
     },
     onSuccess: async (data) => {
-      console.log("Patient updated successfully:", data);
+      console.log("updatePatientMutation onSuccess - Data received:", data);
       
       // Invalidate history to ensure it picks up the new patient
       await queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
+      console.log("Invalidated history_patients query.");
 
-      // Manually update the cache for 'interned_patients'
-      queryClient.setQueryData<InternedPatient[]>(['interned_patients', userId], (oldData) => {
-        if (!oldData) return [];
-        if (data.status === "Alta" || data.status === "Óbito") {
-          // If status is Alta or Óbito, remove the patient from the active list
-          return oldData.filter(patient => patient.id !== data.id);
-        } else {
-          // Otherwise, update the patient in the active list
-          return oldData.map(patient => patient.id === data.id ? data : patient);
-        }
-      });
+      // Force a refetch of the active patients list to ensure consistency with the database
+      // This will re-run the query with the `not('status', 'in', ...)` filter
+      console.log("Forcing refetch of interned_patients to ensure consistency.");
+      await queryClient.refetchQueries({ queryKey: ['interned_patients', userId] });
 
       showSuccess("Paciente atualizado com sucesso!");
       setIsDetailsDialogOpen(false); // Close dialog AFTER cache update
     },
     onError: (error) => {
+      console.error("updatePatientMutation onError:", error);
       showError(`Erro ao atualizar paciente: ${error.message}`);
     },
   });
@@ -334,12 +354,17 @@ const Internacao = () => {
   const clearHistoryMutation = useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error("User not authenticated.");
+      console.log("Attempting to clear history patients for user:", userId);
       const { error } = await supabase
         .from('interned_patients')
         .delete()
         .eq('user_id', userId)
         .in('status', ['Alta', 'Óbito']);
-      if (error) throw error;
+      if (error) {
+        console.error("Error clearing history patients:", error);
+        throw error;
+      }
+      console.log("History patients cleared successfully.");
       return true;
     },
     onSuccess: () => {
@@ -602,6 +627,14 @@ const Internacao = () => {
         onUpdate={handleUpdateInternment}
       />
 
+      <InternmentHistoryDialog
+        isOpen={isHistoryDialogOpen}
+        onClose={() => setIsHistoryDialogOpen(false)}
+        historyPatients={historyPatients}
+        onClearHistory={() => clearHistoryMutation.mutate()}
+        isClearingHistory={clearHistoryMutation.isPending}
+      />
+
       {isAddActionDialogOpen && actionPatientId && actionPatientName && actionDate && actionHour && (
         <AddPatientActionDialog
           isOpen={isAddActionDialogOpen}
@@ -611,7 +644,7 @@ const Internacao = () => {
           patientName={actionPatientName}
           date={actionDate}
           initialHour={actionHour}
-          allActionsForCurrentPatient={allActionsForCurrentPatient}
+          allActionsForPatient={allActionsForCurrentPatient}
         />
       )}
 
