@@ -11,14 +11,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard } from "lucide-react";
+import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin } from "lucide-react"; // Adicionado Mail, Phone, MapPin
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SpeciesFilter from "@/components/SpeciesFilter";
 import PetDetailsDialog from "@/components/PetDetailsDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import ClientForm, { ClientFormValues } from "@/components/ClientForm";
 import { Client, Pet } from "@/types/cadastro";
-import { format } from "date-fns";
+import { format, parseISO, isValid } from "date-fns"; // Importado parseISO e isValid
 
 // Mock de dados para Tutores
 const initialMockClients: Client[] = [
@@ -238,7 +238,11 @@ const Cadastro = () => {
                       <TableRow key={client.id}>
                         <TableCell className="font-medium">{client.name}</TableCell>
                         <TableCell>{client.cpf}</TableCell>
-                        <TableCell>{format(new Date(client.dateOfBirth), "dd/MM/yyyy")}</TableCell>
+                        <TableCell>
+                          {client.dateOfBirth && isValid(parseISO(client.dateOfBirth))
+                            ? format(parseISO(client.dateOfBirth), "dd/MM/yyyy")
+                            : "N/A"}
+                        </TableCell>
                         <TableCell>
                           <p className="flex items-center text-sm"><Mail className="h-3 w-3 mr-1 text-muted-foreground" /> {client.email}</p>
                           <p className="flex items-center text-sm"><Phone className="h-3 w-3 mr-1 text-muted-foreground" /> {client.phone}</p>
