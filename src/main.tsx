@@ -3,12 +3,12 @@ import App from "./App.tsx";
 import "./globals.css";
 import { ThemeProvider } from "./components/ThemeProvider.tsx";
 import { UserProvider } from "./context/UserContext.tsx";
-import { ColorThemeProvider } from "./context/ColorThemeContext.tsx"; // Importa o ColorThemeProvider
+import { ColorThemeProvider } from "./context/ColorThemeContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider defaultTheme="system" attribute="class" enableSystem>
-    <ColorThemeProvider> {/* Envolve o App com o ColorThemeProvider */}
-      <UserProvider>
+    <ColorThemeProvider>
+      <UserProvider> {/* UserProvider deve envolver o App */}
         <App />
       </UserProvider>
     </ColorThemeProvider>
