@@ -20,12 +20,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { DialogFooter } from "@/components/ui/dialog";
 import BirthdayPicker from "./BirthdayPicker";
-import { Client } from "@/types/cadastro"; // Removido Pet
+import { Client } from "@/types/cadastro";
 import { lookupCep } from "@/utils/cepLookup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { showError, showSuccess } from "@/utils/toast";
-import { Textarea } from "@/components/ui/textarea"; // Importar Textarea
-import CameraCaptureDialog from "./CameraCaptureDialog"; // Importar o novo diálogo da câmera
+import { Textarea } from "@/components/ui/textarea";
+import CameraCaptureDialog from "./CameraCaptureDialog";
 
 // Esquema de validação do formulário com Zod
 const formSchema = z.object({
@@ -45,8 +45,8 @@ const formSchema = z.object({
     city: z.string().min(1, "A cidade é obrigatória."),
     state: z.string().min(2, "O estado é obrigatório.").max(2, "O estado deve ter 2 letras."),
   }),
-  observations: z.string().optional(), // Novo campo
-  photoUrl: z.string().optional(), // Novo campo para URL da foto (Base64)
+  observations: z.string().optional(),
+  photoUrl: z.string().optional(),
 });
 
 export type ClientFormValues = z.infer<typeof formSchema>;
@@ -54,7 +54,7 @@ export type ClientFormValues = z.infer<typeof formSchema>;
 interface ClientFormProps {
   onSubmit: (data: ClientFormValues) => void;
   onCancel: () => void;
-  initialData?: Client; // Removido associatedPetIds
+  initialData?: Client;
 }
 
 const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData }) => {
@@ -86,14 +86,14 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
         city: initialData?.address?.city || "",
         state: initialData?.address?.state || "",
       },
-      observations: initialData?.observations || "", // Valor padrão para observações
+      observations: initialData?.observations || "",
       photoUrl: initialData?.photoUrl || undefined,
     },
   });
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialData?.photoUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isCameraDialogOpen, setIsCameraDialogOpen] = useState(false); // Estado para o diálogo da câmera
+  const [isCameraDialogOpen, setIsCameraDialogOpen] = useState(false);
 
   // Efeito para resetar o formulário e o preview da imagem quando o diálogo é aberto/fechado
   useEffect(() => {
@@ -117,7 +117,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
     });
     setPreviewUrl(initialData?.photoUrl || null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ''; // Limpa o input de arquivo
+      fileInputRef.current.value = '';
     }
   }, [initialData, form]);
 
