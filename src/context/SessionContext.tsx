@@ -1,9 +1,21 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from './UserContext';
+
+interface UserProfile {
+  id?: string;
+  name?: string;
+  lastName?: string;
+  email?: string;
+  avatarUrl?: string;
+  role?: string;
+  birthday?: string;
+  registeredTime: string;
+  gender?: string;
+}
 
 interface SessionContextType {
   session: Session | null;
@@ -18,6 +30,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
   const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true); // Start as true to indicate initial loading
   const { setUser: setAppUser } = useUser();
+  const isInitialLoadRef = useRef(true); // Para garantir que isLoading seja definido como false apenas uma vez
 
   // Helper function to fetch profile and set appUser
   const fetchProfileAndSetAppUser = async (supabaseUser: User | null) => {
@@ -33,44 +46,24 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         .eq('id', supabaseUser.id)
         .single();
 
+      const userMetadata = supabaseUser.user_metadata;
+
+      const profileToSet: UserProfile = {
+        id: supabaseUser.id,
+        name: profileData?.first_name || userMetadata.first_name || '',
+        lastName: profileData?.last_name || userMetadata.last_name || '',
+        email: supabaseUser.email || '',
+        avatarUrl: profileData?.avatar_url || userMetadata.avatar_url || undefined,
+        role: profileData?.role || userMetadata.role || 'Usuário',
+        birthday: profileData?.birthday || userMetadata.birthday || undefined,
+        gender: profileData?.gender || userMetadata.gender || undefined,
+        registeredTime: profileData?.registered_time || supabaseUser.created_at,
+      };
+
+      setAppUser(profileToSet);
+
       if (profileError && profileError.code !== 'PGRST116') { // PGRST116 means "no rows found"
         console.error('Error fetching profile:', profileError);
-        // Even if profile fetch fails, set appUser with available data from auth.user
-        setAppUser({
-          id: supabaseUser.id,
-          name: supabaseUser.user_metadata.first_name || '',
-          lastName: supabaseUser.user_metadata.last_name || '',
-          email: supabaseUser.email || '',
-          avatarUrl: supabaseUser.user_metadata.avatar_url || undefined,
-          role: supabaseUser.user_metadata.role || 'Usuário',
-          birthday: supabaseUser.user_metadata.birthday || undefined,
-          gender: supabaseUser.user_metadata.gender || undefined,
-          registeredTime: supabaseUser.created_at,
-        });
-      } else if (profileData) {
-        setAppUser({
-          id: supabaseUser.id,
-          name: profileData.first_name || supabaseUser.user_metadata.first_name || '',
-          lastName: profileData.last_name || supabaseUser.user_metadata.last_name || '',
-          email: supabaseUser.email || '',
-          avatarUrl: profileData.avatar_url || supabaseUser.user_metadata.avatar_url || undefined,
-          role: profileData.role || supabaseUser.user_metadata.role || 'Usuário',
-          birthday: profileData.birthday || supabaseUser.user_metadata.birthday || undefined,
-          gender: profileData.gender || supabaseUser.user_metadata.gender || undefined,
-          registeredTime: profileData.registered_time || supabaseUser.created_at,
-        });
-      } else { // No profile found (PGRST116) or other error, use auth.user metadata
-        setAppUser({
-          id: supabaseUser.id,
-          name: supabaseUser.user_metadata.first_name || '',
-          lastName: supabaseUser.user_metadata.last_name || '',
-          email: supabaseUser.email || '',
-          avatarUrl: supabaseUser.user_metadata.avatar_url || undefined,
-          role: supabaseUser.user_metadata.role || 'Usuário',
-          birthday: supabaseUser.user_metadata.birthday || undefined,
-          gender: supabaseUser.user_metadata.gender || undefined,
-          registeredTime: supabaseUser.created_at,
-        });
       }
     } catch (error) {
       console.error('Unhandled error during profile fetch:', error);
@@ -84,39 +77,19 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       setSession(currentSession);
       setUserState(currentSession?.user || null);
       await fetchProfileAndSetAppUser(currentSession?.user || null);
-      setIsLoading(false); // Set isLoading to false after all state updates
-      console.log('Auth state change processed, isLoading set to false.');
-    };
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(handleAuthStateChange);
-
-    // Initial session check
-    const checkInitialSession = async () => {
-      try {
-        const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError) {
-          console.error('Error fetching initial session:', sessionError);
-          setSession(null);
-          setUserState(null);
-          setAppUser(null);
-        } else {
-          setSession(initialSession);
-          setUserState(initialSession?.user || null);
-          await fetchProfileAndSetAppUser(initialSession?.user || null);
-        }
-      } catch (error) {
-        console.error('Unhandled error during initial session check:', error);
-        setSession(null);
-        setUserState(null);
-        setAppUser(null);
-      } finally {
-        setIsLoading(false); // Ensure isLoading is false after initial check
-        console.log('Initial session check completed, isLoading set to false.');
+      // Only set isLoading to false once after the initial session is handled
+      if (isInitialLoadRef.current) {
+        setIsLoading(false);
+        isInitialLoadRef.current = false;
+        console.log('Initial auth state change processed, isLoading set to false.');
       }
     };
 
-    checkInitialSession();
+    // Listen for auth state changes
+    const { data: authListener } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
+    // Cleanup the subscription on component unmount
     return () => {
       authListener.subscription.unsubscribe();
     };
