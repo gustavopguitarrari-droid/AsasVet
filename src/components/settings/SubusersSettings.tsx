@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, PlusCircle, User as UserIcon, Mail, Lock, Briefcase, Venus, Mars } from "lucide-react";
+import { Users, PlusCircle, User as UserIcon, Mail, Lock, Briefcase } from "lucide-react"; // Removido Venus e Mars
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -165,7 +165,7 @@ const SubusersSettings: React.FC = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="gender" className="flex items-center">
-                <Venus className="h-4 w-4 mr-2 text-muted-foreground" /> Gênero
+                <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Gênero {/* Usando UserIcon */}
               </Label>
               <Select
                 onValueChange={(value) => form.setValue("gender", value as "Masculino" | "Feminino" | "Outro")}
