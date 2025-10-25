@@ -7,20 +7,20 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  // Handle CORS preflight request
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    console.log('Edge Function: update-subuser-role started.');
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Verify the user making the request is an admin
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.log('Edge Function: Unauthorized - No Authorization header.');
       return new Response(JSON.stringify({ error: 'Unauthorized: No Authorization header' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -31,14 +31,14 @@ serve(async (req) => {
     const { data: { user: authUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !authUser) {
-      console.error('Auth error:', authError?.message);
+      console.error('Edge Function: Auth error:', authError?.message);
       return new Response(JSON.stringify({ error: 'Unauthorized: Invalid token' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    console.log('Edge Function: Admin user authenticated:', authUser.id);
 
-    // Fetch the profile of the authenticated user to check their role
     const { data: adminProfile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
@@ -46,31 +46,33 @@ serve(async (req) => {
       .single();
 
     if (profileError || !adminProfile || adminProfile.role !== 'Administrador') {
-      console.error('Profile error or not admin:', profileError?.message, adminProfile?.role);
+      console.error('Edge Function: Profile error or not admin:', profileError?.message, adminProfile?.role);
       return new Response(JSON.stringify({ error: 'Forbidden: Only administrators can update sub-user roles.' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    console.log('Edge Function: Requesting user is an Administrator.');
 
     const { userIdToUpdate, newRole } = await req.json();
+    console.log('Edge Function: Received payload - userIdToUpdate:', userIdToUpdate, 'newRole:', newRole);
 
     if (!userIdToUpdate || !newRole) {
+      console.log('Edge Function: Bad Request - Missing required fields.');
       return new Response(JSON.stringify({ error: 'Missing required fields: userIdToUpdate, newRole' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Prevent an admin from changing their own role via this function (they can do it via profile settings)
     if (userIdToUpdate === authUser.id) {
+      console.log('Edge Function: Forbidden - Admin trying to change own role.');
       return new Response(JSON.stringify({ error: 'Forbidden: An administrator cannot change their own role via this interface.' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // NEW CHECK: Verify if the target profile exists
     const { data: targetProfile, error: targetProfileError } = await supabaseAdmin
       .from('profiles')
       .select('id')
@@ -78,47 +80,47 @@ serve(async (req) => {
       .single();
 
     if (targetProfileError || !targetProfile) {
-      console.error('Target profile not found or error fetching:', targetProfileError?.message);
+      console.error('Edge Function: Target profile not found or error fetching:', targetProfileError?.message);
       return new Response(JSON.stringify({ error: 'Target user profile not found.' }), {
-        status: 404, // Not Found
+        status: 404,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    // END NEW CHECK
+    console.log('Edge Function: Target profile found:', userIdToUpdate);
 
-    // Update the role in the profiles table
     const { error: updateProfileError } = await supabaseAdmin
       .from('profiles')
       .update({ role: newRole })
       .eq('id', userIdToUpdate);
 
     if (updateProfileError) {
-      console.error('Error updating profile role:', updateProfileError.message);
+      console.error('Edge Function: Error updating profile role in public.profiles:', updateProfileError.message);
       return new Response(JSON.stringify({ error: updateProfileError.message }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    console.log('Edge Function: Profile role updated in public.profiles.');
 
-    // Also update the user_metadata in auth.users for consistency
     const { error: updateAuthUserError } = await supabaseAdmin.auth.admin.updateUser(
       userIdToUpdate,
       { user_metadata: { role: newRole } }
     );
 
     if (updateAuthUserError) {
-      console.error('Error updating auth.users metadata:', updateAuthUserError.message);
-      // This is a non-critical error, but we should log it.
-      // We can still return success if the profile table update was successful.
+      console.error('Edge Function: Error updating auth.users metadata:', updateAuthUserError.message);
+    } else {
+      console.log('Edge Function: User metadata updated in auth.users.');
     }
 
+    console.log('Edge Function: Sub-user role updated successfully.');
     return new Response(JSON.stringify({ message: 'Sub-user role updated successfully' }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('Unhandled error:', error.message);
+    console.error('Edge Function: Unhandled error:', error.message);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
