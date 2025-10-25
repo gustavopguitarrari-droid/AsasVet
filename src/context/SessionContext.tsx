@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+// REMOVIDO: import { useNavigate } from 'react-router-dom'; // Não será mais usado para navegação direta
 import { useUser } from './UserContext';
 
 interface SessionContextType {
@@ -18,7 +18,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
+  // REMOVIDO: const navigate = useNavigate(); // Não será mais usado para navegação direta
   const { setUser: setAppUser } = useUser();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
           }
 
           setAppUser({
-            id: currentSession.user.id, // Passando o ID do usuário
+            id: currentSession.user.id,
             name: profileData?.first_name || currentSession.user.user_metadata.first_name || '',
             lastName: profileData?.last_name || currentSession.user.user_metadata.last_name || '',
             email: currentSession.user.email || '',
@@ -49,12 +49,11 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
             birthday: profileData?.birthday || currentSession.user.user_metadata.birthday || undefined,
             registeredTime: profileData?.registered_time || currentSession.user.created_at,
           });
-          navigate('/painel');
+          // REMOVIDO: navigate('/painel');
         } else if (event === 'SIGNED_OUT') {
           setAppUser(null);
-          navigate('/login');
+          // REMOVIDO: navigate('/login');
         }
-        // Removido: else if (event === 'INITIAL_SESSION' && !currentSession) { navigate('/login'); }
       }
     );
 
@@ -62,7 +61,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       setSession(initialSession);
       setUserState(initialSession?.user || null);
       setIsLoading(false);
-      if (initialSession) { // Apenas busca o perfil se houver uma sessão inicial
+      if (initialSession) {
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
@@ -73,7 +72,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
           console.error('Error fetching profile on initial session:', profileError);
         }
         setAppUser({
-          id: initialSession.user.id, // Passando o ID do usuário
+          id: initialSession.user.id,
           name: profileData?.first_name || initialSession.user.user_metadata.first_name || '',
           lastName: profileData?.last_name || initialSession.user.user_metadata.last_name || '',
           email: initialSession.user.email || '',
@@ -83,13 +82,12 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
           registeredTime: profileData?.registered_time || initialSession.user.created_at,
         });
       }
-      // Removido: else { navigate('/login'); }
     });
 
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [navigate, setAppUser]);
+  }, [setAppUser]); // 'navigate' removido das dependências
 
   return (
     <SessionContext.Provider value={{ session, user, isLoading }}>
