@@ -254,16 +254,25 @@ const Internacao = () => {
       console.log("updatePatientMutation onSuccess - Data received:", data);
       console.log("Updated patient status in onSuccess:", data.status);
       
-      // 1. Invalidate history to ensure it picks up the new patient
+      // 1. Optimistically update the 'interned_patients' cache
+      queryClient.setQueryData<InternedPatient[]>(['interned_patients', userId], (oldData) => {
+        if (!oldData) return [];
+        if (data.status === "Alta" || data.status === "Óbito") {
+          // If status is finalized, remove from active interned patients list
+          console.log(`Optimistically removing patient ${data.id} from interned_patients cache.`);
+          return oldData.filter(patient => patient.id !== data.id);
+        } else {
+          // If status is still active, update its details in the list
+          console.log(`Optimistically updating patient ${data.id} in interned_patients cache.`);
+          return oldData.map(patient => patient.id === data.id ? data : patient);
+        }
+      });
+
+      // 2. Invalidate history to ensure it picks up the new patient
       await queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
       console.log("Invalidated history_patients query.");
 
-      // 2. Explicitly remove the active patients query from cache
-      // This ensures no stale data is used for the next fetch.
-      await queryClient.removeQueries({ queryKey: ['interned_patients', userId], exact: true });
-      console.log("Removed interned_patients query from cache.");
-
-      // 3. Force a refetch of the active patients list.
+      // 3. Force a refetch of the active patients list to ensure eventual consistency.
       // This will re-run the query with the `not('status', 'in', ...)` filter
       console.log("Forcing refetch of interned_patients to ensure consistency.");
       await queryClient.refetchQueries({ queryKey: ['interned_patients', userId] });
@@ -652,7 +661,7 @@ const Internacao = () => {
           patientName={actionPatientName}
           date={actionDate}
           initialHour={actionHour}
-          allActionsForCurrentPatient={allActionsForCurrentPatient}
+          allActionsForPatient={allActionsForCurrentPatient}
         />
       )}
 
