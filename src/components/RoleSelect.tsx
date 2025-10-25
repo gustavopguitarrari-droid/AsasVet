@@ -16,6 +16,7 @@ interface RoleSelectProps {
 }
 
 const mockRoles = [
+  "Administrador", // Adicionado o cargo de Administrador
   "Veterinário",
   "Enfermeiro",
   "Recepcionista",
