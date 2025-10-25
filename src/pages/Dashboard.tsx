@@ -6,6 +6,7 @@ import DashboardConfigurator from "@/components/DashboardConfigurator";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Link } from "react-router-dom"; // Importar Link
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -168,16 +169,18 @@ const Dashboard = () => {
         );
       case "internmentStatus":
         return (
-          <Card key={item.id} className={cn("bg-purple-600", baseCardClasses)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Status de Internação</CardTitle>
-              <Bed className={iconClasses} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">3 Animais</div>
-              <p className={textMutedClasses}>Atualmente internados</p>
-            </CardContent>
-          </Card>
+          <Link to="/internacao" key={item.id} className="block"> {/* Adicionado Link aqui */}
+            <Card className={cn("bg-purple-600", baseCardClasses, "hover:shadow-lg transition-shadow cursor-pointer")}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Status de Internação</CardTitle>
+                <Bed className={iconClasses} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">3 Animais</div>
+                <p className={textMutedClasses}>Atualmente internados</p>
+              </CardContent>
+            </Card>
+          </Link>
         );
       case "veterinariansOnDuty":
         return (
