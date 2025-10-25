@@ -225,21 +225,22 @@ const Internacao = () => {
       return data;
     },
     onSuccess: async (data) => {
-      // Invalidate specific queries
-      await queryClient.invalidateQueries({ queryKey: ['interned_patients', userId] });
+      console.log("Patient updated successfully:", data);
+      
+      // Invalidate history to ensure it picks up the new patient
       await queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
 
-      // Manually update the cache for 'interned_patients' to remove the updated patient
-      // if its status is 'Alta' or 'Óbito'. This ensures immediate UI update.
-      queryClient.setQueryData<InternedPatient[]>(['interned_patients', userId], (oldData) => {
-        if (!oldData) return [];
-        if (data.status === "Alta" || data.status === "Óbito") {
-          return oldData.filter(patient => patient.id !== data.id);
-        }
-        // If for some reason the status is not Alta/Óbito, update the patient in the list
-        // (though this specific query should only contain active patients)
-        return oldData.map(patient => patient.id === data.id ? data : patient);
-      });
+      // If the patient was marked as Alta or Óbito, force a refetch of the active patients list
+      // This will re-run the query with the `not('status', 'in', ...)` filter
+      if (data.status === "Alta" || data.status === "Óbito") {
+        console.log("Patient status is Alta/Óbito, refetching interned_patients.");
+        await queryClient.refetchQueries({ queryKey: ['interned_patients', userId] });
+      } else {
+        // If status is not Alta/Óbito, update the patient in the active list cache
+        queryClient.setQueryData<InternedPatient[]>(['interned_patients', userId], (oldData) => {
+          return oldData ? oldData.map(patient => patient.id === data.id ? data : patient) : [];
+        });
+      }
 
       showSuccess("Paciente atualizado com sucesso!");
       setIsDetailsDialogOpen(false); // Close dialog AFTER cache update
