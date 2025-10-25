@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/UserContext";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import { useForm } from "react-hook-form"; // Removido, pois o formulário foi movido
+import { zodResolver } from "@hookform/resolvers/zod"; // Removido
+import * as z from "zod"; // Removido
 import { showSuccess, showError } from "@/utils/toast";
 import { supabase } from "@/integrations/supabase/client";
 import RoleSelect from "@/components/RoleSelect";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Removido, pois o formulário foi movido
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Table,
@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import AddSubuserDialog from "./AddSubuserDialog"; // Importar o novo diálogo
 
 interface SubuserProfile {
   id: string;
@@ -46,37 +47,17 @@ interface SubuserProfile {
   gender: string;
 }
 
-const formSchema = z.object({
-  firstName: z.string().min(1, "O nome é obrigatório."),
-  lastName: z.string().min(1, "O sobrenome é obrigatório."),
-  email: z.string().email("E-mail inválido.").min(1, "O e-mail é obrigatório."),
-  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
-  role: z.string().min(1, "O cargo é obrigatório."),
-  gender: z.enum(["Masculino", "Feminino", "Outro"], {
-    required_error: "O gênero é obrigatório.",
-  }),
-});
-
-type SubuserFormValues = z.infer<typeof formSchema>;
+// Removido formSchema e SubuserFormValues, pois foram movidos para AddSubuserDialog
 
 const SubusersSettings: React.FC = () => {
   const { user } = useUser();
   const queryClient = useQueryClient();
-  const form = useForm<SubuserFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      role: "Veterinário",
-      gender: "Outro",
-    },
-  });
+  // Removido useForm, pois o formulário foi movido
 
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [tempRole, setTempRole] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [isAddSubuserDialogOpen, setIsAddSubuserDialogOpen] = useState(false); // Estado para o diálogo
 
   // Fetch subusers
   const { data: subusers, isLoading, error } = useQuery<SubuserProfile[]>({
@@ -93,41 +74,7 @@ const SubusersSettings: React.FC = () => {
     enabled: user?.role === "Administrador", // Only fetch if current user is admin
   });
 
-  // Mutation for creating a subuser
-  const createSubuserMutation = useMutation({
-    mutationFn: async (newUserData: SubuserFormValues) => {
-      const session = await supabase.auth.getSession();
-      if (!session.data.session) throw new Error("User not authenticated.");
-
-      const { data: responseData, error } = await supabase.functions.invoke('create-subuser', {
-        body: JSON.stringify({
-          email: newUserData.email,
-          password: newUserData.password,
-          first_name: newUserData.firstName,
-          last_name: newUserData.lastName,
-          role: newUserData.role,
-          gender: newUserData.gender,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.data.session.access_token}`,
-        },
-      });
-
-      if (error) throw new Error(error.message);
-      if (responseData.error) throw new Error(responseData.error);
-      return responseData;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subusers'] });
-      showSuccess("Subusuário criado com sucesso!");
-      form.reset();
-    },
-    onError: (err: any) => {
-      console.error("Erro ao criar subusuário:", err.message);
-      showError(`Erro ao criar subusuário: ${err.message}`);
-    },
-  });
+  // Removido createSubuserMutation, pois foi movido para AddSubuserDialog
 
   // Mutation for deleting a subuser
   const deleteSubuserMutation = useMutation({
@@ -187,9 +134,7 @@ const SubusersSettings: React.FC = () => {
     },
   });
 
-  const handleCreateSubuser = (data: SubuserFormValues) => {
-    createSubuserMutation.mutate(data);
-  };
+  // Removido handleCreateSubuser
 
   const handleDeleteSubuser = (userId: string) => {
     deleteSubuserMutation.mutate(userId);
@@ -211,6 +156,10 @@ const SubusersSettings: React.FC = () => {
   const handleCancelEdit = () => {
     setEditingUserId(null);
     setTempRole("");
+  };
+
+  const handleSubuserCreated = () => {
+    queryClient.invalidateQueries({ queryKey: ['subusers'] }); // Invalida a query para atualizar a lista
   };
 
   const filteredSubusers = subusers?.filter(subuser =>
@@ -244,10 +193,17 @@ const SubusersSettings: React.FC = () => {
           <Users className="mr-2 h-5 w-5" /> Gerenciar Subusuários
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6"> {/* Adicionado space-y-6 para espaçamento vertical */}
+      <CardContent className="space-y-6">
         <p className="text-muted-foreground">
           Aqui você pode adicionar novos subusuários para sua equipe, visualizar os existentes, e gerenciar seus cargos e acessos.
         </p>
+
+        {/* Botão para abrir o diálogo de criação de subusuário */}
+        <div className="flex justify-end">
+          <Button onClick={() => setIsAddSubuserDialogOpen(true)} className="font-bold">
+            <PlusCircle className="mr-2 h-4 w-4" /> Criar Novo Subusuário
+          </Button>
+        </div>
 
         {/* Lista de Subusuários - Ocupa uma linha inteira */}
         <div className="space-y-6 p-4 border rounded-md bg-card shadow-sm">
@@ -359,97 +315,13 @@ const SubusersSettings: React.FC = () => {
             <p className="text-muted-foreground text-center py-4">Nenhum subusuário encontrado.</p>
           )}
         </div>
-
-        {/* Formulário de Criação de Subusuário - Ocupa uma linha inteira */}
-        <div className="space-y-6 p-4 border rounded-md bg-card shadow-sm">
-          <h3 className="text-xl font-semibold flex items-center">
-            <PlusCircle className="h-5 w-5 mr-2" /> Criar Novo Subusuário
-          </h3>
-          <form onSubmit={form.handleSubmit(handleCreateSubuser)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="firstName" className="flex items-center">
-                  <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Nome
-                </Label>
-                <Input id="firstName" placeholder="Primeiro Nome" {...form.register("firstName")} />
-                {form.formState.errors.firstName && (
-                  <p className="text-destructive text-sm">{form.formState.errors.firstName.message}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="lastName" className="flex items-center">
-                  <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Sobrenome
-                </Label>
-                <Input id="lastName" placeholder="Sobrenome" {...form.register("lastName")} />
-                {form.formState.errors.lastName && (
-                  <p className="text-destructive text-sm">{form.formState.errors.lastName.message}</p>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email" className="flex items-center">
-                <Mail className="h-4 w-4 mr-2 text-muted-foreground" /> E-mail
-              </Label>
-              <Input id="email" type="email" placeholder="email@exemplo.com" {...form.register("email")} />
-              {form.formState.errors.email && (
-                <p className="text-destructive text-sm">{form.formState.errors.email.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="flex items-center">
-                <Lock className="h-4 w-4 mr-2 text-muted-foreground" /> Senha
-              </Label>
-              <Input id="password" type="password" placeholder="••••••••" {...form.register("password")} />
-              {form.formState.errors.password && (
-                <p className="text-destructive text-sm">{form.formState.errors.password.message}</p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="role" className="flex items-center">
-                  <Briefcase className="h-4 w-4 mr-2 text-muted-foreground" /> Cargo
-                </Label>
-                <RoleSelect
-                  value={form.watch("role")}
-                  onValueChange={(value) => form.setValue("role", value)}
-                />
-                {form.formState.errors.role && (
-                  <p className="text-destructive text-sm">{form.formState.errors.role.message}</p>
-                )}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="gender" className="flex items-center">
-                  <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Gênero
-                </Label>
-                <Select
-                  onValueChange={(value) => form.setValue("gender", value as "Masculino" | "Feminino" | "Outro")}
-                  defaultValue={form.watch("gender")}
-                >
-                  <SelectTrigger id="gender">
-                    <SelectValue placeholder="Selecione o gênero" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Masculino">Masculino</SelectItem>
-                    <SelectItem value="Feminino">Feminino</SelectItem>
-                    <SelectItem value="Outro">Outro</SelectItem>
-                  </SelectContent>
-                </Select>
-                {form.formState.errors.gender && (
-                  <p className="text-destructive text-sm">{form.formState.errors.gender.message}</p>
-                )}
-              </div>
-            </div>
-
-            <Button type="submit" className="w-full" disabled={createSubuserMutation.isPending}>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              {createSubuserMutation.isPending ? "Criando..." : "Criar Subusuário"}
-            </Button>
-          </form>
-        </div>
       </CardContent>
+
+      <AddSubuserDialog
+        isOpen={isAddSubuserDialogOpen}
+        onClose={() => setIsAddSubuserDialogOpen(false)}
+        onSubuserCreated={handleSubuserCreated}
+      />
     </Card>
   );
 };
