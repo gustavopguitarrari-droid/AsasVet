@@ -155,7 +155,7 @@ const Appointments = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Consultas</h2>
+        <h2 className="text-3xl font-bold">Gerenciar consultas do dia</h2>
         <Dialog open={isAddAppointmentDialogOpen} onOpenChange={setIsAddAppointmentDialogOpen}>
           <DialogTrigger asChild>
             <Button>
