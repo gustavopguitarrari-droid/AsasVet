@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
 import AppointmentDateSelector from "./AppointmentDateSelector"; // Importar o novo seletor de data
+import { Client, Pet } from "@/types/cadastro"; // Importar as interfaces Client e Pet
 
 // Mock de veterinários para o select
 const mockVeterinarians = [
@@ -44,11 +45,8 @@ const formSchema = z.object({
   }),
   date: z.date().optional(), // Optional, as it's only required if dateOption is "specific"
   time: z.string().min(1, "A hora da consulta é obrigatória."),
-  client: z.string().min(1, "O nome do cliente é obrigatório."),
-  pet: z.string().min(1, "O nome do animal é obrigatório."),
-  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
-    required_error: "A espécie do animal é obrigatória.",
-  }),
+  clientId: z.string().min(1, "O tutor é obrigatório."), // Novo campo para ID do cliente
+  petId: z.string().min(1, "O animal é obrigatório."),     // Novo campo para ID do pet
   service: z.enum(serviceOptions, { // Usar o array de opções para o enum
     required_error: "O serviço é obrigatório.",
   }),
@@ -69,31 +67,48 @@ interface AppointmentFormProps {
   onSubmit: (data: AppointmentFormValues) => void;
   initialData?: { // Simplified initialData type for clarity in this context
     time?: string;
-    client?: string;
-    pet?: string;
-    species?: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros";
+    clientId?: string; // Usar clientId
+    petId?: string;     // Usar petId
     service?: typeof serviceOptions[number];
     veterinarian?: string;
     date?: string; // Date as string from existing appointment
     status?: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento"; // Status as string
   };
+  allClients: Client[]; // Receber todos os clientes
+  allPets: Pet[];       // Receber todos os pets
 }
 
-const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData }) => {
+const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData, allClients, allPets }) => {
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      // If initialData has a date, assume it's a specific date, otherwise default to today
       dateOption: initialData?.date ? "specific" : "today",
       date: initialData?.date ? new Date(initialData.date) : undefined,
       time: initialData?.time || format(new Date(), "HH:mm"),
-      client: initialData?.client || "",
-      pet: initialData?.pet || "", // Alterado para string vazia
-      species: initialData?.species || "Cachorro",
+      clientId: initialData?.clientId || "",
+      petId: initialData?.petId || "",
       service: initialData?.service || serviceOptions[0],
       veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
     },
   });
+
+  const selectedClientId = form.watch("clientId");
+  const petsForSelectedClient = React.useMemo(() => {
+    return allPets.filter(pet => pet.ownerId === selectedClientId);
+  }, [selectedClientId, allPets]);
+
+  // Reset petId if selected client changes and the current pet is no longer valid
+  React.useEffect(() => {
+    if (selectedClientId && form.getValues("petId")) {
+      const currentPetBelongsToClient = petsForSelectedClient.some(
+        (pet) => pet.id === form.getValues("petId")
+      );
+      if (!currentPetBelongsToClient) {
+        form.setValue("petId", "");
+      }
+    }
+  }, [selectedClientId, petsForSelectedClient, form]);
+
 
   return (
     <Form {...form}>
@@ -114,49 +129,50 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
         />
         <FormField
           control={form.control}
-          name="client"
+          name="clientId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Cliente</FormLabel>
-              <FormControl>
-                <Input placeholder="Nome do cliente" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="pet"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Animal</FormLabel>
-              <FormControl>
-                <Input placeholder="Nome do animal" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="species"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Espécie</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormLabel>Tutor</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione a espécie" />
+                    <SelectValue placeholder="Selecione o tutor" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="Cachorro">Cachorro</SelectItem>
-                  <SelectItem value="Gato">Gato</SelectItem>
-                  <SelectItem value="Pássaro">Pássaro</SelectItem>
-                  <SelectItem value="Roedor">Roedor</SelectItem>
-                  <SelectItem value="Peixe">Peixe</SelectItem>
-                  <SelectItem value="Outros">Outros</SelectItem>
+                  {allClients.map((client) => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="petId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Animal</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value} disabled={!selectedClientId}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o animal" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {petsForSelectedClient.length === 0 ? (
+                    <SelectItem value="no-pets" disabled>Nenhum animal para este tutor</SelectItem>
+                  ) : (
+                    petsForSelectedClient.map((pet) => (
+                      <SelectItem key={pet.id} value={pet.id}>
+                        {pet.name} ({pet.species})
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
               <FormMessage />

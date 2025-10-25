@@ -19,6 +19,8 @@ import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 import AppointmentChronometer from "@/components/AppointmentChronometer"; // Importa o novo componente
 import { format } from "date-fns"; // Importar format para a data
+import { Client, Pet } from "@/types/cadastro"; // Importar as interfaces Client e Pet
+import { initialMockClients, initialMockPets } from "./Cadastro"; // Importar os mocks de Cadastro
 
 interface Appointment {
   id: string;
@@ -64,6 +66,10 @@ const Appointments = () => {
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
   const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false); // Estado para o novo diálogo
 
+  // Estados para clientes e pets
+  const [clients, setClients] = React.useState<Client[]>(initialMockClients);
+  const [pets, setPets] = React.useState<Pet[]>(initialMockPets);
+
   const filteredAppointments = appointments.filter((appointment) => {
     // A busca por termo foi removida, então apenas o filtro por aba é aplicado
     let matchesTab = false;
@@ -89,13 +95,22 @@ const Appointments = () => {
       ? format(new Date(), "yyyy-MM-dd")
       : data.date ? format(data.date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"); // Fallback para hoje se data específica não for selecionada
 
+    // Encontrar o cliente e o pet selecionados pelos IDs
+    const selectedClient = clients.find(c => c.id === data.clientId);
+    const selectedPet = pets.find(p => p.id === data.petId);
+
+    if (!selectedClient || !selectedPet) {
+      console.error("Cliente ou Pet não encontrado para os IDs selecionados.");
+      return;
+    }
+
     const newAppointment: Appointment = {
       id: `C${(appointments.length + 1).toString().padStart(3, '0')}`, // Gerar um ID simples
       date: appointmentDate,
       time: data.time,
-      client: data.client,
-      pet: data.pet,
-      species: data.species,
+      client: selectedClient.name, // Usar o nome do cliente encontrado
+      pet: selectedPet.name,       // Usar o nome do pet encontrado
+      species: selectedPet.species, // Usar a espécie do pet encontrado
       service: data.service,
       veterinarian: data.veterinarian,
       status: "Agendada", // Status padrão definido automaticamente
@@ -166,7 +181,11 @@ const Appointments = () => {
             <DialogHeader>
               <DialogTitle>Incluir Nova Consulta</DialogTitle>
             </DialogHeader>
-            <AppointmentForm onSubmit={handleAddAppointment} />
+            <AppointmentForm
+              onSubmit={handleAddAppointment}
+              allClients={clients} // Passar todos os clientes
+              allPets={pets}       // Passar todos os pets
+            />
           </DialogContent>
         </Dialog>
       </div>
