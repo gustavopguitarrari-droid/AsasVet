@@ -69,6 +69,11 @@
     --profile-header-gradient-start: 222.2 47.4% 15%; /* Darker blue */
     --profile-header-gradient-end: 222.2 47.4% 45%;   /* Lighter blue */
     --profile-header-pattern-color: 210 40% 98%; /* primary-foreground */
+
+    /* Login Background Art - Light Mode */
+    --login-background-gradient-start: 222.2 47.4% 90%; /* Light blue-ish */
+    --login-background-gradient-end: 210 40% 96.1%;   /* Muted background */
+    --login-background-pattern-color: 215.4 16.3% 46.9%; /* Muted foreground */
   }
 
   .dark {
@@ -124,17 +129,22 @@
 
     --event-color-consulta: 220 80% 70%;
     --event-color-cirurgia: 0 62.8% 30.6%;
-    --event-color-vacina: 140 70% 70%;
-    --event-color-exame: 30 90% 70%;
-    --event-color-retorno: 270 70% 70%;
-    --event-color-outros: 40 40% 60%;
+    --event-color-vacina: 150 60% 65%;
+    --event-color-exame: 170 80% 55%;
+    --event-color-retorno: 190 70% 70%;
+    --event-color-outros: 200 60% 60%;
 
-    --green-500: 142.1 76.2% 36.3%; /* Default green for success */
+    --green-500: 142.1 76.2% 36.3%;
 
     /* Profile Header Art Background - Dark Mode */
     --profile-header-gradient-start: 222.2 47.4% 25%; /* Darker blue in dark mode */
     --profile-header-gradient-end: 222.2 47.4% 55%;   /* Lighter blue in dark mode */
     --profile-header-pattern-color: 210 40% 98%; /* primary-foreground */
+
+    /* Login Background Art - Dark Mode */
+    --login-background-gradient-start: 222.2 84% 10%; /* Darker background */
+    --login-background-gradient-end: 217.2 32.6% 17.5%; /* Secondary background */
+    --login-background-pattern-color: 215 20.2% 65.1%; /* Muted foreground */
   }
 
   /* Custom Color Themes - Light Mode Overrides */
@@ -184,6 +194,11 @@
     --profile-header-gradient-start: 142.1 76.2% 15%;
     --profile-header-gradient-end: 142.1 76.2% 45%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Green Theme Light Mode */
+    --login-background-gradient-start: 142.1 76.2% 90%;
+    --login-background-gradient-end: 142.1 76.2% 80%;
+    --login-background-pattern-color: 142.1 76.2% 40%;
   }
 
   /* Purple Theme */
@@ -230,6 +245,11 @@
     --profile-header-gradient-start: 262.1 83.3% 15%;
     --profile-header-gradient-end: 262.1 83.3% 45%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Purple Theme Light Mode */
+    --login-background-gradient-start: 262.1 83.3% 90%;
+    --login-background-gradient-end: 262.1 83.3% 80%;
+    --login-background-pattern-color: 262.1 83.3% 40%;
   }
 
   /* Orange Theme */
@@ -276,6 +296,11 @@
     --profile-header-gradient-start: 28.1 91.2% 15%;
     --profile-header-gradient-end: 28.1 91.2% 45%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Orange Theme Light Mode */
+    --login-background-gradient-start: 28.1 91.2% 90%;
+    --login-background-gradient-end: 28.1 91.2% 80%;
+    --login-background-pattern-color: 28.1 91.2% 40%;
   }
 
   /* Teal Theme */
@@ -322,6 +347,11 @@
     --profile-header-gradient-start: 177.1 70% 15%;
     --profile-header-gradient-end: 177.1 70% 45%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Teal Theme Light Mode */
+    --login-background-gradient-start: 177.1 70% 90%;
+    --login-background-gradient-end: 177.1 70% 80%;
+    --login-background-pattern-color: 177.1 70% 40%;
   }
 
   /* Pink Theme */
@@ -368,6 +398,11 @@
     --profile-header-gradient-start: 330 80% 15%;
     --profile-header-gradient-end: 330 80% 45%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Pink Theme Light Mode */
+    --login-background-gradient-start: 330 80% 90%;
+    --login-background-gradient-end: 330 80% 80%;
+    --login-background-pattern-color: 330 80% 40%;
   }
 
   /* Brown Theme */
@@ -403,9 +438,9 @@
 
     --event-color-consulta: 30 40% 35%;
     --event-color-cirurgia: 0 84.2% 60.2%;
-    --event-color-vacina: 40 35% 40%;
+    --event-color-vacina: 40 35% 50%;
     --event-color-exame: 20 45% 30%;
-    --event-color-retorno: 50 35% 45%;
+    --event-color-retorno: 50 35% 55%;
     --event-color-outros: 60 30% 35%;
 
     --green-500: 142.1 76.2% 36.3%;
@@ -414,6 +449,11 @@
     --profile-header-gradient-start: 30 40% 15%;
     --profile-header-gradient-end: 30 40% 45%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Brown Theme Light Mode */
+    --login-background-gradient-start: 30 40% 90%;
+    --login-background-gradient-end: 30 40% 80%;
+    --login-background-pattern-color: 30 40% 40%;
   }
 
   /* Custom Color Themes - Dark Mode Overrides */
@@ -463,6 +503,11 @@
     --profile-header-gradient-start: 142.1 76.2% 25%;
     --profile-header-gradient-end: 142.1 76.2% 55%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Green Theme Dark Mode */
+    --login-background-gradient-start: 142.1 76.2% 20%;
+    --login-background-gradient-end: 142.1 76.2% 30%;
+    --login-background-pattern-color: 142.1 76.2% 70%;
   }
 
   /* Purple Theme (Dark Mode) */
@@ -509,6 +554,11 @@
     --profile-header-gradient-start: 262.1 83.3% 25%;
     --profile-header-gradient-end: 262.1 83.3% 55%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Purple Theme Dark Mode */
+    --login-background-gradient-start: 262.1 83.3% 20%;
+    --login-background-gradient-end: 262.1 83.3% 30%;
+    --login-background-pattern-color: 262.1 83.3% 70%;
   }
 
   /* Orange Theme (Dark Mode) */
@@ -555,6 +605,11 @@
     --profile-header-gradient-start: 28.1 91.2% 25%;
     --profile-header-gradient-end: 28.1 91.2% 55%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Orange Theme Dark Mode */
+    --login-background-gradient-start: 28.1 91.2% 20%;
+    --login-background-gradient-end: 28.1 91.2% 30%;
+    --login-background-pattern-color: 28.1 91.2% 70%;
   }
 
   /* Teal Theme (Dark Mode) */
@@ -601,6 +656,11 @@
     --profile-header-gradient-start: 177.1 70% 25%;
     --profile-header-gradient-end: 177.1 70% 55%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Teal Theme Dark Mode */
+    --login-background-gradient-start: 177.1 70% 20%;
+    --login-background-gradient-end: 177.1 70% 30%;
+    --login-background-pattern-color: 177.1 70% 70%;
   }
 
   /* Pink Theme (Dark Mode) */
@@ -647,6 +707,11 @@
     --profile-header-gradient-start: 330 80% 25%;
     --profile-header-gradient-end: 330 80% 55%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Pink Theme Dark Mode */
+    --login-background-gradient-start: 330 80% 20%;
+    --login-background-gradient-end: 330 80% 30%;
+    --login-background-pattern-color: 330 80% 70%;
   }
 
   /* Brown Theme (Dark Mode) */
@@ -693,6 +758,11 @@
     --profile-header-gradient-start: 30 40% 25%;
     --profile-header-gradient-end: 30 40% 55%;
     --profile-header-pattern-color: 210 40% 98%;
+
+    /* Login Background Art - Brown Theme Dark Mode */
+    --login-background-gradient-start: 30 40% 20%;
+    --login-background-gradient-end: 30 40% 30%;
+    --login-background-pattern-color: 30 40% 70%;
   }
 }
 
@@ -715,6 +785,16 @@
   background-image: linear-gradient(135deg, hsl(var(--profile-header-gradient-start)), hsl(var(--profile-header-gradient-end))),
                     url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'><circle cx='20' cy='20' r='8' fill='hsl(var(--profile-header-pattern-color))' opacity='0.1'/><circle cx='80' cy='50' r='6' fill='hsl(var(--profile-header-pattern-color))' opacity='0.08'/><circle cx='50' cy='80' r='7' fill='hsl(var(--profile-header-pattern-color))' opacity='0.12'/><rect x='45' y='10' width='10' height='10' fill='hsl(var(--profile-header-pattern-color))' opacity='0.05' transform='rotate(45 50 15)'/><rect x='45' y='45' width='10' height='10' fill='hsl(var(--profile-header-pattern-color))' opacity='0.05' transform='rotate(45 50 50)'/></svg>"); /* Círculos e quadrados rotacionados para um 'plus' abstrato */
   background-size: cover, 100px 100px; /* Cover para o gradiente, 100x100 para o padrão */
+  background-repeat: no-repeat, repeat;
+  background-position: center center, 0 0;
+}
+
+/* Nova classe para o fundo artístico da página de login */
+.login-art-bg {
+  background: linear-gradient(135deg, hsl(var(--login-background-gradient-start)), hsl(var(--login-background-gradient-end)));
+  background-image: linear-gradient(135deg, hsl(var(--login-background-gradient-start)), hsl(var(--login-background-gradient-end))),
+                    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'><circle cx='10' cy='10' r='4' fill='hsl(var(--login-background-pattern-color))' opacity='0.05'/><circle cx='40' cy='40' r='6' fill='hsl(var(--login-background-pattern-color))' opacity='0.07'/><circle cx='70' cy='70' r='5' fill='hsl(var(--login-background-pattern-color))' opacity='0.06'/><rect x='5' y='35' width='10' height='10' fill='hsl(var(--login-background-pattern-color))' opacity='0.03' transform='rotate(30 10 40)'/><rect x='65' y='5' width='10' height='10' fill='hsl(var(--login-background-pattern-color))' opacity='0.04' transform='rotate(60 70 10)'/></svg>");
+  background-size: cover, 80px 80px;
   background-repeat: no-repeat, repeat;
   background-position: center center, 0 0;
 }
