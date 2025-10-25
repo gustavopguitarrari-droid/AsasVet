@@ -5,10 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User as UserIcon, Mail, Briefcase, Cake, Clock, Plus } from "lucide-react";
 import { useUser } from "@/context/UserContext";
-import { format, parseISO, differenceInMonths, differenceInYears } from "date-fns";
+import { format, parseISO, differenceInMonths, differenceInYears, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // Importar Tooltip components
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 // Import new editable components
 import EditableField from "@/components/EditableField";
@@ -16,9 +16,46 @@ import EditableRoleField from "@/components/EditableRoleField";
 import EditableBirthdayField from "@/components/EditableBirthdayField";
 import ProfilePictureUploadDialog from "@/components/ProfilePictureUploadDialog"; // Importar o novo diálogo
 
+import { useMutation, useQueryClient } from "@tanstack/react-query"; // Importar useMutation e useQueryClient
+import { supabase } from "@/integrations/supabase/client"; // Importar o cliente Supabase
+import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
+
 const Profile = () => {
   const { user, setUser } = useUser();
-  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false); // Novo estado para o diálogo de upload
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  // Mutation para atualizar o perfil no Supabase
+  const updateProfileMutation = useMutation({
+    mutationFn: async (updates: { [key: string]: any }) => {
+      if (!user?.id) throw new Error("User not authenticated.");
+      const { data, error } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', user.id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      // Atualiza o contexto do usuário com os novos dados
+      setUser((prevUser) => ({
+        ...prevUser!,
+        name: data.first_name,
+        lastName: data.last_name,
+        email: data.email,
+        avatarUrl: data.avatar_url || undefined,
+        role: data.role,
+        birthday: data.birthday || undefined,
+      }));
+      queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] }); // Invalida o cache para rebuscar se necessário
+      showSuccess("Perfil atualizado com sucesso!");
+    },
+    onError: (error) => {
+      showError(`Erro ao atualizar perfil: ${error.message}`);
+    },
+  });
 
   if (!user) {
     return (
@@ -30,27 +67,27 @@ const Profile = () => {
 
   // Handlers for individual field saves
   const handleSaveName = (newName: string) => {
-    setUser({ ...user, name: newName });
+    updateProfileMutation.mutate({ first_name: newName });
   };
 
   const handleSaveLastName = (newLastName: string) => {
-    setUser({ ...user, lastName: newLastName });
+    updateProfileMutation.mutate({ last_name: newLastName });
   };
 
   const handleSaveEmail = (newEmail: string) => {
-    setUser({ ...user, email: newEmail });
+    updateProfileMutation.mutate({ email: newEmail });
   };
 
   const handleSaveRole = (newRole: string) => {
-    setUser({ ...user, role: newRole });
+    updateProfileMutation.mutate({ role: newRole });
   };
 
   const handleSaveBirthday = (newBirthday?: string) => {
-    setUser({ ...user, birthday: newBirthday });
+    updateProfileMutation.mutate({ birthday: newBirthday });
   };
 
   const handleSaveAvatar = (newAvatarUrl: string) => {
-    setUser({ ...user, avatarUrl: newAvatarUrl || undefined }); // Define como undefined se a URL for vazia
+    updateProfileMutation.mutate({ avatar_url: newAvatarUrl || null }); // Salva null se a URL for vazia
   };
 
   let timeInCompany = "N/A";
