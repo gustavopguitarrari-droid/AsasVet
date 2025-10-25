@@ -109,7 +109,6 @@ serve(async (req) => {
 
     if (updateAuthUserError) {
       console.error('Edge Function: Error updating auth.users metadata:', updateAuthUserError.message);
-      // IMPORTANT: Return a non-2xx status here as well if this update fails
       return new Response(JSON.stringify({ error: `Failed to update user metadata: ${updateAuthUserError.message}` }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -117,14 +116,14 @@ serve(async (req) => {
     }
     console.log('Edge Function: User metadata updated in auth.users.');
 
-    console.log('Edge Function: Sub-user role updated successfully.');
+    console.log('Edge Function: Sub-user role updated successfully. Returning 200 OK.');
     return new Response(JSON.stringify({ message: 'Sub-user role updated successfully' }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
-    console.error('Edge Function: Unhandled error:', error); // Log the full error object
+    console.error('Edge Function: Unhandled error:', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
