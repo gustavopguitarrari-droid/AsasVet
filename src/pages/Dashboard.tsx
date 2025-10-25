@@ -234,6 +234,11 @@ const Dashboard = () => {
           <p className="text-muted-foreground">
             Visão geral do seu consultório veterinário.
           </p>
+          {user?.role === "Administrador" && (
+            <p className="text-green-600 font-semibold mt-2">
+              (Você está logado como Administrador e tem acesso total ao sistema.)
+            </p>
+          )}
         </div>
         <Button
           onClick={() => setIsConfiguratorOpen(true)}
