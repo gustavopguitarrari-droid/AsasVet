@@ -53,40 +53,37 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         } else if (event === 'SIGNED_OUT') {
           setAppUser(null);
           navigate('/login');
-        } else if (event === 'INITIAL_SESSION' && !currentSession) {
-          navigate('/login');
         }
+        // Removido: else if (event === 'INITIAL_SESSION' && !currentSession) { navigate('/login'); }
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+    supabase.auth.getSession().then(async ({ data: { session: initialSession } }) => {
       setSession(initialSession);
       setUserState(initialSession?.user || null);
       setIsLoading(false);
-      if (!initialSession) {
-        navigate('/login');
-      } else {
-        supabase
+      if (initialSession) { // Apenas busca o perfil se houver uma sessão inicial
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', initialSession.user.id)
-          .single()
-          .then(({ data: profileData, error: profileError }) => {
-            if (profileError && profileError.code !== 'PGRST116') {
-              console.error('Error fetching profile on initial session:', profileError);
-            }
-            setAppUser({
-              id: initialSession.user.id, // Passando o ID do usuário
-              name: profileData?.first_name || initialSession.user.user_metadata.first_name || '',
-              lastName: profileData?.last_name || initialSession.user.user_metadata.last_name || '',
-              email: initialSession.user.email || '',
-              avatarUrl: profileData?.avatar_url || initialSession.user.user_metadata.avatar_url || undefined,
-              role: profileData?.role || initialSession.user.user_metadata.role || 'Usuário',
-              birthday: profileData?.birthday || initialSession.user.user_metadata.birthday || undefined,
-              registeredTime: profileData?.registered_time || initialSession.user.created_at,
-            });
-          });
+          .single();
+
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Error fetching profile on initial session:', profileError);
+        }
+        setAppUser({
+          id: initialSession.user.id, // Passando o ID do usuário
+          name: profileData?.first_name || initialSession.user.user_metadata.first_name || '',
+          lastName: profileData?.last_name || initialSession.user.user_metadata.last_name || '',
+          email: initialSession.user.email || '',
+          avatarUrl: profileData?.avatar_url || initialSession.user.user_metadata.avatar_url || undefined,
+          role: profileData?.role || initialSession.user.user_metadata.role || 'Usuário',
+          birthday: profileData?.birthday || initialSession.user.user_metadata.birthday || undefined,
+          registeredTime: profileData?.registered_time || initialSession.user.created_at,
+        });
       }
+      // Removido: else { navigate('/login'); }
     });
 
     return () => {
