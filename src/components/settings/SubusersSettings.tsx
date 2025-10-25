@@ -7,13 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/UserContext";
-import { useForm } from "react-hook-form"; // Removido, pois o formulário foi movido
-import { zodResolver } from "@hookform/resolvers/zod"; // Removido
-import * as z from "zod"; // Removido
 import { showSuccess, showError } from "@/utils/toast";
 import { supabase } from "@/integrations/supabase/client";
 import RoleSelect from "@/components/RoleSelect";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // Removido, pois o formulário foi movido
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Table,
@@ -47,12 +43,9 @@ interface SubuserProfile {
   gender: string;
 }
 
-// Removido formSchema e SubuserFormValues, pois foram movidos para AddSubuserDialog
-
 const SubusersSettings: React.FC = () => {
   const { user } = useUser();
   const queryClient = useQueryClient();
-  // Removido useForm, pois o formulário foi movido
 
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [tempRole, setTempRole] = useState<string>("");
@@ -73,8 +66,6 @@ const SubusersSettings: React.FC = () => {
     },
     enabled: user?.role === "Administrador", // Only fetch if current user is admin
   });
-
-  // Removido createSubuserMutation, pois foi movido para AddSubuserDialog
 
   // Mutation for deleting a subuser
   const deleteSubuserMutation = useMutation({
@@ -118,7 +109,21 @@ const SubusersSettings: React.FC = () => {
         },
       });
 
-      if (error) throw new Error(error.message);
+      if (error) {
+        // Tenta extrair a mensagem de erro do corpo da resposta da Edge Function
+        let errorMessage = error.message;
+        if (error.context && error.context.data) {
+          try {
+            const errorData = JSON.parse(error.context.data);
+            if (errorData.error) {
+              errorMessage = errorData.error;
+            }
+          } catch (parseError) {
+            console.error("Failed to parse Edge Function error response:", parseError);
+          }
+        }
+        throw new Error(errorMessage);
+      }
       if (responseData.error) throw new Error(responseData.error);
       return responseData;
     },
@@ -133,8 +138,6 @@ const SubusersSettings: React.FC = () => {
       showError(`Erro ao atualizar cargo: ${err.message}`);
     },
   });
-
-  // Removido handleCreateSubuser
 
   const handleDeleteSubuser = (userId: string) => {
     deleteSubuserMutation.mutate(userId);
