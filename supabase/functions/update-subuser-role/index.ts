@@ -9,11 +9,11 @@ const corsHeaders = {
 serve(async (req) => {
   console.log('Edge Function: Request received for update-subuser-role.');
 
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  try { // Outer try-catch to catch any early errors, e.g., with req.json()
+    if (req.method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders });
+    }
 
-  try {
     console.log('Edge Function: update-subuser-role started within try block.');
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -126,8 +126,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Edge Function: Unhandled error in catch block:', error);
-    // Ensure error.message is a string, or provide a fallback
+    console.error('Edge Function: Unhandled error in outer catch block:', error);
     const errorMessage = (error instanceof Error) ? error.message : String(error);
     return new Response(JSON.stringify({ error: `Internal Server Error: ${errorMessage}` }), {
       status: 500,
