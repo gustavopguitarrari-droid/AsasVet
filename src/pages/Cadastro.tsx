@@ -11,19 +11,71 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon } from "lucide-react";
+import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SpeciesFilter from "@/components/SpeciesFilter";
 import PetDetailsDialog from "@/components/PetDetailsDialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"; // Importar Dialog
-import ClientForm, { ClientFormValues } from "@/components/ClientForm"; // Importar o novo ClientForm
-import { Client, Pet } from "@/types/cadastro"; // Importar as novas interfaces
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import ClientForm, { ClientFormValues } from "@/components/ClientForm";
+import { Client, Pet } from "@/types/cadastro";
+import { format } from "date-fns";
 
 // Mock de dados para Tutores
 const initialMockClients: Client[] = [
-  { id: "CL001", name: "João Silva", email: "joao.silva@example.com", phone: "(11) 98765-4321" },
-  { id: "CL002", name: "Maria Souza", email: "maria.souza@example.com", phone: "(21) 91234-5678" },
-  { id: "CL003", name: "Pedro Santos", email: "pedro.santos@example.com", phone: "(31) 99876-1234" },
+  {
+    id: "CL001",
+    name: "João Silva",
+    email: "joao.silva@example.com",
+    phone: "(11) 98765-4321",
+    cpf: "123.456.789-00",
+    dateOfBirth: "1985-03-10",
+    address: {
+      cep: "01001-000",
+      street: "Praça da Sé",
+      number: "S/N",
+      complement: "lado ímpar",
+      neighborhood: "Sé",
+      city: "São Paulo",
+      state: "SP",
+    },
+    photoUrl: undefined,
+  },
+  {
+    id: "CL002",
+    name: "Maria Souza",
+    email: "maria.souza@example.com",
+    phone: "(21) 91234-5678",
+    cpf: "987.654.321-00",
+    dateOfBirth: "1990-07-22",
+    address: {
+      cep: "20040-009",
+      street: "Rua da Assembleia",
+      number: "10",
+      complement: "sala 1001",
+      neighborhood: "Centro",
+      city: "Rio de Janeiro",
+      state: "RJ",
+    },
+    photoUrl: undefined,
+  },
+  {
+    id: "CL003",
+    name: "Pedro Santos",
+    email: "pedro.santos@example.com",
+    phone: "(31) 99876-1234",
+    cpf: "111.222.333-44",
+    dateOfBirth: "1978-11-05",
+    address: {
+      cep: "30130-000",
+      street: "Avenida Afonso Pena",
+      number: "500",
+      complement: "",
+      neighborhood: "Centro",
+      city: "Belo Horizonte",
+      state: "MG",
+    },
+    photoUrl: undefined,
+  },
 ];
 
 // Mock de dados para Animais
@@ -74,6 +126,10 @@ const Cadastro = () => {
       name: data.name,
       email: data.email,
       phone: data.phone,
+      cpf: data.cpf,
+      dateOfBirth: format(data.dateOfBirth, "yyyy-MM-dd"),
+      address: data.address,
+      photoUrl: data.photoUrl,
     };
     setClients((prev) => [...prev, newClient]);
 
@@ -107,7 +163,10 @@ const Cadastro = () => {
   const filteredClients = clients.filter((client) =>
     client.name.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
     client.email.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
-    client.phone.toLowerCase().includes(clientSearchTerm.toLowerCase())
+    client.phone.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+    client.cpf.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+    client.address.city.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+    client.address.state.toLowerCase().includes(clientSearchTerm.toLowerCase())
   );
 
   return (
@@ -121,14 +180,14 @@ const Cadastro = () => {
                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Adicionar Novo Tutor</DialogTitle>
               </DialogHeader>
               <ClientForm
                 onSubmit={handleAddClient}
                 onCancel={() => setIsAddClientDialogOpen(false)}
-                allPets={pets} // Passa todos os pets para seleção
+                allPets={pets}
               />
             </DialogContent>
           </Dialog>
@@ -154,7 +213,7 @@ const Cadastro = () => {
           <div className="flex items-center space-x-2 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Buscar tutores..." className="pl-9" value={clientSearchTerm} onChange={(e) => setClientSearchTerm(e.target.value)} />
+              <Input placeholder="Buscar tutores por nome, email, telefone, CPF ou cidade..." className="pl-9" value={clientSearchTerm} onChange={(e) => setClientSearchTerm(e.target.value)} />
             </div>
           </div>
 
@@ -162,11 +221,12 @@ const Cadastro = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>ID</TableHead>
                   <TableHead>Nome</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Telefone</TableHead>
-                  <TableHead>Animais</TableHead> {/* Nova coluna para animais */}
+                  <TableHead>CPF</TableHead>
+                  <TableHead>Nascimento</TableHead>
+                  <TableHead>Contato</TableHead>
+                  <TableHead>Endereço</TableHead>
+                  <TableHead>Animais</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -176,10 +236,18 @@ const Cadastro = () => {
                     const associatedPets = pets.filter(pet => pet.ownerId === client.id);
                     return (
                       <TableRow key={client.id}>
-                        <TableCell className="font-medium">{client.id}</TableCell>
-                        <TableCell>{client.name}</TableCell>
-                        <TableCell>{client.email}</TableCell>
-                        <TableCell>{client.phone}</TableCell>
+                        <TableCell className="font-medium">{client.name}</TableCell>
+                        <TableCell>{client.cpf}</TableCell>
+                        <TableCell>{format(new Date(client.dateOfBirth), "dd/MM/yyyy")}</TableCell>
+                        <TableCell>
+                          <p className="flex items-center text-sm"><Mail className="h-3 w-3 mr-1 text-muted-foreground" /> {client.email}</p>
+                          <p className="flex items-center text-sm"><Phone className="h-3 w-3 mr-1 text-muted-foreground" /> {client.phone}</p>
+                        </TableCell>
+                        <TableCell>
+                          <p className="flex items-center text-sm"><Home className="h-3 w-3 mr-1 text-muted-foreground" /> {client.address.street}, {client.address.number} {client.address.complement}</p>
+                          <p className="flex items-center text-sm"><MapPin className="h-3 w-3 mr-1 text-muted-foreground" /> {client.address.neighborhood}, {client.address.city} - {client.address.state}</p>
+                          <p className="text-xs text-muted-foreground ml-4">CEP: {client.address.cep}</p>
+                        </TableCell>
                         <TableCell>
                           {associatedPets.length > 0 ? (
                             <ul className="list-disc list-inside text-sm text-muted-foreground">
@@ -199,7 +267,7 @@ const Cadastro = () => {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="h-24 text-center">
+                    <TableCell colSpan={7} className="h-24 text-center">
                       Nenhum tutor encontrado.
                     </TableCell>
                   </TableRow>
@@ -233,7 +301,7 @@ const Cadastro = () => {
                   <TableHead>Nome</TableHead>
                   <TableHead>Espécie</TableHead>
                   <TableHead>Raça</TableHead>
-                  <TableHead>Tutor</TableHead> {/* Alterado para Tutor */}
+                  <TableHead>Tutor</TableHead>
                   <TableHead>ID</TableHead>
                 </TableRow>
               </TableHeader>
@@ -250,7 +318,7 @@ const Cadastro = () => {
                           {pet.species}
                         </TableCell>
                         <TableCell>{pet.breed}</TableCell>
-                        <TableCell>{owner ? owner.name : "N/A"}</TableCell> {/* Exibe o nome do tutor */}
+                        <TableCell>{owner ? owner.name : "N/A"}</TableCell>
                         <TableCell>{pet.id}</TableCell>
                       </TableRow>
                     );
@@ -267,7 +335,7 @@ const Cadastro = () => {
           </div>
 
           <PetDetailsDialog
-            pet={selectedPet ? { ...selectedPet, owner: clients.find(c => c.id === selectedPet.ownerId)?.name || "N/A" } : null} // Passa o nome do tutor
+            pet={selectedPet ? { ...selectedPet, owner: clients.find(c => c.id === selectedPet.ownerId)?.name || "N/A" } : null}
             isOpen={isPetDetailsDialogOpen}
             onClose={() => setIsPetDetailsDialogOpen(false)}
           />

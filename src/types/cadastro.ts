@@ -3,6 +3,18 @@ export interface Client {
   name: string;
   email: string;
   phone: string;
+  cpf: string; // Novo campo
+  dateOfBirth: string; // Novo campo (formato YYYY-MM-DD)
+  address: { // Novo campo de endereço
+    cep: string;
+    street: string;
+    number: string;
+    complement?: string;
+    neighborhood: string;
+    city: string;
+    state: string;
+  };
+  photoUrl?: string; // Novo campo para URL da foto
 }
 
 export interface Pet {
