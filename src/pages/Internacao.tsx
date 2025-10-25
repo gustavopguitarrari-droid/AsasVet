@@ -190,7 +190,7 @@ const Internacao = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['interned_patients'] });
+      queryClient.invalidateQueries({ queryKey: ['interned_patients', userId] });
       showSuccess("Paciente internado com sucesso!");
       setIsAddDialogOpen(false);
     },
@@ -225,12 +225,24 @@ const Internacao = () => {
       return data;
     },
     onSuccess: async (data) => {
-      // Invalidate and refetch to ensure immediate UI update
-      await queryClient.invalidateQueries({ queryKey: ['interned_patients'] });
-      await queryClient.invalidateQueries({ queryKey: ['history_patients'] });
-      await refetchInternedPatients(); // Explicitly refetch the active patients list
+      // Invalidate specific queries
+      await queryClient.invalidateQueries({ queryKey: ['interned_patients', userId] });
+      await queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
+
+      // Manually update the cache for 'interned_patients' to remove the updated patient
+      // if its status is 'Alta' or 'Óbito'. This ensures immediate UI update.
+      queryClient.setQueryData<InternedPatient[]>(['interned_patients', userId], (oldData) => {
+        if (!oldData) return [];
+        if (data.status === "Alta" || data.status === "Óbito") {
+          return oldData.filter(patient => patient.id !== data.id);
+        }
+        // If for some reason the status is not Alta/Óbito, update the patient in the list
+        // (though this specific query should only contain active patients)
+        return oldData.map(patient => patient.id === data.id ? data : patient);
+      });
+
       showSuccess("Paciente atualizado com sucesso!");
-      setIsDetailsDialogOpen(false); // Close dialog AFTER refetch
+      setIsDetailsDialogOpen(false); // Close dialog AFTER cache update
     },
     onError: (error) => {
       showError(`Erro ao atualizar paciente: ${error.message}`);
@@ -281,7 +293,7 @@ const Internacao = () => {
       return results;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patient_actions'] });
+      queryClient.invalidateQueries({ queryKey: ['patient_actions', userId] });
       showSuccess("Ações do paciente salvas com sucesso!");
       setIsAddActionDialogOpen(false);
     },
@@ -308,7 +320,7 @@ const Internacao = () => {
       return results;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['patient_actions'] });
+      queryClient.invalidateQueries({ queryKey: ['patient_actions', userId] });
       showSuccess("Status das ações atualizado!");
       setIsConfirmActionsDialogOpen(false);
     },
@@ -575,7 +587,7 @@ const Internacao = () => {
           patientName={actionPatientName}
           date={actionDate}
           initialHour={actionHour}
-          allActionsForPatient={allActionsForCurrentPatient}
+          allActionsForCurrentPatient={allActionsForCurrentPatient}
         />
       )}
 
