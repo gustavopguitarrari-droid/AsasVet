@@ -57,6 +57,17 @@ interface ClientFormProps {
 }
 
 const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData, allPets }) => {
+  // Helper para analisar strings de data com segurança
+  const safeParseDate = (dateString?: string | null): Date => {
+    if (dateString) {
+      const parsed = parseISO(dateString);
+      if (isValid(parsed)) {
+        return parsed;
+      }
+    }
+    return new Date(); // Retorna a data atual como fallback se inválida ou não fornecida
+  };
+
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,10 +75,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
       email: initialData?.email || "",
       phone: initialData?.phone || "",
       cpf: initialData?.cpf || "",
-      // Garante que dateOfBirth seja sempre um objeto Date válido
-      dateOfBirth: initialData?.dateOfBirth && isValid(parseISO(initialData.dateOfBirth))
-        ? parseISO(initialData.dateOfBirth)
-        : new Date(),
+      dateOfBirth: safeParseDate(initialData?.dateOfBirth), // Usa a função safeParseDate
       address: {
         cep: initialData?.address?.cep || "",
         street: initialData?.address?.street || "",
@@ -78,7 +86,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
         state: initialData?.address?.state || "",
       },
       photoUrl: initialData?.photoUrl || undefined,
-      associatedPetIds: initialData?.associatedPetIds || [],
+      associatedPetIds: initialData?.associatedPetIds || [], // Garante que seja um array
     },
   });
 
