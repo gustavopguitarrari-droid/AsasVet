@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'; // Caminho de importação mais direto
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -105,15 +105,8 @@ serve(async (req) => {
     }
     console.log('Edge Function: Profile role updated in public.profiles.');
 
-    // Adicionando logs para inspecionar o objeto admin antes de chamar updateUser
-    console.log('Edge Function: Checking supabaseAdmin.auth.admin object...');
-    console.log('Type of supabaseAdmin.auth.admin:', typeof supabaseAdmin.auth.admin);
-    if (supabaseAdmin.auth.admin) {
-      console.log('Keys on supabaseAdmin.auth.admin:', Object.keys(supabaseAdmin.auth.admin));
-      console.log('Type of updateUser method:', typeof supabaseAdmin.auth.admin.updateUser);
-    }
-
-    const { error: updateAuthUserError } = await supabaseAdmin.auth.admin.updateUser(
+    // Usando updateUserById conforme a sugestão
+    const { error: updateAuthUserError } = await supabaseAdmin.auth.admin.updateUserById(
       userIdToUpdate,
       { user_metadata: { role: newRole } }
     );
