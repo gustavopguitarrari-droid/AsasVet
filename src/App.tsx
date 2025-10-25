@@ -18,6 +18,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login"; // Importar a página de Login
 import { SessionContextProvider } from "./context/SessionContext"; // Importar o SessionContextProvider
+import ProtectedRoute from "./components/ProtectedRoute"; // Importar o ProtectedRoute
 
 const queryClient = new QueryClient();
 
@@ -29,101 +30,125 @@ const App = () => (
       <BrowserRouter>
         <SessionContextProvider> {/* Envolve todo o aplicativo com o SessionContextProvider */}
           <Routes>
-            <Route path="/login" element={<Login />} /> {/* Rota para a página de Login */}
+            <Route path="/login" element={<Login />} /> {/* Rota para a página de Login (não protegida) */}
             <Route
               path="/"
               element={
-                <Layout>
-                  <Dashboard />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/painel"
               element={
-                <Layout>
-                  <Dashboard />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <Dashboard />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/cadastro"
               element={
-                <Layout>
-                  <Cadastro />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <Cadastro />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/consultas"
               element={
-                <Layout>
-                  <Appointments />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <Appointments />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/medical-records"
               element={
-                <Layout>
-                  <AgendamentosMedicos />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <AgendamentosMedicos />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/financeiro"
               element={
-                <Layout>
-                  <Financeiro />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <Financeiro />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/caixa"
               element={
-                <Layout>
-                  <Caixa />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <Caixa />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/internacao"
               element={
-                <Layout>
-                  <Internacao />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <Internacao />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/veterinarios"
               element={
-                <Layout>
-                  <Veterinarios />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <Veterinarios />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/estoque"
               element={
-                <Layout>
-                  <Estoque />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <Estoque />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/profile"
               element={
-                <Layout>
-                  <Profile />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <Profile />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/settings"
               element={
-                <Layout>
-                  <Settings />
-                </Layout>
+                <ProtectedRoute>
+                  <Layout>
+                    <Settings />
+                  </Layout>
+                </ProtectedRoute>
               }
             />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
