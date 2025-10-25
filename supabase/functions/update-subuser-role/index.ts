@@ -108,7 +108,7 @@ serve(async (req) => {
     );
 
     if (updateAuthUserError) {
-      console.error('Edge Function: Error updating auth.users metadata:', updateAuthUserError.message);
+      console.error('Edge Function: Error updating auth.users metadata:', updateAuthUserError); // Log the full error object
       return new Response(JSON.stringify({ error: `Failed to update user metadata: ${updateAuthUserError.message}` }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -124,7 +124,8 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Edge Function: Unhandled error:', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
+    // Return the actual error message for better debugging
+    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
