@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Layout from "./components/layout/Layout";
+import ProtectedRoute from "./components/ProtectedRoute"; // Importar ProtectedRoute
 import Dashboard from "./pages/Dashboard";
 import Cadastro from "./pages/Cadastro";
 import Appointments from "./pages/Appointments";
@@ -16,8 +16,9 @@ import Estoque from "./pages/Estoque";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
-import Login from "./pages/Login"; // Importar a página de Login
-import { SessionContextProvider } from "./context/SessionContext"; // Importar o SessionContextProvider
+import Login from "./pages/Login";
+import Index from "./pages/Index"; // Importar a página Index
+import { SessionContextProvider } from "./context/SessionContext";
 
 const queryClient = new QueryClient();
 
@@ -27,103 +28,98 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <SessionContextProvider> {/* Envolve todo o aplicativo com o SessionContextProvider */}
+        <SessionContextProvider>
           <Routes>
-            <Route path="/login" element={<Login />} /> {/* Rota para a página de Login */}
-            <Route
-              path="/"
-              element={
-                <Layout>
-                  <Dashboard />
-                </Layout>
-              }
-            />
+            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Index />} /> {/* Rota inicial que redireciona */}
+            
+            {/* Rotas Protegidas */}
             <Route
               path="/painel"
               element={
-                <Layout>
+                <ProtectedRoute>
                   <Dashboard />
-                </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/cadastro"
               element={
-                <Layout>
+                <ProtectedRoute>
                   <Cadastro />
-                </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/consultas"
               element={
-                <Layout>
+                <ProtectedRoute>
                   <Appointments />
-                </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/medical-records"
               element={
-                <Layout>
+                <ProtectedRoute>
                   <AgendamentosMedicos />
-                </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/financeiro"
               element={
-                <Layout>
+                <ProtectedRoute>
                   <Financeiro />
-                </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/caixa"
               element={
-                <Layout>
+                <ProtectedRoute>
                   <Caixa />
-                </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/internacao"
               element={
-                <Layout>
+                <ProtectedRoute>
                   <Internacao />
-                </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/veterinarios"
               element={
-                <Layout>
+                <ProtectedRoute>
                   <Veterinarios />
-                </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/estoque"
               element={
-                <Layout>
+                <ProtectedRoute>
                   <Estoque />
-                </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/profile"
               element={
-                <Layout>
+                <ProtectedRoute>
                   <Profile />
-                </Layout>
+                </ProtectedRoute>
               }
             />
             <Route
               path="/settings"
               element={
-                <Layout>
+                <ProtectedRoute>
                   <Settings />
-                </Layout>
+                </ProtectedRoute>
               }
             />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
