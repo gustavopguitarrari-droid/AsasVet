@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FormControl } from "@/components/ui/form";
+// Removido: import { FormControl } from "@/components/ui/form"; // Não é necessário aqui
 
 interface RoleSelectProps {
   value: string;
@@ -28,11 +28,10 @@ const mockRoles = [
 const RoleSelect: React.FC<RoleSelectProps> = ({ value, onValueChange }) => {
   return (
     <Select onValueChange={onValueChange} defaultValue={value}>
-      <FormControl>
-        <SelectTrigger>
-          <SelectValue placeholder="Selecione o cargo" />
-        </SelectTrigger>
-      </FormControl>
+      {/* FormControl removido daqui */}
+      <SelectTrigger>
+        <SelectValue placeholder="Selecione o cargo" />
+      </SelectTrigger>
       <SelectContent>
         {mockRoles.map((role) => (
           <SelectItem key={role} value={role}>
