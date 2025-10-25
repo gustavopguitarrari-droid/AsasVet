@@ -91,6 +91,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
       species: data.species,
       risk: data.risk,
     };
+    console.log("InternmentDetailsDialog: Submitting form, updatedPatient:", updatedPatient); // Log para verificar
     onUpdate(updatedPatient);
     setIsEditing(false);
     onClose();
@@ -103,6 +104,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
         status: "Alta",
         expected_discharge_date: format(new Date(), "yyyy-MM-dd"),
       };
+      console.log("InternmentDetailsDialog: Registering discharge, updatedPatient:", updatedPatient); // Log para verificar
       onUpdate(updatedPatient);
       onClose();
     }
@@ -115,6 +117,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
         status: "Óbito",
         expected_discharge_date: format(new Date(), "yyyy-MM-dd"),
       };
+      console.log("InternmentDetailsDialog: Registering obito, updatedPatient:", updatedPatient); // Log para verificar
       onUpdate(updatedPatient);
       onClose();
     }

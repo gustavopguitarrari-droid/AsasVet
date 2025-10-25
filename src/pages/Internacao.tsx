@@ -254,10 +254,14 @@ const Internacao = () => {
       console.log("updatePatientMutation onSuccess - Data received:", data);
       console.log("Updated patient status in onSuccess:", data.status);
       
-      // Invalidate both queries to ensure they refetch fresh data from Supabase
+      // Invalidate and refetch both queries to ensure they get fresh data from Supabase
       await queryClient.invalidateQueries({ queryKey: ['interned_patients', userId] });
+      await queryClient.refetchQueries({ queryKey: ['interned_patients', userId] });
+      console.log("Invalidated and refetched interned_patients query.");
+
       await queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
-      console.log("Invalidated interned_patients and history_patients queries.");
+      await queryClient.refetchQueries({ queryKey: ['history_patients', userId] });
+      console.log("Invalidated and refetched history_patients query.");
 
       showSuccess("Paciente atualizado com sucesso!");
       setIsDetailsDialogOpen(false); // Close dialog AFTER cache update
@@ -643,7 +647,7 @@ const Internacao = () => {
           patientName={actionPatientName}
           date={actionDate}
           initialHour={actionHour}
-          allActionsForCurrentPatient={allActionsForCurrentPatient}
+          allActionsForPatient={allActionsForCurrentPatient}
         />
       )}
 
