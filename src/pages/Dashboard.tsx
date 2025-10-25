@@ -222,7 +222,7 @@ const Dashboard = () => {
     if (!user) {
       return "Bem-vindo(a) ao AsasVet!";
     }
-    const prefix = user.gender === "feminino" ? "Dra." : "Dr.";
+    const prefix = user.gender === "Feminino" ? "Dra." : "Dr."; // Ajustado para "Feminino"
     return `Bem-vindo(a) ${prefix} ${user.name}!`;
   };
 

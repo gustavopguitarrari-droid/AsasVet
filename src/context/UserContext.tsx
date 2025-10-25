@@ -12,6 +12,7 @@ interface User {
   role?: string; // Tornar opcional
   birthday?: string;
   registeredTime: string;
+  gender?: string; // NOVO: Adicionado campo de gênero
 }
 
 interface UserContextType {

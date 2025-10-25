@@ -47,6 +47,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
             avatarUrl: profileData?.avatar_url || currentSession.user.user_metadata.avatar_url || undefined,
             role: profileData?.role || currentSession.user.user_metadata.role || 'Usuário',
             birthday: profileData?.birthday || currentSession.user.user_metadata.birthday || undefined,
+            gender: profileData?.gender || currentSession.user.user_metadata.gender || undefined, // NOVO: Carregar gênero
             registeredTime: profileData?.registered_time || currentSession.user.created_at,
           });
           console.log('User profile set after SIGNED_IN.');
@@ -95,6 +96,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
                 avatarUrl: profileData?.avatar_url || initialSession.user.user_metadata.avatar_url || undefined,
                 role: profileData?.role || initialSession.user.user_metadata.role || 'Usuário',
                 birthday: profileData?.birthday || initialSession.user.user_metadata.birthday || undefined,
+                gender: profileData?.gender || initialSession.user.user_metadata.gender || undefined, // NOVO: Carregar gênero
                 registeredTime: profileData?.registered_time || initialSession.user.created_at,
               });
               console.log('Initial session user profile set.');
