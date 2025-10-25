@@ -7,14 +7,14 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  console.log('Edge Function: Request received for update-subuser-role.'); // Added log
+  console.log('Edge Function: Request received for update-subuser-role.');
 
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Edge Function: update-subuser-role started within try block.'); // Added log
+    console.log('Edge Function: update-subuser-role started within try block.');
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -56,8 +56,9 @@ serve(async (req) => {
     }
     console.log('Edge Function: Requesting user is an Administrator.');
 
-    const { userIdToUpdate, newRole } = await req.json();
-    console.log('Edge Function: Received payload - userIdToUpdate:', userIdToUpdate, 'newRole:', newRole);
+    const requestBody = await req.json(); // Parse the request body
+    console.log('Edge Function: Received request body:', requestBody); // Log the parsed body
+    const { userIdToUpdate, newRole } = requestBody;
 
     if (!userIdToUpdate || !newRole) {
       console.log('Edge Function: Bad Request - Missing required fields.');
@@ -110,7 +111,7 @@ serve(async (req) => {
     );
 
     if (updateAuthUserError) {
-      console.error('Edge Function: Error updating auth.users metadata:', updateAuthUserError); // Log the full error object
+      console.error('Edge Function: Error updating auth.users metadata:', updateAuthUserError);
       return new Response(JSON.stringify({ error: `Failed to update user metadata: ${updateAuthUserError.message}` }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -125,9 +126,10 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Edge Function: Unhandled error in catch block:', error); // Improved log
-    // Ensure consistent JSON error response with correct status and headers
-    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
+    console.error('Edge Function: Unhandled error in catch block:', error);
+    // Ensure error.message is a string, or provide a fallback
+    const errorMessage = (error instanceof Error) ? error.message : String(error);
+    return new Response(JSON.stringify({ error: `Internal Server Error: ${errorMessage}` }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
