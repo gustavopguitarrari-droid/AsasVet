@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0/dist/main/index.mjs'; // Caminho de importação mais explícito
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -9,7 +9,7 @@ const corsHeaders = {
 serve(async (req) => {
   console.log('Edge Function: Request received for update-subuser-role.');
 
-  try { // Outer try-catch to catch any early errors, e.g., with req.json()
+  try {
     if (req.method === 'OPTIONS') {
       return new Response(null, { headers: corsHeaders });
     }
@@ -56,8 +56,8 @@ serve(async (req) => {
     }
     console.log('Edge Function: Requesting user is an Administrator.');
 
-    const requestBody = await req.json(); // Parse the request body
-    console.log('Edge Function: Received request body:', requestBody); // Log the parsed body
+    const requestBody = await req.json();
+    console.log('Edge Function: Received request body:', requestBody);
     const { userIdToUpdate, newRole } = requestBody;
 
     if (!userIdToUpdate || !newRole) {
@@ -104,6 +104,14 @@ serve(async (req) => {
       });
     }
     console.log('Edge Function: Profile role updated in public.profiles.');
+
+    // Adicionando logs para inspecionar o objeto admin antes de chamar updateUser
+    console.log('Edge Function: Checking supabaseAdmin.auth.admin object...');
+    console.log('Type of supabaseAdmin.auth.admin:', typeof supabaseAdmin.auth.admin);
+    if (supabaseAdmin.auth.admin) {
+      console.log('Keys on supabaseAdmin.auth.admin:', Object.keys(supabaseAdmin.auth.admin));
+      console.log('Type of updateUser method:', typeof supabaseAdmin.auth.admin.updateUser);
+    }
 
     const { error: updateAuthUserError } = await supabaseAdmin.auth.admin.updateUser(
       userIdToUpdate,
