@@ -123,7 +123,7 @@ const Internacao = () => {
     queryKey: ['interned_patients', userId],
     queryFn: async () => {
       if (!userId) return [];
-      console.log("Fetching interned_patients from Supabase...");
+      console.log("Fetching interned_patients from Supabase for user:", userId);
       const { data, error } = await supabase
         .from('interned_patients')
         .select('*')
@@ -133,7 +133,8 @@ const Internacao = () => {
         console.error("Error fetching interned_patients:", error);
         throw error;
       }
-      console.log("interned_patients fetched:", data);
+      console.log("Raw data from Supabase for interned_patients (after filter):", data);
+      data.forEach(p => console.log(`Patient ${p.id} - Status: ${p.status}`)); // Log status of each patient
       return data;
     },
     enabled: !!userId,
@@ -251,27 +252,18 @@ const Internacao = () => {
     },
     onSuccess: async (data) => {
       console.log("updatePatientMutation onSuccess - Data received:", data);
+      console.log("Updated patient status in onSuccess:", data.status);
       
       // Invalidate history to ensure it picks up the new patient
       await queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
       console.log("Invalidated history_patients query.");
 
-      // Optimistically remove from 'interned_patients' cache if status is 'Alta' or 'Óbito'
-      if (data.status === "Alta" || data.status === "Óbito") {
-        queryClient.setQueryData<InternedPatient[]>(['interned_patients', userId], (oldData) => {
-          return oldData ? oldData.filter(patient => patient.id !== data.id) : [];
-        });
-        console.log(`Optimistically removed patient ${data.id} from interned_patients cache.`);
-      } else {
-        // For other status updates, update the patient in the active list cache
-        queryClient.setQueryData<InternedPatient[]>(['interned_patients', userId], (oldData) => {
-          return oldData ? oldData.map(patient => patient.id === data.id ? data : patient) : [];
-        });
-        console.log(`Optimistically updated patient ${data.id} in interned_patients cache.`);
-      }
+      // Explicitly remove the query from cache before refetching
+      // This ensures the next fetch is a hard fetch from the server.
+      await queryClient.removeQueries({ queryKey: ['interned_patients', userId], exact: true });
+      console.log("Removed interned_patients query from cache.");
 
-      // Always refetch 'interned_patients' to ensure eventual consistency with the server
-      // This will re-run the query with the `not('status', 'in', ...)` filter
+      // Then, refetch the active patients list.
       console.log("Forcing refetch of interned_patients to ensure consistency.");
       await queryClient.refetchQueries({ queryKey: ['interned_patients', userId] });
 
@@ -396,6 +388,7 @@ const Internacao = () => {
   };
 
   const handleUpdateInternment = (updatedPatient: InternedPatient) => {
+    console.log("InternmentDetailsDialog: Calling onUpdate with updatedPatient:", updatedPatient);
     updatePatientMutation.mutate(updatedPatient);
   };
 
@@ -658,7 +651,7 @@ const Internacao = () => {
           patientName={actionPatientName}
           date={actionDate}
           initialHour={actionHour}
-          allActionsForCurrentPatient={allActionsForCurrentPatient}
+          allActionsForPatient={allActionsForCurrentPatient}
         />
       )}
 
