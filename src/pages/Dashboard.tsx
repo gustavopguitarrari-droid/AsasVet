@@ -220,7 +220,7 @@ const Dashboard = () => {
 
   const getGreeting = () => {
     if (!user) {
-      return "Bem-vindo(a) ao Simples Vet!";
+      return "Bem-vindo(a) ao AsasVet!";
     }
     const prefix = user.gender === "feminino" ? "Dra." : "Dr.";
     return `Bem-vindo(a) ${prefix} ${user.name}!`;

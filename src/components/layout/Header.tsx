@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { useLocation } from "react-router-dom";
 import UserProfile from "@/components/UserProfile";
@@ -31,7 +33,7 @@ const Header = () => {
       case "/settings":
         return "Configurações";
       default:
-        return "Simples Vet";
+        return "AsasVet";
     }
   };
 
