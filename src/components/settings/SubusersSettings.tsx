@@ -267,8 +267,18 @@ const SubusersSettings: React.FC = () => {
                             />
                             <Tooltip delayDuration={0}>
                               <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" onClick={() => handleSaveRole(subuser.id)} className="h-8 w-8 text-green-600 hover:bg-green-100">
-                                  <Check className="h-4 w-4" />
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleSaveRole(subuser.id)}
+                                  className="h-8 w-8 text-green-600 hover:bg-green-100"
+                                  disabled={updateSubuserRoleMutation.isPending} // Desabilita durante o carregamento
+                                >
+                                  {updateSubuserRoleMutation.isPending ? (
+                                    <span className="loading-spinner h-4 w-4" /> // Placeholder para spinner
+                                  ) : (
+                                    <Check className="h-4 w-4" />
+                                  )}
                                   <span className="sr-only">Salvar</span>
                                 </Button>
                               </TooltipTrigger>
