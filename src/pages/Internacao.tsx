@@ -119,7 +119,7 @@ const Internacao = () => {
   const [confirmActionsForSlot, setConfirmActionsForSlot] = React.useState<PatientAction[]>([]);
 
   // Fetch interned patients
-  const { data: internedPatients = [], isLoading: isLoadingPatients, error: patientsError } = useQuery<InternedPatient[]>({
+  const { data: internedPatients = [], isLoading: isLoadingPatients, error: patientsError, refetch: refetchInternedPatients } = useQuery<InternedPatient[]>({
     queryKey: ['interned_patients', userId],
     queryFn: async () => {
       if (!userId) return [];
@@ -224,11 +224,13 @@ const Internacao = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['interned_patients'] });
-      queryClient.invalidateQueries({ queryKey: ['history_patients'] });
+    onSuccess: async (data) => {
+      // Invalidate and refetch to ensure immediate UI update
+      await queryClient.invalidateQueries({ queryKey: ['interned_patients'] });
+      await queryClient.invalidateQueries({ queryKey: ['history_patients'] });
+      await refetchInternedPatients(); // Explicitly refetch the active patients list
       showSuccess("Paciente atualizado com sucesso!");
-      setIsDetailsDialogOpen(false);
+      setIsDetailsDialogOpen(false); // Close dialog AFTER refetch
     },
     onError: (error) => {
       showError(`Erro ao atualizar paciente: ${error.message}`);
