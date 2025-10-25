@@ -1,75 +1,28 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard,
-  Users, 
-  PawPrint, // Ícone de pata de animal
-  CalendarDays, // Usado para Agenda
-  ClipboardList, // Ícone para Consultas
-  DollarSign,
-  Plus,
-  Stethoscope,
   ArrowLeftToLine,
   ArrowRightToLine,
-  ReceiptText,
-  Package,
-} from "lucide-react";
+} from "lucide-react"; // Ícones específicos para o sidebar
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useUser } from "@/context/UserContext"; // Importar useUser
+import { navItemConfigs, NavItemConfig } from "@/lib/permissions"; // Importar as configurações de navegação e o tipo
 
-interface NavItem {
-  name: string;
-  icon: React.ElementType;
-  path: string;
+interface SidebarProps {
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
 }
-
-const navItems: NavItem[] = [
-  {
-    name: "Painel",
-    icon: LayoutDashboard,
-    path: "/painel",
-  },
-  {
-    name: "Consultas",
-    icon: ClipboardList,
-    path: "/consultas",
-  },
-  {
-    name: "Internação",
-    icon: Plus,
-    path: "/internacao",
-  },
-  {
-    name: "Cadastro", // Item de navegação para a página combinada
-    icon: PawPrint, // Ícone alterado para PawPrint
-    path: "/cadastro",
-  },
-  {
-    name: "Agenda", // Assumindo que "Agendar" se refere a "Agenda"
-    icon: CalendarDays,
-    path: "/medical-records",
-  },
-  { name: "Equipe", icon: Stethoscope, path: "/veterinarios" },
-  {
-    name: "Estoque",
-    icon: Package,
-    path: "/estoque",
-  },
-  {
-    name: "Caixa",
-    icon: ReceiptText,
-    path: "/caixa",
-  },
-  {
-    name: "Financeiro",
-    icon: DollarSign,
-    path: "/financeiro",
-  },
-];
 
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
+  const { user } = useUser(); // Obter o usuário logado e seu cargo
+
+  // Filtra os itens de navegação com base no cargo do usuário
+  const filteredNavItems = navItemConfigs.filter(item =>
+    user?.role ? item.allowedRoles.includes(user.role) : false
+  );
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
@@ -78,7 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         <PawPrint className={cn("h-10 w-10 text-white", !isCollapsed && "ml-2")} strokeWidth={2.5} />
       </Link>
       <nav className="flex-1 space-y-2">
-        {navItems.map((item) => {
+        {filteredNavItems.map((item) => {
           const isActive = location.pathname === item.path;
 
           return (
