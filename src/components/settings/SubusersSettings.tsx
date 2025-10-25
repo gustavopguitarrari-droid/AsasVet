@@ -101,6 +101,7 @@ const SubusersSettings: React.FC = () => {
       const session = await supabase.auth.getSession();
       if (!session.data.session) throw new Error("User not authenticated.");
 
+      console.log("Attempting to invoke update-subuser-role Edge Function...");
       const { data: responseData, error } = await supabase.functions.invoke('update-subuser-role', {
         body: JSON.stringify({ userIdToUpdate, newRole }),
         headers: {
@@ -109,8 +110,11 @@ const SubusersSettings: React.FC = () => {
         },
       });
 
+      console.log("Supabase Functions Invoke Raw Response:");
+      console.log("  data:", responseData);
+      console.log("  error:", error);
+
       if (error) {
-        // Tenta extrair a mensagem de erro do corpo da resposta da Edge Function
         let errorMessage = error.message;
         if (error.context && error.context.data) {
           try {
@@ -119,38 +123,33 @@ const SubusersSettings: React.FC = () => {
               errorMessage = errorData.error;
             }
           } catch (parseError) {
-            console.error("Failed to parse Edge Function error response:", parseError);
+            console.error("Failed to parse Edge Function error response context data:", parseError);
           }
         }
+        console.error("Error from supabase.functions.invoke:", errorMessage);
         throw new Error(errorMessage);
       }
-      if (responseData.error) throw new Error(responseData.error);
+      
+      // If no error from invoke, check if the Edge Function itself returned an error in its body (status 200 with error payload)
+      if (responseData && responseData.error) {
+        console.error("Error reported by Edge Function in 200 response:", responseData.error);
+        throw new Error(responseData.error);
+      }
+
+      console.log("Edge Function invocation successful. Returning data:", responseData);
       return responseData;
     },
     onSuccess: () => {
+      console.log("updateSubuserRoleMutation: onSuccess callback triggered.");
       queryClient.invalidateQueries({ queryKey: ['subusers'] });
       showSuccess("Cargo do subusuário atualizado com sucesso!");
       setEditingUserId(null);
       setTempRole("");
     },
     onError: (err: any) => {
-      console.error("Erro ao atualizar cargo:", err); // Log the full error object
-      let userFriendlyMessage = "Erro ao atualizar cargo. Por favor, tente novamente.";
-
-      // Attempt to parse the detailed error from the Edge Function response
-      if (err.context && err.context.data) {
-        try {
-          const errorData = JSON.parse(err.context.data);
-          if (errorData.error) {
-            userFriendlyMessage = `Erro ao atualizar cargo: ${errorData.error}`;
-          }
-        } catch (parseError) {
-          console.error("Failed to parse Edge Function error response data:", parseAerror);
-        }
-      } else if (err.message) {
-        userFriendlyMessage = `Erro ao atualizar cargo: ${err.message}`;
-      }
-      showError(userFriendlyMessage);
+      console.error("updateSubuserRoleMutation: onError callback triggered. Full error object:", err);
+      // The mutationFn is already throwing an Error with the specific message, so we can use it directly.
+      showError(`Erro ao atualizar cargo: ${err.message || "Erro desconhecido."}`);
     },
   });
 
