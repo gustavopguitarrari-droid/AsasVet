@@ -138,7 +138,8 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
   };
 
   const currentName = form.watch("name");
-  const initials = currentName.charAt(0).toUpperCase();
+  // Garante que initials seja uma string não vazia para evitar problemas de renderização
+  const initials = currentName.charAt(0).toUpperCase() || ''; 
 
   return (
     <Form {...form}>
@@ -149,7 +150,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
               <AvatarImage src={previewUrl} alt="Preview" />
             ) : (
               <AvatarFallback className="bg-muted text-muted-foreground text-3xl font-bold">
-                {initials || <Dog className="h-12 w-12" />}
+                {initials || <Dog className="h-12 w-12" />} {/* Fallback para o ícone Dog se initials for vazio */}
               </AvatarFallback>
             )}
           </Avatar>
