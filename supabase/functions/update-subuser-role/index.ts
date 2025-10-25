@@ -95,7 +95,7 @@ serve(async (req) => {
 
     if (updateProfileError) {
       console.error('Edge Function: Error updating profile role in public.profiles:', updateProfileError.message);
-      return new Response(JSON.stringify({ error: updateProfileError.message }), {
+      return new Response(JSON.stringify({ error: `Failed to update profile role: ${updateProfileError.message}` }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -109,9 +109,13 @@ serve(async (req) => {
 
     if (updateAuthUserError) {
       console.error('Edge Function: Error updating auth.users metadata:', updateAuthUserError.message);
-    } else {
-      console.log('Edge Function: User metadata updated in auth.users.');
+      // IMPORTANT: Return a non-2xx status here as well if this update fails
+      return new Response(JSON.stringify({ error: `Failed to update user metadata: ${updateAuthUserError.message}` }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
+    console.log('Edge Function: User metadata updated in auth.users.');
 
     console.log('Edge Function: Sub-user role updated successfully.');
     return new Response(JSON.stringify({ message: 'Sub-user role updated successfully' }), {
@@ -120,7 +124,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Edge Function: Unhandled error:', error.message);
+    console.error('Edge Function: Unhandled error:', error); // Log the full error object
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
