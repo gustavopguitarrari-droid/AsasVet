@@ -22,7 +22,6 @@ import ExecutionMapLegend from "@/components/ExecutionMapLegend";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
-import { useSession } from '@/context/SessionContext'; // Importar useSession
 import { showError, showSuccess } from "@/utils/toast";
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
@@ -96,7 +95,6 @@ const Internacao = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id; // Assuming user ID is available from context
-  const { isLoading: isSessionLoading } = useSession(); // Obter o estado de carregamento da sessão
 
   const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
@@ -133,7 +131,7 @@ const Internacao = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!userId, // Habilitar a query apenas se o userId estiver disponível
+    enabled: !!userId,
   });
 
   // Fetch history patients
@@ -149,7 +147,7 @@ const Internacao = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!userId, // Habilitar a query apenas se o userId estiver disponível
+    enabled: !!userId,
   });
 
   // Fetch patient actions
@@ -164,7 +162,7 @@ const Internacao = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!userId, // Habilitar a query apenas se o userId estiver disponível
+    enabled: !!userId,
   });
 
   // Mutation for adding a new patient
@@ -318,10 +316,6 @@ const Internacao = () => {
   });
 
   const handleAddInternment = (data: InternmentFormValues) => {
-    if (!userId) {
-      showError("Usuário não autenticado. Por favor, faça login novamente.");
-      return;
-    }
     addPatientMutation.mutate(data);
   };
 
@@ -407,18 +401,10 @@ const Internacao = () => {
     }
   };
 
-  if (isSessionLoading || isLoadingPatients || isLoadingHistory || isLoadingActions) {
+  if (isLoadingPatients || isLoadingHistory || isLoadingActions) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando dados de internação...</p>
-      </div>
-    );
-  }
-
-  if (!userId) {
-    return (
-      <div className="flex items-center justify-center h-full text-destructive">
-        <p>Você precisa estar logado para acessar a internação.</p>
       </div>
     );
   }
@@ -443,7 +429,7 @@ const Internacao = () => {
               </Button>
               <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="font-bold" disabled={!userId}> {/* Desabilitar se não houver userId */}
+                  <Button className="font-bold">
                     <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
                   </Button>
                 </DialogTrigger>
