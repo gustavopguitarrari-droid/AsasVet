@@ -289,7 +289,7 @@ const SubusersSettings: React.FC = () => {
                             <span>{subuser.role}</span>
                             <Tooltip delayDuration={0}>
                               <TooltipTrigger asChild>
-                                <Button variant="ghost" size="icon" onClick={() => handleEditRole(subuser.id, subuser.role)} className="h-8 w-8 text-muted-foreground">
+                                <Button variant="secondary" size="icon" onClick={() => handleEditRole(subuser.id, subuser.role)} className="h-8 w-8">
                                   <Edit className="h-4 w-4" />
                                   <span className="sr-only">Editar Cargo</span>
                                 </Button>
