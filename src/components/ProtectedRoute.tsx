@@ -25,17 +25,30 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user: appUser } = useUser();
   const location = useLocation();
 
-  // Se a sessão ainda está sendo carregada, ou se o perfil do usuário não está disponível
-  // (o que não deveria acontecer se SessionContext estiver funcionando corretamente e Index.tsx esperar),
-  // simplesmente não renderiza nada e espera. O redirecionamento inicial é feito por Index.tsx.
-  if (isLoading || !appUser) {
-    return null;
+  // Se a sessão ainda está sendo carregada, exibe um indicador de carregamento
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+        <p className="text-lg">Carregando sistema...</p>
+      </div>
+    );
   }
 
-  // Se não há sessão (usuário não autenticado), redirecione para o login.
+  // Se não há sessão (usuário não autenticado), redireciona para o login
   if (!session) {
     return <Navigate to="/login" replace />;
   }
+
+  // Se appUser ainda é null/undefined após o carregamento (ex: falha silenciosa na busca do perfil)
+  // Isso serve como uma salvaguarda adicional.
+  if (!appUser) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+          <p className="text-lg">Preparando perfil do usuário...</p>
+        </div>
+      );
+  }
+
 
   // Se o usuário for um "Veterinário" e a rota atual não estiver na lista de permitidas, redireciona para o Painel
   if (appUser.role === "Veterinário" && !allowedVeterinarioPaths.includes(location.pathname)) {
@@ -43,7 +56,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to="/painel" replace />;
   }
 
-  // Se estiver logado e autorizado, renderiza o layout e o conteúdo da rota
+  // Se autenticado e autorizado, renderiza o layout e o conteúdo da rota
   return <Layout>{children}</Layout>;
 };
 
