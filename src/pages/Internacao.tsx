@@ -133,7 +133,7 @@ const Internacao = () => {
         console.error("Error fetching interned_patients:", error);
         throw error;
       }
-      console.log("Raw data from Supabase for interned_patients (after filter):", data);
+      console.log("Supabase returned for interned_patients (after filter):", data); // NEW LOG
       data.forEach(p => console.log(`Patient ${p.id} - Status: ${p.status}`)); // Log status of each patient
       return data;
     },
@@ -254,16 +254,17 @@ const Internacao = () => {
       console.log("updatePatientMutation onSuccess - Data received:", data);
       console.log("Updated patient status in onSuccess:", data.status);
       
-      // Invalidate history to ensure it picks up the new patient
+      // 1. Invalidate history to ensure it picks up the new patient
       await queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
       console.log("Invalidated history_patients query.");
 
-      // Explicitly remove the query from cache before refetching
-      // This ensures the next fetch is a hard fetch from the server.
+      // 2. Explicitly remove the active patients query from cache
+      // This ensures no stale data is used for the next fetch.
       await queryClient.removeQueries({ queryKey: ['interned_patients', userId], exact: true });
       console.log("Removed interned_patients query from cache.");
 
-      // Then, refetch the active patients list.
+      // 3. Force a refetch of the active patients list.
+      // This will re-run the query with the `not('status', 'in', ...)` filter
       console.log("Forcing refetch of interned_patients to ensure consistency.");
       await queryClient.refetchQueries({ queryKey: ['interned_patients', userId] });
 
@@ -651,7 +652,7 @@ const Internacao = () => {
           patientName={actionPatientName}
           date={actionDate}
           initialHour={actionHour}
-          allActionsForPatient={allActionsForCurrentPatient}
+          allActionsForCurrentPatient={allActionsForCurrentPatient}
         />
       )}
 
