@@ -53,10 +53,10 @@ serve(async (req) => {
       });
     }
 
-    const { email, password, first_name, last_name, role, gender } = await req.json();
+    const { email, password, first_name, last_name, role } = await req.json(); // Gênero removido
 
-    if (!email || !password || !first_name || !last_name || !role || !gender) {
-      return new Response(JSON.stringify({ error: 'Missing required fields: email, password, first_name, last_name, role, gender' }), {
+    if (!email || !password || !first_name || !last_name || !role) { // Gênero removido da validação
+      return new Response(JSON.stringify({ error: 'Missing required fields: email, password, first_name, last_name, role' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -71,7 +71,7 @@ serve(async (req) => {
         first_name,
         last_name,
         role,
-        gender,
+        // Gênero removido do user_metadata
       },
     });
 

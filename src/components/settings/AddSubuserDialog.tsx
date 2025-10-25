@@ -37,9 +37,7 @@ const formSchema = z.object({
   email: z.string().email("E-mail inválido.").min(1, "O e-mail é obrigatório."),
   password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
   role: z.string().min(1, "O cargo é obrigatório."),
-  gender: z.enum(["Masculino", "Feminino", "Outro"], {
-    required_error: "O gênero é obrigatório.",
-  }),
+  // Gênero removido
 });
 
 export type SubuserFormValues = z.infer<typeof formSchema>;
@@ -60,7 +58,7 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
       email: "",
       password: "",
       role: "Veterinário",
-      gender: "Outro",
+      // Gênero removido
     },
   });
 
@@ -76,7 +74,7 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
           first_name: newUserData.firstName,
           last_name: newUserData.lastName,
           role: newUserData.role,
-          gender: newUserData.gender,
+          // Gênero removido do body
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -182,53 +180,25 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="role"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center">
-                      <Briefcase className="h-4 w-4 mr-2 text-muted-foreground" /> Cargo
-                    </FormLabel>
-                    <FormControl>
-                      <RoleSelect
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="gender"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center">
-                      <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Gênero
-                    </FormLabel>
-                    <Select
+            {/* Campo de Gênero removido */}
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center">
+                    <Briefcase className="h-4 w-4 mr-2 text-muted-foreground" /> Cargo
+                  </FormLabel>
+                  <FormControl>
+                    <RoleSelect
+                      value={field.value}
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione o gênero" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="Masculino">Masculino</SelectItem>
-                        <SelectItem value="Feminino">Feminino</SelectItem>
-                        <SelectItem value="Outro">Outro</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <DialogFooter className="pt-4">
               <Button variant="outline" onClick={onClose} type="button">
