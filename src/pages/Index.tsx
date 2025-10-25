@@ -7,28 +7,26 @@ const Index = () => {
   const { session, isLoading } = useSession(); // Usar useSession para verificar o estado de autenticação
 
   useEffect(() => {
-    console.log('Index Page - isLoading:', isLoading, 'session:', session);
-    if (!isLoading) {
-      if (session) {
-        console.log('Index Page - Session found, redirecting to /painel.');
-        navigate("/painel");
-      } else {
-        console.log('Index Page - No session, redirecting to /login.');
-        navigate("/login"); // Redireciona para o login se não houver sessão
-      }
+    console.log('Index Page - useEffect triggered. isLoading:', isLoading, 'session:', session);
+    if (isLoading) {
+      // Ainda carregando a sessão inicial, aguarde.
+      // O componente não renderizará nada visualmente neste estado.
+      return;
+    }
+
+    // A verificação inicial da sessão foi concluída
+    if (session) {
+      console.log('Index Page - Session found, redirecting to /painel.');
+      navigate("/painel", { replace: true }); // Redireciona para o painel se houver sessão
+    } else {
+      console.log('Index Page - No session, redirecting to /login.');
+      navigate("/login", { replace: true }); // Redireciona para o login se não houver sessão
     }
   }, [navigate, session, isLoading]);
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Carregando AsasVet...</h1>
-        <p className="text-xl text-gray-600">
-          Você será redirecionado em breve.
-        </p>
-      </div>
-    </div>
-  );
+  // Renderiza nulo. A navegação é tratada pelo useEffect.
+  // Se houver um atraso, a tela ficará em branco por um breve momento.
+  return null;
 };
 
 export default Index;
