@@ -89,7 +89,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [setAppUser]);
+  }, []); // Removido setAppUser das dependências
 
   return (
     <SessionContext.Provider value={{ session, user, isLoading }}>
