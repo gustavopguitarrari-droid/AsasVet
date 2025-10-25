@@ -244,212 +244,210 @@ const SubusersSettings: React.FC = () => {
           <Users className="mr-2 h-5 w-5" /> Gerenciar Subusuários
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6"> {/* Adicionado space-y-6 para espaçamento vertical */}
         <p className="text-muted-foreground">
           Aqui você pode adicionar novos subusuários para sua equipe, visualizar os existentes, e gerenciar seus cargos e acessos.
         </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Lista de Subusuários */}
-          <div className="space-y-6 p-4 border rounded-md bg-card shadow-sm">
-            <h3 className="text-xl font-semibold flex items-center">
-              <Users className="h-5 w-5 mr-2" /> Subusuários Existentes
-            </h3>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Buscar subusuários..."
-                className="pl-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            {isLoading ? (
-              <p className="text-muted-foreground">Carregando subusuários...</p>
-            ) : error ? (
-              <p className="text-destructive">Erro ao carregar subusuários: {error.message}</p>
-            ) : filteredSubusers.length > 0 ? (
-              <ScrollArea className="h-[400px] rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Nome</TableHead>
-                      <TableHead>E-mail</TableHead>
-                      <TableHead>Cargo</TableHead>
-                      <TableHead>Gênero</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
+        {/* Lista de Subusuários - Ocupa uma linha inteira */}
+        <div className="space-y-6 p-4 border rounded-md bg-card shadow-sm">
+          <h3 className="text-xl font-semibold flex items-center">
+            <Users className="h-5 w-5 mr-2" /> Subusuários Existentes
+          </h3>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar subusuários..."
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          {isLoading ? (
+            <p className="text-muted-foreground">Carregando subusuários...</p>
+          ) : error ? (
+            <p className="text-destructive">Erro ao carregar subusuários: {error.message}</p>
+          ) : filteredSubusers.length > 0 ? (
+            <ScrollArea className="h-[400px] rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>E-mail</TableHead>
+                    <TableHead>Cargo</TableHead>
+                    <TableHead>Gênero</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredSubusers.map((subuser) => (
+                    <TableRow key={subuser.id}>
+                      <TableCell className="font-medium">{subuser.first_name} {subuser.last_name}</TableCell>
+                      <TableCell>{subuser.email}</TableCell>
+                      <TableCell>
+                        {editingUserId === subuser.id ? (
+                          <div className="flex items-center space-x-2">
+                            <RoleSelect
+                              value={tempRole}
+                              onValueChange={setTempRole}
+                            />
+                            <Tooltip delayDuration={0}>
+                              <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={() => handleSaveRole(subuser.id)} className="h-8 w-8 text-green-600 hover:bg-green-100">
+                                  <Check className="h-4 w-4" />
+                                  <span className="sr-only">Salvar</span>
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top">Salvar</TooltipContent>
+                            </Tooltip>
+                            <Tooltip delayDuration={0}>
+                              <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={handleCancelEdit} className="h-8 w-8 text-destructive hover:bg-destructive-100">
+                                  <X className="h-4 w-4" />
+                                  <span className="sr-only">Cancelar</span>
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top">Cancelar</TooltipContent>
+                            </Tooltip>
+                          </div>
+                        ) : (
+                          <div className="flex items-center space-x-2">
+                            <span>{subuser.role}</span>
+                            <Tooltip delayDuration={0}>
+                              <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={() => handleEditRole(subuser.id, subuser.role)} className="h-8 w-8 text-muted-foreground">
+                                  <Edit className="h-4 w-4" />
+                                  <span className="sr-only">Editar Cargo</span>
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top">Editar Cargo</TooltipContent>
+                            </Tooltip>
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>{subuser.gender}</TableCell>
+                      <TableCell className="text-right">
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm" disabled={deleteSubuserMutation.isPending}>
+                              <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Esta ação não pode ser desfeita. Isso excluirá permanentemente o subusuário{" "}
+                                <span className="font-bold">{subuser.first_name} {subuser.last_name}</span> e removerá seus dados.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteSubuser(subuser.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                Excluir
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
                     </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredSubusers.map((subuser) => (
-                      <TableRow key={subuser.id}>
-                        <TableCell className="font-medium">{subuser.first_name} {subuser.last_name}</TableCell>
-                        <TableCell>{subuser.email}</TableCell>
-                        <TableCell>
-                          {editingUserId === subuser.id ? (
-                            <div className="flex items-center space-x-2">
-                              <RoleSelect
-                                value={tempRole}
-                                onValueChange={setTempRole}
-                              />
-                              <Tooltip delayDuration={0}>
-                                <TooltipTrigger asChild>
-                                  <Button variant="ghost" size="icon" onClick={() => handleSaveRole(subuser.id)} className="h-8 w-8 text-green-600 hover:bg-green-100">
-                                    <Check className="h-4 w-4" />
-                                    <span className="sr-only">Salvar</span>
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent side="top">Salvar</TooltipContent>
-                              </Tooltip>
-                              <Tooltip delayDuration={0}>
-                                <TooltipTrigger asChild>
-                                  <Button variant="ghost" size="icon" onClick={handleCancelEdit} className="h-8 w-8 text-destructive hover:bg-destructive-100">
-                                    <X className="h-4 w-4" />
-                                    <span className="sr-only">Cancelar</span>
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent side="top">Cancelar</TooltipContent>
-                              </Tooltip>
-                            </div>
-                          ) : (
-                            <div className="flex items-center space-x-2">
-                              <span>{subuser.role}</span>
-                              <Tooltip delayDuration={0}>
-                                <TooltipTrigger asChild>
-                                  <Button variant="ghost" size="icon" onClick={() => handleEditRole(subuser.id, subuser.role)} className="h-8 w-8 text-muted-foreground">
-                                    <Edit className="h-4 w-4" />
-                                    <span className="sr-only">Editar Cargo</span>
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent side="top">Editar Cargo</TooltipContent>
-                              </Tooltip>
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell>{subuser.gender}</TableCell>
-                        <TableCell className="text-right">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm" disabled={deleteSubuserMutation.isPending}>
-                                <Trash2 className="mr-2 h-4 w-4" /> Excluir
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Esta ação não pode ser desfeita. Isso excluirá permanentemente o subusuário{" "}
-                                  <span className="font-bold">{subuser.first_name} {subuser.last_name}</span> e removerá seus dados.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDeleteSubuser(subuser.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                                  Excluir
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </ScrollArea>
-            ) : (
-              <p className="text-muted-foreground text-center py-4">Nenhum subusuário encontrado.</p>
-            )}
-          </div>
+                  ))}
+                </TableBody>
+              </Table>
+            </ScrollArea>
+          ) : (
+            <p className="text-muted-foreground text-center py-4">Nenhum subusuário encontrado.</p>
+          )}
+        </div>
 
-          {/* Formulário de Criação de Subusuário */}
-          <div className="space-y-6 p-4 border rounded-md bg-card shadow-sm">
-            <h3 className="text-xl font-semibold flex items-center">
-              <PlusCircle className="h-5 w-5 mr-2" /> Criar Novo Subusuário
-            </h3>
-            <form onSubmit={form.handleSubmit(handleCreateSubuser)} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName" className="flex items-center">
-                    <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Nome
-                  </Label>
-                  <Input id="firstName" placeholder="Primeiro Nome" {...form.register("firstName")} />
-                  {form.formState.errors.firstName && (
-                    <p className="text-destructive text-sm">{form.formState.errors.firstName.message}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName" className="flex items-center">
-                    <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Sobrenome
-                  </Label>
-                  <Input id="lastName" placeholder="Sobrenome" {...form.register("lastName")} />
-                  {form.formState.errors.lastName && (
-                    <p className="text-destructive text-sm">{form.formState.errors.lastName.message}</p>
-                  )}
-                </div>
-              </div>
-
+        {/* Formulário de Criação de Subusuário - Ocupa uma linha inteira */}
+        <div className="space-y-6 p-4 border rounded-md bg-card shadow-sm">
+          <h3 className="text-xl font-semibold flex items-center">
+            <PlusCircle className="h-5 w-5 mr-2" /> Criar Novo Subusuário
+          </h3>
+          <form onSubmit={form.handleSubmit(handleCreateSubuser)} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center">
-                  <Mail className="h-4 w-4 mr-2 text-muted-foreground" /> E-mail
+                <Label htmlFor="firstName" className="flex items-center">
+                  <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Nome
                 </Label>
-                <Input id="email" type="email" placeholder="email@exemplo.com" {...form.register("email")} />
-                {form.formState.errors.email && (
-                  <p className="text-destructive text-sm">{form.formState.errors.email.message}</p>
+                <Input id="firstName" placeholder="Primeiro Nome" {...form.register("firstName")} />
+                {form.formState.errors.firstName && (
+                  <p className="text-destructive text-sm">{form.formState.errors.firstName.message}</p>
                 )}
               </div>
-
               <div className="space-y-2">
-                <Label htmlFor="password" className="flex items-center">
-                  <Lock className="h-4 w-4 mr-2 text-muted-foreground" /> Senha
+                <Label htmlFor="lastName" className="flex items-center">
+                  <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Sobrenome
                 </Label>
-                <Input id="password" type="password" placeholder="••••••••" {...form.register("password")} />
-                {form.formState.errors.password && (
-                  <p className="text-destructive text-sm">{form.formState.errors.password.message}</p>
+                <Input id="lastName" placeholder="Sobrenome" {...form.register("lastName")} />
+                {form.formState.errors.lastName && (
+                  <p className="text-destructive text-sm">{form.formState.errors.lastName.message}</p>
                 )}
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="role" className="flex items-center">
-                    <Briefcase className="h-4 w-4 mr-2 text-muted-foreground" /> Cargo
-                  </Label>
-                  <RoleSelect
-                    value={form.watch("role")}
-                    onValueChange={(value) => form.setValue("role", value)}
-                  />
-                  {form.formState.errors.role && (
-                    <p className="text-destructive text-sm">{form.formState.errors.role.message}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="gender" className="flex items-center">
-                    <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Gênero
-                  </Label>
-                  <Select
-                    onValueChange={(value) => form.setValue("gender", value as "Masculino" | "Feminino" | "Outro")}
-                    defaultValue={form.watch("gender")}
-                  >
-                    <SelectTrigger id="gender">
-                      <SelectValue placeholder="Selecione o gênero" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Masculino">Masculino</SelectItem>
-                      <SelectItem value="Feminino">Feminino</SelectItem>
-                      <SelectItem value="Outro">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {form.formState.errors.gender && (
-                    <p className="text-destructive text-sm">{form.formState.errors.gender.message}</p>
-                  )}
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="email" className="flex items-center">
+                <Mail className="h-4 w-4 mr-2 text-muted-foreground" /> E-mail
+              </Label>
+              <Input id="email" type="email" placeholder="email@exemplo.com" {...form.register("email")} />
+              {form.formState.errors.email && (
+                <p className="text-destructive text-sm">{form.formState.errors.email.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="flex items-center">
+                <Lock className="h-4 w-4 mr-2 text-muted-foreground" /> Senha
+              </Label>
+              <Input id="password" type="password" placeholder="••••••••" {...form.register("password")} />
+              {form.formState.errors.password && (
+                <p className="text-destructive text-sm">{form.formState.errors.password.message}</p>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="role" className="flex items-center">
+                  <Briefcase className="h-4 w-4 mr-2 text-muted-foreground" /> Cargo
+                </Label>
+                <RoleSelect
+                  value={form.watch("role")}
+                  onValueChange={(value) => form.setValue("role", value)}
+                />
+                {form.formState.errors.role && (
+                  <p className="text-destructive text-sm">{form.formState.errors.role.message}</p>
+                )}
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="gender" className="flex items-center">
+                  <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Gênero
+                </Label>
+                <Select
+                  onValueChange={(value) => form.setValue("gender", value as "Masculino" | "Feminino" | "Outro")}
+                  defaultValue={form.watch("gender")}
+                >
+                  <SelectTrigger id="gender">
+                    <SelectValue placeholder="Selecione o gênero" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Masculino">Masculino</SelectItem>
+                    <SelectItem value="Feminino">Feminino</SelectItem>
+                    <SelectItem value="Outro">Outro</SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.formState.errors.gender && (
+                  <p className="text-destructive text-sm">{form.formState.errors.gender.message}</p>
+                )}
+              </div>
+            </div>
 
-              <Button type="submit" className="w-full" disabled={createSubuserMutation.isPending}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                {createSubuserMutation.isPending ? "Criando..." : "Criar Subusuário"}
-              </Button>
-            </form>
-          </div>
+            <Button type="submit" className="w-full" disabled={createSubuserMutation.isPending}>
+              <PlusCircle className="mr-2 h-4 w-4" />
+              {createSubuserMutation.isPending ? "Criando..." : "Criar Subusuário"}
+            </Button>
+          </form>
         </div>
       </CardContent>
     </Card>
