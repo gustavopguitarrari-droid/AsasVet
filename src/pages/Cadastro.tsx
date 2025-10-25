@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,16 +11,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin } from "lucide-react"; // Adicionado Mail, Phone, MapPin
+import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin, Eye } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SpeciesFilter from "@/components/SpeciesFilter";
 import PetDetailsDialog from "@/components/PetDetailsDialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import ClientForm, { ClientFormValues } from "@/components/ClientForm";
+import PetForm, { PetFormValues } from "@/components/PetForm"; // Importar PetForm
 import { Client, Pet } from "@/types/cadastro";
-import { format, parseISO, isValid } from "date-fns"; // Importado parseISO e isValid
+import { format, parseISO, isValid } from "date-fns";
+import { ScrollArea } from "@/components/ui/scroll-area"; // Importar ScrollArea
 
-// Mock de dados para Tutores
+// Mock de dados iniciais
 const initialMockClients: Client[] = [
   {
     id: "CL001",
@@ -38,6 +40,7 @@ const initialMockClients: Client[] = [
       city: "São Paulo",
       state: "SP",
     },
+    observations: "Tutor muito atencioso, sempre busca o melhor para seus pets.",
     photoUrl: undefined,
   },
   {
@@ -56,38 +59,16 @@ const initialMockClients: Client[] = [
       city: "Rio de Janeiro",
       state: "RJ",
     },
-    photoUrl: undefined,
-  },
-  {
-    id: "CL003",
-    name: "Pedro Santos",
-    email: "pedro.santos@example.com",
-    phone: "(31) 99876-1234",
-    cpf: "111.222.333-44",
-    dateOfBirth: "1978-11-05",
-    address: {
-      cep: "30130-000",
-      street: "Avenida Afonso Pena",
-      number: "500",
-      complement: "",
-      neighborhood: "Centro",
-      city: "Belo Horizonte",
-      state: "MG",
-    },
+    observations: "Prefere contato por e-mail. Tem 2 gatos.",
     photoUrl: undefined,
   },
 ];
 
-// Mock de dados para Animais
 const initialMockPets: Pet[] = [
-  { id: "A001", name: "Rex", species: "Cachorro", breed: "Labrador", ownerId: "CL001" },
-  { id: "A002", name: "Miau", species: "Gato", breed: "Siamês", ownerId: "CL002" },
-  { id: "A003", name: "Pingo", species: "Pássaro", breed: "Periquito", ownerId: "CL003" },
-  { id: "A004", name: "Fido", species: "Cachorro", breed: "Poodle", ownerId: "CL001" },
-  { id: "A005", name: "Whiskers", species: "Gato", breed: "Persa", ownerId: "CL002" },
-  { id: "A006", name: "Pipoca", species: "Roedor", breed: "Hamster", ownerId: "CL003" },
-  { id: "A007", name: "Nemo", species: "Peixe", breed: "Peixe-palhaço", ownerId: "CL001" },
-  { id: "A008", name: "Bolt", species: "Cachorro", breed: "Golden Retriever", ownerId: "CL002" },
+  { id: "A001", name: "Rex", species: "Cachorro", breed: "Labrador", age: "5 anos", gender: "Macho", color: "Dourado", observations: "Muito brincalhão, adora passear.", photoUrl: undefined, ownerId: "CL001" },
+  { id: "A002", name: "Miau", species: "Gato", breed: "Siamês", age: "2 anos", gender: "Fêmea", color: "Creme e Marrom", observations: "Um pouco arisca com estranhos.", photoUrl: undefined, ownerId: "CL002" },
+  { id: "A003", name: "Pingo", species: "Pássaro", breed: "Periquito", age: "1 ano", gender: "Macho", color: "Verde", observations: "Canta bastante pela manhã.", photoUrl: undefined, ownerId: "CL001" },
+  { id: "A004", name: "Fido", species: "Cachorro", breed: "Poodle", age: "8 meses", gender: "Macho", color: "Branco", observations: "Filhote, em fase de adestramento.", photoUrl: undefined, ownerId: "CL001" },
 ];
 
 // Mapeamento de espécies para ícones
@@ -101,19 +82,23 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
 };
 
 const Cadastro = () => {
-  const [activeTab, setActiveTab] = React.useState<string>("tutores");
-  const [clients, setClients] = React.useState<Client[]>(initialMockClients);
-  const [pets, setPets] = React.useState<Pet[]>(initialMockPets);
+  const [activeTab, setActiveTab] = useState<string>("tutores");
+  const [clients, setClients] = useState<Client[]>(initialMockClients);
+  const [pets, setPets] = useState<Pet[]>(initialMockPets);
 
   // Estados para a aba de Animais
-  const [selectedSpecies, setSelectedSpecies] = React.useState<string>("all");
-  const [petSearchTerm, setPetSearchTerm] = React.useState<string>("");
-  const [isPetDetailsDialogOpen, setIsPetDetailsDialogOpen] = React.useState<boolean>(false);
-  const [selectedPet, setSelectedPet] = React.useState<Pet | null>(null);
+  const [selectedSpecies, setSelectedSpecies] = useState<string>("all");
+  const [petSearchTerm, setPetSearchTerm] = useState<string>("");
+  const [isPetDetailsDialogOpen, setIsPetDetailsDialogOpen] = useState<boolean>(false);
+  const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
+  const [isAddPetDialogOpen, setIsAddPetDialogOpen] = useState<boolean>(false);
+  const [defaultOwnerIdForPet, setDefaultOwnerIdForPet] = useState<string | undefined>(undefined);
 
   // Estados para a aba de Tutores
-  const [clientSearchTerm, setClientSearchTerm] = React.useState<string>("");
-  const [isAddClientDialogOpen, setIsAddClientDialogOpen] = React.useState<boolean>(false);
+  const [clientSearchTerm, setClientSearchTerm] = useState<string>("");
+  const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState<boolean>(false);
+  const [isClientPetsDialogOpen, setIsClientPetsDialogOpen] = useState<boolean>(false);
+  const [clientToViewPets, setClientToViewPets] = useState<Client | null>(null);
 
   const handleSelectSpecies = (species: string) => {
     setSelectedSpecies(species);
@@ -129,29 +114,42 @@ const Cadastro = () => {
       cpf: data.cpf,
       dateOfBirth: format(data.dateOfBirth, "yyyy-MM-dd"),
       address: data.address,
+      observations: data.observations,
       photoUrl: data.photoUrl,
     };
     setClients((prev) => [...prev, newClient]);
-
-    // Atualiza os pets selecionados para terem o novo ownerId
-    if (data.associatedPetIds && data.associatedPetIds.length > 0) {
-      setPets((prevPets) =>
-        prevPets.map((pet) =>
-          data.associatedPetIds?.includes(pet.id)
-            ? { ...pet, ownerId: newClientId } // Associa o pet ao novo tutor
-            : pet
-        )
-      );
-    }
     setIsAddClientDialogOpen(false);
+  };
+
+  const handleAddPet = (data: PetFormValues) => {
+    const newPetId = `A${(pets.length + 1).toString().padStart(3, '0')}`;
+    const newPet: Pet = {
+      id: newPetId,
+      name: data.name,
+      species: data.species,
+      breed: data.breed,
+      age: data.age,
+      gender: data.gender,
+      color: data.color,
+      observations: data.observations,
+      photoUrl: data.photoUrl,
+      ownerId: data.ownerId,
+    };
+    setPets((prev) => [...prev, newPet]);
+    setIsAddPetDialogOpen(false);
+    // Se o diálogo de pets do cliente estiver aberto, atualiza-o
+    if (isClientPetsDialogOpen && clientToViewPets?.id === data.ownerId) {
+      setClientToViewPets(prev => prev ? { ...prev } : null); // Força a re-renderização para atualizar a lista de pets
+    }
   };
 
   const filteredPets = pets.filter((pet) => {
     const matchesSpecies = selectedSpecies === "all" || pet.species === selectedSpecies;
+    const owner = clients.find(client => client.id === pet.ownerId);
     const matchesSearch =
       pet.name.toLowerCase().includes(petSearchTerm.toLowerCase()) ||
       pet.breed.toLowerCase().includes(petSearchTerm.toLowerCase()) ||
-      clients.find(client => client.id === pet.ownerId)?.name.toLowerCase().includes(petSearchTerm.toLowerCase()); // Busca pelo nome do tutor
+      (owner?.name.toLowerCase().includes(petSearchTerm.toLowerCase()));
     return matchesSpecies && matchesSearch;
   });
 
@@ -169,10 +167,21 @@ const Cadastro = () => {
     client.address.state.toLowerCase().includes(clientSearchTerm.toLowerCase())
   );
 
+  const handleViewClientPets = (client: Client) => {
+    setClientToViewPets(client);
+    setIsClientPetsDialogOpen(true);
+  };
+
+  const handleAddPetForClient = (clientId: string) => {
+    setDefaultOwnerIdForPet(clientId);
+    setIsAddPetDialogOpen(true);
+    setIsClientPetsDialogOpen(false); // Fecha o diálogo de pets do cliente
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Cadastro de novos tutores e animais</h2>
+        <h2 className="text-3xl font-bold">Cadastro de Tutores e Animais</h2>
         {activeTab === "tutores" && (
           <Dialog open={isAddClientDialogOpen} onOpenChange={setIsAddClientDialogOpen}>
             <DialogTrigger asChild>
@@ -185,18 +194,33 @@ const Cadastro = () => {
                 <DialogTitle>Adicionar Novo Tutor</DialogTitle>
               </DialogHeader>
               <ClientForm
-                key={isAddClientDialogOpen ? "open" : "closed"} // Adicionada a key aqui
+                key={isAddClientDialogOpen ? "open" : "closed"}
                 onSubmit={handleAddClient}
                 onCancel={() => setIsAddClientDialogOpen(false)}
-                allPets={pets}
               />
             </DialogContent>
           </Dialog>
         )}
         {activeTab === "animais" && (
-          <Button className="font-bold">
-            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
-          </Button>
+          <Dialog open={isAddPetDialogOpen} onOpenChange={setIsAddPetDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="font-bold" disabled={clients.length === 0}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Animal</DialogTitle>
+              </DialogHeader>
+              <PetForm
+                key={isAddPetDialogOpen ? "open" : "closed"}
+                onSubmit={handleAddPet}
+                onCancel={() => setIsAddPetDialogOpen(false)}
+                allClients={clients}
+                defaultOwnerId={defaultOwnerIdForPet}
+              />
+            </DialogContent>
+          </Dialog>
         )}
       </div>
 
@@ -227,14 +251,12 @@ const Cadastro = () => {
                   <TableHead>Nascimento</TableHead>
                   <TableHead>Contato</TableHead>
                   <TableHead>Endereço</TableHead>
-                  <TableHead>Animais</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredClients.length > 0 ? (
                   filteredClients.map((client) => {
-                    const associatedPets = pets.filter(pet => pet.ownerId === client.id);
                     return (
                       <TableRow key={client.id}>
                         <TableCell className="font-medium">{client.name}</TableCell>
@@ -253,18 +275,9 @@ const Cadastro = () => {
                           <p className="flex items-center text-sm"><MapPin className="h-3 w-3 mr-1 text-muted-foreground" /> {client.address.neighborhood}, {client.address.city} - {client.address.state}</p>
                           <p className="text-xs text-muted-foreground ml-4">CEP: {client.address.cep}</p>
                         </TableCell>
-                        <TableCell>
-                          {associatedPets.length > 0 ? (
-                            <ul className="list-disc list-inside text-sm text-muted-foreground">
-                              {associatedPets.map(pet => <li key={pet.id}>{pet.name} ({pet.species})</li>)}
-                            </ul>
-                          ) : (
-                            <span className="text-muted-foreground text-sm">Nenhum animal</span>
-                          )}
-                        </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm">
-                            Ver Detalhes
+                          <Button variant="ghost" size="sm" onClick={() => handleViewClientPets(client)}>
+                            <Eye className="h-4 w-4 mr-2" /> Ver Animais
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -272,7 +285,7 @@ const Cadastro = () => {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
+                    <TableCell colSpan={6} className="h-24 text-center">
                       Nenhum tutor encontrado.
                     </TableCell>
                   </TableRow>
@@ -291,7 +304,7 @@ const Cadastro = () => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Buscar animais..."
+                placeholder="Buscar animais por nome, raça ou tutor..."
                 className="pl-9"
                 value={petSearchTerm}
                 onChange={(e) => setPetSearchTerm(e.target.value)}
@@ -307,7 +320,10 @@ const Cadastro = () => {
                   <TableHead>Espécie</TableHead>
                   <TableHead>Raça</TableHead>
                   <TableHead>Tutor</TableHead>
-                  <TableHead>ID</TableHead>
+                  <TableHead>Idade</TableHead>
+                  <TableHead>Sexo</TableHead>
+                  <TableHead>Cor</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -317,20 +333,27 @@ const Cadastro = () => {
                     const owner = clients.find(client => client.id === pet.ownerId);
                     return (
                       <TableRow key={pet.id} onClick={() => handlePetRowClick(pet)} className="cursor-pointer hover:bg-muted/50">
-                        <TableCell className="font-bold">{pet.name}</TableCell>
-                        <TableCell className="flex items-center">
+                        <TableCell className="font-bold flex items-center">
                           <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
-                          {pet.species}
+                          {pet.name}
                         </TableCell>
+                        <TableCell>{pet.species}</TableCell>
                         <TableCell>{pet.breed}</TableCell>
                         <TableCell>{owner ? owner.name : "N/A"}</TableCell>
-                        <TableCell>{pet.id}</TableCell>
+                        <TableCell>{pet.age}</TableCell>
+                        <TableCell>{pet.gender}</TableCell>
+                        <TableCell>{pet.color}</TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     );
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center">
+                    <TableCell colSpan={8} className="h-24 text-center">
                       Nenhum animal encontrado para a espécie selecionada.
                     </TableCell>
                   </TableRow>
@@ -346,6 +369,56 @@ const Cadastro = () => {
           />
         </TabsContent>
       </Tabs>
+
+      {/* Diálogo para ver os animais de um tutor específico */}
+      <Dialog open={isClientPetsDialogOpen} onOpenChange={setIsClientPetsDialogOpen}>
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Animais de {clientToViewPets?.name}</DialogTitle>
+            <DialogDescription>
+              Lista de todos os animais vinculados a {clientToViewPets?.name}.
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="flex-1 p-4 border rounded-md bg-muted/20 mb-4">
+            {clientToViewPets ? (
+              (() => {
+                const petsOfClient = pets.filter(pet => pet.ownerId === clientToViewPets.id);
+                return petsOfClient.length > 0 ? (
+                  <div className="space-y-3">
+                    {petsOfClient.map(pet => {
+                      const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
+                      return (
+                        <div key={pet.id} className="flex items-center justify-between p-3 border rounded-md bg-card">
+                          <div className="flex items-center">
+                            <IconComponent className="h-5 w-5 mr-3 text-muted-foreground" />
+                            <div>
+                              <p className="font-medium">{pet.name} ({pet.species})</p>
+                              <p className="text-sm text-muted-foreground">Raça: {pet.breed} | Idade: {pet.age}</p>
+                            </div>
+                          </div>
+                          <Button variant="ghost" size="sm" onClick={() => handlePetRowClick(pet)}>
+                            <Eye className="h-4 w-4 mr-2" /> Detalhes
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-center text-muted-foreground">Nenhum animal cadastrado para este tutor.</p>
+                );
+              })()
+            ) : (
+              <p className="text-center text-muted-foreground">Selecione um tutor para ver seus animais.</p>
+            )}
+          </ScrollArea>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsClientPetsDialogOpen(false)}>Fechar</Button>
+            <Button onClick={() => handleAddPetForClient(clientToViewPets!.id)} disabled={!clientToViewPets}>
+              <PlusCircle className="h-4 w-4 mr-2" /> Adicionar Animal para {clientToViewPets?.name}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

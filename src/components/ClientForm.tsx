@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, User, Mail, Phone, Home, MapPin, Calendar, IdCard, Upload, XCircle } from "lucide-react";
+import { PlusCircle, User, Mail, Phone, Home, MapPin, Calendar, IdCard, Upload, XCircle, Camera } from "lucide-react";
 import { format, parseISO, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -19,12 +19,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { DialogFooter } from "@/components/ui/dialog";
-import MultiSelectPets from "./MultiSelectPets";
 import BirthdayPicker from "./BirthdayPicker";
-import { Client, Pet } from "@/types/cadastro";
+import { Client } from "@/types/cadastro"; // Removido Pet
 import { lookupCep } from "@/utils/cepLookup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { showError, showSuccess } from "@/utils/toast";
+import { Textarea } from "@/components/ui/textarea"; // Importar Textarea
+import CameraCaptureDialog from "./CameraCaptureDialog"; // Importar o novo diálogo da câmera
 
 // Esquema de validação do formulário com Zod
 const formSchema = z.object({
@@ -44,8 +45,8 @@ const formSchema = z.object({
     city: z.string().min(1, "A cidade é obrigatória."),
     state: z.string().min(2, "O estado é obrigatório.").max(2, "O estado deve ter 2 letras."),
   }),
-  photoUrl: z.string().optional(),
-  associatedPetIds: z.array(z.string()).optional(),
+  observations: z.string().optional(), // Novo campo
+  photoUrl: z.string().optional(), // Novo campo para URL da foto (Base64)
 });
 
 export type ClientFormValues = z.infer<typeof formSchema>;
@@ -53,11 +54,10 @@ export type ClientFormValues = z.infer<typeof formSchema>;
 interface ClientFormProps {
   onSubmit: (data: ClientFormValues) => void;
   onCancel: () => void;
-  initialData?: Client & { associatedPetIds?: string[] };
-  allPets: Pet[];
+  initialData?: Client; // Removido associatedPetIds
 }
 
-const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData, allPets }) => {
+const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData }) => {
   // Função auxiliar para analisar strings de data com segurança
   const safeParseDate = (dateString?: string | null): Date => {
     if (dateString) {
@@ -86,13 +86,14 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
         city: initialData?.address?.city || "",
         state: initialData?.address?.state || "",
       },
+      observations: initialData?.observations || "", // Valor padrão para observações
       photoUrl: initialData?.photoUrl || undefined,
-      associatedPetIds: initialData?.associatedPetIds || [],
     },
   });
 
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialData?.photoUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isCameraDialogOpen, setIsCameraDialogOpen] = useState(false); // Estado para o diálogo da câmera
 
   // Efeito para resetar o formulário e o preview da imagem quando o diálogo é aberto/fechado
   useEffect(() => {
@@ -111,14 +112,14 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
         city: initialData?.address?.city || "",
         state: initialData?.address?.state || "",
       },
+      observations: initialData?.observations || "",
       photoUrl: initialData?.photoUrl || undefined,
-      associatedPetIds: initialData?.associatedPetIds || [],
     });
     setPreviewUrl(initialData?.photoUrl || null);
     if (fileInputRef.current) {
       fileInputRef.current.value = ''; // Limpa o input de arquivo
     }
-  }, [initialData, form]); // Depende de initialData para resetar quando os dados mudam (ou o formulário é 'reaberto' sem initialData)
+  }, [initialData, form]);
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const cep = e.target.value;
@@ -171,6 +172,15 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
     }
   };
 
+  const handleCapturePhoto = (imageDataUrl: string) => {
+    setPreviewUrl(imageDataUrl);
+    form.setValue("photoUrl", imageDataUrl);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ''; // Limpa o input de arquivo se uma foto da câmera for usada
+    }
+    showSuccess("Foto capturada com sucesso!");
+  };
+
   const handleRemovePhoto = () => {
     setPreviewUrl(null);
     form.setValue("photoUrl", undefined);
@@ -198,13 +208,20 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
           </Avatar>
           <div className="grid w-full max-w-sm items-center gap-1.5">
             <Label htmlFor="client-picture" className="text-center">Foto do Tutor</Label>
-            <Input
-              id="client-picture"
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              ref={fileInputRef}
-            />
+            <div className="flex space-x-2">
+              <Input
+                id="client-picture"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                ref={fileInputRef}
+                className="flex-1"
+              />
+              <Button type="button" variant="outline" size="icon" onClick={() => setIsCameraDialogOpen(true)}>
+                <Camera className="h-4 w-4" />
+                <span className="sr-only">Tirar foto com câmera</span>
+              </Button>
+            </div>
             {previewUrl && (
               <Button
                 variant="outline"
@@ -385,27 +402,20 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
           />
         </div>
 
-        <h3 className="text-lg font-semibold mt-6 mb-4 flex items-center">
-          <MapPin className="h-5 w-5 mr-2 text-muted-foreground" /> Animais Associados
-        </h3>
         <FormField
           control={form.control}
-          name="associatedPetIds"
+          name="observations"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Animais Associados</FormLabel>
+              <FormLabel>Observações (Opcional)</FormLabel>
               <FormControl>
-                <MultiSelectPets
-                  allPets={allPets}
-                  selectedPetIds={field.value || []}
-                  onValueChange={field.onChange}
-                  placeholder="Selecione os animais deste tutor"
-                />
+                <Textarea placeholder="Informações adicionais sobre o tutor..." {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
         <DialogFooter className="mt-6">
           <Button variant="outline" onClick={onCancel}>
             Cancelar
@@ -415,6 +425,11 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
           </Button>
         </DialogFooter>
       </form>
+      <CameraCaptureDialog
+        isOpen={isCameraDialogOpen}
+        onClose={() => setIsCameraDialogOpen(false)}
+        onCapture={handleCapturePhoto}
+      />
     </Form>
   );
 };

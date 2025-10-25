@@ -3,9 +3,9 @@ export interface Client {
   name: string;
   email: string;
   phone: string;
-  cpf: string; // Novo campo
-  dateOfBirth: string; // Novo campo (formato YYYY-MM-DD)
-  address: { // Novo campo de endereço
+  cpf: string;
+  dateOfBirth: string; // Formato YYYY-MM-DD
+  address: {
     cep: string;
     street: string;
     number: string;
@@ -14,7 +14,8 @@ export interface Client {
     city: string;
     state: string;
   };
-  photoUrl?: string; // Novo campo para URL da foto
+  observations?: string; // Novo campo
+  photoUrl?: string; // Novo campo para URL da foto (Base64)
 }
 
 export interface Pet {
@@ -22,5 +23,10 @@ export interface Pet {
   name: string;
   species: string;
   breed: string;
-  ownerId: string; // ID do tutor associado
+  age: string; // Novo campo (ex: "2 anos", "6 meses")
+  gender: 'Macho' | 'Fêmea' | 'Desconhecido'; // Novo campo
+  color: string; // Novo campo
+  observations?: string; // Novo campo
+  photoUrl?: string; // Novo campo para URL da foto (Base64)
+  ownerId: string; // ID do tutor associado (chave estrangeira)
 }
