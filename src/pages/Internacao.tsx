@@ -123,18 +123,32 @@ const Internacao = () => {
     queryKey: ['interned_patients', userId],
     queryFn: async () => {
       if (!userId) return [];
-      console.log("Fetching interned_patients from Supabase for user:", userId);
+      console.log("Fetching ALL interned_patients from Supabase for user:", userId);
+      const { data: allPatients, error: allPatientsError } = await supabase
+        .from('interned_patients')
+        .select('*')
+        .eq('user_id', userId);
+
+      if (allPatientsError) {
+        console.error("Error fetching ALL interned_patients:", allPatientsError);
+        throw allPatientsError;
+      }
+      console.log("RAW Supabase response for ALL interned_patients:", allPatients);
+      allPatients.forEach(p => console.log(`RAW Patient ${p.id} - Status: '${p.status}'`)); // Log with quotes to see whitespace
+
+      // Now, perform the actual query with the filter
       const { data, error } = await supabase
         .from('interned_patients')
         .select('*')
         .eq('user_id', userId)
-        .not('status', 'in', '("Alta", "Óbito")'); // Filter out discharged/deceased patients
+        .not('status', 'in', '("Alta", "Óbito")'); // This is the actual filter sent to DB
+
       if (error) {
-        console.error("Error fetching interned_patients:", error);
+        console.error("Error fetching interned_patients (with .not() filter):", error);
         throw error;
       }
-      console.log("Supabase returned for interned_patients (after filter):", data); // NEW LOG
-      data.forEach(p => console.log(`Patient ${p.id} - Status: ${p.status}`)); // Log status of each patient
+      console.log("Supabase returned for interned_patients (after .not() filter):", data);
+      data.forEach(p => console.log(`Patient ${p.id} - Status: '${p.status}' (after .not() filter)`));
       return data;
     },
     enabled: !!userId,
@@ -224,7 +238,7 @@ const Internacao = () => {
   const updatePatientMutation = useMutation({
     mutationFn: async (updatedPatient: InternedPatient) => {
       if (!userId) throw new Error("User not authenticated.");
-      console.log("Attempting to update patient:", updatedPatient);
+      console.log("Attempting to update patient in DB:", updatedPatient);
       const { data, error } = await supabase
         .from('interned_patients')
         .update({
@@ -244,10 +258,10 @@ const Internacao = () => {
         .select()
         .single();
       if (error) {
-        console.error("Error updating patient:", error);
+        console.error("Error updating patient in DB:", error);
         throw error;
       }
-      console.log("Patient updated successfully (from DB response):", data);
+      console.log("Patient updated successfully in DB (response):", data);
       return data;
     },
     onSuccess: async (data) => {
@@ -647,7 +661,7 @@ const Internacao = () => {
           patientName={actionPatientName}
           date={actionDate}
           initialHour={actionHour}
-          allActionsForPatient={allActionsForCurrentPatient}
+          allActionsForCurrentPatient={allActionsForCurrentPatient}
         />
       )}
 
