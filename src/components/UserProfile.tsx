@@ -11,13 +11,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { User as UserIcon, LogOut, Settings, UserCircle } from "lucide-react"; // Adicionado UserCircle para o link de perfil
-import { useUser } from "@/context/UserContext";
-import { Link, useNavigate } from "react-router-dom"; // Importar useNavigate
-import { supabase } from "@/integrations/supabase/client"; // Importar o cliente Supabase
+import { User as UserIcon, LogOut, Settings, UserCircle } from "lucide-react";
+import { useUser } from "@/context/UserContext"; // Importar useUser
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const UserProfile = () => {
-  const { user, setUser } = useUser();
+  const { user: appUser, setUser } = useUser(); // Obter o usuário com o cargo do UserContext
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -31,7 +31,7 @@ const UserProfile = () => {
     }
   };
 
-  if (!user) {
+  if (!appUser) { // Usar appUser aqui
     return (
       <Button variant="ghost" onClick={() => navigate("/login")}>
         Login
@@ -40,8 +40,8 @@ const UserProfile = () => {
   }
 
   // Calcular as iniciais de forma mais robusta
-  const firstNameInitial = user.name ? user.name.charAt(0) : '';
-  const lastNameInitial = user.lastName ? user.lastName.charAt(0) : '';
+  const firstNameInitial = appUser.name ? appUser.name.charAt(0) : '';
+  const lastNameInitial = appUser.lastName ? appUser.lastName.charAt(0) : '';
   const initials = `${firstNameInitial}${lastNameInitial}`.toUpperCase();
 
   return (
@@ -49,8 +49,8 @@ const UserProfile = () => {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
           <Avatar className="h-10 w-10">
-            {user.avatarUrl ? (
-              <AvatarImage src={user.avatarUrl} alt={user.name} />
+            {appUser.avatarUrl ? (
+              <AvatarImage src={appUser.avatarUrl} alt={appUser.name} />
             ) : (
               <AvatarFallback className="bg-muted text-muted-foreground text-sm font-bold">
                 {initials} {/* Exibe as iniciais aqui */}
@@ -59,12 +59,12 @@ const UserProfile = () => {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end"> {/* Removido forceMount */}
+      <DropdownMenuContent className="w-56" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.name}</p>
+            <p className="text-sm font-medium leading-none">{appUser.name}</p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
+              {appUser.email}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -75,12 +75,14 @@ const UserProfile = () => {
             Perfil
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link to="/settings" className="flex items-center">
-            <Settings className="mr-2 h-4 w-4" />
-            Configurações
-          </Link>
-        </DropdownMenuItem>
+        {appUser.role === "Administrador" && ( // Renderiza "Configurações" apenas para Administradores
+          <DropdownMenuItem asChild>
+            <Link to="/settings" className="flex items-center">
+              <Settings className="mr-2 h-4 w-4" />
+              Configurações
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout} className="flex items-center">
           <LogOut className="mr-2 h-4 w-4" />

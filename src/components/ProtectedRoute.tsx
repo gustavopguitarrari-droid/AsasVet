@@ -1,28 +1,32 @@
 "use client";
 
 import React, { useEffect } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useSession } from '@/context/SessionContext';
-import Layout from './layout/Layout'; // Importar o Layout
+import { useUser } from '@/context/UserContext'; // Importar useUser
+import Layout from './layout/Layout';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
+// Rotas permitidas para o cargo "Veterinário"
+const allowedVeterinarioPaths = [
+  '/painel',
+  '/consultas',
+  '/internacao',
+  '/cadastro',
+  '/medical-records', // Agenda
+  '/profile', // Perfil deve ser acessível a todos os cargos
+];
+
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { session, isLoading } = useSession();
+  const { user: appUser } = useUser(); // Obter o usuário com o cargo do UserContext
+  const location = useLocation();
 
-  useEffect(() => {
-    console.log('ProtectedRoute - isLoading:', isLoading, 'session:', session);
-    if (!isLoading && !session) {
-      console.log('ProtectedRoute - Redirecting to /login because no session and not loading.');
-    } else if (!isLoading && session) {
-      console.log('ProtectedRoute - Session found, rendering children.');
-    }
-  }, [isLoading, session]);
-
-  if (isLoading) {
-    console.log('ProtectedRoute - Currently loading session...');
+  // Exibe um estado de carregamento enquanto a sessão e o perfil do usuário estão sendo carregados
+  if (isLoading || !appUser) { // Espera tanto pela sessão quanto pelos dados do usuário (incluindo o cargo)
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <p className="text-lg text-gray-600 dark:text-gray-300">Carregando...</p>
@@ -30,11 +34,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
+  // Se não houver sessão, redireciona para a página de login
   if (!session) {
     return <Navigate to="/login" replace />;
   }
 
-  // Se estiver logado, renderiza o layout e o conteúdo da rota
+  // Se o usuário for um "Veterinário" e a rota atual não estiver na lista de permitidas, redireciona para o Painel
+  if (appUser.role === "Veterinário" && !allowedVeterinarioPaths.includes(location.pathname)) {
+    console.log(`ProtectedRoute - Veterinário tentando acessar caminho proibido: ${location.pathname}. Redirecionando para /painel.`);
+    return <Navigate to="/painel" replace />;
+  }
+
+  // Se estiver logado e autorizado, renderiza o layout e o conteúdo da rota
   return <Layout>{children}</Layout>;
 };
 

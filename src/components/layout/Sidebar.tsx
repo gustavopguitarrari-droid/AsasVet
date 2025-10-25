@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useUser } from "@/context/UserContext"; // Importar useUser
 
 interface NavItem {
   name: string;
@@ -24,7 +25,8 @@ interface NavItem {
   path: string;
 }
 
-const navItems: NavItem[] = [
+// Todos os itens de navegação disponíveis
+const allNavItems: NavItem[] = [
   {
     name: "Painel",
     icon: LayoutDashboard,
@@ -41,12 +43,12 @@ const navItems: NavItem[] = [
     path: "/internacao",
   },
   {
-    name: "Cadastro", // Item de navegação para a página combinada
-    icon: PawPrint, // Ícone alterado para PawPrint
+    name: "Cadastro",
+    icon: PawPrint,
     path: "/cadastro",
   },
   {
-    name: "Agenda", // Assumindo que "Agendar" se refere a "Agenda"
+    name: "Agenda",
     icon: CalendarDays,
     path: "/medical-records",
   },
@@ -68,8 +70,37 @@ const navItems: NavItem[] = [
   },
 ];
 
+interface SidebarProps {
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+}
+
 const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
+  const { user: appUser } = useUser(); // Obter o usuário com o cargo do UserContext
+
+  // Filtra os itens de navegação com base no cargo do usuário
+  const filteredNavItems = React.useMemo(() => {
+    if (!appUser) {
+      return []; // Não mostra nada se o usuário não estiver carregado
+    }
+    if (appUser.role === "Administrador") {
+      return allNavItems; // Administradores veem todos os itens
+    }
+    if (appUser.role === "Veterinário") {
+      const allowedPaths = [
+        "/painel",
+        "/consultas",
+        "/internacao",
+        "/cadastro",
+        "/medical-records",
+      ];
+      return allNavItems.filter(item => allowedPaths.includes(item.path));
+    }
+    // Para outros cargos ou cargos não definidos, mostra apenas o Painel como padrão
+    return allNavItems.filter(item => item.path === "/painel");
+  }, [appUser]);
+
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
@@ -78,7 +109,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         <PawPrint className={cn("h-10 w-10 text-white", !isCollapsed && "ml-2")} strokeWidth={2.5} />
       </Link>
       <nav className="flex-1 space-y-2">
-        {navItems.map((item) => {
+        {filteredNavItems.map((item) => {
           const isActive = location.pathname === item.path;
 
           return (
@@ -127,7 +158,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         )}
       >
         <Button
-          variant="default" // Usará a cor --primary do tema
+          variant="default"
           size="icon"
           onClick={onToggleCollapse}
           className={cn(
