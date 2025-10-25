@@ -64,7 +64,10 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
       email: initialData?.email || "",
       phone: initialData?.phone || "",
       cpf: initialData?.cpf || "",
-      dateOfBirth: initialData?.dateOfBirth ? parseISO(initialData.dateOfBirth) : new Date(), // Corrigido aqui
+      // Garante que dateOfBirth seja sempre um objeto Date válido
+      dateOfBirth: initialData?.dateOfBirth && isValid(parseISO(initialData.dateOfBirth))
+        ? parseISO(initialData.dateOfBirth)
+        : new Date(),
       address: {
         cep: initialData?.address?.cep || "",
         street: initialData?.address?.street || "",

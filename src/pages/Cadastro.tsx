@@ -185,6 +185,7 @@ const Cadastro = () => {
                 <DialogTitle>Adicionar Novo Tutor</DialogTitle>
               </DialogHeader>
               <ClientForm
+                key={isAddClientDialogOpen ? "open" : "closed"} // Adicionada a key aqui
                 onSubmit={handleAddClient}
                 onCancel={() => setIsAddClientDialogOpen(false)}
                 allPets={pets}
