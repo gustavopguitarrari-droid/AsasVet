@@ -12,12 +12,15 @@ const Login = () => {
   const { session, isLoading } = useSession();
 
   useEffect(() => {
+    console.log('Login Page - isLoading:', isLoading, 'session:', session);
     if (session && !isLoading) {
+      console.log('Login Page - Session found and not loading, redirecting to /painel.');
       navigate('/painel'); // Redirect to dashboard if already logged in
     }
   }, [session, isLoading, navigate]);
 
   if (isLoading) {
+    console.log('Login Page - Currently loading session...');
     return (
       <div className="min-h-screen flex items-center justify-center login-art-bg"> {/* Aplicado o novo background */}
         <p className="text-lg text-gray-600 dark:text-gray-300">Carregando...</p>

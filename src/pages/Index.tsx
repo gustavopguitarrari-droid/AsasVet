@@ -1,13 +1,23 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSession } from '@/context/SessionContext'; // Importar useSession
 
 const Index = () => {
   const navigate = useNavigate();
+  const { session, isLoading } = useSession(); // Usar useSession para verificar o estado de autenticação
 
   useEffect(() => {
-    // Redireciona para o painel
-    navigate("/painel"); 
-  }, [navigate]);
+    console.log('Index Page - isLoading:', isLoading, 'session:', session);
+    if (!isLoading) {
+      if (session) {
+        console.log('Index Page - Session found, redirecting to /painel.');
+        navigate("/painel");
+      } else {
+        console.log('Index Page - No session, redirecting to /login.');
+        navigate("/login"); // Redireciona para o login se não houver sessão
+      }
+    }
+  }, [navigate, session, isLoading]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
