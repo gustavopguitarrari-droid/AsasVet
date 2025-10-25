@@ -250,96 +250,6 @@ const SubusersSettings: React.FC = () => {
         </p>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Formulário de Criação de Subusuário */}
-          <div className="space-y-6 p-4 border rounded-md bg-card shadow-sm">
-            <h3 className="text-xl font-semibold flex items-center">
-              <PlusCircle className="h-5 w-5 mr-2" /> Criar Novo Subusuário
-            </h3>
-            <form onSubmit={form.handleSubmit(handleCreateSubuser)} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName" className="flex items-center">
-                    <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Nome
-                  </Label>
-                  <Input id="firstName" placeholder="Primeiro Nome" {...form.register("firstName")} />
-                  {form.formState.errors.firstName && (
-                    <p className="text-destructive text-sm">{form.formState.errors.firstName.message}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName" className="flex items-center">
-                    <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Sobrenome
-                  </Label>
-                  <Input id="lastName" placeholder="Sobrenome" {...form.register("lastName")} />
-                  {form.formState.errors.lastName && (
-                    <p className="text-destructive text-sm">{form.formState.errors.lastName.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center">
-                  <Mail className="h-4 w-4 mr-2 text-muted-foreground" /> E-mail
-                </Label>
-                <Input id="email" type="email" placeholder="email@exemplo.com" {...form.register("email")} />
-                {form.formState.errors.email && (
-                  <p className="text-destructive text-sm">{form.formState.errors.email.message}</p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password" className="flex items-center">
-                  <Lock className="h-4 w-4 mr-2 text-muted-foreground" /> Senha
-                </Label>
-                <Input id="password" type="password" placeholder="••••••••" {...form.register("password")} />
-                {form.formState.errors.password && (
-                  <p className="text-destructive text-sm">{form.formState.errors.password.message}</p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="role" className="flex items-center">
-                    <Briefcase className="h-4 w-4 mr-2 text-muted-foreground" /> Cargo
-                  </Label>
-                  <RoleSelect
-                    value={form.watch("role")}
-                    onValueChange={(value) => form.setValue("role", value)}
-                  />
-                  {form.formState.errors.role && (
-                    <p className="text-destructive text-sm">{form.formState.errors.role.message}</p>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="gender" className="flex items-center">
-                    <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Gênero
-                  </Label>
-                  <Select
-                    onValueChange={(value) => form.setValue("gender", value as "Masculino" | "Feminino" | "Outro")}
-                    defaultValue={form.watch("gender")}
-                  >
-                    <SelectTrigger id="gender">
-                      <SelectValue placeholder="Selecione o gênero" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Masculino">Masculino</SelectItem>
-                      <SelectItem value="Feminino">Feminino</SelectItem>
-                      <SelectItem value="Outro">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {form.formState.errors.gender && (
-                    <p className="text-destructive text-sm">{form.formState.errors.gender.message}</p>
-                  )}
-                </div>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={createSubuserMutation.isPending}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                {createSubuserMutation.isPending ? "Criando..." : "Criar Subusuário"}
-              </Button>
-            </form>
-          </div>
-
           {/* Lista de Subusuários */}
           <div className="space-y-6 p-4 border rounded-md bg-card shadow-sm">
             <h3 className="text-xl font-semibold flex items-center">
@@ -449,6 +359,96 @@ const SubusersSettings: React.FC = () => {
             ) : (
               <p className="text-muted-foreground text-center py-4">Nenhum subusuário encontrado.</p>
             )}
+          </div>
+
+          {/* Formulário de Criação de Subusuário */}
+          <div className="space-y-6 p-4 border rounded-md bg-card shadow-sm">
+            <h3 className="text-xl font-semibold flex items-center">
+              <PlusCircle className="h-5 w-5 mr-2" /> Criar Novo Subusuário
+            </h3>
+            <form onSubmit={form.handleSubmit(handleCreateSubuser)} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName" className="flex items-center">
+                    <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Nome
+                  </Label>
+                  <Input id="firstName" placeholder="Primeiro Nome" {...form.register("firstName")} />
+                  {form.formState.errors.firstName && (
+                    <p className="text-destructive text-sm">{form.formState.errors.firstName.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName" className="flex items-center">
+                    <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Sobrenome
+                  </Label>
+                  <Input id="lastName" placeholder="Sobrenome" {...form.register("lastName")} />
+                  {form.formState.errors.lastName && (
+                    <p className="text-destructive text-sm">{form.formState.errors.lastName.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email" className="flex items-center">
+                  <Mail className="h-4 w-4 mr-2 text-muted-foreground" /> E-mail
+                </Label>
+                <Input id="email" type="email" placeholder="email@exemplo.com" {...form.register("email")} />
+                {form.formState.errors.email && (
+                  <p className="text-destructive text-sm">{form.formState.errors.email.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password" className="flex items-center">
+                  <Lock className="h-4 w-4 mr-2 text-muted-foreground" /> Senha
+                </Label>
+                <Input id="password" type="password" placeholder="••••••••" {...form.register("password")} />
+                {form.formState.errors.password && (
+                  <p className="text-destructive text-sm">{form.formState.errors.password.message}</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="role" className="flex items-center">
+                    <Briefcase className="h-4 w-4 mr-2 text-muted-foreground" /> Cargo
+                  </Label>
+                  <RoleSelect
+                    value={form.watch("role")}
+                    onValueChange={(value) => form.setValue("role", value)}
+                  />
+                  {form.formState.errors.role && (
+                    <p className="text-destructive text-sm">{form.formState.errors.role.message}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="gender" className="flex items-center">
+                    <UserIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Gênero
+                  </Label>
+                  <Select
+                    onValueChange={(value) => form.setValue("gender", value as "Masculino" | "Feminino" | "Outro")}
+                    defaultValue={form.watch("gender")}
+                  >
+                    <SelectTrigger id="gender">
+                      <SelectValue placeholder="Selecione o gênero" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Masculino">Masculino</SelectItem>
+                      <SelectItem value="Feminino">Feminino</SelectItem>
+                      <SelectItem value="Outro">Outro</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.gender && (
+                    <p className="text-destructive text-sm">{form.formState.errors.gender.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <Button type="submit" className="w-full" disabled={createSubuserMutation.isPending}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                {createSubuserMutation.isPending ? "Criando..." : "Criar Subusuário"}
+              </Button>
+            </form>
           </div>
         </div>
       </CardContent>
