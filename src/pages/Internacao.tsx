@@ -330,6 +330,28 @@ const Internacao = () => {
     },
   });
 
+  // NEW: Mutation for clearing history patients
+  const clearHistoryMutation = useMutation({
+    mutationFn: async () => {
+      if (!userId) throw new Error("User not authenticated.");
+      const { error } = await supabase
+        .from('interned_patients')
+        .delete()
+        .eq('user_id', userId)
+        .in('status', ['Alta', 'Óbito']);
+      if (error) throw error;
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
+      showSuccess("Histórico de pacientes internados limpo com sucesso!");
+      setIsHistoryDialogOpen(false); // Fecha o diálogo após a limpeza
+    },
+    onError: (error) => {
+      showError(`Erro ao limpar histórico: ${error.message}`);
+    },
+  });
+
   const handleAddInternment = (data: InternmentFormValues) => {
     addPatientMutation.mutate(data);
   };
@@ -439,6 +461,13 @@ const Internacao = () => {
         <div className="flex space-x-2">
           {activeTab === "pacientes-internados" && (
             <>
+              <InternmentHistoryDialog
+                isOpen={isHistoryDialogOpen}
+                onClose={() => setIsHistoryDialogOpen(false)}
+                historyPatients={historyPatients}
+                onClearHistory={() => clearHistoryMutation.mutate()}
+                isClearingHistory={clearHistoryMutation.isPending}
+              />
               <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
                 <History className="mr-2 h-4 w-4" /> Ver Histórico
               </Button>
@@ -573,12 +602,6 @@ const Internacao = () => {
         onUpdate={handleUpdateInternment}
       />
 
-      <InternmentHistoryDialog
-        isOpen={isHistoryDialogOpen}
-        onClose={() => setIsHistoryDialogOpen(false)}
-        historyPatients={historyPatients}
-      />
-
       {isAddActionDialogOpen && actionPatientId && actionPatientName && actionDate && actionHour && (
         <AddPatientActionDialog
           isOpen={isAddActionDialogOpen}
@@ -588,7 +611,7 @@ const Internacao = () => {
           patientName={actionPatientName}
           date={actionDate}
           initialHour={actionHour}
-          allActionsForCurrentPatient={allActionsForCurrentPatient}
+          allActionsForPatient={allActionsForCurrentPatient}
         />
       )}
 

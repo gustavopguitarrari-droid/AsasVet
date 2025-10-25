@@ -7,12 +7,25 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter, // Importar DialogFooter
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { InternedPatient } from "@/pages/Internacao"; // Importar a interface atualizada
+import { Button } from "@/components/ui/button"; // Importar Button
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter as AlertDialogFooterComponent, // Renomear para evitar conflito
+  AlertDialogHeader,
+  AlertDialogTitle as AlertDialogTitleComponent, // Renomear para evitar conflito
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -20,6 +33,8 @@ interface InternmentHistoryDialogProps {
   isOpen: boolean;
   onClose: () => void;
   historyPatients: InternedPatient[];
+  onClearHistory: () => void; // Nova prop para limpar o histórico
+  isClearingHistory: boolean; // Nova prop para indicar se a limpeza está em andamento
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -52,6 +67,8 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
   isOpen,
   onClose,
   historyPatients,
+  onClearHistory,
+  isClearingHistory,
 }) => {
   const [searchTerm, setSearchTerm] = React.useState<string>("");
 
@@ -66,7 +83,7 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col">
         <DialogHeader>
           <DialogTitle>Histórico de Pacientes Internados</DialogTitle>
           <DialogDescription>
@@ -83,7 +100,7 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
           />
         </div>
         {filteredHistoryPatients.length > 0 ? (
-          <ul className="space-y-4">
+          <ul className="space-y-4 flex-1 overflow-y-auto pr-2">
             {filteredHistoryPatients.map((patient) => {
               const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
               const statusColorClass = statusBadgeColorMap[patient.status] || "bg-gray-500";
@@ -115,8 +132,32 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
             })}
           </ul>
         ) : (
-          <p className="text-muted-foreground text-center py-8">Nenhum paciente no histórico de internações que corresponda à sua busca.</p>
+          <p className="text-muted-foreground text-center py-8 flex-1">Nenhum paciente no histórico de internações que corresponda à sua busca.</p>
         )}
+        <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+          <Button variant="outline" onClick={onClose}>Fechar</Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={historyPatients.length === 0 || isClearingHistory}>
+                {isClearingHistory ? "Limpando..." : "Limpar Histórico"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitleComponent>Tem certeza que deseja limpar o histórico?</AlertDialogTitleComponent>
+                <AlertDialogDescription>
+                  Esta ação não pode ser desfeita. Todos os registros de pacientes com status "Alta" ou "Óbito" serão permanentemente excluídos.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooterComponent>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={onClearHistory} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Limpar Histórico
+                </AlertDialogAction>
+              </AlertDialogFooterComponent>
+            </AlertDialogContent>
+          </AlertDialog>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
