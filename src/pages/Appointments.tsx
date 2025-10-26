@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play } from "lucide-react"; // Adicionado ícone Play
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -25,6 +25,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
+import { Client, Pet } from "@/types/cadastro"; // Import Client and Pet interfaces
 
 export interface Appointment {
   id: string;
@@ -35,7 +36,7 @@ export interface Appointment {
   pet_name: string; // Renomeado para corresponder ao DB
   species: string;
   service: string;
-  veterinarian: string | null; // Pode ser nulo inicialmente
+  veterinarian: string;
   status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
   completion_date?: string | null; // Renomeado para corresponder ao DB
   completion_time?: string | null; // Renomeado para corresponder ao DB
@@ -74,6 +75,53 @@ const Appointments = () => {
         .from('appointments')
         .select('*')
         .eq('user_id', userId);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
+
+  // Fetch clients
+  const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
+    queryKey: ['clients', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('user_id', userId);
+      if (error) throw error;
+      return data.map(dbClient => ({
+        id: dbClient.id,
+        name: dbClient.name,
+        email: dbClient.email,
+        phone: dbClient.phone,
+        cpf: dbClient.cpf,
+        dateOfBirth: dbClient.date_of_birth,
+        address: {
+          cep: dbClient.address_cep || '',
+          street: dbClient.address_street || '',
+          number: dbClient.address_number || '',
+          complement: dbClient.address_complement || undefined,
+          neighborhood: dbClient.address_neighborhood || '',
+          city: dbClient.address_city || '',
+          state: dbClient.address_state || '',
+        },
+        observations: dbClient.observations || undefined,
+        photoUrl: dbClient.photo_url || undefined,
+      }));
+    },
+    enabled: !!userId,
+  });
+
+  // Fetch pets
+  const { data: pets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
+    queryKey: ['pets', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('pets')
+        .select('*'); // RLS will filter by owner_id linked to user_id
       if (error) throw error;
       return data;
     },
@@ -273,18 +321,18 @@ const Appointments = () => {
   const totalCanceladas = appointments.filter(a => a.status === "Cancelada").length;
   const totalEmAndamento = appointments.filter(a => a.status === "Em Andamento").length;
 
-  if (isLoading) {
+  if (isLoading || isLoadingClients || isLoadingPets) {
     return (
       <div className="flex items-center justify-center h-full">
-        <p className="text-muted-foreground">Carregando consultas...</p>
+        <p className="text-muted-foreground">Carregando consultas e dados de cadastro...</p>
       </div>
     );
   }
 
-  if (error) {
+  if (error || clientsError || petsError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar consultas: {error.message}</p>
+        <p>Erro ao carregar dados: {error?.message || clientsError?.message || petsError?.message}</p>
       </div>
     );
   }
@@ -303,7 +351,11 @@ const Appointments = () => {
             <DialogHeader>
               <DialogTitle>Incluir Nova Consulta</DialogTitle>
             </DialogHeader>
-            <AppointmentForm onSubmit={handleAddAppointment} />
+            <AppointmentForm
+              onSubmit={handleAddAppointment}
+              allClients={clients}
+              allPets={pets}
+            />
           </DialogContent>
         </Dialog>
       </div>
