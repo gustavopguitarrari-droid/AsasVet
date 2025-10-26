@@ -206,9 +206,7 @@ const Dashboard = () => {
                     "Nenhuma"
                   )}
                 </div>
-                <p className={textMutedClasses}>
-                  {scheduledAppointmentsCount === 1 ? "Consulta agendada" : "Consultas agendadas"}
-                </p>
+                {/* Removido o parágrafo com o texto "Consulta agendada" ou "Consultas agendadas" */}
               </CardContent>
             </Card>
           </Link>
