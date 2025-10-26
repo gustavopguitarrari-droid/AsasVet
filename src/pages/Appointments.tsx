@@ -505,7 +505,7 @@ const Appointments = () => {
                     <TableCell>{appointment.service}</TableCell>
                     {activeTab === "em-espera" && (
                       <TableCell>
-                        <AppointmentChronometer date={appointment.date} time={appointment.time} />
+                        <AppointmentChronometer startTime={appointment.created_at} />
                       </TableCell>
                     )}
                     {activeTab === "em-andamento" && (
@@ -517,7 +517,7 @@ const Appointments = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <AppointmentChronometer date={appointment.date} time={appointment.time} />
+                          <AppointmentChronometer startTime={appointment.created_at} />
                         </TableCell>
                       </>
                     )}

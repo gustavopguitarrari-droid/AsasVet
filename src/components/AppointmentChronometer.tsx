@@ -1,22 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { differenceInSeconds, parseISO, setHours, setMinutes } from 'date-fns';
+import { differenceInSeconds, parseISO } from 'date-fns';
 
 interface AppointmentChronometerProps {
-  date: string; // e.g., "2024-10-29"
-  time: string; // e.g., "16:00"
+  startTime: string; // e.g., "2024-10-29T10:30:00.000Z" (ISO string from created_at)
 }
 
-const AppointmentChronometer: React.FC<AppointmentChronometerProps> = ({ date, time }) => {
+const AppointmentChronometer: React.FC<AppointmentChronometerProps> = ({ startTime }) => {
   const [elapsedTime, setElapsedTime] = useState<number>(0); // in seconds
 
   useEffect(() => {
-    // Combine date and time to create a start Date object
-    const [hours, minutes] = time.split(':').map(Number);
-    let startDate = parseISO(date);
-    startDate = setHours(startDate, hours);
-    startDate = setMinutes(startDate, minutes);
+    const startDate = parseISO(startTime); // Parse the ISO string directly
 
     const interval = setInterval(() => {
       const now = new Date();
@@ -25,7 +20,7 @@ const AppointmentChronometer: React.FC<AppointmentChronometerProps> = ({ date, t
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [date, time]);
+  }, [startTime]); // Dependency is the `startTime` string
 
   const formatTime = (totalSeconds: number) => {
     const hours = Math.floor(totalSeconds / 3600);
