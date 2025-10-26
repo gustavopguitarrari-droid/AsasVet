@@ -123,32 +123,19 @@ const Internacao = () => {
     queryKey: ['interned_patients', userId],
     queryFn: async () => {
       if (!userId) return [];
-      console.log("Fetching ALL interned_patients from Supabase for user:", userId);
-      const { data: allPatients, error: allPatientsError } = await supabase
-        .from('interned_patients')
-        .select('*')
-        .eq('user_id', userId);
-
-      if (allPatientsError) {
-        console.error("Error fetching ALL interned_patients:", allPatientsError);
-        throw allPatientsError;
-      }
-      console.log("RAW Supabase response for ALL interned_patients:", allPatients);
-      allPatients.forEach(p => console.log(`RAW Patient ${p.id} - Status: '${p.status}'`)); // Log with quotes to see whitespace
-
-      // Now, perform the actual query with the filter
+      console.log("Internacao.tsx: Fetching interned_patients (excluding Alta/Óbito) from Supabase for user:", userId);
       const { data, error } = await supabase
         .from('interned_patients')
         .select('*')
         .eq('user_id', userId)
-        .not('status', 'in', '("Alta", "Óbito")'); // This is the actual filter sent to DB
+        .not('status', 'in', '("Alta", "Óbito")'); // Direct filter
 
       if (error) {
-        console.error("Error fetching interned_patients (with .not() filter):", error);
+        console.error("Internacao.tsx: Error fetching interned_patients:", error);
         throw error;
       }
-      console.log("Supabase returned for interned_patients (after .not() filter):", data);
-      data.forEach(p => console.log(`Patient ${p.id} - Status: '${p.status}' (after .not() filter)`));
+      console.log("Internacao.tsx: Supabase returned for interned_patients:", data);
+      data.forEach(p => console.log(`Internacao.tsx: Patient ${p.id} - Status: '${p.status}'`));
       return data;
     },
     enabled: !!userId,
@@ -159,17 +146,17 @@ const Internacao = () => {
     queryKey: ['history_patients', userId],
     queryFn: async () => {
       if (!userId) return [];
-      console.log("Fetching history_patients from Supabase...");
+      console.log("Internacao.tsx: Fetching history_patients from Supabase...");
       const { data, error } = await supabase
         .from('interned_patients')
         .select('*')
         .eq('user_id', userId)
         .in('status', ['Alta', 'Óbito']); // Only discharged/deceased patients
       if (error) {
-        console.error("Error fetching history_patients:", error);
+        console.error("Internacao.tsx: Error fetching history_patients:", error);
         throw error;
       }
-      console.log("history_patients fetched:", data);
+      console.log("Internacao.tsx: history_patients fetched:", data);
       return data;
     },
     enabled: !!userId,
@@ -180,16 +167,16 @@ const Internacao = () => {
     queryKey: ['patient_actions', userId],
     queryFn: async () => {
       if (!userId) return [];
-      console.log("Fetching patient_actions from Supabase...");
+      console.log("Internacao.tsx: Fetching patient_actions from Supabase...");
       const { data, error } = await supabase
         .from('patient_actions')
         .select('*')
         .eq('user_id', userId);
       if (error) {
-        console.error("Error fetching patient_actions:", error);
+        console.error("Internacao.tsx: Error fetching patient_actions:", error);
         throw error;
       }
-      console.log("patient_actions fetched:", data);
+      console.log("Internacao.tsx: patient_actions fetched:", data);
       return data;
     },
     enabled: !!userId,
@@ -199,7 +186,7 @@ const Internacao = () => {
   const addPatientMutation = useMutation({
     mutationFn: async (newPatientData: InternmentFormValues) => {
       if (!userId) throw new Error("User not authenticated.");
-      console.log("Attempting to insert new patient:", newPatientData);
+      console.log("Internacao.tsx: Attempting to insert new patient:", newPatientData);
       const { data, error } = await supabase
         .from('interned_patients')
         .insert({
@@ -218,10 +205,10 @@ const Internacao = () => {
         .select()
         .single();
       if (error) {
-        console.error("Error inserting new patient:", error);
+        console.error("Internacao.tsx: Error inserting new patient:", error);
         throw error;
       }
-      console.log("New patient inserted successfully:", data);
+      console.log("Internacao.tsx: New patient inserted successfully:", data);
       return data;
     },
     onSuccess: () => {
@@ -238,7 +225,7 @@ const Internacao = () => {
   const updatePatientMutation = useMutation({
     mutationFn: async (updatedPatient: InternedPatient) => {
       if (!userId) throw new Error("User not authenticated.");
-      console.log("Attempting to update patient in DB:", updatedPatient);
+      console.log("Internacao.tsx: Attempting to update patient in DB:", updatedPatient);
       const { data, error } = await supabase
         .from('interned_patients')
         .update({
@@ -258,30 +245,30 @@ const Internacao = () => {
         .select()
         .single();
       if (error) {
-        console.error("Error updating patient in DB:", error);
+        console.error("Internacao.tsx: Error updating patient in DB:", error);
         throw error;
       }
-      console.log("Patient updated successfully in DB (response):", data);
+      console.log("Internacao.tsx: Patient updated successfully in DB (response):", data);
       return data;
     },
     onSuccess: async (data) => {
-      console.log("updatePatientMutation onSuccess - Data received:", data);
-      console.log("Updated patient status in onSuccess:", data.status);
+      console.log("Internacao.tsx: updatePatientMutation onSuccess - Data received:", data);
+      console.log("Internacao.tsx: Updated patient status in onSuccess:", data.status);
       
       // Invalidate and refetch both queries to ensure they get fresh data from Supabase
       await queryClient.invalidateQueries({ queryKey: ['interned_patients', userId] });
       await queryClient.refetchQueries({ queryKey: ['interned_patients', userId] });
-      console.log("Invalidated and refetched interned_patients query.");
+      console.log("Internacao.tsx: Invalidated and refetched interned_patients query.");
 
       await queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
       await queryClient.refetchQueries({ queryKey: ['history_patients', userId] });
-      console.log("Invalidated and refetched history_patients query.");
+      console.log("Internacao.tsx: Invalidated and refetched history_patients query.");
 
       showSuccess("Paciente atualizado com sucesso!");
       setIsDetailsDialogOpen(false); // Close dialog AFTER cache update
     },
     onError: (error) => {
-      console.error("updatePatientMutation onError:", error);
+      console.error("Internacao.tsx: updatePatientMutation onError:", error);
       showError(`Erro ao atualizar paciente: ${error.message}`);
     },
   });
@@ -370,17 +357,17 @@ const Internacao = () => {
   const clearHistoryMutation = useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error("User not authenticated.");
-      console.log("Attempting to clear history patients for user:", userId);
+      console.log("Internacao.tsx: Attempting to clear history patients for user:", userId);
       const { error } = await supabase
         .from('interned_patients')
         .delete()
         .eq('user_id', userId)
         .in('status', ['Alta', 'Óbito']);
       if (error) {
-        console.error("Error clearing history patients:", error);
+        console.error("Internacao.tsx: Error clearing history patients:", error);
         throw error;
       }
-      console.log("History patients cleared successfully.");
+      console.log("Internacao.tsx: History patients cleared successfully.");
       return true;
     },
     onSuccess: () => {
@@ -398,7 +385,7 @@ const Internacao = () => {
   };
 
   const handleUpdateInternment = (updatedPatient: InternedPatient) => {
-    console.log("InternmentDetailsDialog: Calling onUpdate with updatedPatient:", updatedPatient);
+    console.log("Internacao.tsx: InternmentDetailsDialog: Calling onUpdate with updatedPatient:", updatedPatient); // Log para verificar
     updatePatientMutation.mutate(updatedPatient);
   };
 
@@ -428,6 +415,8 @@ const Internacao = () => {
     patient.status.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
     patient.risk.toLowerCase().includes(patientSearchTerm.toLowerCase())
   );
+
+  console.log("Internacao.tsx: filteredInternedPatients for rendering:", filteredInternedPatients);
 
   const openAddEditActionDialog = (
     patientId: string,
