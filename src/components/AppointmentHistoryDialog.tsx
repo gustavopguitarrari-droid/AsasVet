@@ -25,12 +25,25 @@ import { cn } from "@/lib/utils";
 import { format, parseISO, isValid, differenceInSeconds } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Appointment } from "@/pages/Appointments";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter as AlertDialogFooterComponent, // Renomear para evitar conflito
+  AlertDialogHeader,
+  AlertDialogTitle as AlertDialogTitleComponent, // Renomear para evitar conflito
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface AppointmentHistoryDialogProps {
   isOpen: boolean;
   onClose: () => void;
   historyAppointments: Appointment[];
   onViewDetails: (appointment: Appointment) => void;
+  onClearHistory: () => void; // Nova prop para limpar o histórico
+  isClearingHistory: boolean; // Nova prop para indicar se a limpeza está em andamento
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -62,6 +75,8 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   onClose,
   historyAppointments,
   onViewDetails,
+  onClearHistory,
+  isClearingHistory,
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
@@ -105,7 +120,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                 <TableHead>Serviço</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Veterinário</TableHead>
-                <TableHead>Finalização</TableHead> {/* Cabeçalho simplificado */}
+                <TableHead>Finalização</TableHead>
                 <TableHead>Duração</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
@@ -170,10 +185,31 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
           </Table>
         </div>
 
-        <DialogFooter className="pt-4">
+        <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
           <Button variant="outline" onClick={onClose}>
             Fechar
           </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={historyAppointments.length === 0 || isClearingHistory}>
+                {isClearingHistory ? "Limpando..." : "Limpar Histórico"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitleComponent>Tem certeza que deseja limpar o histórico?</AlertDialogTitleComponent>
+                <AlertDialogDescription>
+                  Esta ação não pode ser desfeita. Todas as consultas com status "Realizada" ou "Cancelada" serão permanentemente excluídas.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooterComponent>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={onClearHistory} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  Limpar Histórico
+                </AlertDialogAction>
+              </AlertDialogFooterComponent>
+            </AlertDialogContent>
+          </AlertDialog>
         </DialogFooter>
       </DialogContent>
     </Dialog>

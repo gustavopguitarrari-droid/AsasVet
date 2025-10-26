@@ -205,7 +205,7 @@ const Appointments = () => {
           service: updatedAppointment.service,
           veterinarian: updatedAppointment.veterinarian,
           status: updatedAppointment.status,
-          completion_timestamp: updatedAppointment.completion_timestamp, // Usar completion_timestamp
+          completion_timestamp: updatedAppointment.completion_timestamp,
           start_time: updatedAppointment.start_time,
         })
         .eq('id', updatedAppointment.id)
@@ -234,7 +234,7 @@ const Appointments = () => {
         .from('appointments')
         .update({
           status: "Cancelada",
-          completion_timestamp: now.toISOString(), // Salvar timestamp ISO
+          completion_timestamp: now.toISOString(),
           start_time: null,
         })
         .eq('id', appointmentId)
@@ -282,6 +282,28 @@ const Appointments = () => {
     },
     onError: (err) => {
       showError(`Erro ao iniciar consulta: ${err.message}`);
+    },
+  });
+
+  // NEW: Mutation for clearing history appointments
+  const clearHistoryAppointmentsMutation = useMutation({
+    mutationFn: async () => {
+      if (!userId) throw new Error("User not authenticated.");
+      const { error } = await supabase
+        .from('appointments')
+        .delete()
+        .eq('user_id', userId)
+        .in('status', ['Realizada', 'Cancelada']);
+      if (error) throw error;
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      showSuccess("Histórico de consultas limpo com sucesso!");
+      setIsHistoryDialogOpen(false);
+    },
+    onError: (err) => {
+      showError(`Erro ao limpar histórico: ${err.message}`);
     },
   });
 
@@ -474,7 +496,7 @@ const Appointments = () => {
               {activeTab === "em-andamento" && <TableHead>Veterinário</TableHead>}
               {activeTab === "em-andamento" && <TableHead>Tempo de Consulta</TableHead>}
               {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
-              {activeTab === "finalizadas" && <TableHead>Finalização</TableHead>} {/* Cabeçalho simplificado */}
+              {activeTab === "finalizadas" && <TableHead>Finalização</TableHead>}
               {activeTab === "finalizadas" && <TableHead>Duração</TableHead>}
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -601,6 +623,8 @@ const Appointments = () => {
         onClose={() => setIsHistoryDialogOpen(false)}
         historyAppointments={historyAppointments}
         onViewDetails={handleViewHistoryDetails}
+        onClearHistory={() => clearHistoryAppointmentsMutation.mutate()}
+        isClearingHistory={clearHistoryAppointmentsMutation.isPending}
       />
     </div>
   );
