@@ -48,8 +48,7 @@ const ConsultationPage: React.FC = () => {
         .from('appointments')
         .update({
           status: "Realizada",
-          completion_date: format(now, "yyyy-MM-dd"),
-          completion_time: format(now, "HH:mm"),
+          completion_timestamp: now.toISOString(), // Salvar como ISO string (UTC)
         })
         .eq('id', id)
         .eq('user_id', userId)

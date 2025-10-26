@@ -22,18 +22,17 @@ import {
 import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { format, parseISO, isValid } from "date-fns";
+import { format, parseISO, isValid, differenceInSeconds } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Appointment } from "@/pages/Appointments"; // Importar a interface Appointment
+import { Appointment } from "@/pages/Appointments";
 
 interface AppointmentHistoryDialogProps {
   isOpen: boolean;
   onClose: () => void;
   historyAppointments: Appointment[];
-  onViewDetails: (appointment: Appointment) => void; // Para reabrir o diálogo de detalhes
+  onViewDetails: (appointment: Appointment) => void;
 }
 
-// Mapeamento de espécies para ícones (duplicado para evitar prop drilling excessivo)
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
   Gato: Cat,
@@ -43,7 +42,6 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Outros: MoreHorizontal,
 };
 
-// Função para obter a variante do badge de status (duplicado para evitar prop drilling excessivo)
 const getStatusBadgeVariant = (status: Appointment["status"]) => {
   switch (status) {
     case "Agendada":
@@ -73,7 +71,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
     appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (appointment.veterinarian && appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase())) ||
     appointment.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (appointment.completion_date && appointment.completion_date.includes(searchTerm))
+    (appointment.completion_timestamp && format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy").includes(searchTerm))
   );
 
   return (
@@ -107,8 +105,8 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                 <TableHead>Serviço</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Veterinário</TableHead>
-                <TableHead>Data Finalização</TableHead>
-                <TableHead>Hora Finalização</TableHead>
+                <TableHead>Finalização</TableHead> {/* Cabeçalho simplificado */}
+                <TableHead>Duração</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -116,6 +114,23 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
               {filteredHistory.length > 0 ? (
                 filteredHistory.map((appointment) => {
                   const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
+
+                  // Cálculo da duração
+                  const duration = appointment.start_time && appointment.completion_timestamp
+                    ? (() => {
+                        const start = parseISO(appointment.start_time);
+                        const end = parseISO(appointment.completion_timestamp);
+                        if (isValid(start) && isValid(end)) {
+                          const durationSeconds = differenceInSeconds(end, start);
+                          const hours = Math.floor(durationSeconds / 3600);
+                          const minutes = Math.floor((durationSeconds % 3600) / 60);
+                          const seconds = durationSeconds % 60;
+                          return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                        }
+                        return "N/A";
+                      })()
+                    : "N/A";
+
                   return (
                     <TableRow key={appointment.id}>
                       <TableCell className="font-medium flex items-center">
@@ -131,11 +146,11 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                       </TableCell>
                       <TableCell>{appointment.veterinarian || "N/A"}</TableCell>
                       <TableCell>
-                        {appointment.completion_date && isValid(parseISO(appointment.completion_date))
-                          ? format(parseISO(appointment.completion_date), "dd/MM/yyyy", { locale: ptBR })
+                        {appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))
+                          ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
                           : "N/A"}
                       </TableCell>
-                      <TableCell>{appointment.completion_time || "N/A"}</TableCell>
+                      <TableCell>{duration}</TableCell>
                       <TableCell className="text-right">
                         <Button variant="ghost" size="sm" onClick={() => onViewDetails(appointment)}>
                           <Eye className="h-4 w-4" />

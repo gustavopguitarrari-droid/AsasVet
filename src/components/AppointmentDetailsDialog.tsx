@@ -12,12 +12,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { CalendarCheck, CalendarX, CalendarClock, Edit, Trash2, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play } from "lucide-react"; // Adicionado ícone Play
+import { CalendarCheck, CalendarX, CalendarClock, Edit, Trash2, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play } from "lucide-react";
 import AppointmentForm, { AppointmentFormValues } from "./AppointmentForm";
 import { cn } from "@/lib/utils";
-import { Appointment } from "@/pages/Appointments"; // Importar a interface Appointment atualizada
-import { format } from "date-fns";
-import { useNavigate, NavigateFunction } from "react-router-dom"; // Importar useNavigate e NavigateFunction
+import { Appointment } from "@/pages/Appointments";
+import { format, parseISO, isValid } from "date-fns";
+import { useNavigate, NavigateFunction } from "react-router-dom";
 
 interface AppointmentDetailsDialogProps {
   appointment: Appointment | null;
@@ -25,17 +25,15 @@ interface AppointmentDetailsDialogProps {
   onClose: () => void;
   onUpdate: (updatedAppointment: Appointment) => void;
   onCancelAppointment: (appointmentId: string) => void;
-  onStartAppointment: (appointmentId: string) => void; // Removido 'navigate' daqui, será tratado internamente
+  onStartAppointment: (appointmentId: string) => void;
 }
 
-// Mock de veterinários para o select (mantido para compatibilidade, mas não usado no formulário)
 const mockVeterinarians = [
   { id: "V001", name: "Dr. Ana Paula" },
   { id: "V002", name: "Dr. Carlos Eduardo" },
   { id: "V003", name: "Dra. Beatriz Lima" },
 ];
 
-// Mapeamento de espécies para ícones
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
   Gato: Cat,
@@ -51,14 +49,14 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
   onClose,
   onUpdate,
   onCancelAppointment,
-  onStartAppointment, // Recebe a nova prop
+  onStartAppointment,
 }) => {
   const [isEditing, setIsEditing] = React.useState(false);
-  const navigate = useNavigate(); // Inicializar useNavigate
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (!isOpen) {
-      setIsEditing(false); // Reset editing state when dialog closes
+      setIsEditing(false);
     }
   }, [isOpen]);
 
@@ -80,22 +78,19 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
   };
 
   const handleFormSubmit = (data: AppointmentFormValues) => {
-    const appointmentDate = data.dateOption === "today"
-      ? format(new Date(), "yyyy-MM-dd")
-      : data.date ? format(data.date, "yyyy-MM-dd") : appointment.date; // Keep original date if not changed
+    const appointmentDate = data.date ? format(data.date, "yyyy-MM-dd") : appointment.date;
 
     onUpdate({
       ...appointment,
       date: appointmentDate,
       time: data.time,
-      client_name: data.client, // Mapear para client_name
-      pet_name: data.pet,       // Mapear para pet_name
+      client_name: data.client,
+      pet_name: data.pet,
       species: data.species,
       service: data.service,
-      // veterinarian: appointment.veterinarian, // Veterinário não é editável via formulário de edição
-      veterinarian: appointment.veterinarian, // Mantém o veterinário atual
+      veterinarian: appointment.veterinarian,
       status: appointment.status,
-      // Status e completion_date/time são gerenciados por outras ações
+      // completion_timestamp não é alterado via formulário de edição
     });
     setIsEditing(false);
     onClose();
@@ -110,8 +105,8 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
 
   const handleStartClick = () => {
     if (window.confirm("Tem certeza que deseja iniciar esta consulta?")) {
-      onStartAppointment(appointment.id); // Chama a prop, que agora lida com a navegação
-      onClose(); // Fecha o diálogo de detalhes
+      onStartAppointment(appointment.id);
+      onClose();
     }
   };
 
@@ -143,9 +138,11 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
               pet: appointment.pet_name,
               species: appointment.species,
               service: appointment.service,
-              veterinarian: appointment.veterinarian || undefined, // Passa o veterinário existente
-              date: appointment.date, // Passar a data como string
+              veterinarian: appointment.veterinarian || undefined,
+              date: appointment.date,
               status: appointment.status,
+              selectedClientId: "", // Não preenche aqui, o formulário busca
+              selectedPetId: "",     // Não preenche aqui, o formulário busca
             }}
           />
         ) : (
@@ -201,12 +198,14 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
                 </Badge>
               </div>
             </div>
-            {isFinalized && appointment.completion_date && appointment.completion_time && (
+            {isFinalized && appointment.completion_timestamp && (
               <>
                 <Separator />
                 <div className="grid grid-cols-3 items-center gap-4">
                   <p className="text-sm font-medium text-muted-foreground">Finalizado em:</p>
-                  <p className="col-span-2 text-sm">{appointment.completion_date} às {appointment.completion_time}</p>
+                  <p className="col-span-2 text-sm">
+                    {format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}
+                  </p>
                 </div>
               </>
             )}

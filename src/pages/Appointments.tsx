@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History } from "lucide-react"; // Adicionado History
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -20,33 +20,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 import AppointmentChronometer from "@/components/AppointmentChronometer";
-import AppointmentHistoryDialog from "@/components/AppointmentHistoryDialog"; // Importar o novo diálogo
-import { format, parseISO, differenceInSeconds, isValid } from "date-fns"; // Importar differenceInSeconds e isValid
+import AppointmentHistoryDialog from "@/components/AppointmentHistoryDialog";
+import { format, parseISO, differenceInSeconds, isValid } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
-import { Client, Pet } from "@/types/cadastro"; // Import Client and Pet interfaces
-import { useNavigate } from "react-router-dom"; // Importar useNavigate
+import { Client, Pet } from "@/types/cadastro";
+import { useNavigate } from "react-router-dom";
 
 export interface Appointment {
   id: string;
-  user_id: string; // Adicionado para RLS
+  user_id: string;
   date: string; // YYYY-MM-DD
   time: string; // HH:mm
-  client_name: string; // Renomeado para corresponder ao DB
-  pet_name: string; // Renomeado para corresponder ao DB
+  client_name: string;
+  pet_name: string;
   species: string;
   service: string;
   veterinarian: string;
   status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
-  completion_date?: string | null; // Renomeado para corresponder ao DB
-  completion_time?: string | null; // Renomeado para corresponder ao DB
-  created_at: string; // Adicionado para corresponder ao DB
-  start_time?: string | null; // NOVO: Adicionado para registrar o início da consulta
+  completion_timestamp?: string | null; // Alterado para timestamp ISO (UTC)
+  created_at: string;
+  start_time?: string | null;
 }
 
-// Mapeamento de espécies para ícones
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
   Gato: Cat,
@@ -60,8 +59,8 @@ const Appointments = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id;
-  const veterinarianName = appUser?.name || "Veterinário Desconhecido"; // Nome do veterinário logado
-  const navigate = useNavigate(); // Inicializar useNavigate
+  const veterinarianName = appUser?.name || "Veterinário Desconhecido";
+  const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = React.useState<string>("em-espera");
   const [searchTerm, setSearchTerm] = React.useState<string>("");
@@ -69,7 +68,7 @@ const Appointments = () => {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState<boolean>(false);
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
   const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false);
-  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState<boolean>(false); // Novo estado para o histórico
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState<boolean>(false);
 
   // --- Queries ---
   const { data: appointments = [], isLoading, error } = useQuery<Appointment[]>({
@@ -86,7 +85,6 @@ const Appointments = () => {
     enabled: !!userId,
   });
 
-  // Fetch history appointments (Realizada ou Cancelada)
   const { data: historyAppointments = [], isLoading: isLoadingHistory, error: historyError } = useQuery<Appointment[]>({
     queryKey: ['historyAppointments', userId],
     queryFn: async () => {
@@ -95,14 +93,13 @@ const Appointments = () => {
         .from('appointments')
         .select('*')
         .eq('user_id', userId)
-        .in('status', ['Realizada', 'Cancelada']); // Filtra por status
+        .in('status', ['Realizada', 'Cancelada']);
       if (error) throw error;
       return data;
     },
     enabled: !!userId,
   });
 
-  // Fetch clients
   const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
     queryKey: ['clients', userId],
     queryFn: async () => {
@@ -135,17 +132,14 @@ const Appointments = () => {
     enabled: !!userId,
   });
 
-  // Fetch pets
   const { data: pets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
     queryKey: ['pets', userId],
     queryFn: async () => {
       if (!userId) return [];
-      // RLS on 'pets' table ensures only pets belonging to the user's clients are returned
       const { data, error } = await supabase
         .from('pets')
         .select('*');
       if (error) throw error;
-      // Mapeia owner_id para ownerId para corresponder à interface Pet
       return data.map(dbPet => ({
         id: dbPet.id,
         name: dbPet.name,
@@ -156,7 +150,7 @@ const Appointments = () => {
         color: dbPet.color,
         observations: dbPet.observations || undefined,
         photoUrl: dbPet.photo_url || undefined,
-        ownerId: dbPet.owner_id, // CORREÇÃO AQUI: Mapeando owner_id para ownerId
+        ownerId: dbPet.owner_id,
       }));
     },
     enabled: !!userId,
@@ -167,7 +161,6 @@ const Appointments = () => {
     mutationFn: async (newAppointmentData: AppointmentFormValues) => {
       if (!userId) throw new Error("User not authenticated.");
 
-      // A data agora é sempre um objeto Date do formulário, formatamos para string
       const appointmentDate = format(newAppointmentData.date, "yyyy-MM-dd");
 
       const { data, error } = await supabase
@@ -180,8 +173,8 @@ const Appointments = () => {
           pet_name: newAppointmentData.pet,
           species: newAppointmentData.species,
           service: newAppointmentData.service,
-          veterinarian: veterinarianName, // CORREÇÃO AQUI: Usando o nome do veterinário logado
-          status: "Agendada", // Status inicial é "Agendada"
+          veterinarian: veterinarianName,
+          status: "Agendada",
         })
         .select()
         .single();
@@ -212,9 +205,8 @@ const Appointments = () => {
           service: updatedAppointment.service,
           veterinarian: updatedAppointment.veterinarian,
           status: updatedAppointment.status,
-          completion_date: updatedAppointment.completion_date,
-          completion_time: updatedAppointment.completion_time,
-          start_time: updatedAppointment.start_time, // Incluir start_time na atualização
+          completion_timestamp: updatedAppointment.completion_timestamp, // Usar completion_timestamp
+          start_time: updatedAppointment.start_time,
         })
         .eq('id', updatedAppointment.id)
         .eq('user_id', userId)
@@ -225,7 +217,7 @@ const Appointments = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] }); // Invalida o histórico também
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       showSuccess("Consulta atualizada com sucesso!");
       setIsDetailsDialogOpen(false);
     },
@@ -242,9 +234,8 @@ const Appointments = () => {
         .from('appointments')
         .update({
           status: "Cancelada",
-          completion_date: format(now, "yyyy-MM-dd"),
-          completion_time: format(now, "HH:mm"),
-          start_time: null, // Limpar start_time se a consulta for cancelada
+          completion_timestamp: now.toISOString(), // Salvar timestamp ISO
+          start_time: null,
         })
         .eq('id', appointmentId)
         .eq('user_id', userId)
@@ -255,7 +246,7 @@ const Appointments = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] }); // Invalida o histórico também
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       showSuccess("Consulta cancelada com sucesso!");
       setIsDetailsDialogOpen(false);
     },
@@ -269,13 +260,13 @@ const Appointments = () => {
       if (!userId) throw new Error("User not authenticated.");
       if (!appUser?.name) throw new Error("User name not available to assign as veterinarian.");
 
-      const now = new Date(); // Captura o momento exato do início
+      const now = new Date();
       const { data, error } = await supabase
         .from('appointments')
         .update({
           status: "Em Andamento",
-          veterinarian: appUser.name, // Atribui o veterinário logado
-          start_time: now.toISOString(), // Salva o timestamp de início
+          veterinarian: appUser.name,
+          start_time: now.toISOString(),
         })
         .eq('id', appointmentId)
         .eq('user_id', userId)
@@ -287,7 +278,6 @@ const Appointments = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       showSuccess("Consulta iniciada com sucesso!");
-      // Redireciona para a página de consulta
       navigate(`/consultation/${data.id}`);
     },
     onError: (err) => {
@@ -318,8 +308,8 @@ const Appointments = () => {
 
   const handleViewHistoryDetails = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
-    setIsHistoryDialogOpen(false); // Fecha o histórico
-    setIsDetailsDialogOpen(true); // Abre os detalhes
+    setIsHistoryDialogOpen(false);
+    setIsDetailsDialogOpen(true);
   };
 
   const getStatusBadgeVariant = (status: Appointment["status"]) => {
@@ -387,7 +377,7 @@ const Appointments = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Gerenciar consultas do dia</h2>
-        <div className="flex space-x-2"> {/* Container para os botões */}
+        <div className="flex space-x-2">
           <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
             <History className="mr-2 h-4 w-4" /> Ver Histórico
           </Button>
@@ -411,7 +401,6 @@ const Appointments = () => {
         </div>
       </div>
 
-      {/* Cards de Resumo */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="bg-gray-700 text-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -485,10 +474,9 @@ const Appointments = () => {
               {activeTab === "em-andamento" && <TableHead>Veterinário</TableHead>}
               {activeTab === "em-andamento" && <TableHead>Tempo de Consulta</TableHead>}
               {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
-              {activeTab === "finalizadas" && <TableHead>Data Finalização</TableHead>}
-              {activeTab === "finalizadas" && <TableHead>Hora Finalização</TableHead>}
-              {activeTab === "finalizadas" && <TableHead>Duração</TableHead>} {/* Nova coluna */}
-              <TableHead className="text-right">Ações</TableHead> {/* Adicionada coluna de Ações */}
+              {activeTab === "finalizadas" && <TableHead>Finalização</TableHead>} {/* Cabeçalho simplificado */}
+              {activeTab === "finalizadas" && <TableHead>Duração</TableHead>}
+              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -498,6 +486,23 @@ const Appointments = () => {
                 const isCancelled = activeTab === "finalizadas" && appointment.status === "Cancelada";
                 const isRealizada = activeTab === "finalizadas" && appointment.status === "Realizada";
                 const isEmAndamento = activeTab === "em-andamento" && appointment.status === "Em Andamento";
+
+                // Cálculo da duração
+                const duration = appointment.start_time && appointment.completion_timestamp
+                  ? (() => {
+                      const start = parseISO(appointment.start_time);
+                      const end = parseISO(appointment.completion_timestamp);
+                      if (isValid(start) && isValid(end)) {
+                        const durationSeconds = differenceInSeconds(end, start);
+                        const hours = Math.floor(durationSeconds / 3600);
+                        const minutes = Math.floor((durationSeconds % 3600) / 60);
+                        const seconds = durationSeconds % 60;
+                        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                      }
+                      return "N/A";
+                    })()
+                  : "N/A";
+
                 return (
                   <TableRow
                     key={appointment.id}
@@ -545,24 +550,12 @@ const Appointments = () => {
                             </Badge>
                           )}
                         </TableCell>
-                        <TableCell>{appointment.completion_date || "N/A"}</TableCell>
-                        <TableCell>{appointment.completion_time || "N/A"}</TableCell>
                         <TableCell>
-                          {appointment.start_time && appointment.completion_date && appointment.completion_time ? (
-                            (() => {
-                                const start = parseISO(appointment.start_time);
-                                const end = parseISO(`${appointment.completion_date}T${appointment.completion_time}:00`); // Assuming completion_time is HH:mm
-                                if (isValid(start) && isValid(end)) {
-                                    const durationSeconds = differenceInSeconds(end, start);
-                                    const hours = Math.floor(durationSeconds / 3600);
-                                    const minutes = Math.floor((durationSeconds % 3600) / 60);
-                                    const seconds = durationSeconds % 60;
-                                    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                                }
-                                return "N/A";
-                            })()
-                          ) : "N/A"}
+                          {appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))
+                            ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
+                            : "N/A"}
                         </TableCell>
+                        <TableCell>{duration}</TableCell>
                       </>
                     )}
                     <TableCell className="text-right">
@@ -571,7 +564,7 @@ const Appointments = () => {
                           variant="default"
                           size="sm"
                           onClick={(e) => {
-                            e.stopPropagation(); // Evita que o clique na linha abra o diálogo de detalhes
+                            e.stopPropagation();
                             handleStartAppointment(appointment.id);
                           }}
                           disabled={startAppointmentMutation.isPending}
@@ -579,14 +572,13 @@ const Appointments = () => {
                           <Play className="mr-2 h-4 w-4" /> Iniciar
                         </Button>
                       )}
-                      {/* Outras ações (editar/cancelar) serão tratadas no AppointmentDetailsDialog */}
                     </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={activeTab === "em-andamento" ? 6 : (activeTab === "finalizadas" ? 9 : 5)} className="h-24 text-center">
+                <TableCell colSpan={activeTab === "em-andamento" ? 6 : (activeTab === "finalizadas" ? 8 : 5)} className="h-24 text-center">
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
@@ -601,7 +593,7 @@ const Appointments = () => {
         onClose={() => setIsDetailsDialogOpen(false)}
         onUpdate={handleUpdateAppointment}
         onCancelAppointment={handleCancelAppointment}
-        onStartAppointment={handleStartAppointment} // Passa a função de iniciar consulta
+        onStartAppointment={handleStartAppointment}
       />
 
       <AppointmentHistoryDialog
