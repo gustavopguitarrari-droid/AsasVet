@@ -374,7 +374,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
           )}
         />
         <DialogFooter>
-          <Button type="submit">Agendar</Button>
+          <Button type="submit">Adicionar na espera</Button>
         </DialogFooter>
       </form>
     </Form>
