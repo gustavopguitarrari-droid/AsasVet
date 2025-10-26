@@ -120,7 +120,8 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
     };
   }, []); // Empty dependency array to run only once on mount
 
-  console.log('SessionContext: Render. Current isLoading:', isLoading, 'Session:', !!session, 'User:', !!user, 'AppUser:', !!appUser); // Add this to see render cycles
+  // Corrigido: Removido '!!appUser' pois não está definido neste escopo
+  console.log('SessionContext: Render. Current isLoading:', isLoading, 'Session:', !!session, 'User:', !!user); 
 
   return (
     <SessionContext.Provider value={{ session, user, isLoading }}>
