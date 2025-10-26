@@ -294,7 +294,7 @@ const Internacao = () => {
       if (newActions.length > 0) {
         promises.push(supabase.from('patient_actions').insert(newActions.map(action => ({
           ...action,
-          user_id: userId,
+          user_id: userId, // CORREÇÃO AQUI: Atribuindo o userId real
           frequency: action.frequency || null, // Ensure null for optional fields
           quantity: action.quantity || null,
           route: action.route || null,

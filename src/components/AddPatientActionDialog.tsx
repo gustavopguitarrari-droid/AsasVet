@@ -64,7 +64,7 @@ interface AddPatientActionDialogProps {
   patientName: string;
   date: Date;
   initialHour: string;
-  allActionsForPatient: PatientAction[];
+  allActionsForCurrentPatient: PatientAction[];
 }
 
 const actionTypeIconMap: Record<PatientActionFormValues["type"], React.ElementType> = {
@@ -111,7 +111,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
   patientName,
   date,
   initialHour,
-  allActionsForPatient,
+  allActionsForCurrentPatient,
 }) => {
   const form = useForm<PatientActionFormValues>({
     resolver: zodResolver(formSchema),
@@ -129,8 +129,9 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      console.log("AddPatientActionDialog: useEffect - allActionsForPatient received:", allActionsForPatient);
-      setEditedActions(allActionsForPatient || []); // Garante que seja sempre um array
+      console.log("AddPatientActionDialog: useEffect - allActionsForCurrentPatient received:", allActionsForCurrentPatient);
+      // Garante que editedActions seja sempre um array, mesmo que allActionsForCurrentPatient seja undefined/null
+      setEditedActions(allActionsForCurrentPatient || []); 
       form.reset({
         description: "",
         type: "Medicação",
@@ -140,7 +141,7 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
         route: "",
       });
     }
-  }, [isOpen, form, allActionsForPatient]);
+  }, [isOpen, form, allActionsForCurrentPatient]);
 
   const frequencyWatch = form.watch("frequency");
   const typeWatch = form.watch("type");
@@ -214,7 +215,8 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
     onClose();
   };
 
-  const actionsGroupedByDateAndHour = editedActions.reduce((acc, action) => {
+  // Garante que editedActions seja um array antes de chamar reduce
+  const actionsGroupedByDateAndHour = (editedActions || []).reduce((acc, action) => {
     const dateKey = action.date;
     const hourKey = action.hour;
 
@@ -350,7 +352,8 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
                               min="1"
                               placeholder="1"
                               {...field}
-                              onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
+                              // Garante que o valor seja um número ou 1 como fallback
+                              onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 1)}
                             />
                           </FormControl>
                           <FormMessage />
