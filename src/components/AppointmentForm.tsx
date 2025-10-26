@@ -89,7 +89,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
     defaultValues: {
       dateOption: initialData?.date ? "specific" : "today",
       date: initialData?.date ? new Date(initialData.date) : undefined,
-      time: initialData?.time || format(new Date(), "HH:mm"),
+      time: initialData?.time || format(new Date(), "HH:mm"), // Define o horário atual como padrão
       
       cpfSearch: "",
       selectedClientId: "",
@@ -111,7 +111,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
     form.reset({
       dateOption: initialData?.date ? "specific" : "today",
       date: initialData?.date ? new Date(initialData.date) : undefined,
-      time: initialData?.time || format(new Date(), "HH:mm"),
+      time: initialData?.time || format(new Date(), "HH:mm"), // Garante que o horário seja atualizado ao reabrir
       
       cpfSearch: "",
       selectedClientId: "",
@@ -181,14 +181,14 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <AppointmentDateSelector />
+        {/* O campo de hora foi removido daqui, pois será definido automaticamente */}
         <FormField
           control={form.control}
           name="time"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Hora</FormLabel>
+            <FormItem className="hidden"> {/* Campo oculto para manter o valor no formulário */}
               <FormControl>
-                <Input type="time" {...field} />
+                <Input type="hidden" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
