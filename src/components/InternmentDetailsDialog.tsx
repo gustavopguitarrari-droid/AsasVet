@@ -233,11 +233,11 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Risco:</p>
-              <p className="col-span-2 text-sm">
+              <div className="col-span-2 text-sm"> {/* Alterado de <p> para <div> */}
                 <Badge className={cn(riskColorMap[patient.risk as RiskLevel], "text-white")}>
                   {patient.risk}
                 </Badge>
-              </p>
+              </div>
             </div>
           </div>
         )}
