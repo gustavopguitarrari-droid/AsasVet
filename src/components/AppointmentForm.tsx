@@ -19,7 +19,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
-import AppointmentDateSelector from "./AppointmentDateSelector";
 import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
 import { Search, User, PawPrint } from "lucide-react"; // Ícones para busca e seleção
 import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
@@ -35,10 +34,9 @@ const serviceOptions = [
 ] as const;
 
 const formSchema = z.object({
-  dateOption: z.enum(["today", "specific"], {
-    required_error: "Selecione uma opção de data.",
+  date: z.date({
+    required_error: "A data da consulta é obrigatória.",
   }),
-  date: z.date().optional(),
   time: z.string().min(1, "A hora da consulta é obrigatória."),
   
   // Campos para seleção de cliente/pet
@@ -55,14 +53,6 @@ const formSchema = z.object({
   service: z.enum(serviceOptions, {
     required_error: "O serviço é obrigatório.",
   }),
-}).superRefine((data, ctx) => {
-  if (data.dateOption === "specific" && !data.date) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "A data é obrigatória para agendamento específico.",
-      path: ["date"],
-    });
-  }
 });
 
 export type AppointmentFormValues = z.infer<typeof formSchema>;
@@ -87,8 +77,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      dateOption: initialData?.date ? "specific" : "today",
-      date: initialData?.date ? new Date(initialData.date) : undefined,
+      date: initialData?.date ? new Date(initialData.date) : new Date(), // Sempre define uma data, padrão para hoje
       time: initialData?.time || format(new Date(), "HH:mm"), // Define o horário atual como padrão
       
       cpfSearch: "",
@@ -109,8 +98,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
   // Reset form and states when initialData changes (e.g., dialog opens for new appointment)
   useEffect(() => {
     form.reset({
-      dateOption: initialData?.date ? "specific" : "today",
-      date: initialData?.date ? new Date(initialData.date) : undefined,
+      date: initialData?.date ? new Date(initialData.date) : new Date(),
       time: initialData?.time || format(new Date(), "HH:mm"), // Garante que o horário seja atualizado ao reabrir
       
       cpfSearch: "",
@@ -180,7 +168,19 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <AppointmentDateSelector />
+        {/* O campo de data agora é oculto e preenchido automaticamente */}
+        <FormField
+          control={form.control}
+          name="date"
+          render={({ field }) => (
+            <FormItem className="hidden">
+              <FormControl>
+                <Input type="hidden" {...field} value={field.value ? format(field.value, "yyyy-MM-dd") : ""} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         {/* O campo de hora foi removido daqui, pois será definido automaticamente */}
         <FormField
           control={form.control}

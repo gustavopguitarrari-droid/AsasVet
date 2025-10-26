@@ -133,9 +133,8 @@ const Appointments = () => {
     mutationFn: async (newAppointmentData: AppointmentFormValues) => {
       if (!userId) throw new Error("User not authenticated.");
 
-      const appointmentDate = newAppointmentData.dateOption === "today"
-        ? format(new Date(), "yyyy-MM-dd")
-        : newAppointmentData.date ? format(newAppointmentData.date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd");
+      // A data agora é sempre um objeto Date do formulário, formatamos para string
+      const appointmentDate = format(newAppointmentData.date, "yyyy-MM-dd");
 
       const { data, error } = await supabase
         .from('appointments')
