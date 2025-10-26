@@ -888,7 +888,7 @@ const Cadastro = () => {
             <DialogDescription>
               Lista de todos os animais vinculados a {clientToViewPets?.name}.
             </DialogDescription>
-          </DialogDescription>
+          </DialogHeader>
           <ScrollArea className="flex-1 p-4 border rounded-md bg-muted/20 mb-4">
             {clientToViewPets ? (
               (() => {
