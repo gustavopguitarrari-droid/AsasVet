@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useMemo } from "react"; // Adicionado useState e useMemo aqui
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -96,27 +96,27 @@ const Internacao = () => {
   const { user: appUser } = useUser();
   const userId = appUser?.id; // Assuming user ID is available from context
 
-  const [isAddDialogOpen, setIsAddDialogOpen] = React.useState(false);
-  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState(false);
-  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState(false);
-  const [selectedPatient, setSelectedPatient] = React.useState<InternedPatient | null>(null);
-  const [activeTab, setActiveTab] = React.useState<string>("pacientes-internados");
-  const [selectedDate, setSelectedDate] = React.useState<Date>(new Date());
-  const [patientSearchTerm, setPatientSearchTerm] = React.useState<string>("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<InternedPatient | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("pacientes-internados");
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [patientSearchTerm, setPatientSearchTerm] = useState<string>("");
 
-  const [isAddActionDialogOpen, setIsAddActionDialogOpen] = React.useState(false);
-  const [actionPatientId, setActionPatientId] = React.useState<string | null>(null);
-  const [actionPatientName, setActionPatientName] = React.useState<string | null>(null);
-  const [actionDate, setActionDate] = React.useState<Date | null>(null);
-  const [actionHour, setActionHour] = React.React.useState<string | null>(null);
-  const [allActionsForCurrentPatient, setAllActionsForCurrentPatient] = React.useState<PatientAction[]>([]);
+  const [isAddActionDialogOpen, setIsAddActionDialogOpen] = useState(false);
+  const [actionPatientId, setActionPatientId] = useState<string | null>(null);
+  const [actionPatientName, setActionPatientName] = useState<string | null>(null);
+  const [actionDate, setActionDate] = useState<Date | null>(null);
+  const [actionHour, setActionHour] = useState<string | null>(null);
+  const [allActionsForCurrentPatient, setAllActionsForCurrentPatient] = useState<PatientAction[]>([]);
 
-  const [isConfirmActionsDialogOpen, setIsConfirmActionsDialogOpen] = React.useState(false);
-  const [confirmActionsPatientId, setConfirmActionsPatientId] = React.useState<string | null>(null);
-  const [confirmActionsPatientName, setConfirmActionsPatientName] = React.useState<string | null>(null);
-  const [confirmActionsDate, setConfirmActionsDate] = React.useState<Date | null>(null);
-  const [confirmActionsHour, setConfirmActionsHour] = React.useState<string | null>(null);
-  const [confirmActionsForSlot, setConfirmActionsForSlot] = React.useState<PatientAction[]>([]);
+  const [isConfirmActionsDialogOpen, setIsConfirmActionsDialogOpen] = useState(false);
+  const [confirmActionsPatientId, setConfirmActionsPatientId] = useState<string | null>(null);
+  const [confirmActionsPatientName, setConfirmActionsPatientName] = useState<string | null>(null);
+  const [confirmActionsDate, setConfirmActionsDate] = useState<Date | null>(null);
+  const [confirmActionsHour, setConfirmActionsHour] = useState<string | null>(null);
+  const [confirmActionsForSlot, setConfirmActionsForSlot] = useState<PatientAction[]>([]);
 
   // Fetch interned patients
   const { data: internedPatients = [], isLoading: isLoadingPatients, error: patientsError, refetch: refetchInternedPatients } = useQuery<InternedPatient[]>({
@@ -394,7 +394,7 @@ const Internacao = () => {
     setIsDetailsDialogOpen(true);
   };
 
-  const patientsForExecutionMap = React.useMemo(() => {
+  const patientsForExecutionMap = useMemo(() => {
     return internedPatients;
   }, [internedPatients]);
 
