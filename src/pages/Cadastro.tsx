@@ -703,10 +703,16 @@ const Cadastro = () => {
   };
 
   const handleNestedAddPetSubmit = (data: PetFormValues) => {
+    console.log("handleNestedAddPetSubmit: Submitting pet data:", data); // Log para depuração
     addPetMutation.mutate(data, {
       onSuccess: () => {
+        console.log("handleNestedAddPetSubmit: Mutation successful."); // Log para depuração
         handleNestedAddPetClose(); // Close nested dialog on success
         // The parent dialog (isClientPetsDialogOpen) remains open
+      },
+      onError: (error) => {
+        console.error("handleNestedAddPetSubmit: Mutation failed:", error); // Log para depuração
+        showError(`Erro ao adicionar animal: ${error.message}`);
       }
     });
   };
