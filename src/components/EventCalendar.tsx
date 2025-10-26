@@ -7,7 +7,8 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button"; // Importação adicionada
+import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react"; // Importar o ícone de lixeira
 
 export interface CalendarEvent {
   id: string;
@@ -92,11 +93,10 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                 <div
                   key={event.id}
                   className={cn(
-                    "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white cursor-pointer", // Adicionado cursor-pointer
+                    "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white",
                     categoryColorMap[event.category],
-                    event.status === "Cancelada" && "opacity-50 line-through" // Estilo para cancelado
+                    event.status === "Cancelada" && "opacity-50 line-through"
                   )}
-                  onClick={() => onEventClick(event)} // Adicionado onClick
                 >
                   <span className="font-bold text-lg">{event.time}</span>
                   <div className="flex-1">
@@ -105,10 +105,23 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                       {event.category}
                     </Badge>
                   </div>
-                  {event.status === "Cancelada" && (
+                  {event.status === "Cancelada" ? (
                     <Badge variant="destructive" className="bg-red-700 text-white">
                       Cancelado
                     </Badge>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-white hover:bg-white/20"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Impede que o clique no botão propague para o div pai
+                        onEventClick(event);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Cancelar Agendamento</span>
+                    </Button>
                   )}
                 </div>
               ))}
