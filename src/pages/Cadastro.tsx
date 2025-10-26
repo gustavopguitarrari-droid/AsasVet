@@ -829,8 +829,8 @@ const Cadastro = () => {
                           <p className="text-xs text-muted-foreground ml-4">CEP: {client.address?.cep || 'N/A'}</p>
                         </TableCell>
                         <TableCell className="text-right">
-                          <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleViewClientPets(client); }}>
-                            Ver Animais
+                          <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleAddPetForClient(client); }}>
+                            Adicionar Animal
                           </Button>
                           <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleEditClient(client); }}>
                             <Edit className="h-4 w-4" />
