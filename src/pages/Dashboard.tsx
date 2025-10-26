@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Link } from "react-router-dom"; // Importar Link
+import { useQuery } from "@tanstack/react-query"; // Importar useQuery
+import { supabase } from "@/integrations/supabase/client"; // Importar supabase
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -51,6 +53,25 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "animalHealth" | "recentActivity">("recentActivity");
 
   const { user } = useUser();
+  const userId = user?.id;
+
+  // Query para buscar a contagem de clientes
+  const { data: totalClients = 0, isLoading: isLoadingClients } = useQuery<number>({
+    queryKey: ['totalClients', userId],
+    queryFn: async () => {
+      if (!userId) return 0;
+      const { count, error } = await supabase
+        .from('clients')
+        .select('*', { count: 'exact' })
+        .eq('user_id', userId);
+      if (error) {
+        console.error("Erro ao buscar contagem de clientes:", error);
+        throw error;
+      }
+      return count || 0;
+    },
+    enabled: !!userId,
+  });
 
   React.useEffect(() => {
     const savedConfigString = localStorage.getItem("dashboardConfig");
@@ -105,7 +126,9 @@ const Dashboard = () => {
                 <Users className={iconClasses} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">2,350</div>
+                <div className="text-2xl font-bold">
+                  {isLoadingClients ? "..." : totalClients.toLocaleString('pt-BR')}
+                </div>
                 <p className={textMutedClasses}>+20.1% do mês passado</p>
               </CardContent>
             </Card>
