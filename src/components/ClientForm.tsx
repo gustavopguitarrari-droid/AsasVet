@@ -26,6 +26,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { showError, showSuccess } from "@/utils/toast";
 import { Textarea } from "@/components/ui/textarea";
 import CameraCaptureDialog from "./CameraCaptureDialog";
+import { Label } from "@/components/ui/label"; // Adicionado importação do Label
 
 // Esquema de validação do formulário com Zod
 const formSchema = z.object({
