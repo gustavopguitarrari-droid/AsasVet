@@ -129,7 +129,8 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setEditedActions(allActionsForPatient);
+      console.log("AddPatientActionDialog: useEffect - allActionsForPatient received:", allActionsForPatient);
+      setEditedActions(allActionsForPatient || []); // Garante que seja sempre um array
       form.reset({
         description: "",
         type: "Medicação",
