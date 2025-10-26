@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -32,6 +32,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import TeamMemberFormDialog, { TeamMemberFormValues } from "@/components/team/TeamMemberFormDialog"; // Importar o novo formulário
+import { useLocation } from "react-router-dom"; // Importar useLocation
 
 export interface TeamMember { // Renomeado de Veterinario para TeamMember para ser mais genérico
   id: string;
@@ -59,16 +60,24 @@ const Veterinarios = () => {
   const { user: appUser } = useUser();
   const userId = appUser?.id;
   const isAdmin = appUser?.role === "Administrador";
+  const location = useLocation(); // Inicializar useLocation
 
   const [selectedRole, setSelectedRole] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState<boolean>(false);
   const [selectedTeamMember, setSelectedTeamMember] = useState<TeamMember | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("equipe");
+  const [activeTab, setActiveTab] = useState<string>("equipe"); // Estado inicial da aba
 
   const [isAddMemberDialogOpen, setIsAddMemberDialogOpen] = useState(false);
   const [isEditMemberDialogOpen, setIsEditMemberDialogOpen] = useState(false);
   const [memberToEdit, setMemberToEdit] = useState<TeamMember | undefined>(undefined);
+
+  // Efeito para verificar o estado da rota e definir a aba ativa
+  useEffect(() => {
+    if (location.state && (location.state as any).activeTab) {
+      setActiveTab((location.state as any).activeTab);
+    }
+  }, [location.state]);
 
   // Query para buscar todos os perfis (membros da equipe)
   const { data: teamMembers = [], isLoading, error } = useQuery<TeamMember[]>({

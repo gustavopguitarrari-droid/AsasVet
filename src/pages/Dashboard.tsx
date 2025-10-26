@@ -258,16 +258,18 @@ const Dashboard = () => {
         );
       case "veterinariansOnDuty":
         return (
-          <Card key={item.id} className={cn("bg-orange-600", baseCardClasses)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Veterinários de Plantão</CardTitle>
-              <Stethoscope className={iconClasses} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">2 Veterinários</div>
-              <p className={textMutedClasses}>Disponíveis hoje</p>
-            </CardContent>
-          </Card>
+          <Link to="/veterinarios" state={{ activeTab: "escala" }} key={item.id} className="block">
+            <Card className={cn("bg-orange-600", baseCardClasses)}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Veterinários de Plantão</CardTitle>
+                <Stethoscope className={iconClasses} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">2 Veterinários</div>
+                <p className={textMutedClasses}>Disponíveis hoje</p>
+              </CardContent>
+            </Card>
+          </Link>
         );
       case "medicalRecordsSummary":
         return (
