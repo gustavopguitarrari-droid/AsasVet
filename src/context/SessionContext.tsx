@@ -30,68 +30,85 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
   const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true); // Start as true to indicate initial loading
   const { setUser: setAppUser } = useUser();
-  const isInitialLoadRef = useRef(true); // Para garantir que isLoading seja definido como false apenas uma vez
 
   // Helper function to fetch profile and set appUser
   const fetchProfileAndSetAppUser = async (supabaseUser: User | null) => {
+    console.log('SessionContext: fetchProfileAndSetAppUser called with supabaseUser:', supabaseUser);
     if (!supabaseUser) {
+      console.log('SessionContext: No supabaseUser, setting appUser to null.');
       setAppUser(null);
       return;
     }
 
     try {
+      console.log('SessionContext: Attempting to fetch profile for user ID:', supabaseUser.id);
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', supabaseUser.id)
         .single();
 
+      if (profileError) {
+        if (profileError.code === 'PGRST116') {
+          console.warn('SessionContext: No profile found for user ID:', supabaseUser.id, '. Defaulting to metadata.');
+        } else {
+          console.error('SessionContext: Error fetching profile from Supabase:', profileError);
+          setAppUser(null); // Clear appUser on actual profile fetch error
+          return;
+        }
+      }
+      console.log('SessionContext: Raw profileData from Supabase:', profileData);
+
       const userMetadata = supabaseUser.user_metadata;
+      console.log('SessionContext: Supabase user_metadata:', userMetadata);
 
       const profileToSet: UserProfile = {
         id: supabaseUser.id,
-        name: profileData?.first_name || userMetadata.first_name || '',
-        lastName: profileData?.last_name || userMetadata.last_name || '',
+        name: profileData?.first_name || userMetadata.first_name?.toString() || '',
+        lastName: profileData?.last_name || userMetadata.last_name?.toString() || '',
         email: supabaseUser.email || '',
-        avatarUrl: profileData?.avatar_url || userMetadata.avatar_url || undefined,
-        role: profileData?.role || userMetadata.role || 'Usuário',
-        birthday: profileData?.birthday || userMetadata.birthday || undefined,
-        gender: profileData?.gender || userMetadata.gender || undefined,
+        avatarUrl: profileData?.avatar_url || userMetadata.avatar_url?.toString() || undefined,
+        role: profileData?.role || userMetadata.role?.toString() || 'Usuário',
+        birthday: profileData?.birthday || userMetadata.birthday?.toString() || undefined,
+        gender: profileData?.gender || userMetadata.gender?.toString() || undefined,
         registeredTime: profileData?.registered_time || supabaseUser.created_at,
       };
-
+      console.log('SessionContext: Constructed profileToSet for UserContext:', profileToSet);
       setAppUser(profileToSet);
 
-      if (profileError && profileError.code !== 'PGRST116') { // PGRST116 means "no rows found"
-        console.error('Error fetching profile:', profileError);
-      }
     } catch (error) {
-      console.error('Unhandled error during profile fetch:', error);
+      console.error('SessionContext: Unhandled error during profile fetch and set:', error);
       setAppUser(null); // Fallback to null if any unhandled error occurs
     }
   };
 
   useEffect(() => {
+    let isMounted = true; // Flag to prevent state updates on unmounted component
+
     const handleAuthStateChange = async (event: string, currentSession: Session | null) => {
-      console.log('Auth state change event:', event, 'Session:', currentSession);
+      console.log('SessionContext: Auth state change event:', event, 'Session:', currentSession);
+      if (!isMounted) return; // Prevent state update if component unmounted
+
       setSession(currentSession);
       setUserState(currentSession?.user || null);
       await fetchProfileAndSetAppUser(currentSession?.user || null);
 
-      // Only set isLoading to false once after the initial session is handled
-      if (isInitialLoadRef.current) {
+      // Set isLoading to false after the initial session is handled.
+      // This will happen once for 'INITIAL_SESSION' or 'SIGNED_IN' on page load.
+      if (isMounted) { // Check again before setting state
         setIsLoading(false);
-        isInitialLoadRef.current = false;
-        console.log('Initial auth state change processed, isLoading set to false.');
+        console.log('SessionContext: Initial auth state change processed, isLoading set to false.');
       }
     };
 
     // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
-    // Cleanup the subscription on component unmount
+    // Cleanup the subscription and set isMounted to false
     return () => {
+      isMounted = false;
       authListener.subscription.unsubscribe();
+      console.log('SessionContext: Auth listener unsubscribed, component unmounted.');
     };
   }, []); // Empty dependency array to run only once on mount
 

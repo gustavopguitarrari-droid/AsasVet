@@ -25,8 +25,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user: appUser } = useUser();
   const location = useLocation();
 
+  console.log('ProtectedRoute: Rendering. isLoading:', isLoading, 'session:', !!session, 'appUser:', !!appUser, 'path:', location.pathname);
+
   // Se a sessão ainda está sendo carregada, exibe um indicador de carregamento
   if (isLoading) {
+    console.log('ProtectedRoute: Displaying "Carregando sistema..."');
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
         <p className="text-lg">Carregando sistema...</p>
@@ -36,12 +39,14 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   // Se não há sessão (usuário não autenticado), redireciona para o login
   if (!session) {
+    console.log('ProtectedRoute: No session found, redirecting to /login.');
     return <Navigate to="/login" replace />;
   }
 
   // Se appUser ainda é null/undefined após o carregamento (ex: falha silenciosa na busca do perfil)
   // Isso serve como uma salvaguarda adicional.
   if (!appUser) {
+      console.log('ProtectedRoute: Session exists but appUser is null, displaying "Preparando perfil do usuário..."');
       return (
         <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
           <p className="text-lg">Preparando perfil do usuário...</p>
