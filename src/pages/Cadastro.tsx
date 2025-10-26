@@ -728,6 +728,7 @@ const Cadastro = () => {
                 key={isAddClientDialogOpen ? "open" : "closed"}
                 onSubmit={handleAddClient}
                 onCancel={() => setIsAddClientDialogOpen(false)}
+                isSubmittingParent={addClientMutation.isPending} // Passa o estado de carregamento da mutação
               />
             </DialogContent>
           </Dialog>
@@ -998,6 +999,7 @@ const Cadastro = () => {
               onSubmit={handleUpdateClient}
               onCancel={() => setIsEditClientDialogOpen(false)}
               initialData={clientToEdit}
+              isSubmittingParent={updateClientMutation.isPending} // Passa o estado de carregamento da mutação
             />
           )}
         </DialogContent>

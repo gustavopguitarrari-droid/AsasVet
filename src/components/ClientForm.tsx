@@ -56,9 +56,10 @@ interface ClientFormProps {
   onSubmit: (data: ClientFormValues) => void;
   onCancel: () => void;
   initialData?: Client;
+  isSubmittingParent?: boolean; // Nova prop para indicar se a mutação pai está pendente
 }
 
-const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData }) => {
+const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData, isSubmittingParent = false }) => {
   // Função auxiliar para analisar strings de data com segurança
   const safeParseDate = (dateString?: string | null): Date => {
     if (dateString) {
@@ -193,6 +194,8 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
 
   const currentName = form.watch("name");
   const initials = `${currentName.charAt(0)}${currentName.split(' ').pop()?.charAt(0) || ''}`.toUpperCase();
+
+  const isFormSubmitting = form.formState.isSubmitting || isSubmittingParent;
 
   return (
     <Form {...form}>
@@ -418,10 +421,10 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
         />
 
         <DialogFooter className="mt-6">
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="outline" onClick={onCancel} type="button" disabled={isFormSubmitting}>
             Cancelar
           </Button>
-          <Button type="submit">
+          <Button type="submit" disabled={isFormSubmitting}>
             <PlusCircle className="mr-2 h-4 w-4" /> {initialData ? "Salvar Alterações" : "Adicionar Tutor"}
           </Button>
         </DialogFooter>
