@@ -163,7 +163,7 @@ const Dashboard = () => {
                 <div className="text-2xl font-bold">
                   {isLoadingPets ? "..." : totalPets.toLocaleString('pt-BR')}
                 </div>
-                <p className={textMutedClasses}>+18.5% do mês passado</p>
+                {/* <p className={textMutedClasses}>+18.5% do mês passado</p> */} {/* Linha removida */}
               </CardContent>
             </Card>
           </Link>
