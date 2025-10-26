@@ -9,6 +9,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Link } from "react-router-dom"; // Importar Link
 import { useQuery } from "@tanstack/react-query"; // Importar useQuery
 import { supabase } from "@/integrations/supabase/client"; // Importar supabase
+import { format } from "date-fns"; // Importar format
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -51,6 +52,7 @@ const Dashboard = () => {
     initialDashboardConfig
   );
   const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "animalHealth" | "recentActivity">("recentActivity");
+  const [vetsOnDutyToday, setVetsOnDutyToday] = React.useState<number>(0); // Novo estado para veterinários de plantão
 
   const { user } = useUser();
   const userId = user?.id;
@@ -142,6 +144,26 @@ const Dashboard = () => {
 
     setDashboardConfig(mergedConfig);
   }, []);
+
+  // Efeito para carregar a escala de veterinários do localStorage
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const savedSchedule = localStorage.getItem('teamSchedule');
+      if (savedSchedule) {
+        try {
+          const scheduleMap = new Map<string, string[]>(JSON.parse(savedSchedule));
+          const todayKey = format(new Date(), "yyyy-MM-dd");
+          const vetsToday = scheduleMap.get(todayKey) || [];
+          setVetsOnDutyToday(vetsToday.length);
+        } catch (e) {
+          console.error("Erro ao carregar a escala do localStorage para o Dashboard:", e);
+          setVetsOnDutyToday(0);
+        }
+      } else {
+        setVetsOnDutyToday(0);
+      }
+    }
+  }, []); // Executa apenas uma vez no carregamento do componente
 
   const handleSaveConfig = (newConfig: DashboardItemConfig[]) => {
     setDashboardConfig(newConfig);
@@ -265,7 +287,7 @@ const Dashboard = () => {
                 <Stethoscope className={iconClasses} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">2 Veterinários</div>
+                <div className="text-2xl font-bold">{vetsOnDutyToday} Veterinário{vetsOnDutyToday !== 1 ? 's' : ''}</div>
                 <p className={textMutedClasses}>Disponíveis hoje</p>
               </CardContent>
             </Card>
