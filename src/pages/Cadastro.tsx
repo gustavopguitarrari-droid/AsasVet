@@ -992,26 +992,6 @@ const Cadastro = () => {
               <PlusCircle className="h-4 w-4 mr-2" /> Adicionar Animal para {clientToViewPets?.name}
             </Button>
           </DialogFooter>
-
-          {/* Diálogo Aninhado para Adicionar Animal */}
-          <Dialog open={isNestedAddPetDialogOpen} onOpenChange={handleNestedAddPetClose}>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>
-                  {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
-                </DialogTitle>
-              </DialogHeader>
-              <PetForm
-                key={isNestedAddPetDialogOpen ? "open" : "closed"}
-                onSubmit={handleNestedAddPetSubmit}
-                onCancel={handleNestedAddPetClose}
-                allClients={clients}
-                defaultOwnerId={defaultOwnerIdForPet}
-                defaultOwnerName={defaultOwnerNameForPet}
-              />
-            </DialogContent>
-          </Dialog>
-
         </DialogContent>
       </Dialog>
 
@@ -1058,6 +1038,25 @@ const Cadastro = () => {
               allClients={clients}
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Diálogo Aninhado para Adicionar Animal (MOVIDO PARA CÁ) */}
+      <Dialog open={isNestedAddPetDialogOpen} onOpenChange={handleNestedAddPetClose}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
+            </DialogTitle>
+          </DialogHeader>
+          <PetForm
+            key={isNestedAddPetDialogOpen ? "open" : "closed"}
+            onSubmit={handleNestedAddPetSubmit}
+            onCancel={handleNestedAddPetClose}
+            allClients={clients}
+            defaultOwnerId={defaultOwnerIdForPet}
+            defaultOwnerName={defaultOwnerNameForPet}
+          />
         </DialogContent>
       </Dialog>
     </div>
