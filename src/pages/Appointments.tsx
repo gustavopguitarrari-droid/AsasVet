@@ -69,22 +69,43 @@ const Appointments = () => {
   const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState<boolean>(false); // Novo estado para o histórico
 
+  const todayFormatted = format(new Date(), "yyyy-MM-dd");
+
   // --- Queries ---
-  const { data: appointments = [], isLoading, error } = useQuery<Appointment[]>({
-    queryKey: ['appointments', userId],
+  // Query para consultas ativas (Agendada, Em Andamento)
+  const { data: activeAppointments = [], isLoading, error } = useQuery<Appointment[]>({
+    queryKey: ['activeAppointments', userId],
     queryFn: async () => {
       if (!userId) return [];
       const { data, error } = await supabase
         .from('appointments')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .not('status', 'in', ['Realizada', 'Cancelada']); // Filtra para não incluir finalizadas/canceladas
       if (error) throw error;
       return data;
     },
     enabled: !!userId,
   });
 
-  // Fetch history appointments (Realizada ou Cancelada)
+  // Query para consultas finalizadas/canceladas HOJE
+  const { data: todayFinalizedAppointments = [], isLoading: isLoadingTodayFinalized, error: todayFinalizedError } = useQuery<Appointment[]>({
+    queryKey: ['todayFinalizedAppointments', userId, todayFormatted],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('user_id', userId)
+        .in('status', ['Realizada', 'Cancelada'])
+        .eq('completion_date', todayFormatted); // Filtra pela data de finalização de hoje
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
+
+  // Query para histórico de consultas (todas as Realizadas ou Canceladas)
   const { data: historyAppointments = [], isLoading: isLoadingHistory, error: historyError } = useQuery<Appointment[]>({
     queryKey: ['historyAppointments', userId],
     queryFn: async () => {
@@ -187,7 +208,7 @@ const Appointments = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['activeAppointments', userId] });
       showSuccess("Consulta agendada com sucesso!");
       setIsAddAppointmentDialogOpen(false);
     },
@@ -221,8 +242,9 @@ const Appointments = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['activeAppointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['todayFinalizedAppointments', userId, todayFormatted] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] }); // Invalida o histórico também
       showSuccess("Consulta atualizada com sucesso!");
       setIsDetailsDialogOpen(false);
@@ -252,7 +274,8 @@ const Appointments = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['activeAppointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['todayFinalizedAppointments', userId, todayFormatted] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] }); // Invalida o histórico também
       showSuccess("Consulta cancelada com sucesso!");
       setIsDetailsDialogOpen(false);
@@ -283,7 +306,7 @@ const Appointments = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['activeAppointments', userId] });
       showSuccess("Consulta iniciada com sucesso!");
       setActiveTab("em-andamento"); // Muda para a aba "Em Andamento"
     },
@@ -334,37 +357,38 @@ const Appointments = () => {
     }
   };
 
-  const filteredAppointments = appointments.filter((appointment) => {
-    let matchesTab = false;
+  const filteredAppointments = React.useMemo(() => {
+    let appointmentsToFilter: Appointment[] = [];
     switch (activeTab) {
       case "em-espera":
-        matchesTab = appointment.status === "Agendada";
+        appointmentsToFilter = activeAppointments.filter(a => a.status === "Agendada");
         break;
       case "em-andamento":
-        matchesTab = appointment.status === "Em Andamento";
+        appointmentsToFilter = activeAppointments.filter(a => a.status === "Em Andamento");
         break;
       case "finalizadas":
-        matchesTab = appointment.status === "Realizada" || appointment.status === "Cancelada";
+        appointmentsToFilter = todayFinalizedAppointments; // Usa a nova query para finalizadas do dia
         break;
       default:
-        matchesTab = true;
+        appointmentsToFilter = []; // Should not happen
         break;
     }
-    const matchesSearch =
+
+    return appointmentsToFilter.filter((appointment) =>
       appointment.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.pet_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (appointment.veterinarian && appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()));
+      (appointment.veterinarian && appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [activeTab, searchTerm, activeAppointments, todayFinalizedAppointments]);
 
-    return matchesTab && matchesSearch;
-  });
+  // Contadores para os cards de resumo
+  const totalAgendadas = activeAppointments.filter(a => a.status === "Agendada").length;
+  const totalEmAndamento = activeAppointments.filter(a => a.status === "Em Andamento").length;
+  const totalRealizadas = historyAppointments.filter(a => a.status === "Realizada").length; // Usa histórico completo
+  const totalCanceladas = historyAppointments.filter(a => a.status === "Cancelada").length; // Usa histórico completo
 
-  const totalAgendadas = appointments.filter(a => a.status === "Agendada").length;
-  const totalRealizadas = appointments.filter(a => a.status === "Realizada").length;
-  const totalCanceladas = appointments.filter(a => a.status === "Cancelada").length;
-  const totalEmAndamento = appointments.filter(a => a.status === "Em Andamento").length;
-
-  if (isLoading || isLoadingClients || isLoadingPets || isLoadingHistory) {
+  if (isLoading || isLoadingClients || isLoadingPets || isLoadingHistory || isLoadingTodayFinalized) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando consultas e dados de cadastro...</p>
@@ -372,10 +396,10 @@ const Appointments = () => {
     );
   }
 
-  if (error || clientsError || petsError || historyError) {
+  if (error || clientsError || petsError || historyError || todayFinalizedError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar dados: {error?.message || clientsError?.message || petsError?.message || historyError?.message}</p>
+        <p>Erro ao carregar dados: {error?.message || clientsError?.message || petsError?.message || historyError?.message || todayFinalizedError?.message}</p>
       </div>
     );
   }
