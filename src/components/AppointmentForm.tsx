@@ -4,10 +4,14 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
+import { format, parseISO, isValid } from "date-fns";
+import { ptBR } from "date-fns/locale"; // Importar ptBR
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar"; // Importar Calendar
+import { CalendarIcon, Search, User, PawPrint } from "lucide-react"; // Ícones para busca e seleção
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
 import {
   Form,
   FormControl,
@@ -20,7 +24,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
-import { Search, User, PawPrint } from "lucide-react"; // Ícones para busca e seleção
 import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
 
 // Definir as opções de serviço como um array para reutilização
@@ -68,6 +71,8 @@ interface AppointmentFormProps {
     veterinarian?: string;
     date?: string;
     status?: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
+    selectedClientId?: string; // Adicionado para initialData
+    selectedPetId?: string;   // Adicionado para initialData
   };
   allClients: Client[]; // Lista de todos os clientes
   allPets: Pet[];       // Lista de todos os pets
@@ -77,12 +82,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      date: initialData?.date ? new Date(initialData.date) : new Date(), // Sempre define uma data, padrão para hoje
+      date: initialData?.date ? parseISO(initialData.date) : new Date(), // Sempre define uma data, padrão para hoje
       time: initialData?.time || format(new Date(), "HH:mm"), // Define o horário atual como padrão
       
       cpfSearch: "",
-      selectedClientId: "",
-      selectedPetId: "",
+      selectedClientId: initialData?.selectedClientId || "",
+      selectedPetId: initialData?.selectedPetId || "",
 
       client: initialData?.client || "",
       pet: initialData?.pet || "",
@@ -98,12 +103,12 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
   // Reset form and states when initialData changes (e.g., dialog opens for new appointment)
   useEffect(() => {
     form.reset({
-      date: initialData?.date ? new Date(initialData.date) : new Date(),
+      date: initialData?.date ? parseISO(initialData.date) : new Date(),
       time: initialData?.time || format(new Date(), "HH:mm"), // Garante que o horário seja atualizado ao reabrir
       
       cpfSearch: "",
-      selectedClientId: "",
-      selectedPetId: "",
+      selectedClientId: initialData?.selectedClientId || "",
+      selectedPetId: initialData?.selectedPetId || "",
 
       client: initialData?.client || "",
       pet: initialData?.pet || "",
@@ -113,7 +118,27 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
     setCpfInput("");
     setSelectedClientFromSearch(null);
     setSelectedPetFromDropdown(null);
-  }, [initialData, form]);
+
+    // If initialData has client/pet, pre-populate search and selection
+    if (initialData?.selectedClientId) {
+      const client = allClients.find(c => c.id === initialData.selectedClientId);
+      if (client) {
+        setSelectedClientFromSearch(client);
+        form.setValue("selectedClientId", client.id);
+        form.setValue("client", client.name);
+        setCpfInput(client.cpf); // Pre-fill CPF input
+      }
+    }
+    if (initialData?.selectedPetId) {
+      const pet = allPets.find(p => p.id === initialData.selectedPetId);
+      if (pet) {
+        setSelectedPetFromDropdown(pet);
+        form.setValue("selectedPetId", pet.id);
+        form.setValue("pet", pet.name);
+        form.setValue("species", pet.species as AppointmentFormValues["species"]);
+      }
+    }
+  }, [initialData, form, allClients, allPets]);
 
   const handleSearchCpf = () => {
     const cleanCpf = cpfInput.replace(/\D/g, '');
@@ -122,6 +147,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
       setSelectedClientFromSearch(null);
       form.setValue("selectedClientId", "");
       form.setValue("client", "");
+      setSelectedPetFromDropdown(null);
       form.setValue("selectedPetId", "");
       form.setValue("pet", "");
       form.setValue("species", "Cachorro");
@@ -145,6 +171,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
       setSelectedClientFromSearch(null);
       form.setValue("selectedClientId", "");
       form.setValue("client", "");
+      setSelectedPetFromDropdown(null);
       form.setValue("selectedPetId", "");
       form.setValue("pet", "");
       form.setValue("species", "Cachorro");
@@ -168,32 +195,60 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        {/* O campo de data agora é oculto e preenchido automaticamente */}
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem className="hidden">
-              <FormControl>
-                <Input type="hidden" {...field} value={field.value ? format(field.value, "yyyy-MM-dd") : ""} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* O campo de hora foi removido daqui, pois será definido automaticamente */}
-        <FormField
-          control={form.control}
-          name="time"
-          render={({ field }) => (
-            <FormItem className="hidden"> {/* Campo oculto para manter o valor no formulário */}
-              <FormControl>
-                <Input type="hidden" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Data da Consulta</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP", { locale: ptBR })
+                        ) : (
+                          <span>Selecione uma data</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      initialFocus
+                      locale={ptBR}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="time"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Hora da Consulta</FormLabel>
+                <FormControl>
+                  <Input type="time" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         {/* Busca de Tutor por CPF */}
         <div className="space-y-2 border p-3 rounded-md">
