@@ -265,7 +265,8 @@ const Veterinarios = () => {
         </TabsContent>
 
         <TabsContent value="equipe" className="mt-4">
-          <div className="flex items-center justify-end mb-4"> {/* Adicionado mb-4 para espaçamento */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4"> {/* Ajustado para flex-col em mobile e flex-row em md+ */}
+            <RoleFilter selectedRole={selectedRole} onSelectRole={handleSelectRole} />
             {isAdmin ? (
               <Button onClick={() => setIsAddMemberDialogOpen(true)}>
                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
@@ -276,8 +277,6 @@ const Veterinarios = () => {
               </p>
             )}
           </div>
-
-          <RoleFilter selectedRole={selectedRole} onSelectRole={handleSelectRole} />
 
           <div className="flex items-center space-x-2 mt-4">
             <div className="relative flex-1">
