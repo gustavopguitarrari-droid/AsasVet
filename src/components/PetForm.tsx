@@ -195,7 +195,8 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
               <Select
                 onValueChange={field.onChange}
                 defaultValue={field.value}
-                disabled={!!defaultOwnerId} {/* Desabilita se defaultOwnerId for fornecido */}
+                // Desabilita se defaultOwnerId for fornecido
+                disabled={!!defaultOwnerId} 
               >
                 <FormControl>
                   <SelectTrigger>
