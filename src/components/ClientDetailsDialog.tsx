@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Phone, Home, MapPin, Calendar, IdCard, Info, Edit, Trash2 } from "lucide-react";
+import { User, Mail, Phone, Home, MapPin, Calendar, IdCard, Info, Edit, Trash2, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
 import { Client } from "@/types/cadastro";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { format, parseISO, isValid } from "date-fns";
