@@ -90,6 +90,25 @@ const Dashboard = () => {
     enabled: !!userId,
   });
 
+  // Query para buscar a contagem de consultas agendadas
+  const { data: scheduledAppointmentsCount = 0, isLoading: isLoadingScheduledAppointments } = useQuery<number>({
+    queryKey: ['scheduledAppointmentsCount', userId],
+    queryFn: async () => {
+      if (!userId) return 0;
+      const { count, error } = await supabase
+        .from('appointments')
+        .select('*', { count: 'exact' })
+        .eq('user_id', userId)
+        .eq('status', 'Agendada'); // Filtra por status "Agendada"
+      if (error) {
+        console.error("Erro ao buscar contagem de consultas agendadas:", error);
+        throw error;
+      }
+      return count || 0;
+    },
+    enabled: !!userId,
+  });
+
   React.useEffect(() => {
     const savedConfigString = localStorage.getItem("dashboardConfig");
     let savedConfig: DashboardItemConfig[] = [];
@@ -177,9 +196,10 @@ const Dashboard = () => {
                 <CalendarDays className={iconClasses} />
               </CardHeader>
               <CardContent>
-                {/* Removido o valor fixo e a porcentagem */}
-                <div className="text-2xl font-bold">Ver Agenda</div>
-                {/* <p className={textMutedClasses}>Clique para ver os detalhes</p> */} {/* Linha removida */}
+                <div className="text-2xl font-bold">
+                  {isLoadingScheduledAppointments ? "..." : scheduledAppointmentsCount.toLocaleString('pt-BR')}
+                </div>
+                <p className={textMutedClasses}>Consultas agendadas</p>
               </CardContent>
             </Card>
           </Link>
