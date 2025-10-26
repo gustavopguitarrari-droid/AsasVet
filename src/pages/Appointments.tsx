@@ -234,10 +234,10 @@ const Appointments = () => {
               <TableHead>Serviço</TableHead>
               {activeTab === "em-espera" && <TableHead>Tempo de Espera</TableHead>}
               {activeTab === "em-andamento" && <TableHead>Veterinário</TableHead>}
-              {activeTab === "em-andamento" && <TableHead>Tempo de Consulta</TableHead>} {/* Nova coluna */}
+              {activeTab === "em-andamento" && <TableHead>Tempo de Consulta</TableHead>}
               {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
-              {activeTab === "finalizadas" && <TableHead>Data Finalização</TableHead>} {/* NOVO */}
-              {activeTab === "finalizadas" && <TableHead>Hora Finalização</TableHead>} {/* NOVO */}
+              {activeTab === "finalizadas" && <TableHead>Data Finalização</TableHead>}
+              {activeTab === "finalizadas" && <TableHead>Hora Finalização</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -274,7 +274,7 @@ const Appointments = () => {
                             Iniciada
                           </Badge>
                         </TableCell>
-                        <TableCell> {/* Nova célula para o cronômetro */}
+                        <TableCell>
                           <AppointmentChronometer date={appointment.date} time={appointment.time} />
                         </TableCell>
                       </>
@@ -294,8 +294,8 @@ const Appointments = () => {
                             </Badge>
                           )}
                         </TableCell>
-                        <TableCell>{appointment.completionDate || "N/A"}</TableCell> {/* NOVO */}
-                        <TableCell>{appointment.completionTime || "N/A"}</TableCell> {/* NOVO */}
+                        <TableCell>{appointment.completionDate || "N/A"}</TableCell>
+                        <TableCell>{appointment.completionTime || "N/A"}</TableCell>
                       </>
                     )}
                   </TableRow>
