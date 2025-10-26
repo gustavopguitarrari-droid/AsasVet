@@ -713,7 +713,7 @@ const Cadastro = () => {
                 onCancel={() => setIsAddPetDialogOpen(false)}
                 allClients={clients}
                 defaultOwnerId={defaultOwnerIdForPet}
-                defaultOwnerName={defaultOwnerNameForPet} {/* Passa o nome do tutor */}
+                defaultOwnerName={defaultOwnerNameForPet} /* Passa o nome do tutor */
               />
             </DialogContent>
           </Dialog>
@@ -888,7 +888,7 @@ const Cadastro = () => {
             <DialogDescription>
               Lista de todos os animais vinculados a {clientToViewPets?.name}.
             </DialogDescription>
-          </DialogHeader>
+          </DialogDescription>
           <ScrollArea className="flex-1 p-4 border rounded-md bg-muted/20 mb-4">
             {clientToViewPets ? (
               (() => {
