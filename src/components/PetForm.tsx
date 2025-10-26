@@ -144,7 +144,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
   const initials = currentName.charAt(0).toUpperCase() || ''; 
 
   const handleSubmit = (data: PetFormValues) => {
-    console.log("PetForm: Submitting data:", data); // Log para depuração
+    console.log("PetForm (handleSubmit): Dados do formulário sendo submetidos:", data); // Log para depuração
     onSubmit(data);
   };
 

@@ -109,6 +109,7 @@ const Cadastro = () => {
         .from('pets')
         .select('*');
       if (error) throw error;
+      console.log("Cadastro (pets queryFn): Pets fetched from Supabase:", data); // Log dos pets retornados
       return data;
     },
     enabled: !!userId,
@@ -220,7 +221,7 @@ const Cadastro = () => {
       }
     },
     onSuccess: (data) => {
-      console.log("addClientMutation: Client added successfully, invalidating queries. Data:", data);
+      console.log("addClientMutation (onSuccess): Client added successfully, invalidating queries. Data:", data);
       queryClient.invalidateQueries({ queryKey: ['clients', userId] });
       showSuccess("Tutor adicionado com sucesso!");
       setIsAddClientDialogOpen(false);
@@ -310,14 +311,14 @@ const Cadastro = () => {
       return updatedClient;
     },
     onSuccess: () => {
-      console.log("updateClientMutation: Client updated successfully, invalidating queries.");
+      console.log("updateClientMutation (onSuccess): Client updated successfully, invalidating queries.");
       queryClient.invalidateQueries({ queryKey: ['clients', userId] });
       showSuccess("Tutor atualizado com sucesso!");
       setIsEditClientDialogOpen(false);
       setIsClientDetailsDialogOpen(false); // Close details dialog if open
     },
     onError: (error) => {
-      console.error("updateClientMutation: Error updating client:", error);
+      console.error("updateClientMutation (onError): Error updating client:", error);
       showError(`Erro ao atualizar tutor: ${error.message}`);
     },
   });
@@ -340,7 +341,7 @@ const Cadastro = () => {
         throw fetchError;
       }
 
-      // Delete client's photo from storage if it exists
+      // Delete client's photo from storage if it existed
       if (clientToDelete?.photo_url) {
         console.log("deleteClientMutation: Deleting client photo from storage:", clientToDelete.photo_url);
         await deleteImageFromSupabase(clientToDelete.photo_url);
@@ -381,14 +382,14 @@ const Cadastro = () => {
       return clientId;
     },
     onSuccess: () => {
-      console.log("deleteClientMutation: Client deleted successfully, invalidating queries.");
+      console.log("deleteClientMutation (onSuccess): Client deleted successfully, invalidating queries.");
       queryClient.invalidateQueries({ queryKey: ['clients', userId] });
       queryClient.invalidateQueries({ queryKey: ['pets', userId] }); // Pets also affected
       showSuccess("Tutor e seus animais excluídos com sucesso!");
       setIsClientDetailsDialogOpen(false); // Close details dialog
     },
     onError: (error) => {
-      console.error("deleteClientMutation: Error deleting client:", error);
+      console.error("deleteClientMutation (onError): Error deleting client:", error);
       showError(`Erro ao excluir tutor: ${error.message}`);
     },
   });
@@ -396,13 +397,14 @@ const Cadastro = () => {
   const addPetMutation = useMutation({
     mutationFn: async (data: PetFormValues) => {
       if (!userId) throw new Error("User not authenticated.");
-      console.log("addPetMutation: Attempting to add new pet with data:", data); // Log de dados de entrada
+      console.log("addPetMutation (mutationFn): Attempting to add new pet with data:", data); // Log de dados de entrada
+      console.log("addPetMutation (mutationFn): ownerId being sent:", data.ownerId); // Log específico para ownerId
 
       let photoUrl: string | null = null;
       let newPetId: string | undefined;
 
       // First, insert pet without photo_url to get an ID
-      console.log("addPetMutation: Inserting pet without photo_url to get an ID.");
+      console.log("addPetMutation (mutationFn): Inserting pet without photo_url to get an ID.");
       const { data: insertedPet, error: insertError } = await supabase
         .from('pets')
         .insert({
@@ -420,25 +422,25 @@ const Cadastro = () => {
         .single();
 
       if (insertError || !insertedPet) {
-        console.error("addPetMutation: Error inserting pet to get ID:", insertError);
+        console.error("addPetMutation (mutationFn): Error inserting pet to get ID:", insertError);
         throw insertError || new Error("Failed to create pet.");
       }
       newPetId = insertedPet.id;
-      console.log("addPetMutation: Pet inserted with temporary ID:", newPetId);
+      console.log("addPetMutation (mutationFn): Pet inserted with temporary ID:", newPetId);
 
       if (data.photoUrl) {
-        console.log("addPetMutation: Photo URL provided, attempting upload.");
+        console.log("addPetMutation (mutationFn): Photo URL provided, attempting upload.");
         photoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'pets', newPetId);
         if (!photoUrl) {
-          console.error("addPetMutation: Failed to upload pet photo. Deleting temporary pet.");
+          console.error("addPetMutation (mutationFn): Failed to upload pet photo. Deleting temporary pet.");
           // If photo upload fails, delete the newly created pet and throw error
           await supabase.from('pets').delete().eq('id', newPetId);
           throw new Error("Failed to upload pet photo.");
         }
-        console.log("addPetMutation: Photo uploaded, public URL:", photoUrl);
+        console.log("addPetMutation (mutationFn): Photo uploaded, public URL:", photoUrl);
 
         // Update the pet with the photo URL
-        console.log("addPetMutation: Updating pet with photo_url.");
+        console.log("addPetMutation (mutationFn): Updating pet with photo_url.");
         const { data: updatedPet, error: updateError } = await supabase
           .from('pets')
           .update({ photo_url: photoUrl })
@@ -446,13 +448,13 @@ const Cadastro = () => {
           .select()
           .single();
         if (updateError) {
-          console.error("addPetMutation: Error updating pet with photo_url:", updateError);
+          console.error("addPetMutation (mutationFn): Error updating pet with photo_url:", updateError);
           throw updateError;
         }
-        console.log("addPetMutation: Pet updated with photo_url:", updatedPet);
+        console.log("addPetMutation (mutationFn): Pet updated with photo_url:", updatedPet);
         return updatedPet;
       }
-      console.log("addPetMutation: No photo URL provided, returning inserted pet.");
+      console.log("addPetMutation (mutationFn): No photo URL provided, returning inserted pet.");
       // No photo, just return the inserted pet
       const { data: finalPet, error: fetchFinalPetError } = await supabase
         .from('pets')
@@ -460,20 +462,20 @@ const Cadastro = () => {
         .eq('id', newPetId)
         .single();
       if (fetchFinalPetError) {
-        console.error("addPetMutation: Error fetching final pet after no photo upload:", fetchFinalPetError);
+        console.error("addPetMutation (mutationFn): Error fetching final pet after no photo upload:", fetchFinalPetError);
         throw fetchFinalPetError;
       }
       return finalPet;
     },
     onSuccess: () => {
-      console.log("addPetMutation: Pet added successfully, invalidating queries.");
+      console.log("addPetMutation (onSuccess): Pet added successfully, invalidating queries.");
       queryClient.invalidateQueries({ queryKey: ['pets', userId] });
       showSuccess("Animal adicionado com sucesso!");
       setIsAddPetDialogOpen(false);
       // setIsClientPetsDialogOpen(false); // No longer closes parent dialog
     },
     onError: (error) => {
-      console.error("addPetMutation: Error adding animal:", error);
+      console.error("addPetMutation (onError): Error adding animal:", error);
       showError(`Erro ao adicionar animal: ${error.message}`);
     },
   });
@@ -530,14 +532,14 @@ const Cadastro = () => {
       return updatedPet;
     },
     onSuccess: () => {
-      console.log("updatePetMutation: Pet updated successfully, invalidating queries.");
+      console.log("updatePetMutation (onSuccess): Pet updated successfully, invalidating queries.");
       queryClient.invalidateQueries({ queryKey: ['pets', userId] });
       showSuccess("Animal atualizado com sucesso!");
       setIsEditPetDialogOpen(false);
       setIsPetDetailsDialogOpen(false); // Close details dialog if open
     },
     onError: (error) => {
-      console.error("updatePetMutation: Error updating animal:", error);
+      console.error("updatePetMutation (onError): Error updating animal:", error);
       showError(`Erro ao atualizar animal: ${error.message}`);
     },
   });
@@ -576,13 +578,13 @@ const Cadastro = () => {
       return petId;
     },
     onSuccess: () => {
-      console.log("deletePetMutation: Pet deleted successfully, invalidating queries.");
+      console.log("deletePetMutation (onSuccess): Pet deleted successfully, invalidating queries.");
       queryClient.invalidateQueries({ queryKey: ['pets', userId] });
       showSuccess("Animal excluído com sucesso!");
       setIsPetDetailsDialogOpen(false); // Close details dialog
     },
     onError: (error) => {
-      console.error("deletePetMutation: Error deleting animal:", error);
+      console.error("deletePetMutation (onError): Error deleting animal:", error);
       showError(`Erro ao excluir animal: ${error.message}`);
     },
   });
@@ -697,6 +699,7 @@ const Cadastro = () => {
   };
 
   const handleNestedAddPetClose = () => {
+    console.log("handleNestedAddPetClose called.");
     setIsNestedAddPetDialogOpen(false);
     setDefaultOwnerIdForPet(undefined);
     setDefaultOwnerNameForPet(undefined);
@@ -704,6 +707,7 @@ const Cadastro = () => {
 
   const handleNestedAddPetSubmit = (data: PetFormValues) => {
     console.log("handleNestedAddPetSubmit: Submitting pet data:", data); // Log para depuração
+    console.log("handleNestedAddPetSubmit: ownerId being passed to mutation:", data.ownerId); // Log específico para ownerId
     addPetMutation.mutate(data, {
       onSuccess: () => {
         console.log("handleNestedAddPetSubmit: Mutation successful."); // Log para depuração
@@ -818,6 +822,7 @@ const Cadastro = () => {
                 {filteredClients.length > 0 ? (
                   filteredClients.map((client) => {
                     const petsOfClient = pets.filter(pet => pet.ownerId === client.id);
+                    console.log(`Cadastro (Tutores Tab): Cliente ${client.name} (ID: ${client.id}) tem ${petsOfClient.length} animais.`); // Log para cada cliente
                     return (
                       <TableRow key={client.id} className="cursor-pointer hover:bg-muted/50">
                         <TableCell className="font-medium" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>{client.name}</TableCell>
@@ -981,6 +986,7 @@ const Cadastro = () => {
             {clientToViewPets ? (
               (() => {
                 const petsOfClient = pets.filter(pet => pet.ownerId === clientToViewPets.id);
+                console.log(`Cadastro (ClientPetsDialog): Para o cliente ${clientToViewPets.name} (ID: ${clientToViewPets.id}), encontrados ${petsOfClient.length} animais.`); // Log para o diálogo de pets do cliente
                 return petsOfClient.length > 0 ? (
                   <div className="space-y-3">
                     {petsOfClient.map(pet => {
