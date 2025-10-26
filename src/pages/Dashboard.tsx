@@ -6,6 +6,7 @@ import DashboardConfigurator from "@/components/DashboardConfigurator";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Link } from "react-router-dom"; // Importar Link
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -97,16 +98,18 @@ const Dashboard = () => {
     switch (item.id) {
       case "totalClients":
         return (
-          <Card key={item.id} className={cn("bg-blue-600", baseCardClasses)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Tutores</CardTitle> {/* Renomeado aqui */}
-              <Users className={iconClasses} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">2,350</div>
-              <p className={textMutedClasses}>+20.1% do mês passado</p>
-            </CardContent>
-          </Card>
+          <Link to="/cadastro" key={item.id} className="block"> {/* Adicionado Link aqui */}
+            <Card className={cn("bg-blue-600", baseCardClasses)}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total de Tutores</CardTitle> {/* Renomeado aqui */}
+                <Users className={iconClasses} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">2,350</div>
+                <p className={textMutedClasses}>+20.1% do mês passado</p>
+              </CardContent>
+            </Card>
+          </Link>
         );
       case "totalPets":
         return (
