@@ -42,6 +42,7 @@ export interface Appointment {
   completion_date?: string | null; // Renomeado para corresponder ao DB
   completion_time?: string | null; // Renomeado para corresponder ao DB
   created_at: string; // Adicionado para corresponder ao DB
+  start_time?: string | null; // NOVO: Adicionado para registrar o início da consulta
 }
 
 // Mapeamento de espécies para ícones
@@ -211,6 +212,7 @@ const Appointments = () => {
           status: updatedAppointment.status,
           completion_date: updatedAppointment.completion_date,
           completion_time: updatedAppointment.completion_time,
+          start_time: updatedAppointment.start_time, // Incluir start_time na atualização
         })
         .eq('id', updatedAppointment.id)
         .eq('user_id', userId)
@@ -240,6 +242,7 @@ const Appointments = () => {
           status: "Cancelada",
           completion_date: format(now, "yyyy-MM-dd"),
           completion_time: format(now, "HH:mm"),
+          start_time: null, // Limpar start_time se a consulta for cancelada
         })
         .eq('id', appointmentId)
         .eq('user_id', userId)
@@ -264,11 +267,13 @@ const Appointments = () => {
       if (!userId) throw new Error("User not authenticated.");
       if (!appUser?.name) throw new Error("User name not available to assign as veterinarian.");
 
+      const now = new Date(); // Captura o momento exato do início
       const { data, error } = await supabase
         .from('appointments')
         .update({
           status: "Em Andamento",
           veterinarian: appUser.name, // Atribui o veterinário logado
+          start_time: now.toISOString(), // Salva o timestamp de início
         })
         .eq('id', appointmentId)
         .eq('user_id', userId)
@@ -517,7 +522,7 @@ const Appointments = () => {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <AppointmentChronometer startTime={appointment.created_at} />
+                          {appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
                         </TableCell>
                       </>
                     )}
