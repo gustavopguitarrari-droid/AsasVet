@@ -53,6 +53,7 @@ const Cadastro = () => {
   const [isEditPetDialogOpen, setIsEditPetDialogOpen] = useState<boolean>(false);
   const [petToEdit, setPetToEdit] = useState<Pet | undefined>(undefined);
   const [defaultOwnerIdForPet, setDefaultOwnerIdForPet] = useState<string | undefined>(undefined);
+  const [defaultOwnerNameForPet, setDefaultOwnerNameForPet] = useState<string | undefined>(undefined); // NOVO: Nome do tutor padrão
 
   // Estados para a aba de Tutores
   const [clientSearchTerm, setClientSearchTerm] = useState<string>("");
@@ -646,9 +647,10 @@ const Cadastro = () => {
     setIsClientPetsDialogOpen(true);
   };
 
-  const handleAddPetForClient = (clientId: string) => {
-    console.log("handleAddPetForClient called for client ID:", clientId);
-    setDefaultOwnerIdForPet(clientId);
+  const handleAddPetForClient = (client: Client) => { // Alterado para aceitar o objeto Client
+    console.log("handleAddPetForClient called for client ID:", client.id);
+    setDefaultOwnerIdForPet(client.id);
+    setDefaultOwnerNameForPet(client.name); // Define o nome do tutor
     setIsAddPetDialogOpen(true);
     setIsClientPetsDialogOpen(false); // Fecha o diálogo de pets do cliente
   };
@@ -701,7 +703,9 @@ const Cadastro = () => {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Adicionar Novo Animal</DialogTitle>
+                <DialogTitle>
+                  {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
+                </DialogTitle>
               </DialogHeader>
               <PetForm
                 key={isAddPetDialogOpen ? "open" : "closed"}
@@ -709,6 +713,7 @@ const Cadastro = () => {
                 onCancel={() => setIsAddPetDialogOpen(false)}
                 allClients={clients}
                 defaultOwnerId={defaultOwnerIdForPet}
+                defaultOwnerName={defaultOwnerNameForPet} {/* Passa o nome do tutor */}
               />
             </DialogContent>
           </Dialog>
@@ -926,7 +931,7 @@ const Cadastro = () => {
           </ScrollArea>
           <DialogFooter>
             <Button variant="outline" onClick={() => setIsClientPetsDialogOpen(false)}>Fechar</Button>
-            <Button onClick={() => handleAddPetForClient(clientToViewPets!.id)} disabled={!clientToViewPets}>
+            <Button onClick={() => handleAddPetForClient(clientToViewPets!)} disabled={!clientToViewPets}>
               <PlusCircle className="h-4 w-4 mr-2" /> Adicionar Animal para {clientToViewPets?.name}
             </Button>
           </DialogFooter>

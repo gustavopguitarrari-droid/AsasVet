@@ -23,6 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CameraCaptureDialog from "./CameraCaptureDialog";
 import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
+import { Label } from "@/components/ui/label"; // Adicionado importação do Label
 
 // Esquema de validação do formulário com Zod
 const formSchema = z.object({
@@ -49,9 +50,10 @@ interface PetFormProps {
   initialData?: Pet;
   allClients: Client[]; // Lista de todos os tutores para seleção
   defaultOwnerId?: string; // Para pré-selecionar um tutor
+  defaultOwnerName?: string; // NOVO: Nome do tutor padrão
 }
 
-const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allClients, defaultOwnerId }) => {
+const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allClients, defaultOwnerId, defaultOwnerName }) => {
   const form = useForm<PetFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -87,7 +89,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  }, [initialData, form, defaultOwnerId]);
+  }, [initialData, form, defaultOwnerId, defaultOwnerName]); // Adicionado defaultOwnerName às dependências
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -187,8 +189,14 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
           name="ownerId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tutor</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormLabel>
+                {defaultOwnerName ? `Tutor: ${defaultOwnerName}` : "Tutor"}
+              </FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                disabled={!!defaultOwnerId} {/* Desabilita se defaultOwnerId for fornecido */}
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o tutor" />
