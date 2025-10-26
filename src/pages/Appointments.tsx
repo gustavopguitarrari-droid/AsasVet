@@ -119,11 +119,24 @@ const Appointments = () => {
     queryKey: ['pets', userId],
     queryFn: async () => {
       if (!userId) return [];
+      // RLS on 'pets' table ensures only pets belonging to the user's clients are returned
       const { data, error } = await supabase
         .from('pets')
-        .select('*'); // RLS will filter by owner_id linked to user_id
+        .select('*');
       if (error) throw error;
-      return data;
+      // Mapeia owner_id para ownerId para corresponder à interface Pet
+      return data.map(dbPet => ({
+        id: dbPet.id,
+        name: dbPet.name,
+        species: dbPet.species,
+        breed: dbPet.breed,
+        age: dbPet.age,
+        gender: dbPet.gender,
+        color: dbPet.color,
+        observations: dbPet.observations || undefined,
+        photoUrl: dbPet.photo_url || undefined,
+        ownerId: dbPet.owner_id, // CORREÇÃO AQUI: Mapeando owner_id para ownerId
+      }));
     },
     enabled: !!userId,
   });
