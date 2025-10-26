@@ -22,7 +22,6 @@ import { DialogFooter } from "@/components/ui/dialog";
 import BirthdayPicker from "./BirthdayPicker";
 import { Client } from "@/types/cadastro";
 import { lookupCep } from "@/utils/cepLookup";
-import { lookupCpf } from "@/utils/cpfLookup"; // Importar o novo utilitário de CPF
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { showError, showSuccess } from "@/utils/toast";
 import { Textarea } from "@/components/ui/textarea";
@@ -144,28 +143,6 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
     }
   };
 
-  const handleCpfChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const cpf = e.target.value;
-    form.setValue("cpf", cpf);
-    const cleanCpf = cpf.replace(/\D/g, '');
-
-    if (cleanCpf.length === 11) {
-      // Apenas busca se o campo de nome estiver vazio ou for o nome inicial
-      const currentName = form.getValues("name");
-      if (!currentName || currentName === initialData?.name) {
-        const cpfData = await lookupCpf(cleanCpf);
-        if (cpfData) {
-          form.setValue("name", cpfData.name, { shouldValidate: true });
-          showSuccess("Nome do tutor preenchido automaticamente!");
-        } else {
-          // Opcional: Limpar o campo de nome se o CPF não for encontrado e o nome não tiver sido alterado manualmente
-          // form.setValue("name", "", { shouldValidate: true });
-          showError("CPF não encontrado na base de dados (simulada).");
-        }
-      }
-    }
-  };
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -278,7 +255,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
             <FormItem>
               <FormLabel>CPF</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: 123.456.789-00" {...field} onChange={handleCpfChange} />
+                <Input placeholder="Ex: 123.456.789-00" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
