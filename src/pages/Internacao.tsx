@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react"; // Adicionado useState e useMemo aqui
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -128,7 +128,8 @@ const Internacao = () => {
         .from('interned_patients')
         .select('*')
         .eq('user_id', userId)
-        .not('status', 'in', ['Alta', 'Óbito']); // CORREÇÃO AQUI: Usando array de strings
+        .neq('status', 'Alta') // CORREÇÃO AQUI: Usando neq
+        .neq('status', 'Óbito'); // CORREÇÃO AQUI: Usando neq
 
       if (error) {
         console.error("Internacao.tsx: Error fetching interned_patients:", error);
