@@ -13,7 +13,7 @@ import {
   isToday,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus, X, Eraser } from "lucide-react"; // Importar Eraser
 
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +26,17 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle as AlertDialogTitleComponent,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"; // Importar AlertDialog
 
 interface Veterinario {
   id: string;
@@ -115,6 +126,15 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
     setCurrentMonth((prevMonth) => addMonths(prevMonth, 1));
   };
 
+  const handleClearSchedule = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('teamSchedule');
+      setSchedule(new Map<string, string[]>());
+      setSelectedDay(undefined);
+      setEditingDaySchedule([]);
+    }
+  };
+
   const weekdays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
   return (
@@ -173,6 +193,30 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
             );
           })}
         </div>
+      </div>
+
+      <div className="flex justify-end mt-4">
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" className="flex items-center">
+              <Eraser className="h-4 w-4 mr-2" /> Limpar Escala
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitleComponent>Tem certeza que deseja limpar a escala?</AlertDialogTitleComponent>
+              <AlertDialogDescription>
+                Esta ação não pode ser desfeita. Todos os agendamentos de escala serão permanentemente excluídos.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleClearSchedule} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Limpar Escala
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
