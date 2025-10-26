@@ -380,7 +380,7 @@ const Appointments = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Gerenciar consultas do dia</h2>
         <div className="flex space-x-2"> {/* Container para os botões */}
-          <Button onClick={() => setIsHistoryDialogOpen(true)} variant="outline">
+          <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
             <History className="mr-2 h-4 w-4" /> Ver Histórico
           </Button>
           <Dialog open={isAddAppointmentDialogOpen} onOpenChange={setIsAddAppointmentDialogOpen}>
