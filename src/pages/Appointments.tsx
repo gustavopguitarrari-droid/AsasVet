@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,37 +15,32 @@ import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import AppointmentForm, { AppointmentFormValues } from "@/components/AppointmentForm"; // Importa AppointmentFormValues
+import AppointmentForm, { AppointmentFormValues } from "@/components/AppointmentForm";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
-import AppointmentChronometer from "@/components/AppointmentChronometer"; // Importa o novo componente
-import { format } from "date-fns"; // Importar format para a data
+import AppointmentChronometer from "@/components/AppointmentChronometer";
+import { format, parseISO } from "date-fns";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@/context/UserContext";
+import { showError, showSuccess } from "@/utils/toast";
 
-interface Appointment {
+export interface Appointment {
   id: string;
-  date: string;
-  time: string;
-  client: string;
-  pet: string;
+  user_id: string; // Adicionado para RLS
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm
+  client_name: string; // Renomeado para corresponder ao DB
+  pet_name: string; // Renomeado para corresponder ao DB
   species: string;
   service: string;
   veterinarian: string;
-  status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento"; // Adicionado 'Em Andamento'
-  completionDate?: string; // NOVO: Data de finalização/cancelamento
-  completionTime?: string; // NOVO: Hora de finalização/cancelamento
+  status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
+  completion_date?: string | null; // Renomeado para corresponder ao DB
+  completion_time?: string | null; // Renomeado para corresponder ao DB
+  created_at: string; // Adicionado para corresponder ao DB
 }
-
-const mockAppointments: Appointment[] = [
-  { id: "C001", date: "2024-10-26", time: "10:00", client: "João Silva", pet: "Rex", species: "Cachorro", service: "Consulta Geral", veterinarian: "Dr. Ana Paula", status: "Agendada" },
-  { id: "C002", date: "2024-10-26", time: "14:30", client: "Maria Souza", pet: "Miau", species: "Gato", service: "Vacinação", veterinarian: "Dr. Carlos Eduardo", status: "Realizada", completionDate: "2024-10-26", completionTime: "15:00" },
-  { id: "C003", date: "2024-10-27", time: "09:00", client: "Pedro Santos", pet: "Pingo", species: "Pássaro", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Cancelada", completionDate: "2024-10-27", completionTime: "08:30" },
-  { id: "C004", date: "2024-10-28", time: "11:00", client: "Ana Costa", pet: "Bob", species: "Cachorro", service: "Banho e Tosa", veterinarian: "Dr. Ana Paula", status: "Agendada" },
-  { id: "C005", date: "2024-10-29", time: "16:00", client: "Carlos Lima", pet: "Luna", species: "Gato", service: "Consulta de Retorno", veterinarian: "Dr. Carlos Eduardo", status: "Em Andamento" }, // Exemplo de 'Em Andamento'
-  { id: "C006", date: "2024-10-25", time: "13:00", client: "Fernanda Reis", pet: "Thor", species: "Cachorro", service: "Cirurgia", veterinarian: "Dra. Beatriz Lima", status: "Realizada", completionDate: "2024-10-25", completionTime: "14:30" },
-  { id: "C007", date: "2024-10-30", time: "10:00", client: "Lucas Mendes", pet: "Nemo", species: "Peixe", service: "Consulta Geral", veterinarian: "Dr. Ana Paula", status: "Agendada" },
-  { id: "C008", date: "2024-10-31", time: "15:00", client: "Mariana Santos", pet: "Pipoca", species: "Roedor", service: "Exame de Rotina", veterinarian: "Dra. Beatriz Lima", status: "Agendada" },
-];
 
 // Mapeamento de espécies para ícones
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -56,74 +53,141 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
 };
 
 const Appointments = () => {
-  const [activeTab, setActiveTab] = React.useState<string>("em-espera"); // Alterado para a nova aba padrão
-  const [appointments, setAppointments] = React.useState<Appointment[]>(mockAppointments);
+  const queryClient = useQueryClient();
+  const { user: appUser } = useUser();
+  const userId = appUser?.id;
+
+  const [activeTab, setActiveTab] = React.useState<string>("em-espera");
   const [searchTerm, setSearchTerm] = React.useState<string>("");
 
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState<boolean>(false);
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
-  const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false); // Estado para o novo diálogo
+  const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false);
 
-  const filteredAppointments = appointments.filter((appointment) => {
-    // A busca por termo foi removida, então apenas o filtro por aba é aplicado
-    let matchesTab = false;
-    switch (activeTab) {
-      case "em-espera":
-        matchesTab = appointment.status === "Agendada";
-        break;
-      case "em-andamento":
-        matchesTab = appointment.status === "Em Andamento";
-        break;
-      case "finalizadas":
-        matchesTab = appointment.status === "Realizada" || appointment.status === "Cancelada";
-        break;
-      default: // Fallback para 'all' ou qualquer outro caso
-        matchesTab = true;
-        break;
-    }
-    return matchesTab; // Retorna apenas o filtro por aba
+  // --- Queries ---
+  const { data: appointments = [], isLoading, error } = useQuery<Appointment[]>({
+    queryKey: ['appointments', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('user_id', userId);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
+
+  // --- Mutations ---
+  const addAppointmentMutation = useMutation({
+    mutationFn: async (newAppointmentData: AppointmentFormValues) => {
+      if (!userId) throw new Error("User not authenticated.");
+
+      const appointmentDate = newAppointmentData.dateOption === "today"
+        ? format(new Date(), "yyyy-MM-dd")
+        : newAppointmentData.date ? format(newAppointmentData.date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd");
+
+      const { data, error } = await supabase
+        .from('appointments')
+        .insert({
+          user_id: userId,
+          date: appointmentDate,
+          time: newAppointmentData.time,
+          client_name: newAppointmentData.client,
+          pet_name: newAppointmentData.pet,
+          species: newAppointmentData.species,
+          service: newAppointmentData.service,
+          veterinarian: newAppointmentData.veterinarian,
+          status: "Agendada", // Default status
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      showSuccess("Consulta agendada com sucesso!");
+      setIsAddAppointmentDialogOpen(false);
+    },
+    onError: (err) => {
+      showError(`Erro ao agendar consulta: ${err.message}`);
+    },
+  });
+
+  const updateAppointmentMutation = useMutation({
+    mutationFn: async (updatedAppointment: Appointment) => {
+      if (!userId) throw new Error("User not authenticated.");
+      const { data, error } = await supabase
+        .from('appointments')
+        .update({
+          date: updatedAppointment.date,
+          time: updatedAppointment.time,
+          client_name: updatedAppointment.client_name,
+          pet_name: updatedAppointment.pet_name,
+          species: updatedAppointment.species,
+          service: updatedAppointment.service,
+          veterinarian: updatedAppointment.veterinarian,
+          status: updatedAppointment.status,
+          completion_date: updatedAppointment.completion_date,
+          completion_time: updatedAppointment.completion_time,
+        })
+        .eq('id', updatedAppointment.id)
+        .eq('user_id', userId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      showSuccess("Consulta atualizada com sucesso!");
+      setIsDetailsDialogOpen(false);
+    },
+    onError: (err) => {
+      showError(`Erro ao atualizar consulta: ${err.message}`);
+    },
+  });
+
+  const cancelAppointmentMutation = useMutation({
+    mutationFn: async (appointmentId: string) => {
+      if (!userId) throw new Error("User not authenticated.");
+      const now = new Date();
+      const { data, error } = await supabase
+        .from('appointments')
+        .update({
+          status: "Cancelada",
+          completion_date: format(now, "yyyy-MM-dd"),
+          completion_time: format(now, "HH:mm"),
+        })
+        .eq('id', appointmentId)
+        .eq('user_id', userId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      showSuccess("Consulta cancelada com sucesso!");
+      setIsDetailsDialogOpen(false);
+    },
+    onError: (err) => {
+      showError(`Erro ao cancelar consulta: ${err.message}`);
+    },
   });
 
   const handleAddAppointment = (data: AppointmentFormValues) => {
-    const appointmentDate = data.dateOption === "today"
-      ? format(new Date(), "yyyy-MM-dd")
-      : data.date ? format(data.date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"); // Fallback para hoje se data específica não for selecionada
-
-    const newAppointment: Appointment = {
-      id: `C${(appointments.length + 1).toString().padStart(3, '0')}`, // Gerar um ID simples
-      date: appointmentDate,
-      time: data.time,
-      client: data.client,
-      pet: data.pet,
-      species: data.species,
-      service: data.service,
-      veterinarian: data.veterinarian,
-      status: "Agendada", // Status padrão definido automaticamente
-    };
-    setAppointments((prev) => [...prev, newAppointment]);
-    setIsAddAppointmentDialogOpen(false); // Fechar o diálogo após adicionar
+    addAppointmentMutation.mutate(data);
   };
 
   const handleUpdateAppointment = (updatedAppointment: Appointment) => {
-    setAppointments((prev) =>
-      prev.map((app) => (app.id === updatedAppointment.id ? updatedAppointment : app))
-    );
+    updateAppointmentMutation.mutate(updatedAppointment);
   };
 
   const handleCancelAppointment = (appointmentId: string) => {
-    const now = new Date();
-    setAppointments((prev) =>
-      prev.map((app) =>
-        app.id === appointmentId
-          ? {
-              ...app,
-              status: "Cancelada",
-              completionDate: format(now, "yyyy-MM-dd"), // Define a data de cancelamento
-              completionTime: format(now, "HH:mm"),     // Define a hora de cancelamento
-            }
-          : app
-      )
-    );
+    cancelAppointmentMutation.mutate(appointmentId);
   };
 
   const handleRowClick = (appointment: Appointment) => {
@@ -135,7 +199,7 @@ const Appointments = () => {
     switch (status) {
       case "Agendada":
         return "bg-primary text-primary-foreground";
-      case "Em Andamento": // Novo status
+      case "Em Andamento":
         return "bg-orange-500 text-white";
       case "Realizada":
         return "bg-green-500 text-white";
@@ -146,11 +210,51 @@ const Appointments = () => {
     }
   };
 
+  const filteredAppointments = appointments.filter((appointment) => {
+    let matchesTab = false;
+    switch (activeTab) {
+      case "em-espera":
+        matchesTab = appointment.status === "Agendada";
+        break;
+      case "em-andamento":
+        matchesTab = appointment.status === "Em Andamento";
+        break;
+      case "finalizadas":
+        matchesTab = appointment.status === "Realizada" || appointment.status === "Cancelada";
+        break;
+      default:
+        matchesTab = true;
+        break;
+    }
+    const matchesSearch =
+      appointment.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.pet_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase());
+
+    return matchesTab && matchesSearch;
+  });
+
   const totalAgendadas = appointments.filter(a => a.status === "Agendada").length;
   const totalRealizadas = appointments.filter(a => a.status === "Realizada").length;
   const totalCanceladas = appointments.filter(a => a.status === "Cancelada").length;
   const totalEmAndamento = appointments.filter(a => a.status === "Em Andamento").length;
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">Carregando consultas...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-full text-destructive">
+        <p>Erro ao carregar consultas: {error.message}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -172,18 +276,18 @@ const Appointments = () => {
       </div>
 
       {/* Cards de Resumo */}
-      <div className="grid gap-4 md:grid-cols-4"> {/* Ajustado para 4 colunas */}
-        <Card className="bg-gray-700 text-white shadow-md"> {/* Alterado para cinza escuro */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card className="bg-gray-700 text-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Em espera</CardTitle> {/* Nome alterado aqui */}
-            <CalendarClock className="h-4 w-4 text-white" /> {/* Ícone branco */}
+            <CardTitle className="text-sm font-medium">Em espera</CardTitle>
+            <CalendarClock className="h-4 w-4 text-white" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalAgendadas}</div>
-            <p className="text-gray-200 text-xs">Consultas aguardando</p> {/* Texto cinza claro */}
+            <p className="text-gray-200 text-xs">Consultas aguardando</p>
           </CardContent>
         </Card>
-        <Card className="bg-orange-500 text-white shadow-md"> {/* Novo card para 'Em Andamento' */}
+        <Card className="bg-orange-500 text-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Em Andamento</CardTitle>
             <CalendarClock className="h-4 w-4 text-white" />
@@ -223,6 +327,15 @@ const Appointments = () => {
             <TabsTrigger value="finalizadas" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">Finalizadas</TabsTrigger>
           </TabsList>
         </Tabs>
+        <div className="relative flex-1 w-full md:w-auto">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Buscar consultas..."
+            className="pl-9"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className="rounded-md border">
@@ -257,9 +370,9 @@ const Appointments = () => {
                   >
                     <TableCell className="font-medium flex items-center">
                       <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
-                      {appointment.pet}
+                      {appointment.pet_name}
                     </TableCell>
-                    <TableCell>{appointment.client}</TableCell>
+                    <TableCell>{appointment.client_name}</TableCell>
                     <TableCell>{appointment.service}</TableCell>
                     {activeTab === "em-espera" && (
                       <TableCell>
@@ -294,8 +407,8 @@ const Appointments = () => {
                             </Badge>
                           )}
                         </TableCell>
-                        <TableCell>{appointment.completionDate || "N/A"}</TableCell>
-                        <TableCell>{appointment.completionTime || "N/A"}</TableCell>
+                        <TableCell>{appointment.completion_date || "N/A"}</TableCell>
+                        <TableCell>{appointment.completion_time || "N/A"}</TableCell>
                       </>
                     )}
                   </TableRow>

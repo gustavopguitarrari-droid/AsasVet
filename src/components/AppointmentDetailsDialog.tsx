@@ -13,20 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { CalendarCheck, CalendarX, CalendarClock, Edit, Trash2, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
-import AppointmentForm, { AppointmentFormValues } from "./AppointmentForm"; // Reutilizar o formulário de agendamento
+import AppointmentForm, { AppointmentFormValues } from "./AppointmentForm";
 import { cn } from "@/lib/utils";
-
-interface Appointment {
-  id: string;
-  date: string;
-  time: string;
-  client: string;
-  pet: string;
-  species: string; // Adicionado campo de espécie
-  service: string;
-  veterinarian: string;
-  status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento"; // Adicionado 'Em Andamento'
-}
+import { Appointment } from "@/pages/Appointments"; // Importar a interface Appointment atualizada
+import { format } from "date-fns";
 
 interface AppointmentDetailsDialogProps {
   appointment: Appointment | null;
@@ -67,7 +57,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
     switch (status) {
       case "Agendada":
         return "bg-sidebar-item-bg-1 text-white";
-      case "Em Andamento": // Novo status
+      case "Em Andamento":
         return "bg-orange-500 text-white";
       case "Realizada":
         return "bg-green-500 text-white";
@@ -79,15 +69,20 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
   };
 
   const handleFormSubmit = (data: AppointmentFormValues) => {
-    // O formulário agora não inclui 'date' e 'status' diretamente para edição.
-    // Preservamos os valores originais do 'appointment' e mesclamos com os dados do formulário.
-    // A data será a original do appointment, pois o formulário de edição não a altera.
-    // O status também será o original, pois o formulário de edição não o altera.
+    const appointmentDate = data.dateOption === "today"
+      ? format(new Date(), "yyyy-MM-dd")
+      : data.date ? format(data.date, "yyyy-MM-dd") : appointment.date; // Keep original date if not changed
+
     onUpdate({
-      ...appointment, // Mantém id, date, status e outros campos originais
-      ...data,        // Sobrescreve os campos editáveis (client, pet, etc.)
-      date: appointment.date, // Garante que a data original seja mantida
-      status: appointment.status, // Garante que o status original seja mantido
+      ...appointment,
+      date: appointmentDate,
+      time: data.time,
+      client_name: data.client, // Mapear para client_name
+      pet_name: data.pet,       // Mapear para pet_name
+      species: data.species,
+      service: data.service,
+      veterinarian: data.veterinarian,
+      // Status e completion_date/time são gerenciados por outras ações
     });
     setIsEditing(false);
     onClose();
@@ -102,22 +97,36 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
 
   const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
 
+  const isFinalized = appointment.status === "Realizada" || appointment.status === "Cancelada";
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? "Editar Consulta" : `Detalhes da Consulta: ${appointment.pet}`}
+            {isEditing ? "Editar Consulta" : `Detalhes da Consulta: ${appointment.pet_name}`}
           </DialogTitle>
           <DialogDescription>
             {isEditing
               ? "Faça as alterações necessárias e salve."
-              : `Informações completas sobre a consulta de ${appointment.pet}.`}
+              : `Informações completas sobre a consulta de ${appointment.pet_name}.`}
           </DialogDescription>
         </DialogHeader>
 
         {isEditing ? (
-          <AppointmentForm onSubmit={handleFormSubmit} initialData={appointment} />
+          <AppointmentForm
+            onSubmit={handleFormSubmit}
+            initialData={{
+              time: appointment.time,
+              client: appointment.client_name,
+              pet: appointment.pet_name,
+              species: appointment.species,
+              service: appointment.service,
+              veterinarian: appointment.veterinarian,
+              date: appointment.date, // Passar a data como string
+              status: appointment.status,
+            }}
+          />
         ) : (
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-3 items-center gap-4">
@@ -137,12 +146,12 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Cliente:</p>
-              <p className="col-span-2 text-sm font-bold">{appointment.client}</p>
+              <p className="col-span-2 text-sm font-bold">{appointment.client_name}</p>
             </div>
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Animal:</p>
-              <p className="col-span-2 text-sm">{appointment.pet}</p>
+              <p className="col-span-2 text-sm">{appointment.pet_name}</p>
             </div>
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
@@ -162,7 +171,24 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
               <p className="text-sm font-medium text-muted-foreground">Veterinário:</p>
               <p className="col-span-2 text-sm">{appointment.veterinarian}</p>
             </div>
-            {/* O campo de Status foi removido daqui */}
+            <Separator />
+            <div className="grid grid-cols-3 items-center gap-4">
+              <p className="text-sm font-medium text-muted-foreground">Status:</p>
+              <div className="col-span-2 text-sm">
+                <Badge className={cn("text-white", getStatusBadgeVariant(appointment.status))}>
+                  {appointment.status}
+                </Badge>
+              </div>
+            </div>
+            {isFinalized && appointment.completion_date && appointment.completion_time && (
+              <>
+                <Separator />
+                <div className="grid grid-cols-3 items-center gap-4">
+                  <p className="text-sm font-medium text-muted-foreground">Finalizado em:</p>
+                  <p className="col-span-2 text-sm">{appointment.completion_date} às {appointment.completion_time}</p>
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -171,7 +197,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
             <Button variant="outline" onClick={() => setIsEditing(true)} className="w-full sm:w-auto mb-2 sm:mb-0">
               <Edit className="mr-2 h-4 w-4" /> Editar
             </Button>
-            {appointment.status !== "Cancelada" && (
+            {!isFinalized && (
               <Button variant="destructive" onClick={handleCancelClick} className="w-full sm:w-auto">
                 <Trash2 className="mr-2 h-4 w-4" /> Cancelar Consulta
               </Button>
