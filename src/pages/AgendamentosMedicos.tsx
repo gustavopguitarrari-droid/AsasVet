@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import AddEventDialog, { EventFormValues } from "@/components/AddEventDialog";
 import EventCalendar, { CalendarEvent } from "@/components/EventCalendar";
 import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale"; // Importar ptBR
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
