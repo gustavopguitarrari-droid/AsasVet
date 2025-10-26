@@ -104,6 +104,7 @@ const Dashboard = () => {
         console.error("Erro ao buscar contagem de consultas agendadas:", error);
         throw error;
       }
+      console.log("Contagem de consultas agendadas do Supabase:", count); // Log para depuração
       return count || 0;
     },
     enabled: !!userId,
@@ -189,7 +190,7 @@ const Dashboard = () => {
         );
       case "scheduledAppointments":
         return (
-          <Link to="/medical-records" key={item.id} className="block"> {/* Adicionado Link aqui */}
+          <Link to="/medical-records" key={item.id} className="block">
             <Card className={cn("bg-pink-600", baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Consultas Agendadas</CardTitle>
@@ -197,9 +198,17 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {isLoadingScheduledAppointments ? "..." : scheduledAppointmentsCount.toLocaleString('pt-BR')}
+                  {isLoadingScheduledAppointments ? (
+                    "..."
+                  ) : scheduledAppointmentsCount > 0 ? (
+                    scheduledAppointmentsCount.toLocaleString('pt-BR')
+                  ) : (
+                    "Nenhuma"
+                  )}
                 </div>
-                <p className={textMutedClasses}>Consultas agendadas</p>
+                <p className={textMutedClasses}>
+                  {scheduledAppointmentsCount === 1 ? "Consulta agendada" : "Consultas agendadas"}
+                </p>
               </CardContent>
             </Card>
           </Link>
