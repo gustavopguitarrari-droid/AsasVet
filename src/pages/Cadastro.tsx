@@ -396,7 +396,7 @@ const Cadastro = () => {
   const addPetMutation = useMutation({
     mutationFn: async (data: PetFormValues) => {
       if (!userId) throw new Error("User not authenticated.");
-      console.log("addPetMutation: Attempting to add new pet with data:", data);
+      console.log("addPetMutation: Attempting to add new pet with data:", data); // Log de dados de entrada
 
       let photoUrl: string | null = null;
       let newPetId: string | undefined;
@@ -828,20 +828,24 @@ const Cadastro = () => {
                             : "N/A"}
                         </TableCell>
                         <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
-                          <p className="flex items-center text-sm mb-1">
-                            <Mail className="h-4 w-4 mr-2 text-muted-foreground" /> {client.email}
-                          </p>
-                          <p className="flex items-center text-sm">
-                            <Phone className="h-4 w-4 mr-2 text-muted-foreground" /> {client.phone}
-                          </p>
+                          <div className="flex items-center text-sm mb-1">
+                            <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
+                            <span>{client.email}</span>
+                          </div>
+                          <div className="flex items-center text-sm">
+                            <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
+                            <span>{client.phone}</span>
+                          </div>
                         </TableCell>
                         <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
-                          <p className="flex items-center text-sm mb-1">
-                            <Home className="h-4 w-4 mr-2 text-muted-foreground" /> {client.address?.street || 'N/A'}, {client.address?.number || 'N/A'} {client.address?.complement || ''}
-                          </p>
-                          <p className="flex items-center text-sm mb-1">
-                            <MapPin className="h-4 w-4 mr-2 text-muted-foreground" /> {client.address?.neighborhood || 'N/A'}, {client.address?.city || 'N/A'} - {client.address?.state || 'N/A'}
-                          </p>
+                          <div className="flex items-center text-sm mb-1">
+                            <Home className="h-4 w-4 mr-2 text-muted-foreground" />
+                            <span>{client.address?.street || 'N/A'}, {client.address?.number || 'N/A'} {client.address?.complement || ''}</span>
+                          </div>
+                          <div className="flex items-center text-sm mb-1">
+                            <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+                            <span>{client.address?.neighborhood || 'N/A'}, {client.address?.city || 'N/A'} - {client.address?.state || 'N/A'}</span>
+                          </div>
                           <p className="text-xs text-muted-foreground ml-6">CEP: {client.address?.cep || 'N/A'}</p>
                         </TableCell>
                         <TableCell className="text-center"> {/* Célula para Animais */}

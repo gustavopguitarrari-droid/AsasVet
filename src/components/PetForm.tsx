@@ -143,9 +143,14 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
   // Garante que initials seja uma string não vazia para evitar problemas de renderização
   const initials = currentName.charAt(0).toUpperCase() || ''; 
 
+  const handleSubmit = (data: PetFormValues) => {
+    console.log("PetForm: Submitting data:", data); // Log para depuração
+    onSubmit(data);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <div className="flex flex-col items-center space-y-4 mb-6">
           <Avatar className="h-24 w-24 border-4 border-primary shadow-lg">
             {previewUrl ? (
