@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, User as UserIcon, Mail, Lock, Briefcase } from "lucide-react";
+import { PlusCircle, User as UserIcon, Mail, Phone, Briefcase, IdCard, Stethoscope } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,89 +24,85 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import RoleSelect from "@/components/RoleSelect";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { showError, showSuccess } from "@/utils/toast";
+import RoleSelect from "@/components/RoleSelect"; // Reutilizando o RoleSelect
 
 const formSchema = z.object({
   firstName: z.string().min(1, "O nome é obrigatório."),
   lastName: z.string().min(1, "O sobrenome é obrigatório."),
   email: z.string().email("E-mail inválido.").min(1, "O e-mail é obrigatório."),
-  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
+  phone: z.string().optional(),
+  crmv: z.string().optional(),
   role: z.string().min(1, "O cargo é obrigatório."),
+  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres.").optional(), // Opcional para edição
 });
 
-export type SubuserFormValues = z.infer<typeof formSchema>;
+export type TeamMemberFormValues = z.infer<typeof formSchema>;
 
-interface AddSubuserDialogProps {
+interface TeamMemberFormDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubuserCreated: () => void; // Callback para invalidar queries no componente pai
+  onSubmit: (data: TeamMemberFormValues) => void;
+  initialData?: TeamMemberFormValues & { id: string }; // Inclui ID para edição
+  isSubmitting: boolean;
 }
 
-const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, onSubuserCreated }) => {
-  const queryClient = useQueryClient();
-  const form = useForm<SubuserFormValues>({
+const TeamMemberFormDialog: React.FC<TeamMemberFormDialogProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  initialData,
+  isSubmitting,
+}) => {
+  const form = useForm<TeamMemberFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      role: "Veterinário", // Definido como 'Veterinário' por padrão
+      firstName: initialData?.firstName || "",
+      lastName: initialData?.lastName || "",
+      email: initialData?.email || "",
+      phone: initialData?.phone || "",
+      crmv: initialData?.crmv || "",
+      role: initialData?.role || "Veterinário",
+      password: "", // Senha não é preenchida em edição
     },
   });
 
-  const createSubuserMutation = useMutation({
-    mutationFn: async (newUserData: SubuserFormValues) => {
-      const session = await supabase.auth.getSession();
-      if (!session.data.session) throw new Error("User not authenticated.");
+  // Se estiver em modo de edição, a senha não é obrigatória
+  React.useEffect(() => {
+    if (initialData) {
+      form.unregister("password"); // Remove a validação de senha para edição
+    } else {
+      form.register("password", { required: "A senha é obrigatória para novos usuários." });
+    }
+  }, [initialData, form]);
 
-      const { data: responseData, error } = await supabase.functions.invoke('create-subuser', {
-        body: JSON.stringify({
-          email: newUserData.email,
-          password: newUserData.password,
-          first_name: newUserData.firstName,
-          last_name: newUserData.lastName,
-          role: newUserData.role,
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.data.session.access_token}`,
-        },
-      });
-
-      if (error) throw new Error(error.message);
-      if (responseData.error) throw new Error(responseData.error);
-      return responseData;
-    },
-    onSuccess: () => {
-      onSubuserCreated(); // Chamar o callback para invalidar queries no pai
-      showSuccess("Subusuário criado com sucesso!");
-      form.reset();
-      onClose(); // Fechar o diálogo após sucesso
-    },
-    onError: (err: any) => {
-      console.error("Erro ao criar subusuário:", err.message);
-      showError(`Erro ao criar subusuário: ${err.message}`);
-    },
-  });
-
-  const handleSubmit = (data: SubuserFormValues) => {
-    createSubuserMutation.mutate(data);
+  const handleSubmit = (data: TeamMemberFormValues) => {
+    // Remove a senha se estiver vazia e em modo de edição
+    const dataToSubmit = { ...data };
+    if (initialData && !dataToSubmit.password) {
+      delete dataToSubmit.password;
+    }
+    onSubmit(dataToSubmit);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <PlusCircle className="h-5 w-5 mr-2" /> Criar Novo Subusuário
+            {initialData ? (
+              <>
+                <UserIcon className="h-5 w-5 mr-2" /> Editar Membro da Equipe
+              </>
+            ) : (
+              <>
+                <PlusCircle className="h-5 w-5 mr-2" /> Adicionar Novo Membro
+              </>
+            )}
           </DialogTitle>
           <DialogDescription>
-            Preencha os dados para adicionar um novo membro à sua equipe.
+            {initialData
+              ? "Atualize os detalhes do membro da equipe."
+              : "Preencha os dados para adicionar um novo membro à sua equipe."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -160,16 +156,50 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
               )}
             />
 
+            {!initialData && ( // Campo de senha apenas para novos usuários
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="flex items-center">
+                      <IdCard className="h-4 w-4 mr-2 text-muted-foreground" /> Senha
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
-              name="password"
+              name="phone"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="flex items-center">
-                    <Lock className="h-4 w-4 mr-2 text-muted-foreground" /> Senha
+                    <Phone className="h-4 w-4 mr-2 text-muted-foreground" /> Telefone (Opcional)
                   </FormLabel>
                   <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
+                    <Input placeholder="(XX) XXXXX-XXXX" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="crmv"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center">
+                    <Stethoscope className="h-4 w-4 mr-2 text-muted-foreground" /> CRMV (Opcional)
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="CRMV-XX 12345" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -196,12 +226,17 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
             />
 
             <DialogFooter className="pt-4">
-              <Button variant="outline" onClick={onClose} type="button">
+              <Button variant="outline" onClick={onClose} type="button" disabled={isSubmitting}>
                 Cancelar
               </Button>
-              <Button type="submit" disabled={createSubuserMutation.isPending}>
-                <PlusCircle className="mr-2 h-4 w-4" />
-                {createSubuserMutation.isPending ? "Criando..." : "Criar Subusuário"}
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  "Salvando..."
+                ) : initialData ? (
+                  "Salvar Alterações"
+                ) : (
+                  "Adicionar Membro"
+                )}
               </Button>
             </DialogFooter>
           </form>
@@ -211,4 +246,4 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
   );
 };
 
-export default AddSubuserDialog;
+export default TeamMemberFormDialog;

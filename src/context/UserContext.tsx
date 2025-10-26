@@ -12,7 +12,7 @@ interface User {
   role?: string; // Tornar opcional
   birthday?: string;
   registeredTime: string;
-  gender?: string; // NOVO: Adicionado campo de gênero
+  // gender?: string; // REMOVIDO: Adicionado campo de gênero
 }
 
 interface UserContextType {
@@ -22,7 +22,7 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider = ({ children }: { children: ReactNode }) => {
+export const UserProvider = ({ children }: { ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   return (
