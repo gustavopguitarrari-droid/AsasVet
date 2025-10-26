@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play } from "lucide-react";
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History } from "lucide-react"; // Adicionado History
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -20,6 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 import AppointmentChronometer from "@/components/AppointmentChronometer";
+import AppointmentHistoryDialog from "@/components/AppointmentHistoryDialog"; // Importar o novo diálogo
 import { format, parseISO } from "date-fns";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -65,6 +66,7 @@ const Appointments = () => {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = React.useState<boolean>(false);
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
   const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false);
+  const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState<boolean>(false); // Novo estado para o histórico
 
   // --- Queries ---
   const { data: appointments = [], isLoading, error } = useQuery<Appointment[]>({
@@ -75,6 +77,22 @@ const Appointments = () => {
         .from('appointments')
         .select('*')
         .eq('user_id', userId);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!userId,
+  });
+
+  // Fetch history appointments (Realizada ou Cancelada)
+  const { data: historyAppointments = [], isLoading: isLoadingHistory, error: historyError } = useQuery<Appointment[]>({
+    queryKey: ['historyAppointments', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .eq('user_id', userId)
+        .in('status', ['Realizada', 'Cancelada']); // Filtra por status
       if (error) throw error;
       return data;
     },
@@ -203,6 +221,7 @@ const Appointments = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] }); // Invalida o histórico também
       showSuccess("Consulta atualizada com sucesso!");
       setIsDetailsDialogOpen(false);
     },
@@ -231,6 +250,7 @@ const Appointments = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] }); // Invalida o histórico também
       showSuccess("Consulta cancelada com sucesso!");
       setIsDetailsDialogOpen(false);
     },
@@ -288,6 +308,12 @@ const Appointments = () => {
     setIsDetailsDialogOpen(true);
   };
 
+  const handleViewHistoryDetails = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setIsHistoryDialogOpen(false); // Fecha o histórico
+    setIsDetailsDialogOpen(true); // Abre os detalhes
+  };
+
   const getStatusBadgeVariant = (status: Appointment["status"]) => {
     switch (status) {
       case "Agendada":
@@ -333,7 +359,7 @@ const Appointments = () => {
   const totalCanceladas = appointments.filter(a => a.status === "Cancelada").length;
   const totalEmAndamento = appointments.filter(a => a.status === "Em Andamento").length;
 
-  if (isLoading || isLoadingClients || isLoadingPets) {
+  if (isLoading || isLoadingClients || isLoadingPets || isLoadingHistory) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando consultas e dados de cadastro...</p>
@@ -341,10 +367,10 @@ const Appointments = () => {
     );
   }
 
-  if (error || clientsError || petsError) {
+  if (error || clientsError || petsError || historyError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar dados: {error?.message || clientsError?.message || petsError?.message}</p>
+        <p>Erro ao carregar dados: {error?.message || clientsError?.message || petsError?.message || historyError?.message}</p>
       </div>
     );
   }
@@ -353,23 +379,28 @@ const Appointments = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Gerenciar consultas do dia</h2>
-        <Dialog open={isAddAppointmentDialogOpen} onOpenChange={setIsAddAppointmentDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar consulta a fila
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-4xl max-h-[60vh] overflow-y-auto p-6">
-            <DialogHeader>
-              <DialogTitle>Incluir Nova Consulta</DialogTitle>
-            </DialogHeader>
-            <AppointmentForm
-              onSubmit={handleAddAppointment}
-              allClients={clients}
-              allPets={pets}
-            />
-          </DialogContent>
-        </Dialog>
+        <div className="flex space-x-2"> {/* Container para os botões */}
+          <Button onClick={() => setIsHistoryDialogOpen(true)} variant="outline">
+            <History className="mr-2 h-4 w-4" /> Ver Histórico
+          </Button>
+          <Dialog open={isAddAppointmentDialogOpen} onOpenChange={setIsAddAppointmentDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar consulta a fila
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-4xl max-h-[60vh] overflow-y-auto p-6">
+              <DialogHeader>
+                <DialogTitle>Incluir Nova Consulta</DialogTitle>
+              </DialogHeader>
+              <AppointmentForm
+                onSubmit={handleAddAppointment}
+                allClients={clients}
+                allPets={pets}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Cards de Resumo */}
@@ -546,6 +577,13 @@ const Appointments = () => {
         onUpdate={handleUpdateAppointment}
         onCancelAppointment={handleCancelAppointment}
         onStartAppointment={handleStartAppointment} // Passa a função de iniciar consulta
+      />
+
+      <AppointmentHistoryDialog
+        isOpen={isHistoryDialogOpen}
+        onClose={() => setIsHistoryDialogOpen(false)}
+        historyAppointments={historyAppointments}
+        onViewDetails={handleViewHistoryDetails}
       />
     </div>
   );
