@@ -108,7 +108,7 @@ const Internacao = () => {
   const [actionPatientId, setActionPatientId] = React.useState<string | null>(null);
   const [actionPatientName, setActionPatientName] = React.useState<string | null>(null);
   const [actionDate, setActionDate] = React.useState<Date | null>(null);
-  const [actionHour, setActionHour] = React.useState<string | null>(null);
+  const [actionHour, setActionHour] = React.React.useState<string | null>(null);
   const [allActionsForCurrentPatient, setAllActionsForCurrentPatient] = React.useState<PatientAction[]>([]);
 
   const [isConfirmActionsDialogOpen, setIsConfirmActionsDialogOpen] = React.useState(false);
@@ -128,7 +128,7 @@ const Internacao = () => {
         .from('interned_patients')
         .select('*')
         .eq('user_id', userId)
-        .not('status', 'in', '("Alta", "Óbito")'); // Direct filter
+        .not('status', 'in', ['Alta', 'Óbito']); // CORREÇÃO AQUI: Usando array de strings
 
       if (error) {
         console.error("Internacao.tsx: Error fetching interned_patients:", error);
