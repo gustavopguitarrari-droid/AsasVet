@@ -418,7 +418,7 @@ const Cadastro = () => {
           observations: data.observations,
           photo_url: null,
         })
-        .select('id, owner_id') // Select owner_id to confirm it's returned
+        .select('id')
         .single();
 
       if (insertError || !insertedPet) {
@@ -426,7 +426,7 @@ const Cadastro = () => {
         throw insertError || new Error("Failed to create pet.");
       }
       newPetId = insertedPet.id;
-      console.log("addPetMutation (mutationFn): Pet inserted with temporary ID:", newPetId, "and owner_id:", insertedPet.owner_id);
+      console.log("addPetMutation (mutationFn): Pet inserted with temporary ID:", newPetId);
 
       if (data.photoUrl) {
         console.log("addPetMutation (mutationFn): Photo URL provided, attempting upload.");
@@ -445,20 +445,20 @@ const Cadastro = () => {
           .from('pets')
           .update({ photo_url: photoUrl })
           .eq('id', newPetId)
-          .select('id, owner_id') // Select owner_id to confirm it's returned
+          .select()
           .single();
         if (updateError) {
           console.error("addPetMutation (mutationFn): Error updating pet with photo_url:", updateError);
           throw updateError;
         }
-        console.log("addPetMutation (mutationFn): Pet updated with photo_url:", updatedPet, "and owner_id:", updatedPet.owner_id);
+        console.log("addPetMutation (mutationFn): Pet updated with photo_url:", updatedPet);
         return updatedPet;
       }
       console.log("addPetMutation (mutationFn): No photo URL provided, returning inserted pet.");
       // No photo, just return the inserted pet
       const { data: finalPet, error: fetchFinalPetError } = await supabase
         .from('pets')
-        .select('id, owner_id') // Select owner_id to confirm it's returned
+        .select('*')
         .eq('id', newPetId)
         .single();
       if (fetchFinalPetError) {
@@ -821,7 +821,12 @@ const Cadastro = () => {
               <TableBody>
                 {filteredClients.length > 0 ? (
                   filteredClients.map((client) => {
-                    const petsOfClient = pets.filter(pet => pet.ownerId === client.id);
+                    console.log(`DEBUG: Processing client: ${client.name} (ID: ${client.id})`);
+                    console.log(`DEBUG: Current 'pets' array length: ${pets.length}`);
+                    const petsOfClient = pets.filter(pet => {
+                      console.log(`DEBUG: Comparing pet.ownerId: '${pet.ownerId}' with client.id: '${client.id}'`);
+                      return pet.ownerId === client.id;
+                    });
                     console.log(`Cadastro (Tutores Tab): Cliente ${client.name} (ID: ${client.id}) tem ${petsOfClient.length} animais.`); // Log para cada cliente
                     return (
                       <TableRow key={client.id} className="cursor-pointer hover:bg-muted/50">
