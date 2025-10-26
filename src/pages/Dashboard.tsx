@@ -179,7 +179,7 @@ const Dashboard = () => {
               <CardContent>
                 {/* Removido o valor fixo e a porcentagem */}
                 <div className="text-2xl font-bold">Ver Agenda</div>
-                <p className={textMutedClasses}>Clique para ver os detalhes</p>
+                {/* <p className={textMutedClasses}>Clique para ver os detalhes</p> */} {/* Linha removida */}
               </CardContent>
             </Card>
           </Link>
