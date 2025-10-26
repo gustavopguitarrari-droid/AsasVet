@@ -292,13 +292,19 @@ const Internacao = () => {
       const promises = [];
 
       if (newActions.length > 0) {
-        promises.push(supabase.from('patient_actions').insert(newActions.map(action => ({
-          ...action,
-          user_id: userId, // CORREÇÃO AQUI: Atribuindo o userId real
-          frequency: action.frequency || null, // Ensure null for optional fields
-          quantity: action.quantity || null,
-          route: action.route || null,
-        }))));
+        const payload = newActions.map(action => {
+          // Destructure to omit 'id' and 'created_at' for insertion
+          const { id, created_at, ...rest } = action;
+          return {
+            ...rest,
+            user_id: userId, // Ensure userId is correctly passed
+            frequency: action.frequency || null, // Ensure null for optional fields
+            quantity: action.quantity || null,
+            route: action.route || null,
+          };
+        });
+        console.log("saveAllActionsMutation: Payload for new actions insert:", payload); // Log do payload
+        promises.push(supabase.from('patient_actions').insert(payload));
       }
 
       for (const action of updatedActions) {
