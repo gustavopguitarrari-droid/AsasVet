@@ -278,11 +278,16 @@ const Internacao = () => {
   const saveAllActionsMutation = useMutation({
     mutationFn: async (actionsToSave: PatientAction[]) => {
       if (!userId) throw new Error("User not authenticated.");
+      console.log("saveAllActionsMutation: actionsToSave received:", actionsToSave);
 
       const existingActionsForPatient = allActionsForCurrentPatient.filter(a => a.patient_id === actionPatientId);
       const newActions = actionsToSave.filter(action => !existingActionsForPatient.some(ea => ea.id === action.id));
       const updatedActions = actionsToSave.filter(action => existingActionsForPatient.some(ea => ea.id === action.id));
       const deletedActions = existingActionsForPatient.filter(ea => !actionsToSave.some(action => action.id === ea.id));
+
+      console.log("saveAllActionsMutation: New actions to insert:", newActions);
+      console.log("saveAllActionsMutation: Existing actions to update:", updatedActions);
+      console.log("saveAllActionsMutation: Actions to delete:", deletedActions);
 
       const promises = [];
 
@@ -313,16 +318,22 @@ const Internacao = () => {
 
       const results = await Promise.all(promises);
       for (const result of results) {
-        if (result.error) throw result.error;
+        if (result.error) {
+          console.error("saveAllActionsMutation: Error in one of the operations:", result.error);
+          throw result.error;
+        }
       }
+      console.log("saveAllActionsMutation: All operations completed successfully.");
       return results;
     },
     onSuccess: () => {
+      console.log("saveAllActionsMutation: onSuccess - Invalidating patient_actions query.");
       queryClient.invalidateQueries({ queryKey: ['patient_actions', userId] });
       showSuccess("Ações do paciente salvas com sucesso!");
       setIsAddActionDialogOpen(false);
     },
     onError: (error) => {
+      console.error("saveAllActionsMutation: onError - Error saving patient actions:", error);
       showError(`Erro ao salvar ações do paciente: ${error.message}`);
     },
   });
@@ -331,6 +342,7 @@ const Internacao = () => {
   const updateActionsCompletionMutation = useMutation({
     mutationFn: async (actionsToUpdate: PatientAction[]) => {
       if (!userId) throw new Error("User not authenticated.");
+      console.log("updateActionsCompletionMutation: actionsToUpdate received:", actionsToUpdate);
       const promises = actionsToUpdate.map(action =>
         supabase
           .from('patient_actions')
@@ -340,16 +352,22 @@ const Internacao = () => {
       );
       const results = await Promise.all(promises);
       for (const result of results) {
-        if (result.error) throw result.error;
+        if (result.error) {
+          console.error("updateActionsCompletionMutation: Error in one of the completion updates:", result.error);
+          throw result.error;
+        }
       }
+      console.log("updateActionsCompletionMutation: All completion updates completed successfully.");
       return results;
     },
     onSuccess: () => {
+      console.log("updateActionsCompletionMutation: onSuccess - Invalidating patient_actions query.");
       queryClient.invalidateQueries({ queryKey: ['patient_actions', userId] });
       showSuccess("Status das ações atualizado!");
       setIsConfirmActionsDialogOpen(false);
     },
     onError: (error) => {
+      console.error("updateActionsCompletionMutation: onError - Error updating actions completion:", error);
       showError(`Erro ao atualizar status das ações: ${error.message}`);
     },
   });
@@ -437,6 +455,7 @@ const Internacao = () => {
   };
 
   const handleSaveAllPatientActions = (updatedActionsForPatient: PatientAction[]) => {
+    console.log("handleSaveAllPatientActions: Calling saveAllActionsMutation with:", updatedActionsForPatient);
     saveAllActionsMutation.mutate(updatedActionsForPatient);
   };
 
@@ -456,6 +475,7 @@ const Internacao = () => {
   };
 
   const handleConfirmPatientActions = (updatedActions: PatientAction[]) => {
+    console.log("handleConfirmPatientActions: Calling updateActionsCompletionMutation with:", updatedActions);
     updateActionsCompletionMutation.mutate(updatedActions);
   };
 
