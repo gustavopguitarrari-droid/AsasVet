@@ -49,7 +49,7 @@ const Cadastro = () => {
   const [petSearchTerm, setPetSearchTerm] = useState<string>("");
   const [isPetDetailsDialogOpen, setIsPetDetailsDialogOpen] = useState<boolean>(false);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
-  const [isAddPetDialogOpen, setIsAddPetDialogOpen] = useState<boolean>(false);
+  const [isAddPetDialogOpen, setIsAddPetDialogOpen] = useState<boolean>(false); // Mantido para adicionar pet de forma geral
   const [isEditPetDialogOpen, setIsEditPetDialogOpen] = useState<boolean>(false);
   const [petToEdit, setPetToEdit] = useState<Pet | undefined>(undefined);
   const [defaultOwnerIdForPet, setDefaultOwnerIdForPet] = useState<string | undefined>(undefined);
@@ -470,7 +470,7 @@ const Cadastro = () => {
       queryClient.invalidateQueries({ queryKey: ['pets', userId] });
       showSuccess("Animal adicionado com sucesso!");
       setIsAddPetDialogOpen(false);
-      setIsClientPetsDialogOpen(false); // Close client pets dialog if open
+      // setIsClientPetsDialogOpen(false); // No longer closes parent dialog
     },
     onError: (error) => {
       console.error("addPetMutation: Error adding animal:", error);
@@ -685,12 +685,30 @@ const Cadastro = () => {
     setIsClientPetsDialogOpen(true);
   };
 
-  const handleAddPetForClient = (client: Client) => { // Alterado para aceitar o objeto Client
+  // NEW: Local state for nested Add Pet dialog
+  const [isNestedAddPetDialogOpen, setIsNestedAddPetDialogOpen] = useState(false);
+
+  const handleAddPetForClient = (client: Client) => {
     console.log("handleAddPetForClient called for client ID:", client.id);
     setDefaultOwnerIdForPet(client.id);
-    setDefaultOwnerNameForPet(client.name); // Define o nome do tutor
-    setIsAddPetDialogOpen(true);
-    setIsClientPetsDialogOpen(false); // Fecha o diálogo de pets do cliente
+    setDefaultOwnerNameForPet(client.name);
+    setIsNestedAddPetDialogOpen(true); // Open nested dialog
+    // setIsClientPetsDialogOpen(false); // No longer close parent dialog
+  };
+
+  const handleNestedAddPetClose = () => {
+    setIsNestedAddPetDialogOpen(false);
+    setDefaultOwnerIdForPet(undefined);
+    setDefaultOwnerNameForPet(undefined);
+  };
+
+  const handleNestedAddPetSubmit = (data: PetFormValues) => {
+    addPetMutation.mutate(data, {
+      onSuccess: () => {
+        handleNestedAddPetClose(); // Close nested dialog on success
+        // The parent dialog (isClientPetsDialogOpen) remains open
+      }
+    });
   };
 
   if (isLoadingClients || isLoadingPets) {
@@ -974,6 +992,26 @@ const Cadastro = () => {
               <PlusCircle className="h-4 w-4 mr-2" /> Adicionar Animal para {clientToViewPets?.name}
             </Button>
           </DialogFooter>
+
+          {/* Diálogo Aninhado para Adicionar Animal */}
+          <Dialog open={isNestedAddPetDialogOpen} onOpenChange={handleNestedAddPetClose}>
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
+                </DialogTitle>
+              </DialogHeader>
+              <PetForm
+                key={isNestedAddPetDialogOpen ? "open" : "closed"}
+                onSubmit={handleNestedAddPetSubmit}
+                onCancel={handleNestedAddPetClose}
+                allClients={clients}
+                defaultOwnerId={defaultOwnerIdForPet}
+                defaultOwnerName={defaultOwnerNameForPet}
+              />
+            </DialogContent>
+          </Dialog>
+
         </DialogContent>
       </Dialog>
 
