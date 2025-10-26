@@ -27,6 +27,7 @@ import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { uploadImageToSupabase, deleteImageFromSupabase } from "@/utils/supabaseStorage";
 import ClientDetailsDialog from "@/components/ClientDetailsDialog"; // Importar o novo ClientDetailsDialog
+import { useLocation } from "react-router-dom"; // Importar useLocation
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
@@ -41,8 +42,16 @@ const Cadastro = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id;
+  const location = useLocation(); // Hook para acessar o objeto location
 
   const [activeTab, setActiveTab] = useState<string>("tutores");
+
+  // Efeito para verificar o estado da rota e definir a aba ativa
+  useEffect(() => {
+    if (location.state && (location.state as any).activeTab) {
+      setActiveTab((location.state as any).activeTab);
+    }
+  }, [location.state]);
 
   // Estados para a aba de Animais
   const [selectedSpecies, setSelectedSpecies] = useState<string>("all");

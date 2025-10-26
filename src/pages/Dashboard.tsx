@@ -73,6 +73,23 @@ const Dashboard = () => {
     enabled: !!userId,
   });
 
+  // Query para buscar a contagem de pets
+  const { data: totalPets = 0, isLoading: isLoadingPets } = useQuery<number>({
+    queryKey: ['totalPets', userId],
+    queryFn: async () => {
+      if (!userId) return 0;
+      const { count, error } = await supabase
+        .from('pets')
+        .select('*', { count: 'exact' }); // RLS deve garantir que apenas pets do usuário sejam contados
+      if (error) {
+        console.error("Erro ao buscar contagem de pets:", error);
+        throw error;
+      }
+      return count || 0;
+    },
+    enabled: !!userId,
+  });
+
   React.useEffect(() => {
     const savedConfigString = localStorage.getItem("dashboardConfig");
     let savedConfig: DashboardItemConfig[] = [];
@@ -129,23 +146,27 @@ const Dashboard = () => {
                 <div className="text-2xl font-bold">
                   {isLoadingClients ? "..." : totalClients.toLocaleString('pt-BR')}
                 </div>
-                {/* <p className={textMutedClasses}>+20.1% do mês passado</p> */} {/* Linha removida */}
+                {/* <p className={textMutedClasses}>+20.1% do mês passado</p> */}
               </CardContent>
             </Card>
           </Link>
         );
       case "totalPets":
         return (
-          <Card key={item.id} className={cn("bg-indigo-600", baseCardClasses)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Animais</CardTitle>
-              <PawPrint className={iconClasses} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">3,120</div>
-              <p className={textMutedClasses}>+18.5% do mês passado</p>
-            </CardContent>
-          </Card>
+          <Link to="/cadastro" state={{ activeTab: "animais" }} key={item.id} className="block"> {/* Adicionado Link com state aqui */}
+            <Card className={cn("bg-indigo-600", baseCardClasses)}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total de Animais</CardTitle>
+                <PawPrint className={iconClasses} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {isLoadingPets ? "..." : totalPets.toLocaleString('pt-BR')}
+                </div>
+                <p className={textMutedClasses}>+18.5% do mês passado</p>
+              </CardContent>
+            </Card>
+          </Link>
         );
       case "scheduledAppointments":
         return (
