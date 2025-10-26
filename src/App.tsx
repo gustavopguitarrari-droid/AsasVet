@@ -18,6 +18,7 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Index from "./pages/Index"; // Importar a página Index
+import ConsultationPage from "./pages/Consultation"; // Importar a nova página de Consulta
 import { SessionContextProvider } from "./context/SessionContext";
 
 const queryClient = new QueryClient();
@@ -119,6 +120,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Settings />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/consultation/:appointmentId" // Nova rota para a página de consulta
+              element={
+                <ProtectedRoute>
+                  <ConsultationPage />
                 </ProtectedRoute>
               }
             />

@@ -9,6 +9,10 @@ import ColorThemeToggle from "@/components/ColorThemeToggle"; // Importar o novo
 const Header = () => {
   const location = useLocation();
   const getTitle = () => {
+    // Verifica se a rota começa com /consultation/
+    if (location.pathname.startsWith("/consultation/")) {
+      return "Consulta em Andamento";
+    }
     switch (location.pathname) {
       case "/painel":
         return "Painel";

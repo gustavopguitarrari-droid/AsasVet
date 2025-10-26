@@ -27,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { Client, Pet } from "@/types/cadastro"; // Import Client and Pet interfaces
+import { useNavigate } from "react-router-dom"; // Importar useNavigate
 
 export interface Appointment {
   id: string;
@@ -60,6 +61,7 @@ const Appointments = () => {
   const { user: appUser } = useUser();
   const userId = appUser?.id;
   const veterinarianName = appUser?.name || "Veterinário Desconhecido"; // Nome do veterinário logado
+  const navigate = useNavigate(); // Inicializar useNavigate
 
   const [activeTab, setActiveTab] = React.useState<string>("em-espera");
   const [searchTerm, setSearchTerm] = React.useState<string>("");
@@ -282,10 +284,11 @@ const Appointments = () => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       showSuccess("Consulta iniciada com sucesso!");
-      setActiveTab("em-andamento"); // Muda para a aba "Em Andamento"
+      // Redireciona para a página de consulta
+      navigate(`/consultation/${data.id}`);
     },
     onError: (err) => {
       showError(`Erro ao iniciar consulta: ${err.message}`);

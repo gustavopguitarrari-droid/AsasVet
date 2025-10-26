@@ -17,6 +17,7 @@ import AppointmentForm, { AppointmentFormValues } from "./AppointmentForm";
 import { cn } from "@/lib/utils";
 import { Appointment } from "@/pages/Appointments"; // Importar a interface Appointment atualizada
 import { format } from "date-fns";
+import { useNavigate, NavigateFunction } from "react-router-dom"; // Importar useNavigate e NavigateFunction
 
 interface AppointmentDetailsDialogProps {
   appointment: Appointment | null;
@@ -24,7 +25,7 @@ interface AppointmentDetailsDialogProps {
   onClose: () => void;
   onUpdate: (updatedAppointment: Appointment) => void;
   onCancelAppointment: (appointmentId: string) => void;
-  onStartAppointment: (appointmentId: string) => void; // Nova prop para iniciar consulta
+  onStartAppointment: (appointmentId: string) => void; // Removido 'navigate' daqui, será tratado internamente
 }
 
 // Mock de veterinários para o select (mantido para compatibilidade, mas não usado no formulário)
@@ -53,6 +54,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
   onStartAppointment, // Recebe a nova prop
 }) => {
   const [isEditing, setIsEditing] = React.useState(false);
+  const navigate = useNavigate(); // Inicializar useNavigate
 
   React.useEffect(() => {
     if (!isOpen) {
@@ -108,8 +110,8 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
 
   const handleStartClick = () => {
     if (window.confirm("Tem certeza que deseja iniciar esta consulta?")) {
-      onStartAppointment(appointment.id);
-      onClose();
+      onStartAppointment(appointment.id); // Chama a prop, que agora lida com a navegação
+      onClose(); // Fecha o diálogo de detalhes
     }
   };
 
