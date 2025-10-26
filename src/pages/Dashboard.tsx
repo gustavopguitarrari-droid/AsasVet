@@ -9,7 +9,6 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Link } from "react-router-dom"; // Importar Link
 import { useQuery } from "@tanstack/react-query"; // Importar useQuery
 import { supabase } from "@/integrations/supabase/client"; // Importar supabase
-import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns'; // Importar funções de data
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -56,64 +55,23 @@ const Dashboard = () => {
   const { user } = useUser();
   const userId = user?.id;
 
-  const today = new Date();
-  const currentMonthStart = format(startOfMonth(today), 'yyyy-MM-dd');
-  const currentMonthEnd = format(endOfMonth(today), 'yyyy-MM-dd');
-  const previousMonthStart = format(startOfMonth(subMonths(today, 1)), 'yyyy-MM-dd');
-  const previousMonthEnd = format(endOfMonth(subMonths(today, 1)), 'yyyy-MM-dd');
-
-  // Query para buscar a contagem de clientes do mês atual
-  const { data: totalClientsCurrentMonth = 0, isLoading: isLoadingClientsCurrentMonth } = useQuery<number>({
-    queryKey: ['totalClientsCurrentMonth', userId, currentMonthStart, currentMonthEnd],
+  // Query para buscar a contagem de clientes
+  const { data: totalClients = 0, isLoading: isLoadingClients } = useQuery<number>({
+    queryKey: ['totalClients', userId],
     queryFn: async () => {
       if (!userId) return 0;
       const { count, error } = await supabase
         .from('clients')
         .select('*', { count: 'exact' })
-        .eq('user_id', userId)
-        .gte('created_at', currentMonthStart)
-        .lte('created_at', currentMonthEnd);
+        .eq('user_id', userId);
       if (error) {
-        console.error("Erro ao buscar contagem de clientes do mês atual:", error);
+        console.error("Erro ao buscar contagem de clientes:", error);
         throw error;
       }
       return count || 0;
     },
     enabled: !!userId,
   });
-
-  // Query para buscar a contagem de clientes do mês anterior
-  const { data: totalClientsPreviousMonth = 0, isLoading: isLoadingClientsPreviousMonth } = useQuery<number>({
-    queryKey: ['totalClientsPreviousMonth', userId, previousMonthStart, previousMonthEnd],
-    queryFn: async () => {
-      if (!userId) return 0;
-      const { count, error } = await supabase
-        .from('clients')
-        .select('*', { count: 'exact' })
-        .eq('user_id', userId)
-        .gte('created_at', previousMonthStart)
-        .lte('created_at', previousMonthEnd);
-      if (error) {
-        console.error("Erro ao buscar contagem de clientes do mês anterior:", error);
-        throw error;
-      }
-      return count || 0;
-    },
-    enabled: !!userId,
-  });
-
-  // Calcular a porcentagem de mudança
-  const percentageChange = React.useMemo(() => {
-    if (isLoadingClientsCurrentMonth || isLoadingClientsPreviousMonth) {
-      return "...";
-    }
-    if (totalClientsPreviousMonth === 0) {
-      return totalClientsCurrentMonth > 0 ? "+Novo" : "N/A";
-    }
-    const change = ((totalClientsCurrentMonth - totalClientsPreviousMonth) / totalClientsPreviousMonth) * 100;
-    return `${change >= 0 ? '+' : ''}${change.toFixed(1)}%`;
-  }, [totalClientsCurrentMonth, totalClientsPreviousMonth, isLoadingClientsCurrentMonth, isLoadingClientsPreviousMonth]);
-
 
   React.useEffect(() => {
     const savedConfigString = localStorage.getItem("dashboardConfig");
@@ -161,17 +119,17 @@ const Dashboard = () => {
     switch (item.id) {
       case "totalClients":
         return (
-          <Link to="/cadastro" key={item.id} className="block">
+          <Link to="/cadastro" key={item.id} className="block"> {/* Adicionado Link aqui */}
             <Card className={cn("bg-blue-600", baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total de Tutores</CardTitle>
+                <CardTitle className="text-sm font-medium">Total de Tutores</CardTitle> {/* Renomeado aqui */}
                 <Users className={iconClasses} />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {isLoadingClientsCurrentMonth ? "..." : totalClientsCurrentMonth.toLocaleString('pt-BR')}
+                  {isLoadingClients ? "..." : totalClients.toLocaleString('pt-BR')}
                 </div>
-                <p className={textMutedClasses}>{percentageChange} do mês passado</p>
+                <p className={textMutedClasses}>+20.1% do mês passado</p>
               </CardContent>
             </Card>
           </Link>
