@@ -123,6 +123,25 @@ const Cadastro = () => {
       }
       console.log("addClientMutation: Attempting to add new client with data:", data);
 
+      // 1. Check for duplicate CPF
+      const { data: existingCpf, error: cpfCheckError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('cpf', data.cpf)
+        .single();
+
+      if (cpfCheckError && cpfCheckError.code !== 'PGRST116') { // PGRST116 means "no rows found"
+        console.error("addClientMutation: Error checking for duplicate CPF:", cpfCheckError);
+        throw new Error("Erro ao verificar CPF existente.");
+      }
+      if (existingCpf) {
+        console.log("addClientMutation: Duplicate CPF found:", data.cpf);
+        throw new Error("CPF já cadastrado.");
+      }
+      console.log("addClientMutation: CPF is unique, proceeding with client creation.");
+
+
       let photoUrl: string | null = null;
       let newClientId: string | undefined;
 
@@ -207,7 +226,6 @@ const Cadastro = () => {
       setIsAddClientDialogOpen(false);
     },
     onError: (error) => {
-      console.error("addClientMutation: Error adding client:", error);
       showError(`Erro ao adicionar tutor: ${error.message}`);
     },
   });
@@ -218,6 +236,26 @@ const Cadastro = () => {
 
       const oldClient = clients.find(c => c.id === data.id);
       let newPhotoUrl: string | null | undefined = data.photoUrl; // Can be Base64, public URL, or undefined (removed)
+
+      // 1. Check for duplicate CPF, excluding the current client being updated
+      const { data: existingCpf, error: cpfCheckError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('cpf', data.cpf)
+        .neq('id', data.id) // Exclude the current client from the check
+        .single();
+
+      if (cpfCheckError && cpfCheckError.code !== 'PGRST116') {
+        console.error("updateClientMutation: Error checking for duplicate CPF:", cpfCheckError);
+        throw new Error("Erro ao verificar CPF existente.");
+      }
+      if (existingCpf) {
+        console.log("updateClientMutation: Duplicate CPF found for another client:", data.cpf);
+        throw new Error("CPF já cadastrado para outro tutor.");
+      }
+      console.log("updateClientMutation: CPF is unique or belongs to current client, proceeding with update.");
+
 
       // If photo changed (new Base64 or removed)
       if (data.photoUrl !== oldClient?.photoUrl) {
