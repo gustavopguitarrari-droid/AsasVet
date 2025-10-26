@@ -246,16 +246,14 @@ const Veterinarios = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-end">
-        {activeTab === "equipe" && isAdmin ? ( {/* Condicional para exibir o botão */}
+        {isAdmin ? (
           <Button onClick={() => setIsAddMemberDialogOpen(true)}>
             <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
           </Button>
         ) : (
-          activeTab === "equipe" && !isAdmin && (
-            <p className="text-destructive font-semibold flex items-center">
-              <AlertCircle className="h-5 w-5 mr-2" /> Apenas administradores podem adicionar membros.
-            </p>
-          )
+          <p className="text-destructive font-semibold flex items-center">
+            <AlertCircle className="h-5 w-5 mr-2" /> Apenas administradores podem adicionar membros.
+          </p>
         )}
       </div>
 
