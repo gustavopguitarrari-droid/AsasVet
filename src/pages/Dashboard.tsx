@@ -163,23 +163,26 @@ const Dashboard = () => {
                 <div className="text-2xl font-bold">
                   {isLoadingPets ? "..." : totalPets.toLocaleString('pt-BR')}
                 </div>
-                {/* <p className={textMutedClasses}>+18.5% do mês passado</p> */} {/* Linha removida */}
+                {/* <p className={textMutedClasses}>+18.5% do mês passado</p> */}
               </CardContent>
             </Card>
           </Link>
         );
       case "scheduledAppointments":
         return (
-          <Card key={item.id} className={cn("bg-pink-600", baseCardClasses)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Consultas Agendadas</CardTitle>
-              <CalendarDays className={iconClasses} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">150</div>
-              <p className={textMutedClasses}>+5% do dia anterior</p>
-            </CardContent>
-          </Card>
+          <Link to="/medical-records" key={item.id} className="block"> {/* Adicionado Link aqui */}
+            <Card className={cn("bg-pink-600", baseCardClasses)}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Consultas Agendadas</CardTitle>
+                <CalendarDays className={iconClasses} />
+              </CardHeader>
+              <CardContent>
+                {/* Removido o valor fixo e a porcentagem */}
+                <div className="text-2xl font-bold">Ver Agenda</div>
+                <p className={textMutedClasses}>Clique para ver os detalhes</p>
+              </CardContent>
+            </Card>
+          </Link>
         );
       case "averageWaitingTime":
         return <AverageWaitingTimeCard key={item.id} />;
