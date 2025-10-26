@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Stethoscope, User, Briefcase, Hospital, Mail, Phone, IdCard, Edit, Trash2 } from "lucide-react";
+import { Stethoscope, User, Briefcase, Hospital, Mail, Phone, IdCard, Edit, Trash2, HeartPulse } from "lucide-react"; // Adicionado HeartPulse
 import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
