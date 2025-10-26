@@ -33,10 +33,13 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
 
   // Helper function to fetch profile and set appUser
   const fetchProfileAndSetAppUser = async (supabaseUser: User | null) => {
-    console.log('SessionContext: fetchProfileAndSetAppUser called with supabaseUser:', supabaseUser);
+    console.log('SessionContext: [START] fetchProfileAndSetAppUser for user:', supabaseUser?.id);
+    const startTime = performance.now();
+
     if (!supabaseUser) {
       console.log('SessionContext: No supabaseUser, setting appUser to null.');
       setAppUser(null);
+      console.log('SessionContext: [END] fetchProfileAndSetAppUser (no user). Duration:', (performance.now() - startTime).toFixed(2), 'ms');
       return;
     }
 
@@ -54,6 +57,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         } else {
           console.error('SessionContext: Error fetching profile from Supabase:', profileError);
           setAppUser(null); // Clear appUser on actual profile fetch error
+          console.log('SessionContext: [END] fetchProfileAndSetAppUser (profile error). Duration:', (performance.now() - startTime).toFixed(2), 'ms');
           return;
         }
       }
@@ -75,10 +79,12 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       };
       console.log('SessionContext: Constructed profileToSet for UserContext:', profileToSet);
       setAppUser(profileToSet);
+      console.log('SessionContext: [END] fetchProfileAndSetAppUser (success). Duration:', (performance.now() - startTime).toFixed(2), 'ms');
 
     } catch (error) {
       console.error('SessionContext: Unhandled error during profile fetch and set:', error);
       setAppUser(null); // Fallback to null if any unhandled error occurs
+      console.log('SessionContext: [END] fetchProfileAndSetAppUser (unhandled error). Duration:', (performance.now() - startTime).toFixed(2), 'ms');
     }
   };
 
@@ -86,21 +92,23 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
     let isMounted = true; // Flag to prevent state updates on unmounted component
 
     const handleAuthStateChange = async (event: string, currentSession: Session | null) => {
-      console.log('SessionContext: Auth state change event:', event, 'Session:', currentSession);
+      console.log('SessionContext: [AUTH_STATE_CHANGE] Event:', event, 'Session present:', !!currentSession, 'isMounted:', isMounted);
       if (!isMounted) return; // Prevent state update if component unmounted
 
       setSession(currentSession);
       setUserState(currentSession?.user || null);
+      console.log('SessionContext: Calling fetchProfileAndSetAppUser...');
       await fetchProfileAndSetAppUser(currentSession?.user || null);
 
       // Set isLoading to false after the initial session is handled.
       // This will happen once for 'INITIAL_SESSION' or 'SIGNED_IN' on page load.
       if (isMounted) { // Check again before setting state
         setIsLoading(false);
-        console.log('SessionContext: Initial auth state change processed, isLoading set to false.');
+        console.log('SessionContext: [END_LOADING] isLoading set to false.');
       }
     };
 
+    console.log('SessionContext: [INIT] Setting up auth state listener. Initial isLoading:', isLoading);
     // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
@@ -108,9 +116,11 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
     return () => {
       isMounted = false;
       authListener.subscription.unsubscribe();
-      console.log('SessionContext: Auth listener unsubscribed, component unmounted.');
+      console.log('SessionContext: [CLEANUP] Auth listener unsubscribed, component unmounted.');
     };
   }, []); // Empty dependency array to run only once on mount
+
+  console.log('SessionContext: Render. Current isLoading:', isLoading, 'Session:', !!session, 'User:', !!user, 'AppUser:', !!appUser); // Add this to see render cycles
 
   return (
     <SessionContext.Provider value={{ session, user, isLoading }}>
