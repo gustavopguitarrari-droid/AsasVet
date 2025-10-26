@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { CalendarCheck, CalendarX, CalendarClock, Edit, Trash2, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
+import { CalendarCheck, CalendarX, CalendarClock, Edit, Trash2, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play } from "lucide-react"; // Adicionado ícone Play
 import AppointmentForm, { AppointmentFormValues } from "./AppointmentForm";
 import { cn } from "@/lib/utils";
 import { Appointment } from "@/pages/Appointments"; // Importar a interface Appointment atualizada
@@ -24,7 +24,15 @@ interface AppointmentDetailsDialogProps {
   onClose: () => void;
   onUpdate: (updatedAppointment: Appointment) => void;
   onCancelAppointment: (appointmentId: string) => void;
+  onStartAppointment: (appointmentId: string) => void; // Nova prop para iniciar consulta
 }
+
+// Mock de veterinários para o select (mantido para compatibilidade, mas não usado no formulário)
+const mockVeterinarians = [
+  { id: "V001", name: "Dr. Ana Paula" },
+  { id: "V002", name: "Dr. Carlos Eduardo" },
+  { id: "V003", name: "Dra. Beatriz Lima" },
+];
 
 // Mapeamento de espécies para ícones
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -42,6 +50,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
   onClose,
   onUpdate,
   onCancelAppointment,
+  onStartAppointment, // Recebe a nova prop
 }) => {
   const [isEditing, setIsEditing] = React.useState(false);
 
@@ -81,7 +90,9 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
       pet_name: data.pet,       // Mapear para pet_name
       species: data.species,
       service: data.service,
-      veterinarian: data.veterinarian,
+      // veterinarian: appointment.veterinarian, // Veterinário não é editável via formulário de edição
+      veterinarian: appointment.veterinarian, // Mantém o veterinário atual
+      status: appointment.status,
       // Status e completion_date/time são gerenciados por outras ações
     });
     setIsEditing(false);
@@ -95,9 +106,17 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
     }
   };
 
+  const handleStartClick = () => {
+    if (window.confirm("Tem certeza que deseja iniciar esta consulta?")) {
+      onStartAppointment(appointment.id);
+      onClose();
+    }
+  };
+
   const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
 
   const isFinalized = appointment.status === "Realizada" || appointment.status === "Cancelada";
+  const isAgendada = appointment.status === "Agendada";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -122,7 +141,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
               pet: appointment.pet_name,
               species: appointment.species,
               service: appointment.service,
-              veterinarian: appointment.veterinarian,
+              veterinarian: appointment.veterinarian || undefined, // Passa o veterinário existente
               date: appointment.date, // Passar a data como string
               status: appointment.status,
             }}
@@ -169,7 +188,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Veterinário:</p>
-              <p className="col-span-2 text-sm">{appointment.veterinarian}</p>
+              <p className="col-span-2 text-sm">{appointment.veterinarian || "Não atribuído"}</p>
             </div>
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
@@ -194,6 +213,11 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
 
         {!isEditing && (
           <DialogFooter className="flex flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+            {isAgendada && (
+              <Button variant="default" onClick={handleStartClick} className="w-full sm:w-auto mb-2 sm:mb-0">
+                <Play className="mr-2 h-4 w-4" /> Iniciar Consulta
+              </Button>
+            )}
             <Button variant="outline" onClick={() => setIsEditing(true)} className="w-full sm:w-auto mb-2 sm:mb-0">
               <Edit className="mr-2 h-4 w-4" /> Editar
             </Button>

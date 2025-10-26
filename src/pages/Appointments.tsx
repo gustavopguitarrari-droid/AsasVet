@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal } from "lucide-react";
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play } from "lucide-react"; // Adicionado ícone Play
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -35,7 +35,7 @@ export interface Appointment {
   pet_name: string; // Renomeado para corresponder ao DB
   species: string;
   service: string;
-  veterinarian: string;
+  veterinarian: string | null; // Pode ser nulo inicialmente
   status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
   completion_date?: string | null; // Renomeado para corresponder ao DB
   completion_time?: string | null; // Renomeado para corresponder ao DB
@@ -56,6 +56,7 @@ const Appointments = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id;
+  const veterinarianName = appUser?.name || "Veterinário Desconhecido"; // Nome do veterinário logado
 
   const [activeTab, setActiveTab] = React.useState<string>("em-espera");
   const [searchTerm, setSearchTerm] = React.useState<string>("");
@@ -98,8 +99,8 @@ const Appointments = () => {
           pet_name: newAppointmentData.pet,
           species: newAppointmentData.species,
           service: newAppointmentData.service,
-          veterinarian: newAppointmentData.veterinarian,
-          status: "Agendada", // Default status
+          veterinarian: null, // Veterinário é nulo na criação
+          status: "Agendada", // Status inicial é "Agendada"
         })
         .select()
         .single();
@@ -178,6 +179,34 @@ const Appointments = () => {
     },
   });
 
+  const startAppointmentMutation = useMutation({
+    mutationFn: async (appointmentId: string) => {
+      if (!userId) throw new Error("User not authenticated.");
+      if (!appUser?.name) throw new Error("User name not available to assign as veterinarian.");
+
+      const { data, error } = await supabase
+        .from('appointments')
+        .update({
+          status: "Em Andamento",
+          veterinarian: appUser.name, // Atribui o veterinário logado
+        })
+        .eq('id', appointmentId)
+        .eq('user_id', userId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      showSuccess("Consulta iniciada com sucesso!");
+      setActiveTab("em-andamento"); // Muda para a aba "Em Andamento"
+    },
+    onError: (err) => {
+      showError(`Erro ao iniciar consulta: ${err.message}`);
+    },
+  });
+
   const handleAddAppointment = (data: AppointmentFormValues) => {
     addAppointmentMutation.mutate(data);
   };
@@ -188,6 +217,10 @@ const Appointments = () => {
 
   const handleCancelAppointment = (appointmentId: string) => {
     cancelAppointmentMutation.mutate(appointmentId);
+  };
+
+  const handleStartAppointment = (appointmentId: string) => {
+    startAppointmentMutation.mutate(appointmentId);
   };
 
   const handleRowClick = (appointment: Appointment) => {
@@ -230,7 +263,7 @@ const Appointments = () => {
       appointment.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.pet_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase());
+      (appointment.veterinarian && appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()));
 
     return matchesTab && matchesSearch;
   });
@@ -351,6 +384,7 @@ const Appointments = () => {
               {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
               {activeTab === "finalizadas" && <TableHead>Data Finalização</TableHead>}
               {activeTab === "finalizadas" && <TableHead>Hora Finalização</TableHead>}
+              <TableHead className="text-right">Ações</TableHead> {/* Adicionada coluna de Ações */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -382,7 +416,7 @@ const Appointments = () => {
                     {activeTab === "em-andamento" && (
                       <>
                         <TableCell className="flex items-center">
-                          {appointment.veterinarian}
+                          {appointment.veterinarian || "N/A"}
                           <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
                             Iniciada
                           </Badge>
@@ -395,7 +429,7 @@ const Appointments = () => {
                     {activeTab === "finalizadas" && (
                       <>
                         <TableCell className="flex items-center">
-                          {appointment.veterinarian}
+                          {appointment.veterinarian || "N/A"}
                           {isCancelled && (
                             <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
                               Cancelada
@@ -411,12 +445,28 @@ const Appointments = () => {
                         <TableCell>{appointment.completion_time || "N/A"}</TableCell>
                       </>
                     )}
+                    <TableCell className="text-right">
+                      {activeTab === "em-espera" && (
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Evita que o clique na linha abra o diálogo de detalhes
+                            handleStartAppointment(appointment.id);
+                          }}
+                          disabled={startAppointmentMutation.isPending}
+                        >
+                          <Play className="mr-2 h-4 w-4" /> Iniciar
+                        </Button>
+                      )}
+                      {/* Outras ações (editar/cancelar) serão tratadas no AppointmentDetailsDialog */}
+                    </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={activeTab === "em-andamento" ? 5 : (activeTab === "finalizadas" ? 7 : 4)} className="h-24 text-center">
+                <TableCell colSpan={activeTab === "em-andamento" ? 6 : (activeTab === "finalizadas" ? 8 : 5)} className="h-24 text-center">
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
@@ -431,6 +481,7 @@ const Appointments = () => {
         onClose={() => setIsDetailsDialogOpen(false)}
         onUpdate={handleUpdateAppointment}
         onCancelAppointment={handleCancelAppointment}
+        onStartAppointment={handleStartAppointment} // Passa a função de iniciar consulta
       />
     </div>
   );

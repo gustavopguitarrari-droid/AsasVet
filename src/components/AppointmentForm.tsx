@@ -21,7 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DialogFooter } from "@/components/ui/dialog";
 import AppointmentDateSelector from "./AppointmentDateSelector"; // Importar o novo seletor de data
 
-// Mock de veterinários para o select
+// Mock de veterinários para o select (mantido para outros usos, mas removido deste formulário)
 const mockVeterinarians = [
   { id: "V001", name: "Dr. Ana Paula" },
   { id: "V002", name: "Dr. Carlos Eduardo" },
@@ -52,7 +52,7 @@ const formSchema = z.object({
   service: z.enum(serviceOptions, { // Usar o array de opções para o enum
     required_error: "O serviço é obrigatório.",
   }),
-  veterinarian: z.string().min(1, "O veterinário é obrigatório."),
+  // O campo 'veterinarian' foi removido daqui
 }).superRefine((data, ctx) => {
   if (data.dateOption === "specific" && !data.date) {
     ctx.addIssue({
@@ -73,7 +73,7 @@ interface AppointmentFormProps {
     pet?: string;
     species?: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros";
     service?: typeof serviceOptions[number];
-    veterinarian?: string;
+    veterinarian?: string; // Mantido aqui para compatibilidade com initialData, mas não usado no formulário
     date?: string; // Date as string from existing appointment
     status?: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento"; // Status as string
   };
@@ -91,7 +91,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
       pet: initialData?.pet || "", // Alterado para string vazia
       species: initialData?.species || "Cachorro",
       service: initialData?.service || serviceOptions[0],
-      veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
+      // veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "", // Removido do defaultValues
     },
   });
 
@@ -187,30 +187,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="veterinarian"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Veterinário</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um veterinário" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {mockVeterinarians.map((vet) => (
-                    <SelectItem key={vet.id} value={vet.name}>
-                      {vet.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* O campo 'veterinarian' foi removido do formulário */}
         <DialogFooter>
           <Button type="submit">{initialData ? "Salvar Alterações" : "Agendar"}</Button>
         </DialogFooter>
