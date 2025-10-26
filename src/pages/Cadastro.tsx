@@ -130,10 +130,8 @@ const Cadastro = () => {
   const addClientMutation = useMutation({
     mutationFn: async (data: ClientFormValues) => {
       if (!userId) {
-        console.error("addClientMutation: User not authenticated, userId is null.");
         throw new Error("User not authenticated.");
       }
-      // console.log("addClientMutation: Attempting to add new client with data:", data); // Removido log
 
       // 1. Check for duplicate CPF
       const { data: existingCpf, error: cpfCheckError } = await supabase
@@ -144,21 +142,17 @@ const Cadastro = () => {
         .single();
 
       if (cpfCheckError && cpfCheckError.code !== 'PGRST116') { // PGRST116 means "no rows found"
-        console.error("addClientMutation: Error checking for duplicate CPF:", cpfCheckError);
         throw new Error("Erro ao verificar CPF existente.");
       }
       if (existingCpf) {
-        // console.log("addClientMutation: Duplicate CPF found:", data.cpf); // Removido log
         throw new Error("CPF já cadastrado.");
       }
-      // console.log("addClientMutation: CPF is unique, proceeding with client creation."); // Removido log
 
 
       let photoUrl: string | null = null;
       let newClientId: string | undefined;
 
       // First, insert client without photo_url to get an ID
-      // console.log("addClientMutation: Inserting client without photo_url to get an ID."); // Removido log
       const { data: insertedClient, error: insertError } = await supabase
         .from('clients')
         .insert({
@@ -182,25 +176,19 @@ const Cadastro = () => {
         .single();
 
       if (insertError || !insertedClient) {
-        console.error("addClientMutation: Error inserting client to get ID:", insertError);
         throw insertError || new Error("Failed to create client.");
       }
       newClientId = insertedClient.id;
-      // console.log("addClientMutation: Client inserted with temporary ID:", newClientId); // Removido log
 
       if (data.photoUrl) {
-        // console.log("addClientMutation: Photo URL provided, attempting upload."); // Removido log
         photoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'clients', newClientId);
         if (!photoUrl) {
-          console.error("addClientMutation: Failed to upload client photo. Deleting temporary client.");
           // If photo upload fails, delete the temporary client and throw error
           await supabase.from('clients').delete().eq('id', newClientId);
           throw new Error("Failed to upload client photo.");
         }
-        // console.log("addClientMutation: Photo uploaded, public URL:", photoUrl); // Removido log
 
         // Update the client with the photo URL
-        // console.log("addClientMutation: Updating client with photo_url."); // Removido log
         const { data: updatedClient, error: updateError } = await supabase
           .from('clients')
           .update({ photo_url: photoUrl })
@@ -208,14 +196,11 @@ const Cadastro = () => {
           .select()
           .single();
         if (updateError) {
-          console.error("addClientMutation: Error updating client with photo_url:", updateError);
           throw updateError;
         }
-        // console.log("addClientMutation: Client updated with photo_url:", updatedClient); // Removido log
         return updatedClient;
 
       } else {
-        // console.log("addClientMutation: No photo URL provided, returning inserted client."); // Removido log
         // No photo, just return the inserted client
         // The client was already inserted to get an ID, so we just need to return it.
         // No need to re-insert.
@@ -225,14 +210,12 @@ const Cadastro = () => {
           .eq('id', newClientId)
           .single();
         if (fetchFinalClientError) {
-          console.error("addClientMutation: Error fetching final client after no photo upload:", fetchFinalClientError);
           throw fetchFinalClientError;
         }
         return finalClient;
       }
     },
     onSuccess: (data) => {
-      // console.log("addClientMutation (onSuccess): Client added successfully, invalidating queries. Data:", data); // Removido log
       queryClient.invalidateQueries({ queryKey: ['clients', userId] });
       showSuccess("Tutor adicionado com sucesso!");
       setIsAddClientDialogOpen(false);
@@ -259,39 +242,30 @@ const Cadastro = () => {
         .single();
 
       if (cpfCheckError && cpfCheckError.code !== 'PGRST116') {
-        console.error("updateClientMutation: Error checking for duplicate CPF:", cpfCheckError);
         throw new Error("Erro ao verificar CPF existente.");
       }
       if (existingCpf) {
-        // console.log("updateClientMutation: Duplicate CPF found for another client:", data.cpf); // Removido log
         throw new Error("CPF já cadastrado para outro tutor.");
       }
-      // console.log("updateClientMutation: CPF is unique or belongs to current client, proceeding with update."); // Removido log
 
 
       // If photo changed (new Base64 or removed)
       if (data.photoUrl !== oldClient?.photoUrl) {
         // Delete old image if it existed
         if (oldClient?.photoUrl) {
-          // console.log("updateClientMutation: Deleting old client photo:", oldClient.photoUrl); // Removido log
           await deleteImageFromSupabase(oldClient.photoUrl);
         }
         // Upload new image if it's a Base64 string
         if (data.photoUrl && data.photoUrl.startsWith('data:image')) {
-          // console.log("updateClientMutation: Uploading new client photo."); // Removido log
           newPhotoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'clients', data.id);
           if (!newPhotoUrl) throw new Error("Failed to upload new client photo.");
-          // console.log("updateClientMutation: New photo uploaded, public URL:", newPhotoUrl); // Removido log
         } else if (!data.photoUrl) {
-          // console.log("updateClientMutation: Client photo explicitly removed."); // Removido log
           newPhotoUrl = null; // Photo was explicitly removed
         }
       } else {
         newPhotoUrl = oldClient?.photoUrl; // Photo didn't change, keep existing URL
-        // console.log("updateClientMutation: Client photo did not change, keeping existing URL:", newPhotoUrl); // Removido log
       }
 
-      // console.log("updateClientMutation: Updating client in DB with data:", data); // Removido log
       const { data: updatedClient, error } = await supabase
         .from('clients')
         .update({
@@ -315,21 +289,17 @@ const Cadastro = () => {
         .select()
         .single();
       if (error) {
-        console.error("updateClientMutation: Error updating client in DB:", error);
         throw error;
       }
-      // console.log("updateClientMutation: Client updated successfully in DB:", updatedClient); // Removido log
       return updatedClient;
     },
     onSuccess: () => {
-      // console.log("updateClientMutation (onSuccess): Client updated successfully, invalidating queries."); // Removido log
       queryClient.invalidateQueries({ queryKey: ['clients', userId] });
       showSuccess("Tutor atualizado com sucesso!");
       setIsEditClientDialogOpen(false);
       setIsClientDetailsDialogOpen(false); // Close details dialog if open
     },
     onError: (error) => {
-      console.error("updateClientMutation (onError): Error updating client:", error);
       showError(`Erro ao atualizar tutor: ${error.message}`);
     },
   });
@@ -337,10 +307,8 @@ const Cadastro = () => {
   const deleteClientMutation = useMutation({
     mutationFn: async (clientId: string) => {
       if (!userId) throw new Error("User not authenticated.");
-      // console.log("deleteClientMutation: Attempting to delete client with ID:", clientId); // Removido log
 
       // First, get the client to delete their photo
-      // console.log("deleteClientMutation: Fetching client to delete photo."); // Removido log
       const { data: clientToDelete, error: fetchError } = await supabase
         .from('clients')
         .select('photo_url')
@@ -348,59 +316,49 @@ const Cadastro = () => {
         .single();
 
       if (fetchError) {
-        console.error("deleteClientMutation: Error fetching client for photo deletion:", fetchError);
         throw fetchError;
       }
 
       // Delete client's photo from storage if it existed
       if (clientToDelete?.photo_url) {
-        // console.log("deleteClientMutation: Deleting client photo from storage:", clientToDelete.photo_url); // Removido log
         await deleteImageFromSupabase(clientToDelete.photo_url);
       }
 
       // Get all pets associated with this client to delete their photos
-      // console.log("deleteClientMutation: Fetching pets associated with client for photo deletion."); // Removido log
       const { data: petsToDelete, error: fetchPetsError } = await supabase
         .from('pets')
         .select('id, photo_url')
         .eq('owner_id', clientId);
 
       if (fetchPetsError) {
-        console.error("deleteClientMutation: Error fetching pets for photo deletion:", fetchPetsError);
         throw fetchPetsError;
       }
 
       // Delete each pet's photo
       for (const pet of petsToDelete || []) {
         if (pet.photo_url) {
-          // console.log("deleteClientMutation: Deleting pet photo from storage:", pet.photo_url); // Removido log
           await deleteImageFromSupabase(pet.photo_url);
         }
       }
 
       // Deleting the client will cascade delete associated pets due to foreign key ON DELETE CASCADE
-      // console.log("deleteClientMutation: Deleting client from DB."); // Removido log
       const { error } = await supabase
         .from('clients')
         .delete()
         .eq('id', clientId)
         .eq('user_id', userId);
       if (error) {
-        console.error("deleteClientMutation: Error deleting client from DB:", error);
         throw error;
       }
-      // console.log("deleteClientMutation: Client deleted successfully from DB."); // Removido log
       return clientId;
     },
     onSuccess: () => {
-      // console.log("deleteClientMutation (onSuccess): Client deleted successfully, invalidating queries."); // Removido log
       queryClient.invalidateQueries({ queryKey: ['clients', userId] });
       queryClient.invalidateQueries({ queryKey: ['pets', userId] }); // Pets also affected
       showSuccess("Tutor e seus animais excluídos com sucesso!");
       setIsClientDetailsDialogOpen(false); // Close details dialog
     },
     onError: (error) => {
-      console.error("deleteClientMutation (onError): Error deleting client:", error);
       showError(`Erro ao excluir tutor: ${error.message}`);
     },
   });
@@ -408,14 +366,11 @@ const Cadastro = () => {
   const addPetMutation = useMutation({
     mutationFn: async (data: PetFormValues) => {
       if (!userId) throw new Error("User not authenticated.");
-      // console.log("addPetMutation (mutationFn): Attempting to add new pet with data:", data); // Removido log
-      // console.log("addPetMutation (mutationFn): ownerId being sent:", data.ownerId); // Removido log
 
       let photoUrl: string | null = null;
       let newPetId: string | undefined;
 
       // First, insert pet without photo_url to get an ID
-      // console.log("addPetMutation (mutationFn): Inserting pet without photo_url to get an ID."); // Removido log
       const { data: insertedPet, error: insertError } = await supabase
         .from('pets')
         .insert({
@@ -433,25 +388,19 @@ const Cadastro = () => {
         .single();
 
       if (insertError || !insertedPet) {
-        console.error("addPetMutation (mutationFn): Error inserting pet to get ID:", insertError);
         throw insertError || new Error("Failed to create pet.");
       }
       newPetId = insertedPet.id;
-      // console.log("addPetMutation (mutationFn): Pet inserted with temporary ID:", newPetId); // Removido log
 
       if (data.photoUrl) {
-        // console.log("addPetMutation (mutationFn): Photo URL provided, attempting upload."); // Removido log
         photoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'pets', newPetId);
         if (!photoUrl) {
-          console.error("addPetMutation (mutationFn): Failed to upload pet photo. Deleting temporary pet.");
           // If photo upload fails, delete the newly created pet and throw error
           await supabase.from('pets').delete().eq('id', newPetId);
           throw new Error("Failed to upload pet photo.");
         }
-        // console.log("addPetMutation (mutationFn): Photo uploaded, public URL:", photoUrl); // Removido log
 
         // Update the pet with the photo URL
-        // console.log("addPetMutation (mutationFn): Updating pet with photo_url."); // Removido log
         const { data: updatedPet, error: updateError } = await supabase
           .from('pets')
           .update({ photo_url: photoUrl })
@@ -459,13 +408,10 @@ const Cadastro = () => {
           .select()
           .single();
         if (updateError) {
-          console.error("addPetMutation (mutationFn): Error updating pet with photo_url:", updateError);
           throw updateError;
         }
-        // console.log("addPetMutation (mutationFn): Pet updated with photo_url:", updatedPet); // Removido log
         return updatedPet;
       }
-      // console.log("addPetMutation (mutationFn): No photo URL provided, returning inserted pet."); // Removido log
       // No photo, just return the inserted pet
       const { data: finalPet, error: fetchFinalPetError } = await supabase
         .from('pets')
@@ -473,20 +419,17 @@ const Cadastro = () => {
         .eq('id', newPetId)
         .single();
       if (fetchFinalPetError) {
-        console.error("addPetMutation (mutationFn): Error fetching final pet after no photo upload:", fetchFinalPetError);
         throw fetchFinalPetError;
       }
       return finalPet;
     },
     onSuccess: () => {
-      // console.log("addPetMutation (onSuccess): Pet added successfully, invalidating queries."); // Removido log
       queryClient.invalidateQueries({ queryKey: ['pets', userId] });
       showSuccess("Animal adicionado com sucesso!");
       setIsAddPetDialogOpen(false);
       // setIsClientPetsDialogOpen(false); // No longer closes parent dialog
     },
     onError: (error) => {
-      console.error("addPetMutation (onError): Error adding animal:", error);
       showError(`Erro ao adicionar animal: ${error.message}`);
     },
   });
@@ -494,31 +437,24 @@ const Cadastro = () => {
   const updatePetMutation = useMutation({
     mutationFn: async (data: PetFormValues & { id: string }) => {
       if (!userId) throw new Error("User not authenticated.");
-      // console.log("updatePetMutation: Attempting to update pet with data:", data); // Removido log
 
       const oldPet = pets.find(p => p.id === data.id);
       let newPhotoUrl: string | null | undefined = data.photoUrl;
 
       if (data.photoUrl !== oldPet?.photoUrl) {
         if (oldPet?.photoUrl) {
-          // console.log("updatePetMutation: Deleting old pet photo:", oldPet.photoUrl); // Removido log
           await deleteImageFromSupabase(oldPet.photoUrl);
         }
         if (data.photoUrl && data.photoUrl.startsWith('data:image')) {
-          // console.log("updatePetMutation: Uploading new pet photo."); // Removido log
           newPhotoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'pets', data.id);
           if (!newPhotoUrl) throw new Error("Failed to upload new pet photo.");
-          // console.log("updatePetMutation: New photo uploaded, public URL:", newPhotoUrl); // Removido log
         } else if (!data.photoUrl) {
-          // console.log("updatePetMutation: Pet photo explicitly removed."); // Removido log
           newPhotoUrl = null;
         }
       } else {
         newPhotoUrl = oldPet?.photoUrl;
-        // console.log("updatePetMutation: Pet photo did not change, keeping existing URL:", newPhotoUrl); // Removido log
       }
 
-      // console.log("updatePetMutation: Updating pet in DB with data:", data); // Removido log
       const { data: updatedPet, error } = await supabase
         .from('pets')
         .update({
@@ -536,21 +472,17 @@ const Cadastro = () => {
         .select()
         .single();
       if (error) {
-        console.error("updatePetMutation: Error updating pet in DB:", error);
         throw error;
       }
-      // console.log("updatePetMutation: Pet updated successfully in DB:", updatedPet); // Removido log
       return updatedPet;
     },
     onSuccess: () => {
-      // console.log("updatePetMutation (onSuccess): Pet updated successfully, invalidating queries."); // Removido log
       queryClient.invalidateQueries({ queryKey: ['pets', userId] });
       showSuccess("Animal atualizado com sucesso!");
       setIsEditPetDialogOpen(false);
       setIsPetDetailsDialogOpen(false); // Close details dialog if open
     },
     onError: (error) => {
-      console.error("updatePetMutation (onError): Error updating animal:", error);
       showError(`Erro ao atualizar animal: ${error.message}`);
     },
   });
@@ -558,7 +490,6 @@ const Cadastro = () => {
   const deletePetMutation = useMutation({
     mutationFn: async (petId: string) => {
       if (!userId) throw new Error("User not authenticated.");
-      // console.log("deletePetMutation: Attempting to delete pet with ID:", petId); // Removido log
 
       const { data: petToDelete, error: fetchError } = await supabase
         .from('pets')
@@ -567,35 +498,28 @@ const Cadastro = () => {
         .single();
 
       if (fetchError) {
-        console.error("deletePetMutation: Error fetching pet for photo deletion:", fetchError);
         throw fetchError;
       }
 
       if (petToDelete?.photo_url) {
-        // console.log("deletePetMutation: Deleting pet photo from storage:", petToDelete.photo_url); // Removido log
         await deleteImageFromSupabase(petToDelete.photo_url);
       }
 
-      // console.log("deletePetMutation: Deleting pet from DB."); // Removido log
       const { error } = await supabase
         .from('pets')
         .delete()
         .eq('id', petId);
       if (error) {
-        console.error("deletePetMutation: Error deleting pet from DB:", error);
         throw error;
       }
-      // console.log("deletePetMutation: Pet deleted successfully from DB."); // Removido log
       return petId;
     },
     onSuccess: () => {
-      // console.log("deletePetMutation (onSuccess): Pet deleted successfully, invalidating queries."); // Removido log
       queryClient.invalidateQueries({ queryKey: ['pets', userId] });
       showSuccess("Animal excluído com sucesso!");
       setIsPetDetailsDialogOpen(false); // Close details dialog
     },
     onError: (error) => {
-      console.error("deletePetMutation (onError): Error deleting animal:", error);
       showError(`Erro ao excluir animal: ${error.message}`);
     },
   });
@@ -606,12 +530,10 @@ const Cadastro = () => {
   };
 
   const handleAddClient = (data: ClientFormValues) => {
-    // console.log("handleAddClient called with data:", data); // Removido log
     addClientMutation.mutate(data);
   };
 
   const handleEditClient = (client: Client) => {
-    // console.log("handleEditClient called with client:", client); // Removido log
     setClientToEdit(client);
     setIsEditClientDialogOpen(true);
     setIsClientDetailsDialogOpen(false); // Close details dialog before opening edit
@@ -622,30 +544,25 @@ const Cadastro = () => {
       console.error("handleUpdateClient: clientToEdit is null, cannot update.");
       return;
     }
-    // console.log("handleUpdateClient called with data:", data, "for client ID:", clientToEdit.id); // Removido log
     updateClientMutation.mutate({ ...data, id: clientToEdit.id });
   };
 
   const handleDeleteClient = (clientId: string, clientName: string) => {
-    // console.log("handleDeleteClient called for client ID:", clientId, "name:", clientName); // Removido log
     if (window.confirm(`Tem certeza que deseja excluir o tutor ${clientName} e todos os seus animais? Esta ação não pode ser desfeita.`)) {
       deleteClientMutation.mutate(clientId);
     }
   };
 
   const handleClientRowClick = (client: Client) => {
-    // console.log("handleClientRowClick called with client:", client); // Removido log
     setSelectedClient(client);
     setIsClientDetailsDialogOpen(true);
   };
 
   const handleAddPet = (data: PetFormValues) => {
-    // console.log("handleAddPet called with data:", data); // Removido log
     addPetMutation.mutate(data);
   };
 
   const handleEditPet = (pet: Pet) => {
-    // console.log("handleEditPet called with pet:", pet); // Removido log
     setPetToEdit(pet);
     setIsEditPetDialogOpen(true);
     setIsPetDetailsDialogOpen(false); // Close details dialog before opening edit
@@ -656,12 +573,10 @@ const Cadastro = () => {
       console.error("handleUpdatePet: petToEdit is null, cannot update.");
       return;
     }
-    // console.log("handleUpdatePet called with data:", data, "for pet ID:", petToEdit.id); // Removido log
     updatePetMutation.mutate({ ...data, id: petToEdit.id });
   };
 
   const handleDeletePet = (petId: string, petName: string) => {
-    // console.log("handleDeletePet called for pet ID:", petId, "name:", petName); // Removido log
     if (window.confirm(`Tem certeza que deseja excluir o animal ${petName}? Esta ação não pode ser desfeita.`)) {
       deletePetMutation.mutate(petId);
     }
@@ -678,7 +593,6 @@ const Cadastro = () => {
   });
 
   const handlePetRowClick = (pet: Pet) => {
-    // console.log("handlePetRowClick called with pet:", pet); // Removido log
     setSelectedPet(pet);
     setIsPetDetailsDialogOpen(true);
   };
@@ -693,7 +607,6 @@ const Cadastro = () => {
   );
 
   const handleViewClientPets = (client: Client) => {
-    // console.log("handleViewClientPets called with client:", client); // Removido log
     setClientToViewPets(client);
     setIsClientPetsDialogOpen(true);
   };
@@ -702,7 +615,6 @@ const Cadastro = () => {
   const [isNestedAddPetDialogOpen, setIsNestedAddPetDialogOpen] = useState(false);
 
   const handleAddPetForClient = (client: Client) => {
-    // console.log("handleAddPetForClient called for client ID:", client.id); // Removido log
     setDefaultOwnerIdForPet(client.id);
     setDefaultOwnerNameForPet(client.name);
     setIsNestedAddPetDialogOpen(true); // Open nested dialog
@@ -710,23 +622,18 @@ const Cadastro = () => {
   };
 
   const handleNestedAddPetClose = () => {
-    // console.log("handleNestedAddPetClose called."); // Removido log
     setIsNestedAddPetDialogOpen(false);
     setDefaultOwnerIdForPet(undefined);
     setDefaultOwnerNameForPet(undefined);
   };
 
   const handleNestedAddPetSubmit = (data: PetFormValues) => {
-    // console.log("handleNestedAddPetSubmit: Submitting pet data:", data); // Removido log
-    // console.log("handleNestedAddPetSubmit: ownerId being passed to mutation:", data.ownerId); // Removido log
     addPetMutation.mutate(data, {
       onSuccess: () => {
-        // console.log("handleNestedAddPetSubmit: Mutation successful."); // Removido log
         handleNestedAddPetClose(); // Close nested dialog on success
         // The parent dialog (isClientPetsDialogOpen) remains open
       },
       onError: (error) => {
-        // console.error("handleNestedAddPetSubmit: Mutation failed:", error); // Removido log
         showError(`Erro ao adicionar animal: ${error.message}`);
       }
     });
@@ -832,13 +739,9 @@ const Cadastro = () => {
               <TableBody>
                 {filteredClients.length > 0 ? (
                   filteredClients.map((client) => {
-                    // console.log(`DEBUG: Processing client: ${client.name} (ID: ${client.id})`); // Removido log excessivo
-                    // console.log(`DEBUG: Current 'pets' array length: ${pets.length}`); // Removido log excessivo
                     const petsOfClient = pets.filter(pet => {
-                      // console.log(`DEBUG: Comparing pet.ownerId: '${pet.ownerId}' with client.id: '${client.id}'`); // Removido log excessivo
                       return pet.ownerId === client.id;
                     });
-                    // console.log(`Cadastro (Tutores Tab): Cliente ${client.name} (ID: ${client.id}) tem ${petsOfClient.length} animais.`); // Removido log para cada cliente
                     return (
                       <TableRow key={client.id} className="cursor-pointer hover:bg-muted/50">
                         <TableCell className="font-medium" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>{client.name}</TableCell>
@@ -1002,7 +905,6 @@ const Cadastro = () => {
             {clientToViewPets ? (
               (() => {
                 const petsOfClient = pets.filter(pet => pet.ownerId === clientToViewPets.id);
-                // console.log(`Cadastro (ClientPetsDialog): Para o cliente ${clientToViewPets.name} (ID: ${clientToViewPets.id}), encontrados ${petsOfClient.length} animais.`); // Removido log excessivo
                 return petsOfClient.length > 0 ? (
                   <div className="space-y-3">
                     {petsOfClient.map(pet => {

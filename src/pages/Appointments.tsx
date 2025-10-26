@@ -159,7 +159,7 @@ const Appointments = () => {
           pet_name: newAppointmentData.pet,
           species: newAppointmentData.species,
           service: newAppointmentData.service,
-          veterinarian: null, // Veterinário é nulo na criação
+          veterinarian: veterinarianName, // CORREÇÃO AQUI: Usando o nome do veterinário logado
           status: "Agendada", // Status inicial é "Agendada"
         })
         .select()
