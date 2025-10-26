@@ -21,7 +21,7 @@ import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 import AppointmentChronometer from "@/components/AppointmentChronometer";
 import AppointmentHistoryDialog from "@/components/AppointmentHistoryDialog"; // Importar o novo diálogo
-import { format, parseISO } from "date-fns";
+import { format, parseISO, differenceInSeconds, isValid } from "date-fns"; // Importar differenceInSeconds e isValid
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
@@ -484,6 +484,7 @@ const Appointments = () => {
               {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
               {activeTab === "finalizadas" && <TableHead>Data Finalização</TableHead>}
               {activeTab === "finalizadas" && <TableHead>Hora Finalização</TableHead>}
+              {activeTab === "finalizadas" && <TableHead>Duração</TableHead>} {/* Nova coluna */}
               <TableHead className="text-right">Ações</TableHead> {/* Adicionada coluna de Ações */}
             </TableRow>
           </TableHeader>
@@ -543,6 +544,22 @@ const Appointments = () => {
                         </TableCell>
                         <TableCell>{appointment.completion_date || "N/A"}</TableCell>
                         <TableCell>{appointment.completion_time || "N/A"}</TableCell>
+                        <TableCell>
+                          {appointment.start_time && appointment.completion_date && appointment.completion_time ? (
+                            (() => {
+                                const start = parseISO(appointment.start_time);
+                                const end = parseISO(`${appointment.completion_date}T${appointment.completion_time}:00`); // Assuming completion_time is HH:mm
+                                if (isValid(start) && isValid(end)) {
+                                    const durationSeconds = differenceInSeconds(end, start);
+                                    const hours = Math.floor(durationSeconds / 3600);
+                                    const minutes = Math.floor((durationSeconds % 3600) / 60);
+                                    const seconds = durationSeconds % 60;
+                                    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                                }
+                                return "N/A";
+                            })()
+                          ) : "N/A"}
+                        </TableCell>
                       </>
                     )}
                     <TableCell className="text-right">
@@ -566,7 +583,7 @@ const Appointments = () => {
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={activeTab === "em-andamento" ? 6 : (activeTab === "finalizadas" ? 8 : 5)} className="h-24 text-center">
+                <TableCell colSpan={activeTab === "em-andamento" ? 6 : (activeTab === "finalizadas" ? 9 : 5)} className="h-24 text-center">
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
