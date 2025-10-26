@@ -15,11 +15,13 @@ export interface CalendarEvent {
   date: Date;
   time: string;
   category: "Consulta" | "Cirurgia" | "Vacina" | "Exame" | "Retorno" | "Outros";
+  status?: "Agendada" | "Cancelada"; // Adicionado status
 }
 
 interface EventCalendarProps {
   events: CalendarEvent[];
   onAddEventClick: (date: Date) => void;
+  onEventClick: (event: CalendarEvent) => void; // Nova prop
 }
 
 const categoryColorMap: Record<CalendarEvent["category"], string> = {
@@ -31,7 +33,7 @@ const categoryColorMap: Record<CalendarEvent["category"], string> = {
   Outros: "bg-event-outros",
 };
 
-const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick }) => {
+const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick }) => {
   const [selectedDay, setSelectedDay] = React.useState<Date | undefined>(new Date());
 
   const eventsForSelectedDay = selectedDay
@@ -90,9 +92,11 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick }
                 <div
                   key={event.id}
                   className={cn(
-                    "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white",
-                    categoryColorMap[event.category]
+                    "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white cursor-pointer", // Adicionado cursor-pointer
+                    categoryColorMap[event.category],
+                    event.status === "Cancelada" && "opacity-50 line-through" // Estilo para cancelado
                   )}
+                  onClick={() => onEventClick(event)} // Adicionado onClick
                 >
                   <span className="font-bold text-lg">{event.time}</span>
                   <div className="flex-1">
@@ -101,6 +105,11 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick }
                       {event.category}
                     </Badge>
                   </div>
+                  {event.status === "Cancelada" && (
+                    <Badge variant="destructive" className="bg-red-700 text-white">
+                      Cancelado
+                    </Badge>
+                  )}
                 </div>
               ))}
             </div>

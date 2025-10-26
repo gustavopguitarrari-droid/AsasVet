@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, CalendarX } from "lucide-react"; // Importar CalendarX
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import AddEventDialog, { EventFormValues } from "@/components/AddEventDialog";
 import EventCalendar, { CalendarEvent } from "@/components/EventCalendar";
@@ -11,14 +11,27 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle as AlertDialogTitleComponent, // Renomear para evitar conflito
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 const AgendamentosMedicos = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id;
 
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const [isAddEventDialogOpen, setIsAddEventDialogOpen] = React.useState(false);
   const [defaultDateForNewEvent, setDefaultDateForNewEvent] = React.useState<Date | undefined>(undefined);
+  const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null); // Novo estado para o evento selecionado
+  const [isCancelConfirmDialogOpen, setIsCancelConfirmDialogOpen] = React.useState(false); // Novo estado para o diálogo de confirmação
 
   // Query para buscar eventos do Supabase
   const { data: events = [], isLoading, error } = useQuery<CalendarEvent[]>({
@@ -37,6 +50,7 @@ const AgendamentosMedicos = () => {
         date: parseISO(event.date), // Converte string de data para objeto Date
         time: event.time,
         category: event.category as CalendarEvent["category"],
+        status: (event.status || "Agendada") as CalendarEvent["status"], // Adiciona status com default
       }));
     },
     enabled: !!userId, // Só executa a query se o userId estiver disponível
@@ -54,6 +68,7 @@ const AgendamentosMedicos = () => {
           date: format(newEventData.date, "yyyy-MM-dd"), // Formata Date para string YYYY-MM-DD
           time: newEventData.time,
           category: newEventData.category,
+          status: "Agendada", // Define o status inicial como "Agendada"
         })
         .select()
         .single();
@@ -63,10 +78,35 @@ const AgendamentosMedicos = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events', userId] }); // Invalida a query para rebuscar os eventos
       showSuccess("Agendamento adicionado com sucesso!");
-      setIsDialogOpen(false);
+      setIsAddEventDialogOpen(false);
     },
     onError: (err) => {
       showError(`Erro ao adicionar agendamento: ${err.message}`);
+    },
+  });
+
+  // Mutação para cancelar um evento
+  const cancelEventMutation = useMutation({
+    mutationFn: async (eventId: string) => {
+      if (!userId) throw new Error("User not authenticated.");
+      const { data, error } = await supabase
+        .from('events')
+        .update({ status: "Cancelada" })
+        .eq('id', eventId)
+        .eq('user_id', userId) // Garante que o usuário só pode cancelar seus próprios eventos
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events', userId] });
+      showSuccess("Agendamento cancelado com sucesso!");
+      setIsCancelConfirmDialogOpen(false);
+      setSelectedEvent(null);
+    },
+    onError: (err) => {
+      showError(`Erro ao cancelar agendamento: ${err.message}`);
     },
   });
 
@@ -76,7 +116,18 @@ const AgendamentosMedicos = () => {
 
   const handleOpenDialogWithDate = (date: Date) => {
     setDefaultDateForNewEvent(date);
-    setIsDialogOpen(true);
+    setIsAddEventDialogOpen(true);
+  };
+
+  const handleEventClick = (event: CalendarEvent) => {
+    setSelectedEvent(event);
+    setIsCancelConfirmDialogOpen(true);
+  };
+
+  const handleConfirmCancel = () => {
+    if (selectedEvent) {
+      cancelEventMutation.mutate(selectedEvent.id);
+    }
   };
 
   if (isLoading) {
@@ -99,7 +150,7 @@ const AgendamentosMedicos = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Agenda</h2>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={() => handleOpenDialogWithDate(new Date())}>
               <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
@@ -109,12 +160,35 @@ const AgendamentosMedicos = () => {
             <DialogHeader>
               <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
             </DialogHeader>
-            <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
+            <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsAddEventDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
           </DialogContent>
         </Dialog>
       </div>
 
-      <EventCalendar events={events} onAddEventClick={handleOpenDialogWithDate} />
+      <EventCalendar events={events} onAddEventClick={handleOpenDialogWithDate} onEventClick={handleEventClick} />
+
+      {/* Diálogo de Confirmação de Cancelamento */}
+      <AlertDialog open={isCancelConfirmDialogOpen} onOpenChange={setIsCancelConfirmDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitleComponent className="flex items-center">
+              <CalendarX className="h-5 w-5 mr-2 text-destructive" /> Confirmar Cancelamento
+            </AlertDialogTitleComponent>
+            <AlertDialogDescription>
+              Tem certeza que deseja cancelar o agendamento: <span className="font-bold">{selectedEvent?.title}</span> em{" "}
+              <span className="font-bold">{selectedEvent?.date ? format(selectedEvent.date, "PPP", { locale: ptBR }) : ""}</span> às{" "}
+              <span className="font-bold">{selectedEvent?.time}</span>?
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={cancelEventMutation.isPending}>Não, Manter</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmCancel} disabled={cancelEventMutation.isPending} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {cancelEventMutation.isPending ? "Cancelando..." : "Sim, Cancelar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
