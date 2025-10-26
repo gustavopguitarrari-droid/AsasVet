@@ -110,7 +110,19 @@ const Cadastro = () => {
         .select('*');
       if (error) throw error;
       console.log("Cadastro (pets queryFn): Pets fetched from Supabase:", data); // Log dos pets retornados
-      return data;
+      // Mapeia owner_id para ownerId para corresponder à interface Pet
+      return data.map(dbPet => ({
+        id: dbPet.id,
+        name: dbPet.name,
+        species: dbPet.species,
+        breed: dbPet.breed,
+        age: dbPet.age,
+        gender: dbPet.gender,
+        color: dbPet.color,
+        observations: dbPet.observations || undefined,
+        photoUrl: dbPet.photo_url || undefined,
+        ownerId: dbPet.owner_id, // CORREÇÃO AQUI: Mapeando owner_id para ownerId
+      }));
     },
     enabled: !!userId,
   });
@@ -821,10 +833,10 @@ const Cadastro = () => {
               <TableBody>
                 {filteredClients.length > 0 ? (
                   filteredClients.map((client) => {
-                    console.log(`DEBUG: Processing client: ${client.name} (ID: ${client.id})`);
-                    console.log(`DEBUG: Current 'pets' array length: ${pets.length}`);
+                    // console.log(`DEBUG: Processing client: ${client.name} (ID: ${client.id})`); // Removido log excessivo
+                    // console.log(`DEBUG: Current 'pets' array length: ${pets.length}`); // Removido log excessivo
                     const petsOfClient = pets.filter(pet => {
-                      console.log(`DEBUG: Comparing pet.ownerId: '${pet.ownerId}' with client.id: '${client.id}'`);
+                      // console.log(`DEBUG: Comparing pet.ownerId: '${pet.ownerId}' with client.id: '${client.id}'`); // Removido log excessivo
                       return pet.ownerId === client.id;
                     });
                     console.log(`Cadastro (Tutores Tab): Cliente ${client.name} (ID: ${client.id}) tem ${petsOfClient.length} animais.`); // Log para cada cliente
@@ -991,7 +1003,7 @@ const Cadastro = () => {
             {clientToViewPets ? (
               (() => {
                 const petsOfClient = pets.filter(pet => pet.ownerId === clientToViewPets.id);
-                console.log(`Cadastro (ClientPetsDialog): Para o cliente ${clientToViewPets.name} (ID: ${clientToViewPets.id}), encontrados ${petsOfClient.length} animais.`); // Log para o diálogo de pets do cliente
+                // console.log(`Cadastro (ClientPetsDialog): Para o cliente ${clientToViewPets.name} (ID: ${clientToViewPets.id}), encontrados ${petsOfClient.length} animais.`); // Removido log excessivo
                 return petsOfClient.length > 0 ? (
                   <div className="space-y-3">
                     {petsOfClient.map(pet => {
