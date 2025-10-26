@@ -90,21 +90,21 @@ const Dashboard = () => {
     enabled: !!userId,
   });
 
-  // Query para buscar a contagem de consultas agendadas
+  // Query para buscar a contagem de consultas agendadas (agora da tabela 'events')
   const { data: scheduledAppointmentsCount = 0, isLoading: isLoadingScheduledAppointments } = useQuery<number>({
     queryKey: ['scheduledAppointmentsCount', userId],
     queryFn: async () => {
       if (!userId) return 0;
       const { count, error } = await supabase
-        .from('appointments')
+        .from('events') // Alterado de 'appointments' para 'events'
         .select('*', { count: 'exact' })
         .eq('user_id', userId)
         .eq('status', 'Agendada'); // Filtra por status "Agendada"
       if (error) {
-        console.error("Erro ao buscar contagem de consultas agendadas:", error);
+        console.error("Erro ao buscar contagem de consultas agendadas (events):", error);
         throw error;
       }
-      console.log("Contagem de consultas agendadas do Supabase:", count); // Log para depuração
+      console.log("Contagem de consultas agendadas (events) do Supabase:", count); // Log para depuração
       return count || 0;
     },
     enabled: !!userId,
