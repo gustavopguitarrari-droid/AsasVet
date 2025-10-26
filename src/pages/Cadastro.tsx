@@ -418,7 +418,7 @@ const Cadastro = () => {
           observations: data.observations,
           photo_url: null,
         })
-        .select('id')
+        .select('id, owner_id') // Select owner_id to confirm it's returned
         .single();
 
       if (insertError || !insertedPet) {
@@ -426,7 +426,7 @@ const Cadastro = () => {
         throw insertError || new Error("Failed to create pet.");
       }
       newPetId = insertedPet.id;
-      console.log("addPetMutation (mutationFn): Pet inserted with temporary ID:", newPetId);
+      console.log("addPetMutation (mutationFn): Pet inserted with temporary ID:", newPetId, "and owner_id:", insertedPet.owner_id);
 
       if (data.photoUrl) {
         console.log("addPetMutation (mutationFn): Photo URL provided, attempting upload.");
@@ -445,20 +445,20 @@ const Cadastro = () => {
           .from('pets')
           .update({ photo_url: photoUrl })
           .eq('id', newPetId)
-          .select()
+          .select('id, owner_id') // Select owner_id to confirm it's returned
           .single();
         if (updateError) {
           console.error("addPetMutation (mutationFn): Error updating pet with photo_url:", updateError);
           throw updateError;
         }
-        console.log("addPetMutation (mutationFn): Pet updated with photo_url:", updatedPet);
+        console.log("addPetMutation (mutationFn): Pet updated with photo_url:", updatedPet, "and owner_id:", updatedPet.owner_id);
         return updatedPet;
       }
       console.log("addPetMutation (mutationFn): No photo URL provided, returning inserted pet.");
       // No photo, just return the inserted pet
       const { data: finalPet, error: fetchFinalPetError } = await supabase
         .from('pets')
-        .select('*')
+        .select('id, owner_id') // Select owner_id to confirm it's returned
         .eq('id', newPetId)
         .single();
       if (fetchFinalPetError) {
