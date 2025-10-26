@@ -74,7 +74,27 @@ const Cadastro = () => {
         .select('*')
         .eq('user_id', userId);
       if (error) throw error;
-      return data;
+
+      // Transform flat Supabase data into nested Client interface
+      return data.map(dbClient => ({
+        id: dbClient.id,
+        name: dbClient.name,
+        email: dbClient.email,
+        phone: dbClient.phone,
+        cpf: dbClient.cpf,
+        dateOfBirth: dbClient.date_of_birth, // Supabase returns 'date_of_birth'
+        address: {
+          cep: dbClient.address_cep || '', // Provide default empty string for nullable fields
+          street: dbClient.address_street || '',
+          number: dbClient.address_number || '',
+          complement: dbClient.address_complement || undefined, // Optional
+          neighborhood: dbClient.address_neighborhood || '',
+          city: dbClient.address_city || '',
+          state: dbClient.address_state || '',
+        },
+        observations: dbClient.observations || undefined,
+        photoUrl: dbClient.photo_url || undefined,
+      }));
     },
     enabled: !!userId,
   });
@@ -742,9 +762,9 @@ const Cadastro = () => {
                           <p className="flex items-center text-sm"><Phone className="h-3 w-3 mr-1 text-muted-foreground" /> {client.phone}</p>
                         </TableCell>
                         <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
-                          <p className="flex items-center text-sm"><Home className="h-3 w-3 mr-1 text-muted-foreground" /> {client.address.street}, {client.address.number} {client.address.complement}</p>
-                          <p className="flex items-center text-sm"><MapPin className="h-3 w-3 mr-1 text-muted-foreground" /> {client.address.neighborhood}, {client.address.city} - {client.address.state}</p>
-                          <p className="text-xs text-muted-foreground ml-4">CEP: {client.address.cep}</p>
+                          <p className="flex items-center text-sm"><Home className="h-3 w-3 mr-1 text-muted-foreground" /> {client.address?.street || 'N/A'}, {client.address?.number || 'N/A'} {client.address?.complement || ''}</p>
+                          <p className="flex items-center text-sm"><MapPin className="h-3 w-3 mr-1 text-muted-foreground" /> {client.address?.neighborhood || 'N/A'}, {client.address?.city || 'N/A'} - {client.address?.state || 'N/A'}</p>
+                          <p className="text-xs text-muted-foreground ml-4">CEP: {client.address?.cep || 'N/A'}</p>
                         </TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleViewClientPets(client); }}>
