@@ -119,17 +119,17 @@ const Dashboard = () => {
     switch (item.id) {
       case "totalClients":
         return (
-          <Link to="/cadastro" key={item.id} className="block"> {/* Adicionado Link aqui */}
+          <Link to="/cadastro" key={item.id} className="block">
             <Card className={cn("bg-blue-600", baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total de Tutores</CardTitle> {/* Renomeado aqui */}
+                <CardTitle className="text-sm font-medium">Total de Tutores</CardTitle>
                 <Users className={iconClasses} />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {isLoadingClients ? "..." : totalClients.toLocaleString('pt-BR')}
                 </div>
-                <p className={textMutedClasses}>+20.1% do mês passado</p>
+                {/* <p className={textMutedClasses}>+20.1% do mês passado</p> */} {/* Linha removida */}
               </CardContent>
             </Card>
           </Link>
