@@ -54,7 +54,8 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onSubmit, onCancel, def
   });
 
   return (
-    <Form form={form} onSubmit={onSubmit} className="space-y-4">
+    <Form {...form}> {/* CORREÇÃO AQUI: Usando spread operator para 'form' */}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4"> {/* CORREÇÃO AQUI: 'form.handleSubmit' no elemento HTML 'form' */}
         <FormField
           control={form.control}
           name="title"

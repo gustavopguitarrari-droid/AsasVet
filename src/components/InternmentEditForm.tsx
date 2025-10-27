@@ -96,7 +96,8 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
   });
 
   return (
-    <Form form={form} onSubmit={onSubmit} className="space-y-4"> {/* CORREÇÃO AQUI */}
+    <Form {...form}> {/* CORREÇÃO AQUI: Usando spread operator para 'form' */}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4"> {/* CORREÇÃO AQUI: 'form.handleSubmit' no elemento HTML 'form' */}
         <FormField
           control={form.control}
           name="bayName"
@@ -346,6 +347,7 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
           </Button>
           <Button type="submit">Salvar Alterações</Button>
         </DialogFooter>
+      </form>
     </Form>
   );
 };

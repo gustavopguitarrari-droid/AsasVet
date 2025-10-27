@@ -64,7 +64,8 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Form form={form} onSubmit={onSubmit} className="space-y-6"> {/* CORREÇÃO AQUI */}
+        <Form {...form}> {/* CORREÇÃO AQUI: Usando spread operator para 'form' */}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6"> {/* CORREÇÃO AQUI: 'form.handleSubmit' no elemento HTML 'form' */}
             <FormField
               control={form.control}
               name="anamnesis"
@@ -225,8 +226,8 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "Salvando Prontuário..." : "Salvar Prontuário"}
           </Button>
-        </Form>
-      </CardContent>
+        </form>
+      </Form>
     </Card>
   );
 };

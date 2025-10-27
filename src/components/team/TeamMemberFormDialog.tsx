@@ -105,7 +105,8 @@ const TeamMemberFormDialog: React.FC<TeamMemberFormDialogProps> = ({
               : "Preencha os dados para adicionar um novo membro à sua equipe."}
           </DialogDescription>
         </DialogHeader>
-        <Form form={form} onSubmit={handleSubmit} className="space-y-4 py-4">
+        <Form {...form}> {/* CORREÇÃO AQUI: Usando spread operator para 'form' */}
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4"> {/* CORREÇÃO AQUI: 'form.handleSubmit' no elemento HTML 'form' */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 control={form.control}

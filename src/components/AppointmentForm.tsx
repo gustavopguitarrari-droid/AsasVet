@@ -25,6 +25,7 @@ import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
 import { Label } from "@/components/ui/label"; // Importar o componente Label
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
+import { User, PawPrint, Search, CalendarIcon } from "lucide-react"; // Importar ícones
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -198,7 +199,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
     : [];
 
   return (
-    <Form form={form} onSubmit={onSubmit} className="space-y-4">
+    <Form {...form}> {/* CORREÇÃO AQUI: Usando spread operator para 'form' */}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4"> {/* CORREÇÃO AQUI: 'form.handleSubmit' no elemento HTML 'form' */}
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -383,6 +385,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
           </Button>
           <Button type="submit">Adicionar na espera</Button>
         </DialogFooter>
+      </form>
     </Form>
   );
 };

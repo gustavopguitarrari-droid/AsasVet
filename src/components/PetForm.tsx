@@ -155,237 +155,237 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
   };
 
   return (
-    <> {/* Adicionado React.Fragment aqui */}
-      <Form form={form} onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex flex-col items-center space-y-4 mb-6">
-            <Avatar className="h-24 w-24 border-4 border-primary shadow-lg">
-              {previewUrl ? (
-                <AvatarImage src={previewUrl} alt="Preview" />
-              ) : (
-                <AvatarFallback className="bg-muted text-muted-foreground text-3xl font-bold">
-                  {initials || <Dog className="h-12 w-12" />} {/* Fallback para o ícone Dog se initials for vazio */}
-                </AvatarFallback>
-              )}
-            </Avatar>
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="pet-picture" className="text-center">Foto do Animal</Label>
-              <div className="flex space-x-2">
-                <Input
-                  id="pet-picture"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  ref={fileInputRef}
-                  className="flex-1"
-                />
-                <Button type="button" variant="outline" size="icon" onClick={() => setIsCameraDialogOpen(true)}>
-                  <Camera className="h-4 w-4" />
-                  <span className="sr-only">Tirar foto com câmera</span>
-                </Button>
-              </div>
-              {previewUrl && (
-                <Button
-                  variant="outline"
-                  className="w-full mt-2 text-destructive hover:bg-destructive/10"
-                  onClick={handleRemovePhoto}
-                >
-                  <XCircle className="h-4 w-4 mr-2" /> Remover Foto
-                </Button>
-              )}
+    <Form {...form}> {/* CORREÇÃO AQUI: Usando spread operator para 'form' */}
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4"> {/* CORREÇÃO AQUI: 'form.handleSubmit' no elemento HTML 'form' */}
+        <div className="flex flex-col items-center space-y-4 mb-6">
+          <Avatar className="h-24 w-24 border-4 border-primary shadow-lg">
+            {previewUrl ? (
+              <AvatarImage src={previewUrl} alt="Preview" />
+            ) : (
+              <AvatarFallback className="bg-muted text-muted-foreground text-3xl font-bold">
+                {initials || <Dog className="h-12 w-12" />} {/* Fallback para o ícone Dog se initials for vazio */}
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="pet-picture" className="text-center">Foto do Animal</Label>
+            <div className="flex space-x-2">
+              <Input
+                id="pet-picture"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                ref={fileInputRef}
+                className="flex-1"
+              />
+              <Button type="button" variant="outline" size="icon" onClick={() => setIsCameraDialogOpen(true)}>
+                <Camera className="h-4 w-4" />
+                <span className="sr-only">Tirar foto com câmera</span>
+              </Button>
             </div>
+            {previewUrl && (
+              <Button
+                variant="outline"
+                className="w-full mt-2 text-destructive hover:bg-destructive/10"
+                onClick={handleRemovePhoto}
+              >
+                <XCircle className="h-4 w-4 mr-2" /> Remover Foto
+              </Button>
+            )}
           </div>
+        </div>
 
+        <FormField
+          control={form.control}
+          name="ownerId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                {defaultOwnerName ? `Tutor: ${defaultOwnerName}` : "Tutor"}
+              </FormLabel>
+              <Select
+                onValueChange={field.onChange}
+                defaultValue={field.value}
+                // Desabilita se defaultOwnerId for fornecido
+                disabled={!!defaultOwnerId} 
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o tutor" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {allClients.map((client) => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.name} (CPF: {client.cpf})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nome do Animal</FormLabel>
+              <FormControl>
+                <Input placeholder="Ex: Rex" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="ownerId"
+            name="species"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  {defaultOwnerName ? `Tutor: ${defaultOwnerName}` : "Tutor"}
-                </FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  // Desabilita se defaultOwnerId for fornecido
-                  disabled={!!defaultOwnerId} 
-                >
+                <FormLabel>Espécie</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione o tutor" />
+                      <SelectValue placeholder="Selecione a espécie" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {allClients.map((client) => (
-                      <SelectItem key={client.id} value={client.id}>
-                        {client.name} (CPF: {client.cpf})
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="Cachorro">Cachorro</SelectItem>
+                    <SelectItem value="Gato">Gato</SelectItem>
+                    <SelectItem value="Pássaro">Pássaro</SelectItem>
+                    <SelectItem value="Roedor">Roedor</SelectItem>
+                    <SelectItem value="Peixe">Peixe</SelectItem>
+                    <SelectItem value="Outros">Outros</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
-            name="name"
+            name="breed"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nome do Animal</FormLabel>
+                <FormLabel>Raça</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: Rex" {...field} />
+                  <Input placeholder="Ex: Labrador" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+        </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="species"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Espécie</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione a espécie" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Cachorro">Cachorro</SelectItem>
-                      <SelectItem value="Gato">Gato</SelectItem>
-                      <SelectItem value="Pássaro">Pássaro</SelectItem>
-                      <SelectItem value="Roedor">Roedor</SelectItem>
-                      <SelectItem value="Peixe">Peixe</SelectItem>
-                      <SelectItem value="Outros">Outros</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="breed"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Raça</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Labrador" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="age"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Idade</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: 2 anos, 6 meses" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="gender"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Sexo</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o sexo" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Macho">Macho</SelectItem>
-                      <SelectItem value="Fêmea">Fêmea</SelectItem>
-                      <SelectItem value="Desconhecido">Desconhecido</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="color"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Cor</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Dourado, Preto e Branco" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="weight"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Peso (KG)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.1"
-                      min="0.1"
-                      placeholder="Ex: 15.5"
-                      {...field}
-                      value={field.value === undefined ? "" : field.value} // Garante que o input seja controlado
-                      onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
+        <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="observations"
+            name="age"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Observações (Opcional)</FormLabel>
+                <FormLabel>Idade</FormLabel>
                 <FormControl>
-                  <Textarea placeholder="Informações adicionais sobre o animal..." {...field} />
+                  <Input placeholder="Ex: 2 anos, 6 meses" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Sexo</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o sexo" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Macho">Macho</SelectItem>
+                    <SelectItem value="Fêmea">Fêmea</SelectItem>
+                    <SelectItem value="Desconhecido">Desconhecido</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-          <DialogFooter className="mt-6">
-            <Button variant="outline" onClick={onCancel}>
-              Cancelar
-            </Button>
-            <Button type="submit">
-              <PlusCircle className="mr-2 h-4 w-4" /> {initialData ? "Salvar Alterações" : "Adicionar Animal"}
-            </Button>
-          </DialogFooter>
-        </Form>
-        <CameraCaptureDialog
-          isOpen={isCameraDialogOpen}
-          onClose={() => setIsCameraDialogOpen(false)}
-          onCapture={handleCapturePhoto}
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="color"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Cor</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: Dourado, Preto e Branco" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="weight"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Peso (KG)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0.1"
+                    placeholder="Ex: 15.5"
+                    {...field}
+                    value={field.value === undefined ? "" : field.value} // Garante que o input seja controlado
+                    onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="observations"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Observações (Opcional)</FormLabel>
+              <FormControl>
+                <Textarea placeholder="Informações adicionais sobre o animal..." {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
-    </> {/* Fechado React.Fragment aqui */}
+
+        <DialogFooter className="mt-6">
+          <Button variant="outline" onClick={onCancel}>
+            Cancelar
+          </Button>
+          <Button type="submit">
+            <PlusCircle className="mr-2 h-4 w-4" /> {initialData ? "Salvar Alterações" : "Adicionar Animal"}
+          </Button>
+        </DialogFooter>
+      </form>
+      <CameraCaptureDialog
+        isOpen={isCameraDialogOpen}
+        onClose={() => setIsCameraDialogOpen(false)}
+        onCapture={handleCapturePhoto}
+      />
+    </Form>
   );
 };
 

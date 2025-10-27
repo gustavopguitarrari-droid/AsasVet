@@ -74,7 +74,8 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
   });
 
   return (
-    <Form form={form} onSubmit={onSubmit} className="space-y-4"> {/* CORREÇÃO AQUI */}
+    <Form {...form}> {/* CORREÇÃO AQUI: Usando spread operator para 'form' */}
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4"> {/* CORREÇÃO AQUI: 'form.handleSubmit' no elemento HTML 'form' */}
         <FormField
           control={form.control}
           name="bayName"
@@ -276,6 +277,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
           </Button>
           <Button type="submit">Internar Paciente</Button>
         </DialogFooter>
+      </form>
     </Form>
   );
 };
