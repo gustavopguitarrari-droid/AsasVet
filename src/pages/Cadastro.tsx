@@ -29,6 +29,7 @@ import { uploadImageToSupabase, deleteImageFromSupabase } from "@/utils/supabase
 import ClientDetailsDialog from "@/components/ClientDetailsDialog"; // Importar o novo ClientDetailsDialog
 import { useLocation } from "react-router-dom"; // Importar useLocation
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // NOVO: Importar Tooltip
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
@@ -737,12 +738,13 @@ const Cadastro = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[60px]">Foto</TableHead> {/* Nova TableHead para a foto */}
                   <TableHead>Nome</TableHead>
                   <TableHead>CPF</TableHead>
                   <TableHead>Nascimento</TableHead>
                   <TableHead>Contato</TableHead>
-                  <TableHead>Endereço</TableHead> {/* Nova coluna */}
-                  <TableHead>Animais</TableHead> {/* Nova coluna */}
+                  <TableHead>Endereço</TableHead>
+                  <TableHead>Animais</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -752,8 +754,24 @@ const Cadastro = () => {
                     const petsOfClient = pets.filter(pet => {
                       return pet.ownerId === client.id;
                     });
+                    // Calcular as iniciais de forma mais robusta
+                    const firstNameInitial = client.name ? client.name.charAt(0) : '';
+                    const lastNameInitial = client.name.split(' ').pop()?.charAt(0) || '';
+                    const initials = `${firstNameInitial}${lastNameInitial}`.toUpperCase();
+
                     return (
                       <TableRow key={client.id} className="cursor-pointer hover:bg-muted/50">
+                        <TableCell className="w-[60px]" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
+                          <Avatar className="h-9 w-9">
+                            {client.photoUrl ? (
+                              <AvatarImage src={client.photoUrl} alt={client.name} />
+                            ) : (
+                              <AvatarFallback className="bg-muted text-muted-foreground text-xs font-bold">
+                                {initials}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                        </TableCell>
                         <TableCell className="font-medium" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>{client.name}</TableCell>
                         <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>{client.cpf}</TableCell>
                         <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
@@ -771,13 +789,13 @@ const Cadastro = () => {
                             <span>{client.phone}</span>
                           </div>
                         </TableCell>
-                        <TableCell> {/* Célula para o botão de endereço */}
+                        <TableCell>
                           <Tooltip delayDuration={0}>
                             <TooltipTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="icon"
-                                onClick={(e) => e.stopPropagation()} // Impede que o clique na linha seja acionado
+                                onClick={(e) => e.stopPropagation()}
                                 className="flex items-center gap-1"
                               >
                                 <MapPin className="h-4 w-4" />
@@ -792,7 +810,7 @@ const Cadastro = () => {
                             </TooltipContent>
                           </Tooltip>
                         </TableCell>
-                        <TableCell className="text-center"> {/* Célula para Animais */}
+                        <TableCell className="text-center">
                           {petsOfClient.length > 0 ? (
                             <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleViewClientPets(client); }}>
                               {petsOfClient.length} Animal{petsOfClient.length > 1 ? 's' : ''}
@@ -819,7 +837,7 @@ const Cadastro = () => {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center">
+                    <TableCell colSpan={8} className="h-24 text-center">
                       Nenhum tutor encontrado.
                     </TableCell>
                   </TableRow>
