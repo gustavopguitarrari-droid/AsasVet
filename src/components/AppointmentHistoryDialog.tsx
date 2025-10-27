@@ -256,7 +256,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center text-muted-foreground"> {/* Ajustado colspan */}
+                    <TableCell colSpan={7} className="h-24 text-center text-muted-foreground"> {/* CORRIGIDO: colSpan para 7 */}
                       Nenhuma consulta cancelada encontrada no histórico.
                     </TableCell>
                   </TableRow>
