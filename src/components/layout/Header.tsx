@@ -20,7 +20,7 @@ const Header = () => {
       case "/cadastro": // Novo título para Cadastro
         return "Cadastro";
       case "/consultas":
-        return "Consultas";
+        return ""; // Retorna vazio, a página de Consultas agora gerencia seu próprio título
       case "/medical-records":
         return "Agenda";
       case "/financeiro":
