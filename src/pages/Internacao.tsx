@@ -11,6 +11,7 @@ import ExecutionMapTable from "@/components/ExecutionMapTable";
 import { format, isSameDay, parseISO, isBefore, isAfter, isEqual, addDays, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
@@ -87,8 +88,8 @@ const statusBadgeColorMap: Record<InternedPatient["status"], string> = {
   "Em Observação": "bg-blue-500",
   "Estável": "bg-green-500",
   "Crítico": "bg-red-500",
-  "Alta": "bg-gray-500",
-  "Óbito": "bg-black",
+  "Alta": "bg-green-500",
+  "Óbito": "bg-red-500",
 };
 
 const Internacao = () => {
@@ -100,6 +101,7 @@ const Internacao = () => {
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<InternedPatient | null>(null);
+  const [activeTab, setActiveTab] = useState<string>("pacientes-internados");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [patientSearchTerm, setPatientSearchTerm] = useState<string>("");
 
@@ -494,6 +496,17 @@ const Internacao = () => {
     updateActionsCompletionMutation.mutate(updatedActions);
   };
 
+  const getPageTitle = () => {
+    switch (activeTab) {
+      case "pacientes-internados":
+        return "Pacientes Internados";
+      case "mapa-execucao":
+        return "Mapa de Execução";
+      default:
+        return "Internação";
+    }
+  };
+
   if (isLoadingPatients || isLoadingHistory || isLoadingActions) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -513,130 +526,143 @@ const Internacao = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Internação</h2> {/* Título fixo */}
+        <h2 className="text-3xl font-bold">{getPageTitle()}</h2>
         <div className="flex space-x-2">
-          <InternmentHistoryDialog
-            isOpen={isHistoryDialogOpen}
-            onClose={() => setIsHistoryDialogOpen(false)}
-            historyPatients={historyPatients}
-            onClearHistory={() => clearHistoryMutation.mutate()}
-            isClearingHistory={clearHistoryMutation.isPending}
-          />
-          <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
-            <History className="mr-2 h-4 w-4" /> Ver Histórico
-          </Button>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="font-bold">
-                <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
-              <DialogHeader>
-                <DialogTitle>Internar Novo Paciente</DialogTitle>
-              </DialogHeader>
-              <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-
-      {/* Conteúdo da seção Pacientes Internados */}
-      <div className="mt-8">
-        <div className="flex flex-wrap gap-4 mb-6">
-          {Object.entries(riskColorMap).map(([risk, colorClass]) => (
-            <div key={risk} className="flex items-center space-x-2">
-              <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
-              <span className="text-sm text-muted-foreground">{risk}</span>
-            </div>
-          ))}
-        </div>
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar pacientes internados..."
-            className="pl-9"
-            value={patientSearchTerm}
-            onChange={(e) => setPatientSearchTerm(e.target.value)}
-          />
-        </div>
-        {filteredInternedPatients.length > 0 ? (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {filteredInternedPatients.map((patient) => {
-              const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
-              const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
-              const riskStripeColorClass = riskColorMap[patient.risk as RiskLevel];
-
-              return (
-                <li
-                  key={patient.id}
-                  className="relative p-3 border rounded-md bg-white dark:bg-gray-800 shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => handleCardClick(patient)}
-                >
-                  <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
-
-                  <p className="font-bold text-lg flex items-center">
-                    <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
-                    {patient.pet_name}
-                  </p>
-                  <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.owner_name}</p>
-                  <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
-                  <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
-                  <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
-                  <p className="text-base text-muted-foreground"><span className="font-bold">Entrada:</span> {patient.admission_date}</p>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p className="text-muted-foreground">Nenhum paciente internado no momento.</p>
-        )}
-      </div>
-
-      {/* Conteúdo da seção Mapa de Execução */}
-      <div className="space-y-4 mt-8">
-        <div className="flex items-center space-x-2 justify-end">
-          <Button variant="default" size="icon" onClick={handlePreviousDay}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[280px] justify-start text-left font-normal",
-                  !selectedDate && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={selectedDate}
-                onSelect={(day) => setSelectedDate(day || new Date())}
-                initialFocus
-                locale={ptBR}
+          {activeTab === "pacientes-internados" && (
+            <>
+              <InternmentHistoryDialog
+                isOpen={isHistoryDialogOpen}
+                onClose={() => setIsHistoryDialogOpen(false)}
+                historyPatients={historyPatients}
+                onClearHistory={() => clearHistoryMutation.mutate()}
+                isClearingHistory={clearHistoryMutation.isPending}
               />
-            </PopoverContent>
-          </Popover>
-          <Button variant="default" size="icon" onClick={handleNextDay}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-        <ExecutionMapLegend />
-        <div className="p-4 border rounded-md bg-background space-y-4 mt-4">
-          <ExecutionMapTable
-            patients={patientsForExecutionMap}
-            selectedDate={selectedDate}
-            patientActions={patientActions}
-            onAddActionClick={openAddEditActionDialog}
-            onOpenConfirmActionsDialog={handleOpenConfirmActionsDialog}
-          />
+              <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
+                <History className="mr-2 h-4 w-4" /> Ver Histórico
+              </Button>
+              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="font-bold">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
+                  <DialogHeader>
+                    <DialogTitle>Internar Novo Paciente</DialogTitle>
+                  </DialogHeader>
+                  <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            </>
+          )}
+          {activeTab === "mapa-execucao" && (
+            <div className="flex items-center space-x-2">
+              <Button variant="default" size="icon" onClick={handlePreviousDay}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[280px] justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(day) => setSelectedDate(day || new Date())}
+                    initialFocus
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+              <Button variant="default" size="icon" onClick={handleNextDay}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+          <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
+          <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pacientes-internados" className="mt-4">
+          <div className="mt-8">
+            <div className="flex flex-wrap gap-4 mb-6">
+              {Object.entries(riskColorMap).map(([risk, colorClass]) => (
+                <div key={risk} className="flex items-center space-x-2">
+                  <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
+                  <span className="text-sm text-muted-foreground">{risk}</span>
+                </div>
+              ))}
+            </div>
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar pacientes internados..."
+                className="pl-9"
+                value={patientSearchTerm}
+                onChange={(e) => setPatientSearchTerm(e.target.value)}
+              />
+            </div>
+            {filteredInternedPatients.length > 0 ? (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {filteredInternedPatients.map((patient) => {
+                  const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
+                  const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
+                  const riskStripeColorClass = riskColorMap[patient.risk as RiskLevel];
+
+                  return (
+                    <li
+                      key={patient.id}
+                      className="relative p-3 border rounded-md bg-white dark:bg-gray-800 shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                      onClick={() => handleCardClick(patient)}
+                    >
+                      <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
+
+                      <p className="font-bold text-lg flex items-center">
+                        <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
+                        {patient.pet_name}
+                      </p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.owner_name}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Entrada:</span> {patient.admission_date}</p>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground">Nenhum paciente internado no momento.</p>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="mapa-execucao" className="mt-4">
+          <ExecutionMapLegend />
+          <div className="p-4 border rounded-md bg-background space-y-4 mt-4">
+            <ExecutionMapTable
+              patients={patientsForExecutionMap}
+              selectedDate={selectedDate}
+              patientActions={patientActions}
+              onAddActionClick={openAddEditActionDialog}
+              onOpenConfirmActionsDialog={handleOpenConfirmActionsDialog}
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
 
       <InternmentDetailsDialog
         patient={selectedPatient}
