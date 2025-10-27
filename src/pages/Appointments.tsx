@@ -363,7 +363,14 @@ const Appointments = () => {
       setPdfAppointmentData({ appointment, client, pet });
       setIsPdfDetailsDialogOpen(true);
     } else {
-      showError("Não foi possível carregar os detalhes completos do tutor ou animal para o PDF. Verifique os logs para mais informações.");
+      let errorMessage = "Não foi possível carregar os detalhes completos para o PDF.";
+      if (!client) {
+        errorMessage += ` Tutor com ID '${appointment.client_id}' não encontrado.`;
+      }
+      if (!pet) {
+        errorMessage += ` Animal com ID '${appointment.pet_id}' não encontrado.`;
+      }
+      showError(errorMessage + " Verifique os logs para mais informações.");
     }
   };
 
