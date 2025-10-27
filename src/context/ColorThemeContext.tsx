@@ -14,7 +14,7 @@ interface ColorThemeContextType {
 
 const ColorThemeContext = createContext<ColorThemeContextType | undefined>(undefined);
 
-export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
+export const ColorThemeProvider = ({ children }: { ReactNode }) => {
   const { user: appUser, setUser: setAppUser } = useUser(); // Obter o usuário e o setter do UserContext
   const [colorTheme, setColorThemeState] = useState<ColorTheme>('default');
   const [isInitialLoad, setIsInitialLoad] = useState(true); // Para controlar a aplicação inicial do tema
@@ -43,6 +43,12 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
     // Salvar no Supabase APENAS se o usuário estiver logado e não for o carregamento inicial
     if (appUser?.id && !isInitialLoad) {
       const saveThemeToSupabase = async () => {
+        // Verificação adicional para garantir que appUser.id ainda está disponível
+        if (!appUser?.id) {
+          console.warn("ColorThemeContext: Tentativa de salvar tema, mas appUser.id está ausente.");
+          return;
+        }
+
         try {
           console.log("ColorThemeContext: Attempting to save theme. User ID:", appUser.id, "Theme:", colorTheme); // Added detailed log
           const { error } = await supabase
