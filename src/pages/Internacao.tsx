@@ -23,7 +23,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
-import { usePageTitle } from "@/context/PageTitleContext"; // NOVO: Importar usePageTitle
+import { usePageTitle } from "@/context/PageTitleContext";
+import CustomCalendarCaption from "@/components/CustomCalendarCaption"; // Importar o novo componente
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -641,9 +642,10 @@ const Internacao = () => {
                     onSelect={(day) => setSelectedDate(day || new Date())}
                     initialFocus
                     locale={ptBR}
-                    captionLayout="dropdown-buttons" // Adicionado para permitir seleção de mês e ano
-                    fromYear={new Date().getFullYear() - 10} // Ex: 10 anos para trás
-                    toYear={new Date().getFullYear() + 10} // Ex: 10 anos para frente
+                    components={{ Caption: CustomCalendarCaption }} // Usar o componente de caption personalizado
+                    // Removido: captionLayout="dropdown-buttons"
+                    // Removido: fromYear={new Date().getFullYear() - 10}
+                    // Removido: toYear={new Date().getFullYear() + 10}
                   />
                 </PopoverContent>
               </Popover>
