@@ -8,10 +8,11 @@ import { MedicalRecordFormValues } from '@/components/consultation/MedicalRecord
 interface MedicalRecordPdfData {
   appointment: Appointment;
   medicalRecord: MedicalRecordFormValues;
-  logoUrl?: string | null; // NOVO: URL do logo para incluir no PDF
+  logoUrl?: string | null; // URL do logo para incluir no PDF
+  filename?: string; // NOVO: Nome do arquivo para download
 }
 
-export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, logoUrl }: MedicalRecordPdfData) => {
+export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, logoUrl, filename }: MedicalRecordPdfData) => {
   const doc = new jsPDF('p', 'mm', 'a4');
   const margin = 15; // Aumentar margem
   let yPos = margin;
@@ -48,19 +49,19 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
     doc.setFontSize(10);
     doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, 210 - margin, headerY, { align: 'right' });
     
-    // NOVO: Adicionar logo se disponível
+    // Adicionar logo se disponível
     if (logoUrl) {
-      console.log("generateMedicalRecordPdf: logoUrl received:", logoUrl); // Adicionado log aqui
+      console.log("generateMedicalRecordPdf: logoUrl received:", logoUrl);
       try {
         const img = new Image();
         img.src = logoUrl;
         await new Promise((resolve, reject) => {
           img.onload = () => {
-            console.log("generateMedicalRecordPdf: Image loaded successfully."); // Adicionado log aqui
+            console.log("generateMedicalRecordPdf: Image loaded successfully.");
             resolve(null);
           };
           img.onerror = (e) => {
-            console.error("generateMedicalRecordPdf: Error loading image:", e); // Adicionado log aqui
+            console.error("generateMedicalRecordPdf: Error loading image:", e);
             reject(e);
           };
         });
@@ -70,13 +71,13 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
         const imgX = 210 - margin - imgWidth; // Alinhar à direita
         const imgY = headerY - 5; // Ajustar posição vertical para ficar no topo do cabeçalho
         doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
-        console.log("generateMedicalRecordPdf: Image added to PDF."); // Adicionado log aqui
+        console.log("generateMedicalRecordPdf: Image added to PDF.");
       } catch (e) {
         console.error("Erro ao carregar ou adicionar logo ao PDF:", e);
         // Continua a gerar o PDF sem o logo se houver erro
       }
     } else {
-      console.log("generateMedicalRecordPdf: No logoUrl provided, skipping logo addition."); // Adicionado log aqui
+      console.log("generateMedicalRecordPdf: No logoUrl provided, skipping logo addition.");
     }
 
     yPos = headerY + lineHeight * 1.5;
@@ -87,7 +88,7 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
 
   // Função para adicionar rodapé
   const addFooter = () => {
-    const pageCount = (doc.internal as any).getNumberOfPages(); // CORREÇÃO AQUI: Cast para any
+    const pageCount = (doc.internal as any).getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(8);
@@ -204,5 +205,5 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
 
   addFooter();
 
-  doc.save(`Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
+  doc.save(filename || `Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
 };

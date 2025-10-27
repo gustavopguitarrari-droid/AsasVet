@@ -41,6 +41,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf";
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
+import PdfDownloadDialog from "./PdfDownloadDialog"; // NOVO: Importar o diálogo de download
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -100,9 +101,14 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>("");
   const queryClient = useQueryClient();
 
+  // NOVO: Estados para o diálogo de download de PDF
+  const [isPdfDownloadDialogOpen, setIsPdfDownloadDialogOpen] = useState(false);
+  const [pdfDownloadAppointment, setPdfDownloadAppointment] = useState<Appointment | null>(null);
+  const [defaultPdfFilename, setDefaultPdfFilename] = useState("");
+
   // Mutação para buscar o prontuário e gerar o PDF
   const fetchAndGeneratePdfMutation = useMutation({
-    mutationFn: async (appointment: Appointment) => {
+    mutationFn: async ({ appointment, filename }: { appointment: Appointment, filename: string }) => {
       const { data: medicalRecordData, error } = await supabase
         .from('medical_records')
         .select('*')
@@ -124,13 +130,13 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       // Mapeia os dados do prontuário para o formato do formulário para a função PDF
       const medicalRecordForPdf: MedicalRecordFormValues = {
         anamnesis: medicalRecordData.anamnesis || undefined,
-        physicalExam: medicalRecordData.physical_exam || undefined,
+        physical_exam: medicalRecordData.physical_exam || undefined,
         diagnosis: medicalRecordData.diagnosis || undefined,
         treatment: medicalRecordData.treatment || undefined,
         prescriptions: medicalRecordData.prescriptions || [],
       };
 
-      await generateMedicalRecordPdf({ appointment, medicalRecord: medicalRecordForPdf });
+      await generateMedicalRecordPdf({ appointment, medicalRecord: medicalRecordForPdf, filename }); // NOVO: Passar filename
       return true;
     },
     onSuccess: () => {
@@ -167,6 +173,21 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
     return [hours, minutes, seconds]
       .map(v => v < 10 ? "0" + v : v)
       .join(":");
+  };
+
+  // NOVO: Handler para abrir o diálogo de download de PDF
+  const handleOpenPdfDownloadDialog = (appointment: Appointment) => {
+    setPdfDownloadAppointment(appointment);
+    const defaultName = `Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`;
+    setDefaultPdfFilename(defaultName);
+    setIsPdfDownloadDialogOpen(true);
+  };
+
+  // NOVO: Handler para confirmar o download do PDF
+  const handleConfirmPdfDownload = (filename: string) => {
+    if (pdfDownloadAppointment) {
+      fetchAndGeneratePdfMutation.mutate({ appointment: pdfDownloadAppointment, filename });
+    }
   };
 
   return (
@@ -258,7 +279,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => fetchAndGeneratePdfMutation.mutate(appointment)}
+                            onClick={() => handleOpenPdfDownloadDialog(appointment)} // NOVO: Abre o diálogo de download
                             disabled={fetchAndGeneratePdfMutation.isPending}
                           >
                             {fetchAndGeneratePdfMutation.isPending ? (
@@ -310,6 +331,14 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
           </AlertDialog>
         </DialogFooter>
       </DialogContent>
+
+      {/* NOVO: Renderiza o diálogo de download de PDF */}
+      <PdfDownloadDialog
+        isOpen={isPdfDownloadDialogOpen}
+        onClose={() => setIsPdfDownloadDialogOpen(false)}
+        defaultFilename={defaultPdfFilename}
+        onConfirmDownload={handleConfirmPdfDownload}
+      />
     </Dialog>
   );
 };
