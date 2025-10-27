@@ -611,46 +611,6 @@ const Internacao = () => {
           ) : (
             <p className="text-muted-foreground">Nenhum paciente internado no momento.</p>
           )}
-
-          {/* Nova seção para a legenda de risco e botões */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-8 p-4 border-t pt-4">
-            {/* Legenda de Risco */}
-            <div className="flex flex-wrap gap-4">
-              {Object.entries(riskColorMap).map(([risk, colorClass]) => (
-                <div key={risk} className="flex items-center space-x-2">
-                  <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
-                  <span className="text-sm text-muted-foreground">{risk}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Botões de Ação */}
-            <div className="flex space-x-2">
-              <InternmentHistoryDialog
-                isOpen={isHistoryDialogOpen}
-                onClose={() => setIsHistoryDialogOpen(false)}
-                historyPatients={historyPatients}
-                onClearHistory={() => clearHistoryMutation.mutate()}
-                isClearingHistory={clearHistoryMutation.isPending}
-              />
-              <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
-                <History className="mr-2 h-4 w-4" /> Ver Histórico
-              </Button>
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="font-bold">
-                    <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
-                  <DialogHeader>
-                    <DialogTitle>Internar Novo Paciente</DialogTitle>
-                  </DialogHeader>
-                  <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
         </TabsContent>
 
         <TabsContent value="mapa-execucao" className="mt-4">
@@ -666,6 +626,46 @@ const Internacao = () => {
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Nova seção para a legenda de risco e botões, fora do TabsContent */}
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-8 p-4 border-t pt-4">
+        {/* Legenda de Risco */}
+        <div className="flex flex-wrap gap-4">
+          {Object.entries(riskColorMap).map(([risk, colorClass]) => (
+            <div key={risk} className="flex items-center space-x-2">
+              <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
+              <span className="text-sm text-muted-foreground">{risk}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Botões de Ação */}
+        <div className="flex space-x-2">
+          <InternmentHistoryDialog
+            isOpen={isHistoryDialogOpen}
+            onClose={() => setIsHistoryDialogOpen(false)}
+            historyPatients={historyPatients}
+            onClearHistory={() => clearHistoryMutation.mutate()}
+            isClearingHistory={clearHistoryMutation.isPending}
+          />
+          <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
+            <History className="mr-2 h-4 w-4" /> Ver Histórico
+          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="font-bold">
+                <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
+              <DialogHeader>
+                <DialogTitle>Internar Novo Paciente</DialogTitle>
+              </DialogHeader>
+              <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
 
       <InternmentDetailsDialog
         patient={selectedPatient}
