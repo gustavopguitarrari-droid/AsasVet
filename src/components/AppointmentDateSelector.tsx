@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { AppointmentFormValues } from "./AppointmentForm"; // Importar o tipo do formulário pai
+import { AppointmentFormValues } from "./AppointmentForm";
 
 const AppointmentDateSelector: React.FC = () => {
   const { control, watch, setValue } = useFormContext<AppointmentFormValues>();
@@ -48,13 +48,13 @@ const AppointmentDateSelector: React.FC = () => {
             <FormControl>
               <RadioGroupItem value="today" />
             </FormControl>
-            <FormLabel className="font-normal">Hoje (Em espera)</FormLabel>
+            <label htmlFor="today" className="font-normal cursor-pointer">Hoje (Em espera)</label> {/* CORREÇÃO AQUI */}
           </FormItem>
           <FormItem className="flex items-center space-x-3 space-y-0">
             <FormControl>
               <RadioGroupItem value="specific" />
             </FormControl>
-            <FormLabel className="font-normal">Agendar para outra data específica</FormLabel>
+            <label htmlFor="specific" className="font-normal cursor-pointer">Agendar para outra data específica</label> {/* CORREÇÃO AQUI */}
           </FormItem>
         </RadioGroup>
       </FormControl>

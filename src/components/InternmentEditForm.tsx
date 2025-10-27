@@ -26,7 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter } from "@/components/ui/dialog";
 import RiskSelector from "./RiskSelector";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { InternedPatient } from "@/pages/Internacao"; // Importar a interface atualizada
+import { InternedPatient } from "@/pages/Internacao";
 
 // Mock de veterinários (reutilizando do AppointmentForm)
 const mockVeterinarians = [
@@ -96,7 +96,7 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
   });
 
   return (
-    <Form {...form}>
+    <Form {...form} onSubmit={onSubmit}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
@@ -309,31 +309,31 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
                     <FormControl>
                       <RadioGroupItem value="Em Observação" />
                     </FormControl>
-                    <FormLabel className="font-normal">Em Observação</FormLabel>
+                    <label htmlFor="Em Observação" className="font-normal cursor-pointer">Em Observação</label> {/* CORREÇÃO AQUI */}
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
                       <RadioGroupItem value="Estável" />
                     </FormControl>
-                    <FormLabel className="font-normal">Estável</FormLabel>
+                    <label htmlFor="Estável" className="font-normal cursor-pointer">Estável</label> {/* CORREÇÃO AQUI */}
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
                       <RadioGroupItem value="Crítico" />
                     </FormControl>
-                    <FormLabel className="font-normal">Crítico</FormLabel>
+                    <label htmlFor="Crítico" className="font-normal cursor-pointer">Crítico</label> {/* CORREÇÃO AQUI */}
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
                       <RadioGroupItem value="Alta" />
                     </FormControl>
-                    <FormLabel className="font-normal">Alta</FormLabel>
+                    <label htmlFor="Alta" className="font-normal cursor-pointer">Alta</label> {/* CORREÇÃO AQUI */}
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
                       <RadioGroupItem value="Óbito" />
                     </FormControl>
-                    <FormLabel className="font-normal">Óbito</FormLabel>
+                    <label htmlFor="Óbito" className="font-normal cursor-pointer">Óbito</label> {/* CORREÇÃO AQUI */}
                   </FormItem>
                 </RadioGroup>
               </FormControl>
