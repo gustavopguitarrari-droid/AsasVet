@@ -50,12 +50,19 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
     
     // NOVO: Adicionar logo se disponível
     if (logoUrl) {
+      console.log("generateMedicalRecordPdf: logoUrl received:", logoUrl); // Adicionado log aqui
       try {
         const img = new Image();
         img.src = logoUrl;
         await new Promise((resolve, reject) => {
-          img.onload = resolve;
-          img.onerror = reject;
+          img.onload = () => {
+            console.log("generateMedicalRecordPdf: Image loaded successfully."); // Adicionado log aqui
+            resolve(null);
+          };
+          img.onerror = (e) => {
+            console.error("generateMedicalRecordPdf: Error loading image:", e); // Adicionado log aqui
+            reject(e);
+          };
         });
 
         const imgWidth = 30; // Largura fixa para o logo
@@ -63,10 +70,13 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
         const imgX = 210 - margin - imgWidth; // Alinhar à direita
         const imgY = headerY - 5; // Ajustar posição vertical para ficar no topo do cabeçalho
         doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
+        console.log("generateMedicalRecordPdf: Image added to PDF."); // Adicionado log aqui
       } catch (e) {
         console.error("Erro ao carregar ou adicionar logo ao PDF:", e);
         // Continua a gerar o PDF sem o logo se houver erro
       }
+    } else {
+      console.log("generateMedicalRecordPdf: No logoUrl provided, skipping logo addition."); // Adicionado log aqui
     }
 
     yPos = headerY + lineHeight * 1.5;

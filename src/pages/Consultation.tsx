@@ -168,6 +168,7 @@ const ConsultationPage: React.FC = () => {
 
   const handleGeneratePdf = async () => {
     if (appointment && medicalRecord) {
+      console.log("ConsultationPage: Generating PDF. appUser?.logoUrl:", appUser?.logoUrl); // Adicionado log aqui
       try {
         await generateMedicalRecordPdf({ appointment, medicalRecord: initialMedicalRecordData, logoUrl: appUser?.logoUrl }); // NOVO: Passar logoUrl
         showSuccess("PDF do prontuário gerado com sucesso!");
