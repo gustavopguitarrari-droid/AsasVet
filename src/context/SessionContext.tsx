@@ -15,7 +15,6 @@ interface UserProfile {
   birthday?: string;
   registeredTime: string;
   gender?: string;
-  colorTheme?: string; // Adicionado aqui também para consistência
 }
 
 interface SessionContextType {
@@ -77,7 +76,6 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         birthday: profileData?.birthday || userMetadata.birthday?.toString() || undefined,
         gender: profileData?.gender || userMetadata.gender?.toString() || undefined,
         registeredTime: profileData?.registered_time || supabaseUser.created_at,
-        colorTheme: profileData?.color_theme || 'default', // NOVO: Carrega o tema de cor
       };
       console.log('SessionContext: Constructed profileToSet for UserContext:', profileToSet);
       setAppUser(profileToSet);
@@ -91,57 +89,30 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
   };
 
   useEffect(() => {
-    let isMounted = true;
-    let initialLoadCompleted = false; // Flag to track if initial session load is done
-
-    const loadAndSetSession = async () => {
-      console.log('SessionContext: [INIT] Attempting to load initial session via getSession()...');
-      const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
-
-      if (sessionError) {
-        console.error('SessionContext: Error loading initial session:', sessionError);
-      }
-
-      if (!isMounted) return;
-
-      setSession(initialSession);
-      setUserState(initialSession?.user || null);
-      console.log('SessionContext: Initial session loaded. Calling fetchProfileAndSetAppUser...');
-      await fetchProfileAndSetAppUser(initialSession?.user || null);
-
-      if (isMounted) {
-        setIsLoading(false);
-        initialLoadCompleted = true; // Mark initial load as complete
-        console.log('SessionContext: [END_LOADING] isLoading set to false after initial session load.');
-      }
-    };
-
-    loadAndSetSession(); // Execute once on mount for initial session
+    let isMounted = true; // Flag to prevent state updates on unmounted component
 
     const handleAuthStateChange = async (event: string, currentSession: Session | null) => {
       console.log('SessionContext: [AUTH_STATE_CHANGE] Event:', event, 'Session present:', !!currentSession, 'isMounted:', isMounted);
-      if (!isMounted) return;
+      if (!isMounted) return; // Prevent state update if component unmounted
 
-      // Only process if initial load is complete OR if it's a SIGNED_OUT event
-      // This prevents double-processing INITIAL_SESSION if loadAndSetSession already handled it
-      // And ensures SIGNED_OUT is always handled.
-      if (initialLoadCompleted || event === 'SIGNED_OUT' || event === 'SIGNED_IN' || event === 'USER_UPDATED') {
-        setSession(currentSession);
-        setUserState(currentSession?.user || null);
-        console.log('SessionContext: Calling fetchProfileAndSetAppUser from auth state change listener...');
-        await fetchProfileAndSetAppUser(currentSession?.user || null);
-        
-        // Ensure isLoading is false, especially if this is the first event after a very fast initial render
-        if (isMounted && isLoading) {
-          setIsLoading(false);
-          console.log('SessionContext: [END_LOADING] isLoading set to false after auth state change event.');
-        }
+      setSession(currentSession);
+      setUserState(currentSession?.user || null);
+      console.log('SessionContext: Calling fetchProfileAndSetAppUser...');
+      await fetchProfileAndSetAppUser(currentSession?.user || null);
+
+      // Set isLoading to false after the initial session is handled.
+      // This will happen once for 'INITIAL_SESSION' or 'SIGNED_IN' on page load.
+      if (isMounted) { // Check again before setting state
+        setIsLoading(false);
+        console.log('SessionContext: [END_LOADING] isLoading set to false.');
       }
     };
 
-    console.log('SessionContext: [INIT] Setting up auth state listener.');
+    console.log('SessionContext: [INIT] Setting up auth state listener. Initial isLoading:', isLoading);
+    // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(handleAuthStateChange);
 
+    // Cleanup the subscription and set isMounted to false
     return () => {
       isMounted = false;
       authListener.subscription.unsubscribe();

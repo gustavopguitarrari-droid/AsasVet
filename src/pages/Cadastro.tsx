@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin, Eye, Edit, Trash2, User as UserIconFallback } from "lucide-react"; // Adicionado UserIconFallback
+import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin, Eye, Edit, Trash2 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SpeciesFilter from "@/components/SpeciesFilter";
 import PetDetailsDialog from "@/components/PetDetailsDialog";
@@ -28,8 +28,6 @@ import { showError, showSuccess } from "@/utils/toast";
 import { uploadImageToSupabase, deleteImageFromSupabase } from "@/utils/supabaseStorage";
 import ClientDetailsDialog from "@/components/ClientDetailsDialog"; // Importar o novo ClientDetailsDialog
 import { useLocation } from "react-router-dom"; // Importar useLocation
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
@@ -738,13 +736,12 @@ const Cadastro = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[60px]">Foto</TableHead> {/* Nova TableHead para a foto */}
                   <TableHead>Nome</TableHead>
                   <TableHead>CPF</TableHead>
                   <TableHead>Nascimento</TableHead>
                   <TableHead>Contato</TableHead>
-                  <TableHead>Endereço</TableHead> {/* Título da coluna de endereço */}
-                  <TableHead>Animais</TableHead>
+                  <TableHead>Endereço</TableHead>
+                  <TableHead>Animais</TableHead> {/* Nova coluna */}
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -754,21 +751,9 @@ const Cadastro = () => {
                     const petsOfClient = pets.filter(pet => {
                       return pet.ownerId === client.id;
                     });
-                    const initials = `${client.name.charAt(0)}${client.name.split(' ').pop()?.charAt(0) || ''}`.toUpperCase();
                     return (
                       <TableRow key={client.id} className="cursor-pointer hover:bg-muted/50">
-                        <TableCell className="font-medium" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
-                          <Avatar className="h-9 w-9 border">
-                            {client.photoUrl ? (
-                              <AvatarImage src={client.photoUrl} alt={client.name} />
-                            ) : (
-                              <AvatarFallback className="bg-muted text-muted-foreground text-xs font-bold">
-                                {initials || <UserIconFallback className="h-5 w-5" />}
-                              </AvatarFallback>
-                            )}
-                          </Avatar>
-                        </TableCell>
-                        <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>{client.name}</TableCell>
+                        <TableCell className="font-medium" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>{client.name}</TableCell>
                         <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>{client.cpf}</TableCell>
                         <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
                           {client.dateOfBirth && isValid(parseISO(client.dateOfBirth))
@@ -785,25 +770,18 @@ const Cadastro = () => {
                             <span>{client.phone}</span>
                           </div>
                         </TableCell>
-                        <TableCell> {/* Célula para o botão do endereço */}
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button variant="outline" size="icon" className="h-8 w-8">
-                                <MapPin className="h-4 w-4" />
-                                <span className="sr-only">Ver Endereço</span>
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-64 p-4 text-sm">
-                              <p className="font-semibold mb-2 flex items-center">
-                                <Home className="h-4 w-4 mr-2 text-muted-foreground" /> Endereço Completo
-                              </p>
-                              <p>{client.address?.street || 'N/A'}, {client.address?.number || 'N/A'} {client.address?.complement || ''}</p>
-                              <p>{client.address?.neighborhood || 'N/A'}, {client.address?.city || 'N/A'} - {client.address?.state || 'N/A'}</p>
-                              <p className="text-xs text-muted-foreground mt-1">CEP: {client.address?.cep || 'N/A'}</p>
-                            </PopoverContent>
-                          </Popover>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
+                          <div className="flex items-center text-sm mb-1">
+                            <Home className="h-4 w-4 mr-2 text-muted-foreground" />
+                            <span>{client.address?.street || 'N/A'}, {client.address?.number || 'N/A'} {client.address?.complement || ''}</span>
+                          </div>
+                          <div className="flex items-center text-sm mb-1">
+                            <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+                            <span>{client.address?.neighborhood || 'N/A'}, {client.address?.city || 'N/A'} - {client.address?.state || 'N/A'}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground ml-6">CEP: {client.address?.cep || 'N/A'}</p>
                         </TableCell>
-                        <TableCell className="text-center">
+                        <TableCell className="text-center"> {/* Célula para Animais */}
                           {petsOfClient.length > 0 ? (
                             <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleViewClientPets(client); }}>
                               {petsOfClient.length} Animal{petsOfClient.length > 1 ? 's' : ''}
@@ -830,7 +808,7 @@ const Cadastro = () => {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-24 text-center">
+                    <TableCell colSpan={7} className="h-24 text-center">
                       Nenhum tutor encontrado.
                     </TableCell>
                   </TableRow>

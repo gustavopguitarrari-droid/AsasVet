@@ -7,10 +7,10 @@ import { ColorThemeProvider } from "./context/ColorThemeContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider defaultTheme="system" attribute="class" enableSystem>
-    <UserProvider> {/* UserProvider deve envolver o ColorThemeProvider */}
-      <ColorThemeProvider>
+    <ColorThemeProvider>
+      <UserProvider> {/* UserProvider deve envolver o App */}
         <App />
-      </ColorThemeProvider>
-    </UserProvider>
+      </UserProvider>
+    </ColorThemeProvider>
   </ThemeProvider>
 );

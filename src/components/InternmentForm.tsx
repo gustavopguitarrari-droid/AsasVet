@@ -25,9 +25,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter } from "@/components/ui/dialog";
 import RiskSelector from "./RiskSelector"; // Importar o novo componente RiskSelector
-import { TeamMember } from "@/pages/Veterinarios"; // Importar TeamMember
 
-// Removido: mockVeterinarians
+// Mock de veterinários (reutilizando do AppointmentForm)
+const mockVeterinarians = [
+  { id: "V001", name: "Dr. Ana Paula" },
+  { id: "V002", name: "Dr. Carlos Eduardo" },
+  { id: "V003", name: "Dra. Beatriz Lima" },
+];
 
 const formSchema = z.object({
   bayName: z.string().min(1, "O nome da baia é obrigatório."), // Novo campo
@@ -52,10 +56,9 @@ export type InternmentFormValues = z.infer<typeof formSchema>;
 interface InternmentFormProps {
   onSubmit: (data: InternmentFormValues) => void;
   onCancel: () => void;
-  veterinarians: TeamMember[]; // NEW PROP: List of actual veterinarians
 }
 
-const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, veterinarians }) => {
+const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) => {
   const form = useForm<InternmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,7 +67,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, vet
       ownerName: "",
       reason: "",
       admissionDate: new Date(),
-      veterinarian: veterinarians.length > 0 ? `${veterinarians[0].first_name} ${veterinarians[0].last_name}` : "", // Default to first vet or empty
+      veterinarian: mockVeterinarians[0]?.name || "",
       species: "Cachorro", // Valor padrão para espécie
       risk: "Sem risco", // Valor padrão para risco
     },
@@ -177,9 +180,9 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, vet
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {veterinarians.map((vet) => (
-                    <SelectItem key={vet.id} value={`${vet.first_name} ${vet.last_name}`}>
-                      {vet.first_name} {vet.last_name}
+                  {mockVeterinarians.map((vet) => (
+                    <SelectItem key={vet.id} value={vet.name}>
+                      {vet.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

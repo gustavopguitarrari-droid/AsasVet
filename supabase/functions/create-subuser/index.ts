@@ -53,7 +53,7 @@ serve(async (req) => {
       });
     }
 
-    const { email, password, first_name, last_name, role, phone, crmv } = await req.json(); // Adicionado phone e crmv
+    const { email, password, first_name, last_name, role } = await req.json();
 
     if (!email || !password || !first_name || !last_name || !role) {
       return new Response(JSON.stringify({ error: 'Missing required fields: email, password, first_name, last_name, role' }), {
@@ -79,8 +79,6 @@ serve(async (req) => {
         first_name,
         last_name,
         role,
-        phone: phone || null, // Passa o telefone para user_metadata
-        crmv: crmv || null,   // Passa o CRMV para user_metadata
       },
     });
 

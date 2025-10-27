@@ -17,9 +17,7 @@ import AppointmentForm, { AppointmentFormValues } from "./AppointmentForm";
 import { cn } from "@/lib/utils";
 import { Appointment } from "@/pages/Appointments";
 import { format, parseISO, isValid } from "date-fns";
-import { ptBR } from "date-fns/locale"; // Importar ptBR
 import { useNavigate, NavigateFunction } from "react-router-dom";
-import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
 
 interface AppointmentDetailsDialogProps {
   appointment: Appointment | null;
@@ -28,8 +26,6 @@ interface AppointmentDetailsDialogProps {
   onUpdate: (updatedAppointment: Appointment) => void;
   onCancelAppointment: (appointmentId: string) => void;
   onStartAppointment: (appointmentId: string) => void;
-  allClients: Client[]; // Adicionado
-  allPets: Pet[];       // Adicionado
 }
 
 const mockVeterinarians = [
@@ -54,8 +50,6 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
   onUpdate,
   onCancelAppointment,
   onStartAppointment,
-  allClients, // Desestruturado
-  allPets,     // Desestruturado
 }) => {
   const [isEditing, setIsEditing] = React.useState(false);
   const navigate = useNavigate();
@@ -91,9 +85,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
       date: appointmentDate,
       time: data.time,
       client_name: data.client,
-      client_id: data.selectedClientId, // NOVO: Passa client_id
       pet_name: data.pet,
-      pet_id: data.selectedPetId,     // NOVO: Passa pet_id
       species: data.species,
       service: data.service,
       veterinarian: appointment.veterinarian,
@@ -149,11 +141,9 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
               veterinarian: appointment.veterinarian || undefined,
               date: appointment.date,
               status: appointment.status,
-              selectedClientId: appointment.client_id, // NOVO: Preenche selectedClientId
-              selectedPetId: appointment.pet_id,     // NOVO: Preenche selectedPetId
+              selectedClientId: "", // Não preenche aqui, o formulário busca
+              selectedPetId: "",     // Não preenche aqui, o formulário busca
             }}
-            allClients={allClients} // Passando allClients
-            allPets={allPets}     // Passando allPets
           />
         ) : (
           <div className="grid gap-4 py-4">

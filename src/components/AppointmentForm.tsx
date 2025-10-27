@@ -23,11 +23,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Client, Pet, Species, SpeciesEnum } from "@/types/cadastro"; // Importar Client, Pet e SpeciesEnum
+import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
 import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
 
 // Definir as opções de serviço como um array para reutilização
-export const serviceOptions = [
+const serviceOptions = [
   "Consulta Geral",
   "Vacinação",
   "Exame de Rotina",
@@ -50,13 +50,12 @@ const formSchema = z.object({
   // Campos que serão preenchidos automaticamente e enviados na mutação
   client: z.string().min(1, "O nome do cliente é obrigatório."),
   pet: z.string().min(1, "O nome do animal é obrigatório."),
-  species: z.enum(SpeciesEnum, { // Usando z.enum com SpeciesEnum
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
     required_error: "A espécie do animal é obrigatória.",
   }),
   service: z.enum(serviceOptions, {
     required_error: "O serviço é obrigatório.",
   }),
-  dateOption: z.enum(["today", "specific"]).default("today"), // Adicionado dateOption
 });
 
 export type AppointmentFormValues = z.infer<typeof formSchema>;
@@ -67,14 +66,13 @@ interface AppointmentFormProps {
     time?: string;
     client?: string;
     pet?: string;
-    species?: Species; // Usando o tipo Species
+    species?: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros";
     service?: typeof serviceOptions[number];
     veterinarian?: string;
     date?: string;
     status?: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
     selectedClientId?: string; // Adicionado para initialData
     selectedPetId?: string;   // Adicionado para initialData
-    dateOption?: "today" | "specific"; // Adicionado dateOption
   };
   allClients: Client[]; // Lista de todos os clientes
   allPets: Pet[];       // Lista de todos os pets
@@ -95,7 +93,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
       pet: initialData?.pet || "",
       species: initialData?.species || "Cachorro",
       service: initialData?.service || serviceOptions[0],
-      dateOption: initialData?.dateOption || "today", // Definir valor padrão para dateOption
     },
   });
 
@@ -117,7 +114,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
       pet: initialData?.pet || "",
       species: initialData?.species || "Cachorro",
       service: initialData?.service || serviceOptions[0],
-      dateOption: initialData?.dateOption || "today", // Definir valor padrão para dateOption
     });
     setCpfInput("");
     setSelectedClientFromSearch(null);
@@ -196,16 +192,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
     ? allPets.filter(pet => pet.ownerId === selectedClientFromSearch.id)
     : [];
 
-  const handleSubmit = (data: AppointmentFormValues) => {
-    console.log("AppointmentForm: Submitting data:", data);
-    console.log("AppointmentForm: selectedClientId (from form data):", data.selectedClientId);
-    console.log("AppointmentForm: selectedPetId (from form data):", data.selectedPetId);
-    onSubmit(data);
-  };
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}

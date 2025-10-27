@@ -1,9 +1,6 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useUser } from './UserContext'; // Importar useUser
-import { supabase } from '@/integrations/supabase/client'; // Importar supabase
-import { showError } from '@/utils/toast'; // Importar showError
 
 type ColorTheme = 'default' | 'green' | 'purple' | 'orange' | 'teal' | 'pink' | 'brown';
 
@@ -15,68 +12,24 @@ interface ColorThemeContextType {
 const ColorThemeContext = createContext<ColorThemeContextType | undefined>(undefined);
 
 export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
-  const { user: appUser, setUser: setAppUser } = useUser(); // Obter o usuário e o setter do UserContext
-  const [colorTheme, setColorThemeState] = useState<ColorTheme>('default');
-  const [isInitialLoad, setIsInitialLoad] = useState(true); // Para controlar a aplicação inicial do tema
-
-  // Efeito para carregar o tema do usuário quando o appUser estiver disponível
-  useEffect(() => {
-    if (appUser?.id && isInitialLoad) {
-      const userTheme = (appUser.colorTheme as ColorTheme) || 'default';
-      setColorThemeState(userTheme);
-      setIsInitialLoad(false); // Marca que o carregamento inicial foi feito
-    } else if (!appUser?.id && !isInitialLoad) {
-      // Se o usuário deslogar, resetar para o tema padrão
-      setColorThemeState('default');
-      setIsInitialLoad(true); // Resetar para próximo login
+  const [colorTheme, setColorThemeState] = useState<ColorTheme>(() => {
+    // Tenta carregar o tema salvo no localStorage
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('color-theme');
+      return (savedTheme as ColorTheme) || 'default';
     }
-  }, [appUser, isInitialLoad]);
+    return 'default';
+  });
 
-  // Efeito para aplicar a classe CSS e, se não for o carregamento inicial, salvar no Supabase
   useEffect(() => {
     const root = window.document.documentElement;
     // Remove a classe do tema anterior
     root.classList.remove('theme-default', 'theme-green', 'theme-purple', 'theme-orange', 'theme-teal', 'theme-pink', 'theme-brown');
     // Adiciona a classe do tema atual
     root.classList.add(`theme-${colorTheme}`);
-
-    // Salvar no Supabase APENAS se o usuário estiver logado e não for o carregamento inicial
-    if (appUser?.id && !isInitialLoad) {
-      const saveThemeToSupabase = async () => {
-        // Verificação adicional para garantir que appUser.id ainda está disponível
-        if (!appUser?.id) {
-          console.warn("ColorThemeContext: Tentativa de salvar tema, mas appUser.id está ausente no momento da chamada Supabase.");
-          showError("Não foi possível salvar o tema: usuário não identificado.");
-          return;
-        }
-
-        try {
-          console.log("ColorThemeContext: Attempting to save theme. User ID:", appUser.id, "Theme:", colorTheme);
-          const { error } = await supabase
-            .from('profiles')
-            .update({ color_theme: colorTheme })
-            .eq('id', appUser.id);
-
-          if (error) {
-            console.error("ColorThemeContext: Erro ao salvar tema de cor no Supabase:", error);
-            // Tenta obter a mensagem de erro, ou serializa o objeto completo
-            const errorMessage = (error instanceof Error) ? error.message : (typeof error === 'object' && error !== null && 'message' in error ? (error as any).message : JSON.stringify(error));
-            showError(`Erro ao salvar sua preferência de tema: ${errorMessage || 'Detalhes desconhecidos.'}`);
-          } else {
-            console.log("ColorThemeContext: Tema de cor salvo com sucesso no Supabase.");
-            // Atualiza o contexto do usuário localmente após salvar no DB
-            setAppUser(prevUser => prevUser ? { ...prevUser, colorTheme: colorTheme } : null);
-          }
-        } catch (err: any) {
-          console.error("ColorThemeContext: Erro inesperado ao salvar tema de cor:", err);
-          showError(`Erro inesperado ao salvar sua preferência de tema: ${err.message || 'Detalhes desconhecidos.'}`);
-        }
-      };
-      saveThemeToSupabase();
-    } else {
-      console.log("ColorThemeContext: Skipping theme save. User not logged in or initial load.");
-    }
-  }, [colorTheme, appUser, isInitialLoad, setAppUser]);
+    // Salva o tema no localStorage
+    localStorage.setItem('color-theme', colorTheme);
+  }, [colorTheme]);
 
   const setColorTheme = (theme: ColorTheme) => {
     setColorThemeState(theme);

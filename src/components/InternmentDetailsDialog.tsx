@@ -167,12 +167,11 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
           }} onSubmit={handleFormSubmit} onCancel={() => setIsEditing(false)} />
         ) : (
           <div className="grid gap-4 py-4">
-            {/* Removido: Exibição do ID do paciente */}
-            {/* <div className="grid grid-cols-3 items-center gap-4">
+            <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">ID:</p>
               <p className="col-span-2 text-sm">{patient.id}</p>
             </div>
-            <Separator /> */}
+            <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Baia:</p>
               <p className="col-span-2 text-sm font-bold">{patient.bay_name}</p>

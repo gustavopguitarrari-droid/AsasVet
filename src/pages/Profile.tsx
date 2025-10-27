@@ -19,7 +19,6 @@ import ProfilePictureUploadDialog from "@/components/ProfilePictureUploadDialog"
 import { useMutation, useQueryClient } from "@tanstack/react-query"; // Importar useMutation e useQueryClient
 import { supabase } from "@/integrations/supabase/client"; // Importar o cliente Supabase
 import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
-import { User } from "@/context/UserContext"; // Importar a interface User
 
 const Profile = () => {
   const { user, setUser } = useUser();
@@ -41,16 +40,14 @@ const Profile = () => {
     },
     onSuccess: (data) => {
       // Atualiza o contexto do usuário com os novos dados, convertendo null para undefined
-      setUser((prevUser: User | null) => ({ // Tipagem explícita para prevUser
-        ...prevUser!, // prevUser! garante que não é null aqui
+      setUser((prevUser) => ({
+        ...prevUser!,
         name: data.first_name || undefined,
         lastName: data.last_name || undefined,
         email: data.email || undefined,
         avatarUrl: data.avatar_url || undefined,
         role: data.role || undefined,
         birthday: data.birthday || undefined,
-        registeredTime: prevUser?.registeredTime || new Date().toISOString(), // Manter registeredTime
-        gender: data.gender || undefined, // Manter gender
       }));
       queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] }); // Invalida o cache para rebuscar se necessário
       showSuccess("Perfil atualizado com sucesso!");

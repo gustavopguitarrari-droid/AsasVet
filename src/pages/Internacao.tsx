@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -23,9 +23,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
-import { Species } from "@/types/cadastro"; // Importar Species
-import { useLocation, useNavigate } from "react-router-dom"; // Importar useLocation e useNavigate
-import { TeamMember } from "./Veterinarios"; // Importar TeamMember
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -40,7 +37,7 @@ export interface InternedPatient {
   expected_discharge_date?: string | null;
   veterinarian: string;
   status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
-  species: Species; // Usando o tipo Species
+  species: string;
   risk: RiskLevel;
   created_at: string;
 }
@@ -98,8 +95,6 @@ const Internacao = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id; // Assuming user ID is available from context
-  const navigate = useNavigate(); // Inicializar useNavigate
-  const location = useLocation(); // Inicializar useLocation
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -123,11 +118,6 @@ const Internacao = () => {
   const [confirmActionsHour, setConfirmActionsHour] = useState<string | null>(null);
   const [confirmActionsForSlot, setConfirmActionsForSlot] = useState<PatientAction[]>([]);
 
-  // Efeito para atualizar a URL com a aba ativa
-  useEffect(() => {
-    navigate(location.pathname, { state: { activeTab }, replace: true });
-  }, [activeTab, navigate, location.pathname]);
-
   // Fetch interned patients
   const { data: internedPatients = [], isLoading: isLoadingPatients, error: patientsError, refetch: refetchInternedPatients } = useQuery<InternedPatient[]>({
     queryKey: ['interned_patients', userId],
@@ -147,12 +137,7 @@ const Internacao = () => {
       }
       console.log("Internacao.tsx: Supabase returned for interned_patients:", data);
       data.forEach(p => console.log(`Internacao.tsx: Patient ${p.id} - Status: '${p.status}'`));
-      return data.map(p => ({
-        ...p,
-        species: p.species as Species, // Cast para o tipo Species
-        risk: p.risk as RiskLevel, // Cast para o tipo RiskLevel
-        status: p.status as InternedPatient["status"], // Cast para o tipo Status
-      }));
+      return data;
     },
     enabled: !!userId,
   });
@@ -173,12 +158,7 @@ const Internacao = () => {
         throw error;
       }
       console.log("Internacao.tsx: history_patients fetched:", data);
-      return data.map(p => ({
-        ...p,
-        species: p.species as Species, // Cast para o tipo Species
-        risk: p.risk as RiskLevel, // Cast para o tipo RiskLevel
-        status: p.status as InternedPatient["status"], // Cast para o tipo Status
-      }));
+      return data;
     },
     enabled: !!userId,
   });
@@ -198,24 +178,6 @@ const Internacao = () => {
         throw error;
       }
       console.log("Internacao.tsx: patient_actions fetched:", data);
-      return data;
-    },
-    enabled: !!userId,
-  });
-
-  // NEW: Fetch veterinarians
-  const { data: veterinarians = [], isLoading: isLoadingVeterinarians, error: veterinariansError } = useQuery<TeamMember[]>({
-    queryKey: ['veterinarians', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, first_name, last_name, email, role')
-        .eq('role', 'Veterinário'); // Filter for veterinarians
-      if (error) {
-        console.error("Internacao.tsx: Error fetching veterinarians:", error);
-        throw error;
-      }
       return data;
     },
     enabled: !!userId,
@@ -523,9 +485,18 @@ const Internacao = () => {
     updateActionsCompletionMutation.mutate(updatedActions);
   };
 
-  // Removido getPageTitle pois o Header agora lida com isso
+  const getPageTitle = () => {
+    switch (activeTab) {
+      case "pacientes-internados":
+        return "Pacientes Internados";
+      case "mapa-execucao":
+        return "Mapa de Execução";
+      default:
+        return "Internação";
+    }
+  };
 
-  if (isLoadingPatients || isLoadingHistory || isLoadingActions || isLoadingVeterinarians) {
+  if (isLoadingPatients || isLoadingHistory || isLoadingActions) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando dados de internação...</p>
@@ -533,10 +504,10 @@ const Internacao = () => {
     );
   }
 
-  if (patientsError || historyError || actionsError || veterinariansError) {
+  if (patientsError || historyError || actionsError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar dados: {patientsError?.message || historyError?.message || actionsError?.message || veterinariansError?.message}</p>
+        <p>Erro ao carregar dados: {patientsError?.message || historyError?.message || actionsError?.message}</p>
       </div>
     );
   }
@@ -544,43 +515,10 @@ const Internacao = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        {/* O título da página foi removido daqui, pois o Header agora o gerencia */}
-        <h2 className="text-3xl font-bold"></h2> {/* Título vazio para não duplicar */}
-        {/* O bloco de calendário e navegação de data foi movido para dentro do TabsContent */}
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-auto p-1">
-          <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
-          <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="pacientes-internados" className="mt-4">
-          {/* Seção para a legenda de risco, barra de pesquisa e botões */}
-          <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
-            {/* Legenda de Risco */}
-            <div className="flex flex-wrap gap-4">
-              {Object.entries(riskColorMap).map(([risk, colorClass]) => (
-                <div key={risk} className="flex items-center space-x-2">
-                  <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
-                  <span className="text-sm text-muted-foreground">{risk}</span>
-                </div>
-              ))}
-            </div>
-
-            {/* Barra de Pesquisa */}
-            <div className="relative w-full md:max-w-[300px]"> {/* Ajustado para max-w-[300px] */}
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Buscar pacientes internados..."
-                className="pl-9"
-                value={patientSearchTerm}
-                onChange={(e) => setPatientSearchTerm(e.target.value)}
-              />
-            </div>
-
-            {/* Botões de Ação */}
-            <div className="flex space-x-2">
+        <h2 className="text-3xl font-bold">{getPageTitle()}</h2>
+        <div className="flex space-x-2">
+          {activeTab === "pacientes-internados" && (
+            <>
               <InternmentHistoryDialog
                 isOpen={isHistoryDialogOpen}
                 onClose={() => setIsHistoryDialogOpen(false)}
@@ -601,56 +539,12 @@ const Internacao = () => {
                   <DialogHeader>
                     <DialogTitle>Internar Novo Paciente</DialogTitle>
                   </DialogHeader>
-                  <InternmentForm 
-                    onSubmit={handleAddInternment} 
-                    onCancel={() => setIsAddDialogOpen(false)} 
-                    veterinarians={veterinarians} // Pass veterinarians here
-                  />
+                  <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
                 </DialogContent>
               </Dialog>
-            </div>
-          </div>
-
-          {filteredInternedPatients.length > 0 ? (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {filteredInternedPatients.map((patient) => {
-                const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
-                const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
-                const riskStripeColorClass = riskColorMap[patient.risk as RiskLevel];
-
-                return (
-                  <li
-                    key={patient.id}
-                    className="relative p-3 border rounded-md bg-gray-50 dark:bg-gray-900 shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={() => handleCardClick(patient)}
-                  >
-                    <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
-                    {/* Nome da Baia no canto superior direito */}
-                    <span className="absolute top-0 right-4 text-sm font-semibold px-2 py-1 rounded-bl-md text-gray-600 dark:text-gray-300">
-                      {patient.bay_name}
-                    </span>
-
-                    <p className="font-bold text-lg flex items-center">
-                      <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
-                      {patient.pet_name}
-                    </p>
-                    <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.owner_name}</p>
-                    <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
-                    <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
-                    <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
-                    <p className="text-base text-muted-foreground"><span className="font-bold">Entrada:</span> {patient.admission_date}</p>
-                  </li>
-                );
-              })}
-            </ul>
-          ) : (
-            <p className="text-muted-foreground">Nenhum paciente internado no momento.</p>
+            </>
           )}
-        </TabsContent>
-
-        <TabsContent value="mapa-execucao" className="mt-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
-            <ExecutionMapLegend />
+          {activeTab === "mapa-execucao" && (
             <div className="flex items-center space-x-2">
               <Button variant="default" size="icon" onClick={handlePreviousDay}>
                 <ChevronLeft className="h-4 w-4" />
@@ -682,7 +576,71 @@ const Internacao = () => {
                 <ChevronRight className="h-4 w-4" />
               </Button>
             </div>
+          )}
+        </div>
+      </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+          <TabsTrigger value="pacientes-internados" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
+          <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pacientes-internados" className="mt-4">
+          <div className="mt-8">
+            <div className="flex flex-wrap gap-4 mb-6">
+              {Object.entries(riskColorMap).map(([risk, colorClass]) => (
+                <div key={risk} className="flex items-center space-x-2">
+                  <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
+                  <span className="text-sm text-muted-foreground">{risk}</span>
+                </div>
+              ))}
+            </div>
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar pacientes internados..."
+                className="pl-9"
+                value={patientSearchTerm}
+                onChange={(e) => setPatientSearchTerm(e.target.value)}
+              />
+            </div>
+            {filteredInternedPatients.length > 0 ? (
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {filteredInternedPatients.map((patient) => {
+                  const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
+                  const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
+                  const riskStripeColorClass = riskColorMap[patient.risk as RiskLevel];
+
+                  return (
+                    <li
+                      key={patient.id}
+                      className="relative p-3 border rounded-md bg-white dark:bg-gray-800 shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                      onClick={() => handleCardClick(patient)}
+                    >
+                      <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
+
+                      <p className="font-bold text-lg flex items-center">
+                        <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
+                        {patient.pet_name}
+                      </p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.owner_name}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
+                      <p className="text-base text-muted-foreground"><span className="font-bold">Entrada:</span> {patient.admission_date}</p>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground">Nenhum paciente internado no momento.</p>
+            )}
           </div>
+        </TabsContent>
+
+        <TabsContent value="mapa-execucao" className="mt-4">
+          <ExecutionMapLegend />
           <div className="p-4 border rounded-md bg-background space-y-4 mt-4">
             <ExecutionMapTable
               patients={patientsForExecutionMap}
