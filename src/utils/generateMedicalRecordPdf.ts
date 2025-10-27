@@ -30,12 +30,14 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
     if (yPos > 297 - margin - lineHeight * 3) { // Deixar espaço para o rodapé
       doc.addPage();
       yPos = margin;
-      addHeader(); // Adicionar cabeçalho em novas páginas
+      // Não chama addHeader aqui, pois o logo é carregado assincronamente e só precisa ser adicionado uma vez no início.
+      // Se o logo for necessário em todas as páginas, a lógica de carregamento precisaria ser ajustada.
+      // Por simplicidade, o logo será adicionado apenas na primeira página.
     }
   };
 
-  // Função para adicionar cabeçalho
-  const addHeader = () => {
+  // Função para adicionar cabeçalho (agora assíncrona para o logo)
+  const addHeader = async () => {
     const headerY = yPos;
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
@@ -48,18 +50,23 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
     
     // NOVO: Adicionar logo se disponível
     if (logoUrl) {
-      const img = new Image();
-      img.src = logoUrl;
-      img.onload = () => {
+      try {
+        const img = new Image();
+        img.src = logoUrl;
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+        });
+
         const imgWidth = 30; // Largura fixa para o logo
         const imgHeight = (img.height * imgWidth) / img.width; // Manter proporção
         const imgX = 210 - margin - imgWidth; // Alinhar à direita
-        const imgY = headerY - imgHeight / 2 - 5; // Ajustar posição vertical
+        const imgY = headerY - 5; // Ajustar posição vertical para ficar no topo do cabeçalho
         doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
-      };
-      // Se a imagem não carregar a tempo, o PDF será gerado sem ela.
-      // Para garantir que o logo esteja sempre presente, pode-se usar um await img.onload,
-      // mas isso tornaria a função assíncrona e mais complexa. Para este caso, é aceitável.
+      } catch (e) {
+        console.error("Erro ao carregar ou adicionar logo ao PDF:", e);
+        // Continua a gerar o PDF sem o logo se houver erro
+      }
     }
 
     yPos = headerY + lineHeight * 1.5;
@@ -80,7 +87,7 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
     }
   };
 
-  addHeader();
+  await addHeader(); // Aguarda o cabeçalho ser adicionado (incluindo o logo)
 
   // Detalhes da Consulta
   doc.setFontSize(14);
