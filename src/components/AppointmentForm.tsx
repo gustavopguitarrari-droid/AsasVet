@@ -247,7 +247,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
               <FormItem>
                 <FormLabel>Hora da Consulta</FormLabel>
                 <FormControl>
-                  <Input type="time" {...field} />
+                  <Input type="time" {...field} disabled /> {/* NOVO: Campo desabilitado */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
