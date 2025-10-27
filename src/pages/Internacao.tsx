@@ -528,33 +528,6 @@ const Internacao = () => {
         {/* O título da página foi removido daqui, pois o Header agora o gerencia */}
         <h2 className="text-3xl font-bold"></h2> {/* Título vazio para não duplicar */}
         <div className="flex space-x-2">
-          {activeTab === "pacientes-internados" && (
-            <>
-              <InternmentHistoryDialog
-                isOpen={isHistoryDialogOpen}
-                onClose={() => setIsHistoryDialogOpen(false)}
-                historyPatients={historyPatients}
-                onClearHistory={() => clearHistoryMutation.mutate()}
-                isClearingHistory={clearHistoryMutation.isPending}
-              />
-              <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
-                <History className="mr-2 h-4 w-4" /> Ver Histórico
-              </Button>
-              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="font-bold">
-                    <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
-                  <DialogHeader>
-                    <DialogTitle>Internar Novo Paciente</DialogTitle>
-                  </DialogHeader>
-                  <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
-                </DialogContent>
-              </Dialog>
-            </>
-          )}
           {activeTab === "mapa-execucao" && (
             <div className="flex items-center space-x-2">
               <Button variant="default" size="icon" onClick={handlePreviousDay}>
@@ -598,8 +571,51 @@ const Internacao = () => {
         </TabsList>
 
         <TabsContent value="pacientes-internados" className="mt-4">
-          <div className="mt-8">
-            <div className="flex flex-wrap gap-4 mb-6">
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar pacientes internados..."
+              className="pl-9"
+              value={patientSearchTerm}
+              onChange={(e) => setPatientSearchTerm(e.target.value)}
+            />
+          </div>
+          {filteredInternedPatients.length > 0 ? (
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {filteredInternedPatients.map((patient) => {
+                const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
+                const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
+                const riskStripeColorClass = riskColorMap[patient.risk as RiskLevel];
+
+                return (
+                  <li
+                    key={patient.id}
+                    className="relative p-3 border rounded-md bg-white dark:bg-gray-800 shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                    onClick={() => handleCardClick(patient)}
+                  >
+                    <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
+
+                    <p className="font-bold text-lg flex items-center">
+                      <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
+                      {patient.pet_name}
+                    </p>
+                    <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.owner_name}</p>
+                    <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
+                    <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
+                    <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
+                    <p className="text-base text-muted-foreground"><span className="font-bold">Entrada:</span> {patient.admission_date}</p>
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="text-muted-foreground">Nenhum paciente internado no momento.</p>
+          )}
+
+          {/* Nova seção para a legenda de risco e botões */}
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-8 p-4 border-t pt-4">
+            {/* Legenda de Risco */}
+            <div className="flex flex-wrap gap-4">
               {Object.entries(riskColorMap).map(([risk, colorClass]) => (
                 <div key={risk} className="flex items-center space-x-2">
                   <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
@@ -607,46 +623,33 @@ const Internacao = () => {
                 </div>
               ))}
             </div>
-            <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Buscar pacientes internados..."
-                className="pl-9"
-                value={patientSearchTerm}
-                onChange={(e) => setPatientSearchTerm(e.target.value)}
+
+            {/* Botões de Ação */}
+            <div className="flex space-x-2">
+              <InternmentHistoryDialog
+                isOpen={isHistoryDialogOpen}
+                onClose={() => setIsHistoryDialogOpen(false)}
+                historyPatients={historyPatients}
+                onClearHistory={() => clearHistoryMutation.mutate()}
+                isClearingHistory={clearHistoryMutation.isPending}
               />
+              <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
+                <History className="mr-2 h-4 w-4" /> Ver Histórico
+              </Button>
+              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="font-bold">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
+                  <DialogHeader>
+                    <DialogTitle>Internar Novo Paciente</DialogTitle>
+                  </DialogHeader>
+                  <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
             </div>
-            {filteredInternedPatients.length > 0 ? (
-              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {filteredInternedPatients.map((patient) => {
-                  const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
-                  const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
-                  const riskStripeColorClass = riskColorMap[patient.risk as RiskLevel];
-
-                  return (
-                    <li
-                      key={patient.id}
-                      className="relative p-3 border rounded-md bg-white dark:bg-gray-800 shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-                      onClick={() => handleCardClick(patient)}
-                    >
-                      <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
-
-                      <p className="font-bold text-lg flex items-center">
-                        <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
-                        {patient.pet_name}
-                      </p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.owner_name}</p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
-                      <p className="text-base text-muted-foreground"><span className="font-bold">Entrada:</span> {patient.admission_date}</p>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <p className="text-muted-foreground">Nenhum paciente internado no momento.</p>
-            )}
           </div>
         </TabsContent>
 
