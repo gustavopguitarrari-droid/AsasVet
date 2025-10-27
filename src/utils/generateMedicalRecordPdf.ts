@@ -39,23 +39,24 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
 
   // Função para adicionar cabeçalho (agora assíncrona para o logo)
   const addHeader = async () => {
-    const initialHeaderY = yPos; // Armazena a posição Y inicial para o bloco do cabeçalho
+    const titleText = 'AsasVet - Prontuário Médico';
+    const titleFontSize = 18;
+    const dateFontSize = 10;
+
+    // Posição Y para o título
+    const titleY = yPos;
 
     // Título Principal
-    doc.setFontSize(18);
+    doc.setFontSize(titleFontSize);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(primaryColor);
-    doc.text('AsasVet - Prontuário Médico', margin, yPos);
-    yPos += lineHeight * 1.2; // Move para baixo para a data de emissão
+    doc.text(titleText, margin, titleY);
 
-    // Data de Emissão (abaixo do título, alinhada à esquerda)
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(lightTextColor);
-    doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, margin, yPos);
-    yPos += lineHeight * 1.5; // Move para baixo para a linha separadora
+    // Calcular largura do título para posicionar o logo
+    const titleWidth = doc.getTextWidth(titleText);
+    const spacingAfterTitle = 5; // Espaçamento entre o título e o logo
 
-    // Adicionar logo se disponível (ainda no canto superior direito, relativo ao initialHeaderY)
+    // Adicionar logo se disponível (ao lado do título)
     if (logoUrl) {
       try {
         const img = new Image();
@@ -68,15 +69,28 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
           };
         });
 
-        const imgWidth = 30; // Largura fixa para o logo
+        const imgWidth = 20; // Largura fixa para o logo (ajustado para ser menor)
         const imgHeight = (img.height * imgWidth) / img.width; // Manter proporção
-        const imgX = 210 - margin - imgWidth; // Alinhar à direita
-        const imgY = initialHeaderY - 5; // Posição relativa ao topo do bloco do cabeçalho
+        const imgX = margin + titleWidth + spacingAfterTitle; // Posicionar à direita do título
+        const imgY = titleY - imgHeight / 2 + titleFontSize / 2 - 1; // Alinhar verticalmente com o centro do texto do título
+
         doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
       } catch (e) {
         console.error("Erro ao carregar ou adicionar logo ao PDF:", e);
       }
     }
+
+    // Mover yPos para a próxima linha para a data de emissão
+    yPos = titleY + lineHeight * 1.2;
+
+    // Data de Emissão (abaixo do título, alinhada à esquerda)
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(dateFontSize);
+    doc.setTextColor(lightTextColor);
+    doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, margin, yPos);
+
+    // Mover yPos para a linha separadora
+    yPos += lineHeight * 1.5;
 
     // Linha separadora
     doc.setDrawColor(primaryColor);
