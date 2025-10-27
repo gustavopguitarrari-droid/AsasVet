@@ -527,41 +527,7 @@ const Internacao = () => {
       <div className="flex items-center justify-between">
         {/* O título da página foi removido daqui, pois o Header agora o gerencia */}
         <h2 className="text-3xl font-bold"></h2> {/* Título vazio para não duplicar */}
-        <div className="flex space-x-2">
-          {activeTab === "mapa-execucao" && (
-            <div className="flex items-center space-x-2">
-              <Button variant="default" size="icon" onClick={handlePreviousDay}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-[280px] justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={(day) => setSelectedDate(day || new Date())}
-                    initialFocus
-                    locale={ptBR}
-                  />
-                </PopoverContent>
-              </Popover>
-              <Button variant="default" size="icon" onClick={handleNextDay}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </div>
+        {/* O bloco de calendário e navegação de data foi movido para dentro do TabsContent */}
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -574,7 +540,7 @@ const Internacao = () => {
           {/* Seção para a legenda de risco, barra de pesquisa e botões */}
           <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
             {/* Legenda de Risco */}
-            <div className="flex flex-wrap gap-4"> {/* Removido flex-1 */}
+            <div className="flex flex-wrap gap-4">
               {Object.entries(riskColorMap).map(([risk, colorClass]) => (
                 <div key={risk} className="flex items-center space-x-2">
                   <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
@@ -584,7 +550,7 @@ const Internacao = () => {
             </div>
 
             {/* Barra de Pesquisa */}
-            <div className="relative w-full md:max-w-xs"> {/* Ajustado para max-w-xs */}
+            <div className="relative w-full md:max-w-[300px]"> {/* Ajustado para max-w-[300px] */}
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Buscar pacientes internados..."
@@ -656,7 +622,40 @@ const Internacao = () => {
         </TabsContent>
 
         <TabsContent value="mapa-execucao" className="mt-4">
-          <ExecutionMapLegend />
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
+            <ExecutionMapLegend />
+            <div className="flex items-center space-x-2">
+              <Button variant="default" size="icon" onClick={handlePreviousDay}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[280px] justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={(day) => setSelectedDate(day || new Date())}
+                    initialFocus
+                    locale={ptBR}
+                  />
+                </PopoverContent>
+              </Popover>
+              <Button variant="default" size="icon" onClick={handleNextDay}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
           <div className="p-4 border rounded-md bg-background space-y-4 mt-4">
             <ExecutionMapTable
               patients={patientsForExecutionMap}
