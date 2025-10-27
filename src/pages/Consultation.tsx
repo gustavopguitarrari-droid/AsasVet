@@ -88,8 +88,8 @@ const ConsultationPage: React.FC = () => {
         physical_exam: recordData.physicalExam || null,
         diagnosis: recordData.diagnosis || null,
         treatment: recordData.treatment || null,
-        // Envia o array de prescrições se não estiver vazio, caso contrário, envia null
-        prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : null,
+        // Garante que prescriptions seja sempre um array, mesmo que vazio
+        prescriptions: recordData.prescriptions || [], 
       };
 
       if (medicalRecord?.id) {
