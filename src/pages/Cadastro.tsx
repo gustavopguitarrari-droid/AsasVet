@@ -695,7 +695,7 @@ const Cadastro = () => {
                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-4xl max-h-[70vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Adicionar Novo Tutor</DialogTitle>
               </DialogHeader>
@@ -715,7 +715,7 @@ const Cadastro = () => {
                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-4xl max-h-[70vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
                   {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
@@ -936,7 +936,7 @@ const Cadastro = () => {
 
       {/* Diálogo para ver os animais de um tutor específico */}
       <Dialog open={isClientPetsDialogOpen} onOpenChange={setIsClientPetsDialogOpen}>
-        <DialogContent className="sm:max-w-4xl max-h-[70vh] flex flex-col">
+        <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>Animais de {clientToViewPets?.name}</DialogTitle>
             <DialogDescription>
@@ -1013,7 +1013,7 @@ const Cadastro = () => {
 
       {/* Diálogo de Edição de Tutor */}
       <Dialog open={isEditClientDialogOpen} onOpenChange={setIsEditClientDialogOpen}>
-        <DialogContent className="sm:max-w-4xl max-h-[70vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Tutor</DialogTitle>
           </DialogHeader>
@@ -1031,7 +1031,7 @@ const Cadastro = () => {
 
       {/* Diálogo de Edição de Animal */}
       <Dialog open={isEditPetDialogOpen} onOpenChange={setIsEditPetDialogOpen}>
-        <DialogContent className="sm:max-w-4xl max-h-[70vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Animal</DialogTitle>
           </DialogHeader>
@@ -1049,7 +1049,7 @@ const Cadastro = () => {
 
       {/* Diálogo Aninhado para Adicionar Animal (MOVIDO PARA CÁ) */}
       <Dialog open={isNestedAddPetDialogOpen} onOpenChange={handleNestedAddPetClose}>
-        <DialogContent className="sm:max-w-4xl max-h-[70vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
