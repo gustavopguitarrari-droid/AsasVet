@@ -133,6 +133,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
         {isEditing ? (
           <AppointmentForm
             onSubmit={handleFormSubmit}
+            onCancel={() => setIsEditing(false)} {/* CORREÇÃO AQUI */}
             initialData={{
               time: appointment.time,
               client: appointment.client_name,

@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import html2canvas from 'html22canvas'; // Mantido para compatibilidade, mas não usado diretamente
+import html2canvas from 'html2canvas'; // Mantido para compatibilidade, mas não usado diretamente
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Appointment } from '@/pages/Appointments';
@@ -70,7 +70,7 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
 
   // Função para adicionar rodapé
   const addFooter = () => {
-    const pageCount = doc.internal.getNumberOfPages();
+    const pageCount = (doc.internal as any).getNumberOfPages(); // CORREÇÃO AQUI: Cast para any
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(8);

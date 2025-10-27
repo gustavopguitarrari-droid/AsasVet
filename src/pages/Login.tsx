@@ -70,11 +70,11 @@ const Login = () => {
           theme="light"
           redirectTo={window.location.origin + '/painel'}
           view={authView}
-          onAuthStateChange={(event, session) => {
-            if (event === 'SIGNED_IN') {
-              navigate('/painel');
-            }
-          }}
+          // onAuthStateChange={(event, session) => { // REMOVIDO: Esta prop não existe no componente Auth
+          //   if (event === 'SIGNED_IN') {
+          //     navigate('/painel');
+          //   }
+          // }}
           localization={{
             variables: {
               sign_in: {

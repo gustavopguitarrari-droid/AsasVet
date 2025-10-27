@@ -56,6 +56,7 @@ const formSchema = z.object({
   service: z.enum(serviceOptions, {
     required_error: "O serviço é obrigatório.",
   }),
+  dateOption: z.enum(["today", "specific"]).default("today"), // NOVO: Adicionado dateOption
 });
 
 export type AppointmentFormValues = z.infer<typeof formSchema>;
@@ -74,6 +75,7 @@ interface AppointmentFormProps {
     status?: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
     selectedClientId?: string; // Adicionado para initialData
     selectedPetId?: string;   // Adicionado para initialData
+    dateOption?: "today" | "specific"; // NOVO: Adicionado dateOption
   };
   allClients: Client[]; // Lista de todos os clientes
   allPets: Pet[];       // Lista de todos os pets
@@ -94,6 +96,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
       pet: initialData?.pet || "",
       species: initialData?.species || "Cachorro",
       service: initialData?.service || serviceOptions[0],
+      dateOption: initialData?.dateOption || "today", // NOVO: Valor padrão para dateOption
     },
   });
 
@@ -115,6 +118,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
       pet: initialData?.pet || "",
       species: initialData?.species || "Cachorro",
       service: initialData?.service || serviceOptions[0],
+      dateOption: initialData?.dateOption || "today", // NOVO: Resetar dateOption
     });
     setCpfInput("");
     setSelectedClientFromSearch(null);
