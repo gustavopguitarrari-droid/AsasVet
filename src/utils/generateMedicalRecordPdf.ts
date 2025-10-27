@@ -9,10 +9,9 @@ interface MedicalRecordPdfData {
   appointment: Appointment;
   medicalRecord: MedicalRecordFormValues;
   logoUrl?: string | null; // NOVO: URL do logo para incluir no PDF
-  filename?: string; // NOVO: Nome do arquivo para download
 }
 
-export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, logoUrl, filename }: MedicalRecordPdfData) => {
+export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, logoUrl }: MedicalRecordPdfData) => {
   const doc = new jsPDF('p', 'mm', 'a4');
   const margin = 15; // Aumentar margem
   let yPos = margin;
@@ -205,7 +204,5 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
 
   addFooter();
 
-  // Usa o nome de arquivo fornecido ou um padrão
-  const finalFilename = filename || `Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`;
-  doc.save(finalFilename);
+  doc.save(`Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
 };
