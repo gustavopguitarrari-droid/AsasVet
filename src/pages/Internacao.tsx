@@ -625,6 +625,10 @@ const Internacao = () => {
                     onClick={() => handleCardClick(patient)}
                   >
                     <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
+                    {/* Nome da Baia no canto superior direito */}
+                    <span className="absolute top-0 right-0 bg-muted text-muted-foreground text-xs font-semibold px-2 py-1 rounded-bl-md">
+                      {patient.bay_name}
+                    </span>
 
                     <p className="font-bold text-lg flex items-center">
                       <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
