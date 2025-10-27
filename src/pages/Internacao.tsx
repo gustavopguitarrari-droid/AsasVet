@@ -499,9 +499,9 @@ const Internacao = () => {
   const getPageTitle = () => {
     switch (activeTab) {
       case "pacientes-internados":
-        return ""; // Retorna vazio para remover o título
+        return "Internação - Pacientes Internados";
       case "mapa-execucao":
-        return ""; // Retorna vazio para remover o título
+        return "Internação - Mapa de Execução";
       default:
         return "Internação"; // Fallback, embora as abas cubram todos os casos
     }
