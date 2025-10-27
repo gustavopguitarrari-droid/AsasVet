@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import LandingPage from "./pages/LandingPage"; // Importar a nova LandingPage
 import ConsultationPage from "./pages/Consultation"; // Importar a nova página de Consulta
+import SignUp from "./pages/SignUp"; // NOVO: Importar a página de cadastro
 import { SessionContextProvider } from "./context/SessionContext";
 import ScrollToTop from "./components/ScrollToTop"; // Importar o novo componente ScrollToTop
 
@@ -35,6 +36,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<LandingPage />} /> {/* Nova rota inicial */}
             <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} /> {/* NOVO: Rota para a página de cadastro */}
             
             {/* Rotas Protegidas */}
             <Route
