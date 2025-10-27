@@ -4,18 +4,18 @@ import React, { useEffect, useState } from 'react';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate, Link, useLocation } from 'react-router-dom'; // Importar useLocation
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useSession } from '@/context/SessionContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import SignUpForm from '@/components/SignUpForm'; // Importar o novo componente SignUpForm
+import { cn } from '@/lib/utils'; // Importar cn para classes condicionais
 
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useSession();
-  const location = useLocation(); // Inicializar useLocation
+  const location = useLocation();
   const [authView, setAuthView] = useState<'sign_in' | 'sign_up' | 'forgotten_password' | 'update_password'>(() => {
-    // Ler o estado da localização para definir a view inicial
     const state = location.state as { view?: 'sign_up' };
     return state?.view || 'sign_in';
   });
@@ -24,7 +24,7 @@ const Login = () => {
     console.log('Login Page - isLoading:', isLoading, 'session:', session);
     if (session && !isLoading) {
       console.log('Login Page - Session found and not loading, redirecting to /painel.');
-      navigate('/painel'); // Redirect to dashboard if already logged in
+      navigate('/painel');
     }
   }, [session, isLoading, navigate]);
 
@@ -38,13 +38,15 @@ const Login = () => {
   }
 
   const handleSignUpSuccess = () => {
-    // After successful signup, switch back to sign_in view
     setAuthView('sign_in');
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center login-art-bg p-4">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-gray-800 rounded-lg shadow-md relative">
+      <div className={cn(
+        "p-8 space-y-6 bg-white dark:bg-gray-800 rounded-lg shadow-md relative",
+        authView === 'sign_up' ? "w-full max-w-full md:max-w-4xl lg:max-w-6xl h-[90vh] overflow-y-auto" : "w-full max-w-md"
+      )}>
         <Button asChild variant="ghost" className="absolute top-4 left-4">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
@@ -114,7 +116,6 @@ const Login = () => {
             }}
           />
         )}
-        {/* Custom links to switch between views */}
         {authView === 'sign_in' && (
           <p className="text-center text-sm text-muted-foreground">
             Não tem uma conta?{' '}
