@@ -488,7 +488,7 @@ const Internacao = () => {
   const getPageTitle = () => {
     switch (activeTab) {
       case "pacientes-internados":
-        return "Pacientes Internados";
+        return ""; // Retorna string vazia para remover o título
       case "mapa-execucao":
         return "Mapa de Execução";
       default:
