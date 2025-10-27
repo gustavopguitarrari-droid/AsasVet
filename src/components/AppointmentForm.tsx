@@ -10,8 +10,6 @@ import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon, Search, User, PawPrint } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Form,
   FormControl,
@@ -26,6 +24,7 @@ import { DialogFooter } from "@/components/ui/dialog";
 import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
 import { Label } from "@/components/ui/label"; // Importar o componente Label
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
