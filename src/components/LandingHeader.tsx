@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button'; // Importar buttonVariants
 import { PawPrint } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -29,19 +29,19 @@ const LandingHeader: React.FC = () => {
             Serviços
           </a>
           <a href="#plans" className="text-muted-foreground hover:text-primary transition-colors text-lg font-medium">
-            Planos
+            Plano
           </a>
         </nav>
       </div>
 
       {/* Auth Buttons */}
       <div className="flex items-center space-x-4">
-        <Button asChild variant="ghost" className="text-lg font-medium">
-          <Link to="/login">Login</Link>
-        </Button>
-        <Button asChild className="text-lg font-medium">
-          <Link to="/signup">Cadastre-se</Link> {/* Link atualizado para a nova página de cadastro */}
-        </Button>
+        <Link to="/login" className={cn(buttonVariants({ variant: "ghost", size: "default" }), "text-lg font-medium")}>
+          Login
+        </Link>
+        <Link to="/signup" className={cn(buttonVariants({ variant: "default", size: "default" }), "text-lg font-medium")}>
+          Cadastre-se
+        </Link>
       </div>
     </header>
   );

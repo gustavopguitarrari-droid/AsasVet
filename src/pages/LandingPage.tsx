@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button'; // Importar buttonVariants
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, PawPrint, DollarSign, Users, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -67,12 +67,12 @@ const LandingPage: React.FC = () => {
             Mais tempo para cuidar dos seus pacientes, menos para a burocracia.
           </p>
           <div className="flex justify-center space-x-4 mt-8">
-            <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              <Link to="/login">Entrar</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary">
-              <Link to="/login" state={{ view: 'sign_up' }}>Cadastre-se</Link>
-            </Button>
+            <Link to="/login" className={cn(buttonVariants({ size: "lg" }), "bg-primary hover:bg-primary/90 text-primary-foreground")}>
+              Entrar
+            </Link>
+            <Link to="/login" state={{ view: 'sign_up' }} className={cn(buttonVariants({ size: "lg", variant: "outline" }), "text-white border-white hover:bg-white hover:text-primary")}>
+              Cadastre-se
+            </Link>
           </div>
         </div >
       </section >
@@ -128,16 +128,17 @@ const LandingPage: React.FC = () => {
                   ))}
                 </ul>
               </div>
-              <Button
-                asChild
-                size="lg"
+              <Link
+                to="/login"
+                state={{ view: 'sign_up' }}
                 className={cn(
+                  buttonVariants({ size: "lg" }),
                   "w-full",
                   plan.highlight ? "bg-primary hover:bg-primary/90 text-primary-foreground" : "bg-secondary hover:bg-secondary/80 text-secondary-foreground"
                 )}
               >
-                <Link to="/login" state={{ view: 'sign_up' }}>{plan.buttonText}</Link>
-              </Button>
+                {plan.buttonText}
+              </Link>
             </Card>
           ))}
         </div>
