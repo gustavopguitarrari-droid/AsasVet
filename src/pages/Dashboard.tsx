@@ -335,7 +335,7 @@ const Dashboard = () => {
             <img
               src={user.logoUrl}
               alt="Logo da Clínica"
-              className="h-24 w-auto max-w-[150px] object-contain dark:invert" // Adicionado dark:invert aqui
+              className="h-24 w-auto max-w-[150px] object-contain" // Removido rounded-md e shadow-sm
             />
           )}
           <div>
