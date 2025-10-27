@@ -1,5 +1,7 @@
 export type Species = "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros";
 
+export const SpeciesEnum = ["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"] as const;
+
 export interface Client {
   id: string;
   name: string;

@@ -19,6 +19,7 @@ import { Appointment } from "@/pages/Appointments";
 import { format, parseISO, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale"; // Importar ptBR
 import { useNavigate, NavigateFunction } from "react-router-dom";
+import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
 
 interface AppointmentDetailsDialogProps {
   appointment: Appointment | null;
@@ -27,6 +28,8 @@ interface AppointmentDetailsDialogProps {
   onUpdate: (updatedAppointment: Appointment) => void;
   onCancelAppointment: (appointmentId: string) => void;
   onStartAppointment: (appointmentId: string) => void;
+  allClients: Client[]; // Adicionado
+  allPets: Pet[];       // Adicionado
 }
 
 const mockVeterinarians = [
@@ -51,6 +54,8 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
   onUpdate,
   onCancelAppointment,
   onStartAppointment,
+  allClients, // Desestruturado
+  allPets,     // Desestruturado
 }) => {
   const [isEditing, setIsEditing] = React.useState(false);
   const navigate = useNavigate();
@@ -145,6 +150,8 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
               selectedClientId: "", // Não preenche aqui, o formulário busca
               selectedPetId: "",     // Não preenche aqui, o formulário busca
             }}
+            allClients={allClients} // Passando allClients
+            allPets={allPets}     // Passando allPets
           />
         ) : (
           <div className="grid gap-4 py-4">

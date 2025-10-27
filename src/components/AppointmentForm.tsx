@@ -23,7 +23,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Client, Pet, Species } from "@/types/cadastro"; // Importar Client e Pet
+import { Client, Pet, Species, SpeciesEnum } from "@/types/cadastro"; // Importar Client, Pet e SpeciesEnum
 import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
 
 // Definir as opções de serviço como um array para reutilização
@@ -50,7 +50,7 @@ const formSchema = z.object({
   // Campos que serão preenchidos automaticamente e enviados na mutação
   client: z.string().min(1, "O nome do cliente é obrigatório."),
   pet: z.string().min(1, "O nome do animal é obrigatório."),
-  species: z.nativeEnum(Species, { // Usando z.nativeEnum com o tipo Species
+  species: z.enum(SpeciesEnum, { // Usando z.enum com SpeciesEnum
     required_error: "A espécie do animal é obrigatória.",
   }),
   service: z.enum(serviceOptions, {

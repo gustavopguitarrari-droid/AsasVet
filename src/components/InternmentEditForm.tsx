@@ -27,7 +27,7 @@ import { DialogFooter } from "@/components/ui/dialog";
 import RiskSelector from "./RiskSelector";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { InternedPatient } from "@/pages/Internacao"; // Importar a interface atualizada
-import { Species } from "@/types/cadastro"; // Importar Species
+import { Species, SpeciesEnum } from "@/types/cadastro"; // Importar SpeciesEnum
 
 // Mock de veterinários (reutilizando do AppointmentForm)
 const mockVeterinarians = [
@@ -46,7 +46,7 @@ const formSchema = z.object({
   }),
   expectedDischargeDate: z.date().nullable().optional(),
   veterinarian: z.string().min(1, "O veterinário responsável é obrigatório."),
-  species: z.nativeEnum(Species, { // Usando z.nativeEnum com o tipo Species
+  species: z.enum(SpeciesEnum, { // Usando z.enum com SpeciesEnum
     required_error: "A espécie do animal é obrigatória.",
   }),
   risk: z.enum(["Sem risco", "Baixo", "Médio", "Alto", "Emergência"], {

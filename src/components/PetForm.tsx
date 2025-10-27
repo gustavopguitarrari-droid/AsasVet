@@ -21,14 +21,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CameraCaptureDialog from "./CameraCaptureDialog";
-import { Client, Pet, Species } from "@/types/cadastro"; // Importar Species
+import { Client, Pet, Species, SpeciesEnum } from "@/types/cadastro"; // Importar SpeciesEnum
 import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
 import { Label } from "@/components/ui/label"; // Adicionado importação do Label
 
 // Esquema de validação do formulário com Zod
 const formSchema = z.object({
   name: z.string().min(1, "O nome do animal é obrigatório."),
-  species: z.nativeEnum(Species, { // Usando z.nativeEnum com o tipo Species
+  species: z.enum(SpeciesEnum, { // Usando z.enum com SpeciesEnum
     required_error: "A espécie do animal é obrigatória.",
   }),
   breed: z.string().min(1, "A raça é obrigatória."),
@@ -287,9 +287,9 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
                   <Input placeholder="Ex: 2 anos, 6 meses" {...field} />
                 </FormControl>
                 <FormMessage />
-              </FormItem>
-            )}
-          />
+            </FormItem>
+          )}
+        />
           <FormField
             control={form.control}
             name="gender"

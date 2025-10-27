@@ -616,6 +616,8 @@ const Appointments = () => {
         onUpdate={handleUpdateAppointment}
         onCancelAppointment={handleCancelAppointment}
         onStartAppointment={handleStartAppointment}
+        allClients={clients} // Passando allClients
+        allPets={pets}     // Passando allPets
       />
 
       <AppointmentHistoryDialog
