@@ -44,7 +44,7 @@ const UpcomingEventsCard: React.FC = () => {
     .sort((a, b) => a.date.getTime() - b.date.getTime() || a.time.localeCompare(b.time));
 
   return (
-    <Card className="col-span-full">
+    <Card className="col-span-full bg-gray-100 dark:bg-gray-800">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg font-semibold">Próximos Eventos (Esta Semana)</CardTitle>
         <CalendarDays className="h-5 w-5 text-muted-foreground" />
