@@ -4,7 +4,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList } from 'lucide-react'; // Removido FileText
+import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, Hospital } from 'lucide-react'; // Adicionado Hospital
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/context/UserContext';
@@ -14,7 +14,7 @@ import { ptBR } from 'date-fns/locale';
 import AppointmentChronometer from '@/components/AppointmentChronometer';
 import { Appointment } from './Appointments'; // Importar a interface Appointment
 import MedicalRecordForm, { MedicalRecordFormValues } from '@/components/consultation/MedicalRecordForm'; // Importar o novo formulário
-// Removido: import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf'; // Removido a importação da função de geração de PDF
+import ForwardToInternmentDialog from '@/components/ForwardToInternmentDialog'; // NOVO: Importar o diálogo de encaminhamento
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -36,6 +36,8 @@ const ConsultationPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id;
+
+  const [isForwardToInternmentDialogOpen, setIsForwardToInternmentDialogOpen] = React.useState(false); // NOVO: Estado para o diálogo de internação
 
   // Query para buscar os detalhes da consulta
   const { data: appointment, isLoading, error } = useQuery<Appointment>({
@@ -166,8 +168,6 @@ const ConsultationPage: React.FC = () => {
     saveMedicalRecordMutation.mutate(data);
   };
 
-  // Removido: handleGeneratePdf não é mais necessário aqui
-
   if (isLoading || isLoadingMedicalRecord) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -213,9 +213,14 @@ const ConsultationPage: React.FC = () => {
         <h2 className="text-3xl font-bold flex items-center">
           <CalendarCheck className="mr-3 h-7 w-7 text-primary" /> Consulta em Andamento
         </h2>
-        <Button onClick={() => navigate('/consultas')} variant="outline">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
-        </Button>
+        <div className="flex space-x-2"> {/* NOVO: Container para os botões */}
+          <Button onClick={() => setIsForwardToInternmentDialogOpen(true)} variant="secondary"> {/* NOVO: Botão de encaminhar */}
+            <Hospital className="mr-2 h-4 w-4" /> Encaminhar para Internação
+          </Button>
+          <Button onClick={() => navigate('/consultas')} variant="outline">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -258,7 +263,6 @@ const ConsultationPage: React.FC = () => {
       />
 
       <div className="flex justify-end space-x-2">
-        {/* Removido o botão Gerar PDF */}
         <Button
           onClick={handleFinalizeConsultation}
           disabled={finalizeAppointmentMutation.isPending}
@@ -268,6 +272,15 @@ const ConsultationPage: React.FC = () => {
           {finalizeAppointmentMutation.isPending ? "Finalizando..." : "Finalizar Consulta"}
         </Button>
       </div>
+
+      {/* NOVO: Diálogo de Encaminhamento para Internação */}
+      {appointment && (
+        <ForwardToInternmentDialog
+          isOpen={isForwardToInternmentDialogOpen}
+          onClose={() => setIsForwardToInternmentDialogOpen(false)}
+          appointment={appointment}
+        />
+      )}
     </div>
   );
 };

@@ -56,20 +56,23 @@ export type InternmentFormValues = z.infer<typeof formSchema>;
 interface InternmentFormProps {
   onSubmit: (data: InternmentFormValues) => void;
   onCancel: () => void;
+  initialData?: Partial<InternmentFormValues>; // Permitir dados iniciais parciais
+  isSubmittingParent?: boolean; // Nova prop para indicar se a mutação pai está pendente
 }
 
-const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) => {
+const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, initialData, isSubmittingParent = false }) => {
   const form = useForm<InternmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      bayName: "", // Valor padrão para o novo campo
-      petName: "",
-      ownerName: "",
-      reason: "",
-      admissionDate: new Date(),
-      veterinarian: mockVeterinarians[0]?.name || "",
-      species: "Cachorro", // Valor padrão para espécie
-      risk: "Sem risco", // Valor padrão para risco
+      bayName: initialData?.bayName || "",
+      petName: initialData?.petName || "",
+      ownerName: initialData?.ownerName || "",
+      reason: initialData?.reason || "",
+      admissionDate: initialData?.admissionDate || new Date(),
+      expectedDischargeDate: initialData?.expectedDischargeDate,
+      veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
+      species: initialData?.species || "Cachorro",
+      risk: initialData?.risk || "Sem risco",
     },
   });
 
@@ -109,7 +112,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
             <FormItem>
               <FormLabel>Nome do Animal</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: Rex" {...field} />
+                <Input placeholder="Ex: Rex" {...field} disabled={!!initialData?.petName} /> {/* Desabilita se pré-preenchido */}
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -122,7 +125,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
             <FormItem>
               <FormLabel>Nome do Tutor</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: João Silva" {...field} />
+                <Input placeholder="Ex: João Silva" {...field} disabled={!!initialData?.ownerName} /> {/* Desabilita se pré-preenchido */}
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -134,7 +137,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
           render={({ field }) => (
             <FormItem>
               <FormLabel>Espécie</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!initialData?.species}> {/* Desabilita se pré-preenchido */}
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione a espécie" />
@@ -173,7 +176,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
           render={({ field }) => (
             <FormItem>
               <FormLabel>Veterinário Responsável</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!initialData?.veterinarian}> {/* Desabilita se pré-preenchido */}
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um veterinário" />
@@ -272,10 +275,12 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
         />
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onCancel}>
+          <Button variant="outline" onClick={onCancel} type="button" disabled={isSubmittingParent}>
             Cancelar
           </Button>
-          <Button type="submit">Internar Paciente</Button>
+          <Button type="submit" disabled={isSubmittingParent}>
+            {isSubmittingParent ? "Internando..." : "Internar Paciente"}
+          </Button>
         </DialogFooter>
       </form>
     </Form>
