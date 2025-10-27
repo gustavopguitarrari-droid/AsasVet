@@ -51,28 +51,30 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
         }
 
         try {
-          console.log("ColorThemeContext: Attempting to save theme. User ID:", appUser.id, "Theme:", colorTheme); // Added detailed log
+          console.log("ColorThemeContext: Attempting to save theme. User ID:", appUser.id, "Theme:", colorTheme);
           const { error } = await supabase
             .from('profiles')
             .update({ color_theme: colorTheme })
             .eq('id', appUser.id);
 
           if (error) {
-            console.error("ColorThemeContext: Erro ao salvar tema de cor no Supabase:", error); // Updated log
-            showError(`Erro ao salvar sua preferência de tema: ${error.message || 'Detalhes desconhecidos.'}`);
+            console.error("ColorThemeContext: Erro ao salvar tema de cor no Supabase:", error);
+            // Tenta obter a mensagem de erro, ou serializa o objeto completo
+            const errorMessage = (error instanceof Error) ? error.message : (typeof error === 'object' && error !== null && 'message' in error ? (error as any).message : JSON.stringify(error));
+            showError(`Erro ao salvar sua preferência de tema: ${errorMessage || 'Detalhes desconhecidos.'}`);
           } else {
-            console.log("ColorThemeContext: Tema de cor salvo com sucesso no Supabase."); // Added log
+            console.log("ColorThemeContext: Tema de cor salvo com sucesso no Supabase.");
             // Atualiza o contexto do usuário localmente após salvar no DB
             setAppUser(prevUser => prevUser ? { ...prevUser, colorTheme: colorTheme } : null);
           }
-        } catch (err: any) { // Catch any unexpected errors
-          console.error("ColorThemeContext: Erro inesperado ao salvar tema de cor:", err); // Updated log
+        } catch (err: any) {
+          console.error("ColorThemeContext: Erro inesperado ao salvar tema de cor:", err);
           showError(`Erro inesperado ao salvar sua preferência de tema: ${err.message || 'Detalhes desconhecidos.'}`);
         }
       };
       saveThemeToSupabase();
     } else {
-      console.log("ColorThemeContext: Skipping theme save. User not logged in or initial load."); // Added log
+      console.log("ColorThemeContext: Skipping theme save. User not logged in or initial load.");
     }
   }, [colorTheme, appUser, isInitialLoad, setAppUser]);
 
