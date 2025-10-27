@@ -10,7 +10,6 @@ import { Link } from "react-router-dom"; // Importar Link
 import { useQuery } from "@tanstack/react-query"; // Importar useQuery
 import { supabase } from "@/integrations/supabase/client"; // Importar supabase
 import { format } from "date-fns"; // Importar format
-import { useTheme } from "next-themes"; // NOVO: Importar useTheme
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -57,7 +56,6 @@ const Dashboard = () => {
 
   const { user } = useUser();
   const userId = user?.id;
-  const { theme } = useTheme(); // NOVO: Obter o tema atual
 
   // Query para buscar a contagem de clientes
   const { data: totalClients = 0, isLoading: isLoadingClients } = useQuery<number>({
@@ -337,10 +335,7 @@ const Dashboard = () => {
             <img
               src={user.logoUrl}
               alt="Logo da Clínica"
-              className={cn(
-                "h-24 w-auto max-w-[150px] object-contain",
-                theme === "dark" ? "invert" : "" // NOVO: Aplica o filtro invert no modo escuro
-              )}
+              className="h-24 w-auto max-w-[150px] object-contain" // Removido rounded-md e shadow-sm
             />
           )}
           <div>
