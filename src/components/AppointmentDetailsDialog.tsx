@@ -91,7 +91,9 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
       date: appointmentDate,
       time: data.time,
       client_name: data.client,
+      client_id: data.selectedClientId, // NOVO: Passa client_id
       pet_name: data.pet,
+      pet_id: data.selectedPetId,     // NOVO: Passa pet_id
       species: data.species,
       service: data.service,
       veterinarian: appointment.veterinarian,
@@ -147,8 +149,8 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
               veterinarian: appointment.veterinarian || undefined,
               date: appointment.date,
               status: appointment.status,
-              selectedClientId: "", // Não preenche aqui, o formulário busca
-              selectedPetId: "",     // Não preenche aqui, o formulário busca
+              selectedClientId: appointment.client_id, // NOVO: Preenche selectedClientId
+              selectedPetId: appointment.pet_id,     // NOVO: Preenche selectedPetId
             }}
             allClients={allClients} // Passando allClients
             allPets={allPets}     // Passando allPets

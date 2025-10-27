@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History } from "lucide-react";
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, FileText } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -29,6 +29,7 @@ import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { Client, Pet, Species } from "@/types/cadastro"; // Importar Species
 import { useNavigate } from "react-router-dom";
+import ConsultationPdfGenerator from "@/components/ConsultationPdfGenerator"; // Importar o novo componente
 
 export interface Appointment {
   id: string;
@@ -36,7 +37,9 @@ export interface Appointment {
   date: string; // YYYY-MM-DD
   time: string; // HH:mm
   client_name: string;
+  client_id: string; // NOVO: ID do cliente
   pet_name: string;
+  pet_id: string; // NOVO: ID do pet
   species: Species; // Usando o tipo Species
   service: typeof serviceOptions[number]; // Usando o tipo literal de serviceOptions
   veterinarian: string;
@@ -44,6 +47,7 @@ export interface Appointment {
   completion_timestamp?: string | null; // Alterado para timestamp ISO (UTC)
   created_at: string;
   start_time?: string | null;
+  observations?: string | null; // Adicionado campo de observações
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -70,6 +74,9 @@ const Appointments = () => {
   const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState<boolean>(false);
 
+  const [isPdfDetailsDialogOpen, setIsPdfDetailsDialogOpen] = React.useState<boolean>(false); // NOVO: Estado para o diálogo do PDF
+  const [pdfAppointmentData, setPdfAppointmentData] = React.useState<{ appointment: Appointment; client: Client; pet: Pet } | null>(null); // NOVO: Dados para o PDF
+
   // --- Queries ---
   const { data: appointments = [], isLoading, error } = useQuery<Appointment[]>({
     queryKey: ['appointments', userId],
@@ -77,8 +84,7 @@ const Appointments = () => {
       if (!userId) return [];
       const { data, error } = await supabase
         .from('appointments')
-        .select('*')
-        .eq('user_id', userId);
+        .select('*, client_id, pet_id'); // NOVO: Seleciona client_id e pet_id
       if (error) throw error;
       return data;
     },
@@ -91,7 +97,7 @@ const Appointments = () => {
       if (!userId) return [];
       const { data, error } = await supabase
         .from('appointments')
-        .select('*')
+        .select('*, client_id, pet_id') // NOVO: Seleciona client_id e pet_id
         .eq('user_id', userId)
         .in('status', ['Realizada', 'Cancelada']);
       if (error) throw error;
@@ -170,7 +176,9 @@ const Appointments = () => {
           date: appointmentDate,
           time: newAppointmentData.time,
           client_name: newAppointmentData.client,
+          client_id: newAppointmentData.selectedClientId, // NOVO: Salva client_id
           pet_name: newAppointmentData.pet,
+          pet_id: newAppointmentData.selectedPetId,     // NOVO: Salva pet_id
           species: newAppointmentData.species,
           service: newAppointmentData.service,
           veterinarian: veterinarianName,
@@ -200,13 +208,16 @@ const Appointments = () => {
           date: updatedAppointment.date,
           time: updatedAppointment.time,
           client_name: updatedAppointment.client_name,
+          client_id: updatedAppointment.client_id, // NOVO: Atualiza client_id
           pet_name: updatedAppointment.pet_name,
+          pet_id: updatedAppointment.pet_id,     // NOVO: Atualiza pet_id
           species: updatedAppointment.species,
           service: updatedAppointment.service,
           veterinarian: updatedAppointment.veterinarian,
           status: updatedAppointment.status,
           completion_timestamp: updatedAppointment.completion_timestamp,
           start_time: updatedAppointment.start_time,
+          observations: updatedAppointment.observations, // NOVO: Atualiza observações
         })
         .eq('id', updatedAppointment.id)
         .eq('user_id', userId)
@@ -332,6 +343,19 @@ const Appointments = () => {
     setSelectedAppointment(appointment);
     setIsHistoryDialogOpen(false);
     setIsDetailsDialogOpen(true);
+  };
+
+  // NOVO: Handler para abrir o gerador de PDF
+  const handleOpenPdfGenerator = (appointment: Appointment) => {
+    const client = clients.find(c => c.id === appointment.client_id);
+    const pet = pets.find(p => p.id === appointment.pet_id);
+
+    if (client && pet) {
+      setPdfAppointmentData({ appointment, client, pet });
+      setIsPdfDetailsDialogOpen(true);
+    } else {
+      showError("Não foi possível carregar os detalhes completos do tutor ou animal para o PDF.");
+    }
   };
 
   const getStatusBadgeVariant = (status: Appointment["status"]) => {
@@ -594,6 +618,19 @@ const Appointments = () => {
                           <Play className="mr-2 h-4 w-4" /> Iniciar
                         </Button>
                       )}
+                      {activeTab === "finalizadas" && appointment.status === "Realizada" && ( // NOVO: Botão PDF
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenPdfGenerator(appointment);
+                          }}
+                          className="ml-2"
+                        >
+                          <FileText className="mr-2 h-4 w-4" /> PDF
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
@@ -628,6 +665,25 @@ const Appointments = () => {
         onClearHistory={() => clearHistoryAppointmentsMutation.mutate()}
         isClearingHistory={clearHistoryAppointmentsMutation.isPending}
       />
+
+      {/* NOVO: Diálogo para o Gerador de PDF */}
+      <Dialog open={isPdfDetailsDialogOpen} onOpenChange={setIsPdfDetailsDialogOpen}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <FileText className="h-5 w-5 mr-2" /> Ficha da Consulta em PDF
+            </DialogTitle>
+          </DialogHeader>
+          {pdfAppointmentData && (
+            <ConsultationPdfGenerator
+              appointment={pdfAppointmentData.appointment}
+              client={pdfAppointmentData.client}
+              pet={pdfAppointmentData.pet}
+              onClose={() => setIsPdfDetailsDialogOpen(false)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
