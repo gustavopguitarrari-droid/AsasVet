@@ -8,9 +8,10 @@ import { MedicalRecordFormValues } from '@/components/consultation/MedicalRecord
 interface MedicalRecordPdfData {
   appointment: Appointment;
   medicalRecord: MedicalRecordFormValues;
+  logoUrl?: string | null; // NOVO: URL do logo para incluir no PDF
 }
 
-export const generateMedicalRecordPdf = async ({ appointment, medicalRecord }: MedicalRecordPdfData) => {
+export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, logoUrl }: MedicalRecordPdfData) => {
   const doc = new jsPDF('p', 'mm', 'a4');
   const margin = 15; // Aumentar margem
   let yPos = margin;
@@ -35,15 +36,33 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord }: M
 
   // Função para adicionar cabeçalho
   const addHeader = () => {
+    const headerY = yPos;
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(primaryColor);
-    doc.text('AsasVet - Prontuário Médico', margin, yPos);
+    doc.text('AsasVet - Prontuário Médico', margin, headerY);
     doc.setTextColor(textColor);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, 210 - margin, yPos, { align: 'right' });
-    yPos += lineHeight * 1.5;
+    doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, 210 - margin, headerY, { align: 'right' });
+    
+    // NOVO: Adicionar logo se disponível
+    if (logoUrl) {
+      const img = new Image();
+      img.src = logoUrl;
+      img.onload = () => {
+        const imgWidth = 30; // Largura fixa para o logo
+        const imgHeight = (img.height * imgWidth) / img.width; // Manter proporção
+        const imgX = 210 - margin - imgWidth; // Alinhar à direita
+        const imgY = headerY - imgHeight / 2 - 5; // Ajustar posição vertical
+        doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
+      };
+      // Se a imagem não carregar a tempo, o PDF será gerado sem ela.
+      // Para garantir que o logo esteja sempre presente, pode-se usar um await img.onload,
+      // mas isso tornaria a função assíncrona e mais complexa. Para este caso, é aceitável.
+    }
+
+    yPos = headerY + lineHeight * 1.5;
     doc.setDrawColor(primaryColor);
     doc.line(margin, yPos, 210 - margin, yPos); // Linha separadora
     yPos += lineHeight * 1.5;

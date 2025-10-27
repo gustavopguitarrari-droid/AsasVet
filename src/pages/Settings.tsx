@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar Tabs
 import SubusersSettings from "@/components/settings/SubusersSettings"; // Importar novo componente
 import MyPlanSettings from "@/components/settings/MyPlanSettings"; // Importar novo componente
+import LogoUploadSettings from "@/components/settings/LogoUploadSettings"; // NOVO: Importar o componente de logo
 
 const Settings = () => {
   return (
@@ -16,10 +17,11 @@ const Settings = () => {
       <p className="text-muted-foreground">Gerencie as preferências da sua conta e do aplicativo.</p>
 
       <Tabs defaultValue="security" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-auto p-1">
+        <TabsList className="grid w-full grid-cols-4 h-auto p-1"> {/* Aumentado para 4 colunas */}
           <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Segurança</TabsTrigger>
           <TabsTrigger value="subusers" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Subusuários</TabsTrigger>
           <TabsTrigger value="my-plan" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Meu Plano</TabsTrigger>
+          <TabsTrigger value="personalization" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Personalização</TabsTrigger> {/* NOVO */}
         </TabsList>
 
         <TabsContent value="security" className="mt-4 space-y-6">
@@ -65,6 +67,10 @@ const Settings = () => {
 
         <TabsContent value="my-plan" className="mt-4">
           <MyPlanSettings />
+        </TabsContent>
+
+        <TabsContent value="personalization" className="mt-4"> {/* NOVO */}
+          <LogoUploadSettings />
         </TabsContent>
       </Tabs>
     </div>

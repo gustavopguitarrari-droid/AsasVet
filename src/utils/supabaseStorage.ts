@@ -1,7 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from 'uuid';
 
-const BUCKET_NAME = 'avatars';
+const AVATARS_BUCKET_NAME = 'avatars';
+const LOGOS_BUCKET_NAME = 'logos'; // NOVO: Nome do bucket para logos
 
 /**
  * Converte uma string Base64 em um Blob.
@@ -40,14 +41,13 @@ export const uploadImageToSupabase = async (
       base64Image.indexOf(":") + 1,
       base64Image.indexOf(";")
     );
-    const blob = base64ToBlob(base64Image, contentType);
     const fileExtension = contentType.split('/')[1];
     const fileName = `${uuidv4()}.${fileExtension}`; // Nome de arquivo único
     const filePath = `${userId}/${entityType}/${entityId}/${fileName}`;
 
     const { data, error } = await supabase.storage
-      .from(BUCKET_NAME)
-      .upload(filePath, blob, {
+      .from(AVATARS_BUCKET_NAME) // Usando o bucket de avatares
+      .upload(filePath, base64ToBlob(base64Image, contentType), {
         contentType,
         upsert: false, // Não sobrescrever se já existir
       });
@@ -58,7 +58,7 @@ export const uploadImageToSupabase = async (
     }
 
     const { data: publicUrlData } = supabase.storage
-      .from(BUCKET_NAME)
+      .from(AVATARS_BUCKET_NAME)
       .getPublicUrl(filePath);
 
     return publicUrlData.publicUrl;
@@ -79,7 +79,7 @@ export const deleteImageFromSupabase = async (publicUrl: string): Promise<boolea
 
   try {
     // Extrai o caminho do arquivo da URL pública
-    const pathSegments = publicUrl.split(`${BUCKET_NAME}/`);
+    const pathSegments = publicUrl.split(`${AVATARS_BUCKET_NAME}/`);
     if (pathSegments.length < 2) {
       console.warn("URL pública inválida para exclusão:", publicUrl);
       return false;
@@ -87,7 +87,7 @@ export const deleteImageFromSupabase = async (publicUrl: string): Promise<boolea
     const filePath = pathSegments[1];
 
     const { error } = await supabase.storage
-      .from(BUCKET_NAME)
+      .from(AVATARS_BUCKET_NAME)
       .remove([filePath]);
 
     if (error) {
@@ -97,6 +97,76 @@ export const deleteImageFromSupabase = async (publicUrl: string): Promise<boolea
     return true;
   } catch (error) {
     console.error("Erro no processo de exclusão da imagem:", error);
+    return false;
+  }
+};
+
+// NOVO: Funções para upload e exclusão de logos
+export const uploadLogoToSupabase = async (
+  base64Image: string,
+  userId: string,
+): Promise<string | null> => {
+  if (!base64Image) return null;
+
+  try {
+    const contentType = base64Image.substring(
+      base64Image.indexOf(":") + 1,
+      base64Image.indexOf(";")
+    );
+    const fileExtension = contentType.split('/')[1];
+    // Usar um nome de arquivo fixo ou baseado no ID do usuário para garantir que só haja um logo por usuário
+    const fileName = `logo.${fileExtension}`; 
+    const filePath = `${userId}/${fileName}`; // Caminho: userId/logo.ext
+
+    // Primeiro, tentar remover o logo antigo se existir
+    await deleteLogoFromSupabase(`${supabase.storage.from(LOGOS_BUCKET_NAME).getPublicUrl(filePath).data.publicUrl}`);
+
+    const { data, error } = await supabase.storage
+      .from(LOGOS_BUCKET_NAME)
+      .upload(filePath, base64ToBlob(base64Image, contentType), {
+        contentType,
+        upsert: true, // Sobrescrever se já existir
+      });
+
+    if (error) {
+      console.error("Erro ao fazer upload do logo:", error);
+      throw error;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(LOGOS_BUCKET_NAME)
+      .getPublicUrl(filePath);
+
+    return publicUrlData.publicUrl;
+
+  } catch (error) {
+    console.error("Erro no processo de upload do logo:", error);
+    return null;
+  }
+};
+
+export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean> => {
+  if (!publicUrl) return true;
+
+  try {
+    const pathSegments = publicUrl.split(`${LOGOS_BUCKET_NAME}/`);
+    if (pathSegments.length < 2) {
+      console.warn("URL pública inválida para exclusão do logo:", publicUrl);
+      return false;
+    }
+    const filePath = pathSegments[1];
+
+    const { error } = await supabase.storage
+      .from(LOGOS_BUCKET_NAME)
+      .remove([filePath]);
+
+    if (error) {
+      console.error("Erro ao deletar logo do storage:", error);
+      throw error;
+    }
+    return true;
+  } catch (error) {
+    console.error("Erro no processo de exclusão do logo:", error);
     return false;
   }
 };

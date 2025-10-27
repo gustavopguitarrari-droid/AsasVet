@@ -169,7 +169,7 @@ const ConsultationPage: React.FC = () => {
   const handleGeneratePdf = async () => {
     if (appointment && medicalRecord) {
       try {
-        await generateMedicalRecordPdf({ appointment, medicalRecord: initialMedicalRecordData });
+        await generateMedicalRecordPdf({ appointment, medicalRecord: initialMedicalRecordData, logoUrl: appUser?.logoUrl }); // NOVO: Passar logoUrl
         showSuccess("PDF do prontuário gerado com sucesso!");
       } catch (err: any) {
         console.error("Erro ao gerar PDF:", err);

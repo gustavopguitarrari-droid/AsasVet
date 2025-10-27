@@ -9,6 +9,7 @@ export interface User {
   lastName?: string;
   email?: string;
   avatarUrl?: string;
+  logoUrl?: string; // NOVO: URL do logo da clínica do usuário
   role?: string;
   birthday?: string; // YYYY-MM-DD string
   registeredTime: string; // ISO string
