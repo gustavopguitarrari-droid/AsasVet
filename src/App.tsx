@@ -17,7 +17,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
-import Index from "./pages/Index"; // Importar a página Index
+import Index from "./pages/Index"; // Importar a NOVA página Index
 import ConsultationPage from "./pages/Consultation"; // Importar a nova página de Consulta
 import { SessionContextProvider } from "./context/SessionContext";
 
@@ -31,8 +31,8 @@ const App = () => (
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}> {/* Adicionado o prop 'future' */}
         <SessionContextProvider>
           <Routes>
+            <Route path="/" element={<Index />} /> {/* Rota inicial agora aponta para a nova Landing Page */}
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Index />} /> {/* Rota inicial que redireciona */}
             
             {/* Rotas Protegidas */}
             <Route
