@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History } from "lucide-react";
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight } from "lucide-react"; // Importar ArrowRight
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -605,13 +605,25 @@ const Appointments = () => {
                           <Play className="mr-2 h-4 w-4" /> Iniciar
                         </Button>
                       )}
+                      {activeTab === "em-andamento" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/consultation/${appointment.id}`);
+                          }}
+                        >
+                          <ArrowRight className="mr-2 h-4 w-4" /> Voltar para Consulta
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
               })
             ) : (
               <TableRow>
-                <TableCell colSpan={activeTab === "em-andamento" ? 6 : (activeTab === "finalizadas" ? 8 : 5)} className="h-24 text-center">
+                <TableCell colSpan={activeTab === "em-andamento" ? 7 : (activeTab === "finalizadas" ? 8 : 5)} className="h-24 text-center"> {/* Ajustado colspan */}
                   Nenhuma consulta encontrada.
                 </TableCell>
               </TableRow>
