@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -24,6 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { Species } from "@/types/cadastro"; // Importar Species
+import { useLocation, useNavigate } from "react-router-dom"; // Importar useLocation e useNavigate
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -96,6 +97,8 @@ const Internacao = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id; // Assuming user ID is available from context
+  const navigate = useNavigate(); // Inicializar useNavigate
+  const location = useLocation(); // Inicializar useLocation
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -118,6 +121,11 @@ const Internacao = () => {
   const [confirmActionsDate, setConfirmActionsDate] = useState<Date | null>(null);
   const [confirmActionsHour, setConfirmActionsHour] = useState<string | null>(null);
   const [confirmActionsForSlot, setConfirmActionsForSlot] = useState<PatientAction[]>([]);
+
+  // Efeito para atualizar a URL com a aba ativa
+  useEffect(() => {
+    navigate(location.pathname, { state: { activeTab }, replace: true });
+  }, [activeTab, navigate, location.pathname]);
 
   // Fetch interned patients
   const { data: internedPatients = [], isLoading: isLoadingPatients, error: patientsError, refetch: refetchInternedPatients } = useQuery<InternedPatient[]>({
@@ -496,16 +504,7 @@ const Internacao = () => {
     updateActionsCompletionMutation.mutate(updatedActions);
   };
 
-  const getPageTitle = () => {
-    switch (activeTab) {
-      case "pacientes-internados":
-        return ""; // Retorna vazio para remover o título
-      case "mapa-execucao":
-        return ""; // Retorna vazio para remover o título
-      default:
-        return "Internação"; // Fallback, embora as abas cubram todos os casos
-    }
-  };
+  // Removido getPageTitle pois o Header agora lida com isso
 
   if (isLoadingPatients || isLoadingHistory || isLoadingActions) {
     return (
@@ -526,7 +525,8 @@ const Internacao = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">{getPageTitle()}</h2>
+        {/* O título da página foi removido daqui, pois o Header agora o gerencia */}
+        <h2 className="text-3xl font-bold"></h2> {/* Título vazio para não duplicar */}
         <div className="flex space-x-2">
           {activeTab === "pacientes-internados" && (
             <>

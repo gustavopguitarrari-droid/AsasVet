@@ -27,7 +27,12 @@ const Header = () => {
       case "/caixa":
         return "Caixa";
       case "/internacao":
-        return "Internação";
+        // Se estiver na página de internação, verifica a aba ativa
+        const activeInternacaoTab = (location.state as any)?.activeTab;
+        if (activeInternacaoTab === "mapa-execucao") {
+          return "Internação: Mapa de Execução";
+        }
+        return "Internação: Pacientes Internados"; // Padrão para a primeira aba
       case "/veterinarios":
         return "Equipe";
       case "/estoque":
