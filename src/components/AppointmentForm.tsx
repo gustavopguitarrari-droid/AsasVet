@@ -13,7 +13,7 @@ import { Calendar } from "@/components/ui/calendar"; // Importar Calendar
 import { CalendarIcon, Search, User, PawPrint } from "lucide-react"; // Ícones para busca e seleção
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
 import {
-  Form,
+  Form, // Importar o componente Form
   FormControl,
   FormField,
   FormItem,
@@ -198,8 +198,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
     : [];
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <Form form={form} onSubmit={onSubmit} className="space-y-4"> {/* CORREÇÃO AQUI */}
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -247,7 +246,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
               <FormItem>
                 <FormLabel>Hora da Consulta</FormLabel>
                 <FormControl>
-                  <Input type="time" {...field} disabled /> {/* NOVO: Campo desabilitado */}
+                  <Input type="time" {...field} disabled />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -282,7 +281,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
             control={form.control}
             name="selectedClientId"
             render={({ field }) => (
-              <FormItem className="hidden"> {/* Campo oculto para validação */}
+              <FormItem className="hidden">
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
@@ -384,7 +383,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
           </Button>
           <Button type="submit">Adicionar na espera</Button>
         </DialogFooter>
-      </form>
     </Form>
   );
 };
