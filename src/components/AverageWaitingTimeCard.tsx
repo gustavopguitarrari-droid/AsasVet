@@ -14,19 +14,19 @@ const AverageWaitingTimeCard: React.FC = () => {
   const { user: appUser } = useUser();
   const userId = appUser?.id;
 
-  // Query para buscar consultas canceladas
-  const { data: cancelledAppointments = [], isLoading } = useQuery<Appointment[]>({
-    queryKey: ['cancelledAppointmentsWaitingTime', userId],
+  // Query para buscar consultas que foram iniciadas (Em Andamento ou Realizada)
+  const { data: startedAppointments = [], isLoading } = useQuery<Appointment[]>({
+    queryKey: ['startedAppointmentsWaitingTime', userId],
     queryFn: async () => {
       if (!userId) return [];
       const { data, error } = await supabase
         .from('appointments')
-        .select('created_at, completion_timestamp')
+        .select('created_at, start_time')
         .eq('user_id', userId)
-        .eq('status', 'Cancelada')
-        .not('completion_timestamp', 'is', null); // Garante que completion_timestamp não é nulo
+        .in('status', ['Em Andamento', 'Realizada']) // Inclui consultas em andamento e realizadas
+        .not('start_time', 'is', null); // Garante que start_time não é nulo
       if (error) {
-        console.error("Erro ao buscar consultas canceladas para média de tempo de espera:", error);
+        console.error("Erro ao buscar consultas iniciadas para média de tempo de espera:", error);
         throw error;
       }
       return data as Appointment[];
@@ -42,11 +42,11 @@ const AverageWaitingTimeCard: React.FC = () => {
 
     appointments.forEach(appointment => {
       const createdAt = parseISO(appointment.created_at);
-      const completionTime = appointment.completion_timestamp ? parseISO(appointment.completion_timestamp) : null;
+      const startTime = appointment.start_time ? parseISO(appointment.start_time) : null;
 
-      if (isValid(createdAt) && completionTime && isValid(completionTime)) {
-        const waitingDuration = differenceInSeconds(completionTime, createdAt);
-        if (waitingDuration > 0) { // Apenas durações positivas
+      if (isValid(createdAt) && startTime && isValid(startTime)) {
+        const waitingDuration = differenceInSeconds(startTime, createdAt);
+        if (waitingDuration >= 0) { // Apenas durações não negativas
           totalWaitingTimeSeconds += waitingDuration;
           validAppointmentsCount++;
         }
@@ -56,7 +56,7 @@ const AverageWaitingTimeCard: React.FC = () => {
     return validAppointmentsCount > 0 ? Math.round(totalWaitingTimeSeconds / validAppointmentsCount) : 0;
   };
 
-  const averageSeconds = calculateAverageWaitingTime(cancelledAppointments);
+  const averageSeconds = calculateAverageWaitingTime(startedAppointments);
 
   const formatTime = (totalSeconds: number) => {
     if (totalSeconds === 0) return "00:00";
@@ -84,7 +84,7 @@ const AverageWaitingTimeCard: React.FC = () => {
         <div className="text-2xl font-bold">
           {isLoading ? "..." : formatTime(averageSeconds)}
         </div>
-        <p className="text-white/80 text-xs">Para consultas canceladas</p>
+        <p className="text-white/80 text-xs">Tempo médio até o início da consulta</p>
       </CardContent>
     </Card>
   );
