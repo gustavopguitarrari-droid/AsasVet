@@ -15,6 +15,7 @@ interface UserProfile {
   birthday?: string;
   registeredTime: string;
   gender?: string;
+  colorTheme?: string; // Adicionado aqui também para consistência
 }
 
 interface SessionContextType {
@@ -76,6 +77,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         birthday: profileData?.birthday || userMetadata.birthday?.toString() || undefined,
         gender: profileData?.gender || userMetadata.gender?.toString() || undefined,
         registeredTime: profileData?.registered_time || supabaseUser.created_at,
+        colorTheme: profileData?.color_theme || 'default', // NOVO: Carrega o tema de cor
       };
       console.log('SessionContext: Constructed profileToSet for UserContext:', profileToSet);
       setAppUser(profileToSet);

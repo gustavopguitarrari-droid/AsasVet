@@ -13,6 +13,7 @@ export interface User { // Adicionado 'export' aqui
   birthday?: string;
   registeredTime: string;
   gender?: string; // Adicionado campo de gênero
+  colorTheme?: string; // NOVO: Tema de cor do usuário
 }
 
 interface UserContextType {
