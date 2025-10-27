@@ -14,7 +14,7 @@ interface ColorThemeContextType {
 
 const ColorThemeContext = createContext<ColorThemeContextType | undefined>(undefined);
 
-export const ColorThemeProvider = ({ children }: { ReactNode }) => {
+export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   const { user: appUser, setUser: setAppUser } = useUser(); // Obter o usuário e o setter do UserContext
   const [colorTheme, setColorThemeState] = useState<ColorTheme>('default');
   const [isInitialLoad, setIsInitialLoad] = useState(true); // Para controlar a aplicação inicial do tema
@@ -45,7 +45,8 @@ export const ColorThemeProvider = ({ children }: { ReactNode }) => {
       const saveThemeToSupabase = async () => {
         // Verificação adicional para garantir que appUser.id ainda está disponível
         if (!appUser?.id) {
-          console.warn("ColorThemeContext: Tentativa de salvar tema, mas appUser.id está ausente.");
+          console.warn("ColorThemeContext: Tentativa de salvar tema, mas appUser.id está ausente no momento da chamada Supabase.");
+          showError("Não foi possível salvar o tema: usuário não identificado.");
           return;
         }
 
@@ -58,15 +59,15 @@ export const ColorThemeProvider = ({ children }: { ReactNode }) => {
 
           if (error) {
             console.error("ColorThemeContext: Erro ao salvar tema de cor no Supabase:", error); // Updated log
-            showError("Erro ao salvar sua preferência de tema.");
+            showError(`Erro ao salvar sua preferência de tema: ${error.message || 'Detalhes desconhecidos.'}`);
           } else {
             console.log("ColorThemeContext: Tema de cor salvo com sucesso no Supabase."); // Added log
             // Atualiza o contexto do usuário localmente após salvar no DB
             setAppUser(prevUser => prevUser ? { ...prevUser, colorTheme: colorTheme } : null);
           }
-        } catch (err) {
+        } catch (err: any) { // Catch any unexpected errors
           console.error("ColorThemeContext: Erro inesperado ao salvar tema de cor:", err); // Updated log
-          showError("Erro inesperado ao salvar sua preferência de tema.");
+          showError(`Erro inesperado ao salvar sua preferência de tema: ${err.message || 'Detalhes desconhecidos.'}`);
         }
       };
       saveThemeToSupabase();
