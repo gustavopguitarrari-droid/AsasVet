@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, User as UserIcon, Mail, Lock, Briefcase } from "lucide-react";
+import { PlusCircle, User as UserIcon, Mail, Lock, Briefcase, Phone, Stethoscope } from "lucide-react"; // Adicionado Phone e Stethoscope
 
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +36,8 @@ const formSchema = z.object({
   email: z.string().email("E-mail inválido.").min(1, "O e-mail é obrigatório."),
   password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
   role: z.string().min(1, "O cargo é obrigatório."),
+  phone: z.string().optional(), // Novo campo: Telefone
+  crmv: z.string().optional(),   // Novo campo: CRMV
 });
 
 export type SubuserFormValues = z.infer<typeof formSchema>;
@@ -56,6 +58,8 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
       email: "",
       password: "",
       role: "Veterinário", // Definido como 'Veterinário' por padrão
+      phone: "", // Valor padrão
+      crmv: "",  // Valor padrão
     },
   });
 
@@ -71,6 +75,8 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
           first_name: newUserData.firstName,
           last_name: newUserData.lastName,
           role: newUserData.role,
+          phone: newUserData.phone, // Passando o telefone
+          crmv: newUserData.crmv,   // Passando o CRMV
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -170,6 +176,38 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
                   </FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center">
+                    <Phone className="h-4 w-4 mr-2 text-muted-foreground" /> Telefone (Opcional)
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="(XX) XXXXX-XXXX" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="crmv"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center">
+                    <Stethoscope className="h-4 w-4 mr-2 text-muted-foreground" /> CRMV (Opcional)
+                  </FormLabel>
+                  <FormControl>
+                    <Input placeholder="CRMV-XX 12345" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
