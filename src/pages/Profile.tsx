@@ -48,6 +48,8 @@ const Profile = () => {
         avatarUrl: data.avatar_url || undefined,
         role: data.role || undefined,
         birthday: data.birthday || undefined,
+        registeredTime: prevUser?.registeredTime || new Date().toISOString(), // Manter registeredTime
+        gender: data.gender || undefined, // Manter gender
       }));
       queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] }); // Invalida o cache para rebuscar se necessário
       showSuccess("Perfil atualizado com sucesso!");

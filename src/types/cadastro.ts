@@ -1,3 +1,5 @@
+export type Species = "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros";
+
 export interface Client {
   id: string;
   name: string;
@@ -21,7 +23,7 @@ export interface Client {
 export interface Pet {
   id: string;
   name: string;
-  species: string;
+  species: Species; // Usando o tipo Species
   breed: string;
   age: string; // Novo campo (ex: "2 anos", "6 meses")
   gender: 'Macho' | 'Fêmea' | 'Desconhecido'; // Novo campo

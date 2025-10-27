@@ -23,6 +23,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
+import { Species } from "@/types/cadastro"; // Importar Species
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -37,7 +38,7 @@ export interface InternedPatient {
   expected_discharge_date?: string | null;
   veterinarian: string;
   status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
-  species: string;
+  species: Species; // Usando o tipo Species
   risk: RiskLevel;
   created_at: string;
 }
@@ -137,7 +138,12 @@ const Internacao = () => {
       }
       console.log("Internacao.tsx: Supabase returned for interned_patients:", data);
       data.forEach(p => console.log(`Internacao.tsx: Patient ${p.id} - Status: '${p.status}'`));
-      return data;
+      return data.map(p => ({
+        ...p,
+        species: p.species as Species, // Cast para o tipo Species
+        risk: p.risk as RiskLevel, // Cast para o tipo RiskLevel
+        status: p.status as InternedPatient["status"], // Cast para o tipo Status
+      }));
     },
     enabled: !!userId,
   });
@@ -158,7 +164,12 @@ const Internacao = () => {
         throw error;
       }
       console.log("Internacao.tsx: history_patients fetched:", data);
-      return data;
+      return data.map(p => ({
+        ...p,
+        species: p.species as Species, // Cast para o tipo Species
+        risk: p.risk as RiskLevel, // Cast para o tipo RiskLevel
+        status: p.status as InternedPatient["status"], // Cast para o tipo Status
+      }));
     },
     enabled: !!userId,
   });

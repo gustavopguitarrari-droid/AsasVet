@@ -15,7 +15,7 @@ import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import AppointmentForm, { AppointmentFormValues } from "@/components/AppointmentForm";
+import AppointmentForm, { AppointmentFormValues, serviceOptions } from "@/components/AppointmentForm"; // Importar serviceOptions
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
@@ -27,7 +27,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
-import { Client, Pet } from "@/types/cadastro";
+import { Client, Pet, Species } from "@/types/cadastro"; // Importar Species
 import { useNavigate } from "react-router-dom";
 
 export interface Appointment {
@@ -37,8 +37,8 @@ export interface Appointment {
   time: string; // HH:mm
   client_name: string;
   pet_name: string;
-  species: string;
-  service: string;
+  species: Species; // Usando o tipo Species
+  service: typeof serviceOptions[number]; // Usando o tipo literal de serviceOptions
   veterinarian: string;
   status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
   completion_timestamp?: string | null; // Alterado para timestamp ISO (UTC)
@@ -143,7 +143,7 @@ const Appointments = () => {
       return data.map(dbPet => ({
         id: dbPet.id,
         name: dbPet.name,
-        species: dbPet.species,
+        species: dbPet.species as Species, // Cast para o tipo Species
         breed: dbPet.breed,
         age: dbPet.age,
         gender: dbPet.gender,

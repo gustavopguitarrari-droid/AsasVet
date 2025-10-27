@@ -17,6 +17,7 @@ import AppointmentForm, { AppointmentFormValues } from "./AppointmentForm";
 import { cn } from "@/lib/utils";
 import { Appointment } from "@/pages/Appointments";
 import { format, parseISO, isValid } from "date-fns";
+import { ptBR } from "date-fns/locale"; // Importar ptBR
 import { useNavigate, NavigateFunction } from "react-router-dom";
 
 interface AppointmentDetailsDialogProps {
