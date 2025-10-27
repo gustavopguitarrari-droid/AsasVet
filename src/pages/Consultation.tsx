@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, Save } from 'lucide-react';
+import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, Save, FileText } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/context/UserContext';
