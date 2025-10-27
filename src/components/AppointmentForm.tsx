@@ -37,10 +37,9 @@ const serviceOptions = [
 ] as const;
 
 const formSchema = z.object({
-  dateOption: z.enum(["today", "specific"]).default("today"), // NOVO: Campo para a opção de data
   date: z.date({
     required_error: "A data da consulta é obrigatória.",
-  }).optional(), // Tornar opcional, pois 'today' não terá uma data específica
+  }),
   time: z.string().min(1, "A hora da consulta é obrigatória."),
   
   // Campos para seleção de cliente/pet
@@ -63,6 +62,7 @@ export type AppointmentFormValues = z.infer<typeof formSchema>;
 
 interface AppointmentFormProps {
   onSubmit: (data: AppointmentFormValues) => void;
+  onCancel: () => void; // Adicionado prop onCancel
   initialData?: {
     time?: string;
     client?: string;
@@ -74,18 +74,16 @@ interface AppointmentFormProps {
     status?: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
     selectedClientId?: string; // Adicionado para initialData
     selectedPetId?: string;   // Adicionado para initialData
-    dateOption?: "today" | "specific"; // NOVO: Adicionado ao initialData
   };
   allClients: Client[]; // Lista de todos os clientes
   allPets: Pet[];       // Lista de todos os pets
 }
 
-const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData, allClients, allPets }) => {
+const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, initialData, allClients, allPets }) => {
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      dateOption: initialData?.dateOption || "today", // Definir valor padrão para dateOption
-      date: initialData?.date ? parseISO(initialData.date) : undefined, // Data é opcional
+      date: initialData?.date ? parseISO(initialData.date) : new Date(), // Data padrão para hoje
       time: initialData?.time || format(new Date(), "HH:mm"), // Define o horário atual como padrão
       
       cpfSearch: "",
@@ -106,8 +104,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
   // Reset form and states when initialData changes (e.g., dialog opens for new appointment)
   useEffect(() => {
     form.reset({
-      dateOption: initialData?.dateOption || "today", // Resetar dateOption
-      date: initialData?.date ? parseISO(initialData.date) : undefined,
+      date: initialData?.date ? parseISO(initialData.date) : new Date(), // Resetar data para hoje
       time: initialData?.time || format(new Date(), "HH:mm"), // Garante que o horário seja atualizado ao reabrir
       
       cpfSearch: "",
@@ -378,6 +375,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
           )}
         />
         <DialogFooter>
+          <Button variant="outline" onClick={onCancel} type="button">
+            Cancelar
+          </Button>
           <Button type="submit">Adicionar na espera</Button>
         </DialogFooter>
       </form>

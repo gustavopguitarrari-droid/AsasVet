@@ -425,6 +425,7 @@ const Appointments = () => {
               </DialogHeader>
               <AppointmentForm
                 onSubmit={handleAddAppointment}
+                onCancel={() => setIsAddAppointmentDialogOpen(false)} // Passa o handler de cancelamento
                 allClients={clients}
                 allPets={pets}
               />
