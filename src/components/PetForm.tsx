@@ -155,8 +155,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+    <Form form={form} onSubmit={handleSubmit} className="space-y-4">
         <div className="flex flex-col items-center space-y-4 mb-6">
           <Avatar className="h-24 w-24 border-4 border-primary shadow-lg">
             {previewUrl ? (

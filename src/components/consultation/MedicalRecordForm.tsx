@@ -64,7 +64,7 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Form {...form} onSubmit={onSubmit} className="space-y-6"> {/* CORREÇÃO AQUI */}
+        <Form form={form} onSubmit={onSubmit} className="space-y-6"> {/* CORREÇÃO AQUI */}
             <FormField
               control={form.control}
               name="anamnesis"

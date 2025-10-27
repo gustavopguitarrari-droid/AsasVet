@@ -56,8 +56,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({ onSubmit, o
   });
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <Form form={form} onSubmit={onSubmit} className="space-y-4">
         <FormField
           control={form.control}
           name="description"

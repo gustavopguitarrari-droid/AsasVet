@@ -74,7 +74,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel }) =
   });
 
   return (
-    <Form {...form} onSubmit={onSubmit} className="space-y-4"> {/* CORREÇÃO AQUI */}
+    <Form form={form} onSubmit={onSubmit} className="space-y-4"> {/* CORREÇÃO AQUI */}
         <FormField
           control={form.control}
           name="bayName"
