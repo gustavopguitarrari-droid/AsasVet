@@ -28,7 +28,7 @@ import { showError, showSuccess } from "@/utils/toast";
 import { uploadImageToSupabase, deleteImageFromSupabase } from "@/utils/supabaseStorage";
 import ClientDetailsDialog from "@/components/ClientDetailsDialog"; // Importar o novo ClientDetailsDialog
 import { useLocation } from "react-router-dom"; // Importar useLocation
-import AddressDetailsDialog from "@/components/AddressDetailsDialog"; // NOVO: Importar AddressDetailsDialog
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // NOVO: Importar Tooltip
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
@@ -74,11 +74,6 @@ const Cadastro = () => {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null); // Novo estado para cliente selecionado
   const [isClientPetsDialogOpen, setIsClientPetsDialogOpen] = useState<boolean>(false);
   const [clientToViewPets, setClientToViewPets] = useState<Client | null>(null);
-
-  // NOVO: Estados para o diálogo de detalhes do endereço
-  const [isAddressDetailsDialogOpen, setIsAddressDetailsDialogOpen] = useState<boolean>(false);
-  const [addressToDisplay, setAddressToDisplay] = useState<Client['address'] | null>(null);
-  const [clientNameForAddress, setClientNameForAddress] = useState<string>("");
 
   // --- Queries ---
   const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
@@ -654,14 +649,6 @@ const Cadastro = () => {
     });
   };
 
-  // NOVO: Handler para abrir o diálogo de detalhes do endereço
-  const handleViewAddress = (client: Client) => {
-    setAddressToDisplay(client.address);
-    setClientNameForAddress(client.name);
-    setIsAddressDetailsDialogOpen(true);
-  };
-
-
   if (isLoadingClients || isLoadingPets) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -785,17 +772,25 @@ const Cadastro = () => {
                           </div>
                         </TableCell>
                         <TableCell> {/* Célula para o botão de endereço */}
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation(); // Impede que o clique na linha seja acionado
-                              handleViewAddress(client);
-                            }}
-                            className="flex items-center gap-1"
-                          >
-                            <MapPin className="h-4 w-4" /> Ver Endereço
-                          </Button>
+                          <Tooltip delayDuration={0}>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={(e) => e.stopPropagation()} // Impede que o clique na linha seja acionado
+                                className="flex items-center gap-1"
+                              >
+                                <MapPin className="h-4 w-4" />
+                                <span className="sr-only">Ver Endereço</span>
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="right" className="max-w-xs">
+                              <p className="font-semibold mb-1">Endereço de {client.name}</p>
+                              <p className="text-sm">{client.address.street}, {client.address.number} {client.address.complement}</p>
+                              <p className="text-sm">{client.address.neighborhood}, {client.address.city} - {client.address.state}</p>
+                              <p className="text-xs text-muted-foreground">CEP: {client.address.cep}</p>
+                            </TooltipContent>
+                          </Tooltip>
                         </TableCell>
                         <TableCell className="text-center"> {/* Célula para Animais */}
                           {petsOfClient.length > 0 ? (
@@ -1039,14 +1034,6 @@ const Cadastro = () => {
           />
         </DialogContent>
       </Dialog>
-
-      {/* NOVO: Renderiza o AddressDetailsDialog */}
-      <AddressDetailsDialog
-        isOpen={isAddressDetailsDialogOpen}
-        onClose={() => setIsAddressDetailsDialogOpen(false)}
-        address={addressToDisplay}
-        clientName={clientNameForAddress}
-      />
     </div>
   );
 };
