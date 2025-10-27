@@ -240,6 +240,7 @@ const TeamMemberFormDialog: React.FC<TeamMemberFormDialogProps> = ({
               </Button>
             </DialogFooter>
           </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
