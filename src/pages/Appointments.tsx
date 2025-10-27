@@ -433,31 +433,7 @@ const Appointments = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex space-x-2">
-          <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
-            <History className="mr-2 h-4 w-4" /> Ver Histórico
-          </Button>
-          <Dialog open={isAddAppointmentDialogOpen} onOpenChange={setIsAddAppointmentDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar consulta a fila
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-4xl max-h-[60vh] overflow-y-auto p-6">
-              <DialogHeader>
-                <DialogTitle>Incluir Nova Consulta</DialogTitle>
-              </DialogHeader>
-              <AppointmentForm
-                onSubmit={handleAddAppointment}
-                onCancel={() => setIsAddAppointmentDialogOpen(false)} // Passa o handler de cancelamento
-                allClients={clients}
-                allPets={pets}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+      {/* Removido o div flex items-center justify-between que continha os botões */}
 
       <div className="grid gap-4 md:grid-cols-4">
         <Card className="bg-gray-700 text-white shadow-md">
@@ -503,7 +479,7 @@ const Appointments = () => {
       </div>
 
       <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto flex-1"> {/* Adicionado flex-1 */}
           <TabsList className="grid w-full grid-cols-3 bg-muted/50">
             <TabsTrigger value="em-espera" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">Em Espera</TabsTrigger>
             <TabsTrigger value="em-andamento" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">Em Andamento</TabsTrigger>
