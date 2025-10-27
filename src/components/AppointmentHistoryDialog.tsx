@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock, FileText } from "lucide-react"; // Adicionado FileText
+import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isValid, differenceInSeconds } from "date-fns";
@@ -36,11 +36,11 @@ import {
   AlertDialogTitle as AlertDialogTitleComponent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useMutation, useQueryClient } from "@tanstack/react-query"; // Importar useMutation
-import { supabase } from "@/integrations/supabase/client"; // Importar supabase
-import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
-import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf"; // Importar a função de geração de PDF
-import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm"; // Importar a interface do formulário
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { showError, showSuccess } from "@/utils/toast";
+import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf";
+import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
