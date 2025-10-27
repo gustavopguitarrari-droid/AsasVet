@@ -6,6 +6,8 @@ import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '@/context/SessionContext'; // Importar useSession
+import { Button } from '@/components/ui/button'; // Importar Button
+import { ArrowLeft } from 'lucide-react'; // Importar ícone ArrowLeft
 
 const Login = () => {
   const navigate = useNavigate();
@@ -29,7 +31,17 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center login-art-bg p-4"> {/* Aplicado o novo background */}
+    <div className="min-h-screen flex items-center justify-center login-art-bg p-4 relative"> {/* Adicionado 'relative' para posicionamento absoluto do botão */}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => navigate(-1)} // Navega para a página anterior
+        className="absolute top-4 left-4 text-muted-foreground hover:bg-accent"
+      >
+        <ArrowLeft className="h-5 w-5" />
+        <span className="sr-only">Voltar</span>
+      </Button>
+
       <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
           Bem-vindo ao AsasVet
