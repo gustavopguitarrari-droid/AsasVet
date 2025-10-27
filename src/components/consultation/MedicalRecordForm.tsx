@@ -12,7 +12,7 @@ import { PlusCircle, Trash2, Stethoscope, FlaskConical, ClipboardList, HeartPuls
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label"; // Importar o componente Label
+import { Label } from "@/components/ui/label";
 
 // Esquema de validação para um item de prescrição
 const prescriptionItemSchema = z.object({
@@ -173,61 +173,62 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
                               <FormLabel>Dosagem</FormLabel>
                               <FormControl>
                                 <Input placeholder="Ex: 5mg, 1 comprimido" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`prescriptions.${index}.frequency`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Frequência</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Ex: 12/12h, 1x ao dia" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                       <FormField
                         control={form.control}
-                        name={`prescriptions.${index}.frequency`}
+                        name={`prescriptions.${index}.instructions`}
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Frequência</FormLabel>
+                            <FormLabel>Instruções (Opcional)</FormLabel>
                             <FormControl>
-                              <Input placeholder="Ex: 12/12h, 1x ao dia" {...field} />
+                              <Textarea placeholder="Instruções adicionais de uso..." rows={2} {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2 h-8 w-8"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Remover Prescrição</span>
+                      </Button>
                     </div>
-                    <FormField
-                      control={form.control}
-                      name={`prescriptions.${index}.instructions`}
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Instruções (Opcional)</FormLabel>
-                          <FormControl>
-                            <Textarea placeholder="Instruções adicionais de uso..." rows={2} {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      className="absolute top-2 right-2 h-8 w-8"
-                      onClick={() => remove(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Remover Prescrição</span>
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
 
-          <Separator />
+            <Separator />
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? "Salvando Prontuário..." : "Salvar Prontuário"}
-          </Button>
-        </form>
-      </Form>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Salvando Prontuário..." : "Salvar Prontuário"}
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
     </Card>
   );
 };
