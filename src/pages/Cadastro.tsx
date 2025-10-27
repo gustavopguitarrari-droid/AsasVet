@@ -754,8 +754,8 @@ const Cadastro = () => {
 
                     return (
                       <TableRow key={client.id} className="cursor-pointer hover:bg-muted/50">
-                        <TableCell className="w-[60px]" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
-                          <Avatar className="h-9 w-9">
+                        <TableCell className="w-[60px] relative group" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
+                          <Avatar className="h-9 w-9 group-hover:scale-150 group-hover:z-10 transition-transform duration-200 ease-in-out">
                             {client.photoUrl ? (
                               <AvatarImage src={client.photoUrl} alt={client.name} />
                             ) : (
@@ -865,8 +865,8 @@ const Cadastro = () => {
                     const initials = pet.name.charAt(0).toUpperCase(); // Apenas a primeira inicial para pets
                     return (
                       <TableRow key={pet.id} className="cursor-pointer hover:bg-muted/50">
-                        <TableCell className="w-[60px]" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
-                          <Avatar className="h-9 w-9">
+                        <TableCell className="w-[60px] relative group" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
+                          <Avatar className="h-9 w-9 group-hover:scale-150 group-hover:z-10 transition-transform duration-200 ease-in-out">
                             {pet.photoUrl ? (
                               <AvatarImage src={pet.photoUrl} alt={pet.name} />
                             ) : (
