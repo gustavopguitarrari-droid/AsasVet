@@ -30,6 +30,7 @@ import ClientDetailsDialog from "@/components/ClientDetailsDialog"; // Importar 
 import { useLocation } from "react-router-dom"; // Importar useLocation
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // NOVO: Importar Tooltip
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
+import ImagePreviewDialog from "@/components/ImagePreviewDialog"; // NOVO: Importar ImagePreviewDialog
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
@@ -75,6 +76,11 @@ const Cadastro = () => {
   const [selectedClient, setSelectedClient] = useState<Client | null>(null); // Novo estado para cliente selecionado
   const [isClientPetsDialogOpen, setIsClientPetsDialogOpen] = useState<boolean>(false);
   const [clientToViewPets, setClientToViewPets] = useState<Client | null>(null);
+
+  // Estados para o ImagePreviewDialog
+  const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [imagePreviewAlt, setImagePreviewAlt] = useState("");
 
   // --- Queries ---
   const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
@@ -650,6 +656,15 @@ const Cadastro = () => {
     });
   };
 
+  // Handler para abrir o ImagePreviewDialog
+  const handleImageClick = (imageUrl: string | null, imageAlt: string) => {
+    if (imageUrl) {
+      setImagePreviewUrl(imageUrl);
+      setImagePreviewAlt(imageAlt);
+      setIsImagePreviewOpen(true);
+    }
+  };
+
   if (isLoadingClients || isLoadingPets) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -754,8 +769,11 @@ const Cadastro = () => {
 
                     return (
                       <TableRow key={client.id} className="cursor-pointer hover:bg-muted/50">
-                        <TableCell className="w-[60px] relative group" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
-                          <Avatar className="h-9 w-9 group-hover:scale-150 group-hover:z-10 transition-transform duration-200 ease-in-out">
+                        <TableCell className="w-[60px] relative group">
+                          <Avatar 
+                            className="h-9 w-9 group-hover:scale-150 group-hover:z-10 transition-transform duration-200 ease-in-out cursor-pointer"
+                            onClick={(e) => { e.stopPropagation(); handleImageClick(client.photoUrl || null, client.name); }}
+                          >
                             {client.photoUrl ? (
                               <AvatarImage src={client.photoUrl} alt={client.name} />
                             ) : (
@@ -865,8 +883,11 @@ const Cadastro = () => {
                     const initials = pet.name.charAt(0).toUpperCase(); // Apenas a primeira inicial para pets
                     return (
                       <TableRow key={pet.id} className="cursor-pointer hover:bg-muted/50">
-                        <TableCell className="w-[60px] relative group" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
-                          <Avatar className="h-9 w-9 group-hover:scale-150 group-hover:z-10 transition-transform duration-200 ease-in-out">
+                        <TableCell className="w-[60px] relative group">
+                          <Avatar 
+                            className="h-9 w-9 group-hover:scale-150 group-hover:z-10 transition-transform duration-200 ease-in-out cursor-pointer"
+                            onClick={(e) => { e.stopPropagation(); handleImageClick(pet.photoUrl || null, pet.name); }}
+                          >
                             {pet.photoUrl ? (
                               <AvatarImage src={pet.photoUrl} alt={pet.name} />
                             ) : (
@@ -931,7 +952,10 @@ const Cadastro = () => {
                       return (
                         <div key={pet.id} className="flex items-center justify-between p-3 border rounded-md bg-card">
                           <div className="flex items-center">
-                            <Avatar className="h-9 w-9 mr-3">
+                            <Avatar 
+                              className="h-9 w-9 mr-3 cursor-pointer"
+                              onClick={(e) => { e.stopPropagation(); handleImageClick(pet.photoUrl || null, pet.name); }}
+                            >
                               {pet.photoUrl ? (
                                 <AvatarImage src={pet.photoUrl} alt={pet.name} />
                               ) : (
@@ -1038,6 +1062,14 @@ const Cadastro = () => {
           />
         </DialogContent>
       </Dialog>
+
+      {/* NOVO: Image Preview Dialog */}
+      <ImagePreviewDialog
+        isOpen={isImagePreviewOpen}
+        onClose={() => setIsImagePreviewOpen(false)}
+        imageUrl={imagePreviewUrl}
+        imageAlt={imagePreviewAlt}
+      />
     </div>
   );
 };
