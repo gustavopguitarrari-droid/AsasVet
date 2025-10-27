@@ -292,7 +292,7 @@ const Appointments = () => {
           start_time: now.toISOString(),
         })
         .eq('id', appointmentId)
-        .eq('user_id', userId)
+        // REMOVIDO: .eq('user_id', userId)
         .select()
         .single();
       if (error) throw error;
