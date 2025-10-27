@@ -25,6 +25,7 @@ import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
 import { Label } from "@/components/ui/label"; // Importar o componente Label
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
+import { CalendarIcon, Search, User, PawPrint } from "lucide-react"; // Adicionado User e Search aqui
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
