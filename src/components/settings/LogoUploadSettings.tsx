@@ -120,18 +120,21 @@ const LogoUploadSettings: React.FC = () => {
       if (typeof reader.result === 'string') {
         console.log("handleUploadLogo: FileReader finished, result type string.");
         try {
-          const oldLogoUrl = user.logoUrl; // Get the current logo URL before uploading new one
+          // 1. Delete the old logo from storage if it exists
+          if (user.logoUrl) {
+            console.log("handleUploadLogo: Old logo detected, attempting to delete:", user.logoUrl);
+            const deleteSuccess = await deleteLogoFromSupabase(user.logoUrl);
+            if (!deleteSuccess) {
+              console.warn("handleUploadLogo: Failed to delete old logo, proceeding with new upload.");
+              // Optionally, you could throw an error here or show a warning to the user
+            }
+          }
+
+          // 2. Upload the new logo (which will now have a unique filename)
           const newLogoUrl = await uploadLogoToSupabase(reader.result, user.id);
           
           if (newLogoUrl) {
-            console.log("handleUploadLogo: Logo uploaded to storage, new URL:", newLogoUrl);
-            
-            // If there was an old logo and it's different from the new one, delete it from storage
-            if (oldLogoUrl && oldLogoUrl !== newLogoUrl) {
-              console.log("handleUploadLogo: Old logo detected, attempting to delete:", oldLogoUrl);
-              await deleteLogoFromSupabase(oldLogoUrl);
-            }
-            
+            console.log("handleUploadLogo: New logo uploaded to storage, URL:", newLogoUrl);
             updateProfileLogoMutation.mutate(newLogoUrl);
           } else {
             showError("Falha ao fazer upload do logo para o storage.");

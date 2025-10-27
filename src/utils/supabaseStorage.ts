@@ -117,17 +117,16 @@ export const uploadLogoToSupabase = async (
       base64Image.indexOf(";")
     );
     const fileExtension = contentType.split('/')[1];
-    // Usar um nome de arquivo fixo para o logo do usuário, ex: 'logo.ext'
-    // Isso permite que `upsert: true` funcione para sobrescrever o logo existente.
-    const fileName = `logo.${fileExtension}`; 
-    const filePath = `${userId}/${fileName}`; // Caminho: userId/logo.ext
+    // Usar um nome de arquivo único para o logo do usuário para evitar cache
+    const fileName = `${uuidv4()}.${fileExtension}`; 
+    const filePath = `${userId}/${fileName}`; // Caminho: userId/uuid.ext
     console.log(`uploadLogoToSupabase: Attempting to upload to filePath: ${filePath} with contentType: ${contentType}`);
 
     const { data, error } = await supabase.storage
       .from(LOGOS_BUCKET_NAME)
       .upload(filePath, base64ToBlob(base64Image, contentType), {
         contentType,
-        upsert: true, // Sobrescrever se já existir
+        upsert: false, // Não sobrescrever, pois o nome do arquivo é único
       });
 
     if (error) {
@@ -157,7 +156,7 @@ export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean
 
   try {
     // Extrai o caminho do arquivo da URL pública de forma mais robusta
-    // Exemplo publicUrl: https://<project_id>.supabase.co/storage/v1/object/public/logos/user_id/logo.png
+    // Exemplo publicUrl: https://<project_id>.supabase.co/storage/v1/object/public/logos/user_id/uuid.png
     const url = new URL(publicUrl);
     const pathSegments = url.pathname.split('/');
     // O caminho do arquivo no storage é tudo depois de '/storage/v1/object/public/logos/'
@@ -166,7 +165,7 @@ export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean
       console.warn("deleteLogoFromSupabase: URL pública inválida para exclusão do logo:", publicUrl);
       return false;
     }
-    const filePath = pathSegments.slice(bucketIndex + 1).join('/'); // user_id/logo.ext
+    const filePath = pathSegments.slice(bucketIndex + 1).join('/'); // user_id/uuid.ext
     console.log(`deleteLogoFromSupabase: Attempting to delete filePath: ${filePath} from bucket: ${LOGOS_BUCKET_NAME}`);
 
     const { error } = await supabase.storage
