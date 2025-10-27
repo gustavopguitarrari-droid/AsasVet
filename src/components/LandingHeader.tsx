@@ -40,7 +40,7 @@ const LandingHeader: React.FC = () => {
           <Link to="/login">Login</Link>
         </Button>
         <Button asChild className="text-lg font-medium">
-          <Link to="/login">Cadastre-se</Link>
+          <Link to="/login" state={{ view: 'sign_up' }}>Cadastre-se</Link>
         </Button>
       </div>
     </header>
