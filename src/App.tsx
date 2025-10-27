@@ -17,7 +17,7 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
-import Index from "./pages/Index"; // Importar a página Index
+import LandingPage from "./pages/LandingPage"; // Importar a nova LandingPage
 import ConsultationPage from "./pages/Consultation"; // Importar a nova página de Consulta
 import { SessionContextProvider } from "./context/SessionContext";
 
@@ -28,11 +28,11 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}> {/* Adicionado o prop 'future' */}
+      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <SessionContextProvider>
           <Routes>
+            <Route path="/" element={<LandingPage />} /> {/* Nova rota inicial */}
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Index />} /> {/* Rota inicial que redireciona */}
             
             {/* Rotas Protegidas */}
             <Route
@@ -124,7 +124,7 @@ const App = () => (
               }
             />
             <Route
-              path="/consultation/:appointmentId" // Nova rota para a página de consulta
+              path="/consultation/:appointmentId"
               element={
                 <ProtectedRoute>
                   <ConsultationPage />

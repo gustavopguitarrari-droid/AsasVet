@@ -4,8 +4,10 @@ import React, { useEffect } from 'react';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
-import { useSession } from '@/context/SessionContext'; // Importar useSession
+import { useNavigate, Link } from 'react-router-dom'; // Importar Link
+import { useSession } from '@/context/SessionContext';
+import { Button } from '@/components/ui/button'; // Importar Button
+import { ArrowLeft } from 'lucide-react'; // Importar ArrowLeft
 
 const Login = () => {
   const navigate = useNavigate();
@@ -22,21 +24,26 @@ const Login = () => {
   if (isLoading) {
     console.log('Login Page - Currently loading session...');
     return (
-      <div className="min-h-screen flex items-center justify-center login-art-bg"> {/* Aplicado o novo background */}
+      <div className="min-h-screen flex items-center justify-center login-art-bg">
         <p className="text-lg text-gray-600 dark:text-gray-300">Carregando...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center login-art-bg p-4"> {/* Aplicado o novo background */}
-      <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
+    <div className="min-h-screen flex items-center justify-center login-art-bg p-4">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white dark:bg-gray-800 rounded-lg shadow-md relative">
+        <Button asChild variant="ghost" className="absolute top-4 left-4">
+          <Link to="/">
+            <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
+          </Link>
+        </Button>
+        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mt-8">
           Bem-vindo ao AsasVet
         </h2>
         <Auth
           supabaseClient={supabase}
-          providers={[]} // No third-party providers for now
+          providers={[]}
           appearance={{
             theme: ThemeSupa,
             variables: {
@@ -48,8 +55,8 @@ const Login = () => {
               },
             },
           }}
-          theme="light" // Use light theme by default, can be adjusted with dark mode later
-          redirectTo={window.location.origin + '/painel'} // Redirect to dashboard after login
+          theme="light"
+          redirectTo={window.location.origin + '/painel'}
           localization={{
             variables: {
               sign_in: {
