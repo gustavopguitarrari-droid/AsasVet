@@ -98,7 +98,7 @@ const Appointments = () => {
       default:
         tabName = "";
     }
-    setPageTitle(`${tabName} - Consultas`); // Definir o título dinâmico
+    setPageTitle(`Consultas - ${tabName}`); // Definir o título dinâmico
   }, [activeTab, setPageTitle]);
 
   // --- Queries ---
