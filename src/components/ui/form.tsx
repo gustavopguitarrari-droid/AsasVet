@@ -9,6 +9,8 @@ import {
   FieldPath,
   FieldValues,
   useFormContext,
+  FormProvider, // Importar FormProvider
+  UseFormReturn, // Importar UseFormReturn para tipagem
 } from "react-hook-form";
 
 import { cn } from "@/lib/utils";
@@ -55,7 +57,7 @@ FormLabel.displayName = "FormLabel";
 const FormControl = React.forwardRef<
   React.ElementRef<typeof Slot>,
   React.ComponentPropsWithoutRef<typeof Slot>
->(({ children, ...props }, ref) => { // Desestruturar 'children' explicitamente
+>(({ children, ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
@@ -71,7 +73,7 @@ const FormControl = React.forwardRef<
       aria-invalid={!!error}
       {...props}
     >
-      {children} {/* Passar 'children' explicitamente */}
+      {children}
     </Slot>
   );
 });
@@ -142,6 +144,28 @@ const FormField = <
   );
 };
 
+// NOVO: Definição do componente Form
+interface FormComponentProps<TFieldValues extends FieldValues> extends React.ComponentPropsWithoutRef<'form'> {
+  form: UseFormReturn<TFieldValues>;
+  onSubmit: (data: TFieldValues) => void;
+}
+
+const Form = <TFieldValues extends FieldValues = FieldValues>({
+  form,
+  onSubmit,
+  children,
+  ...props
+}: FormComponentProps<TFieldValues>) => {
+  return (
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} {...props}>
+        {children}
+      </form>
+    </FormProvider>
+  );
+};
+
+
 const useFormField = () => {
   const fieldContext = React.useContext(FormFieldContext);
   const itemContext = React.useContext(FormItemContext);
@@ -167,7 +191,7 @@ const useFormField = () => {
 
 export {
   useFormField,
-  Form,
+  Form, // Agora Form está definido
   FormItem,
   FormLabel,
   FormControl,
