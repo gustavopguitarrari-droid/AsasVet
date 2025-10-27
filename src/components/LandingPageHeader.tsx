@@ -17,7 +17,7 @@ const LandingPageHeader: React.FC = () => {
           <Link to="/login">Entrar</Link>
         </Button>
         <Button asChild>
-          <Link to="/cadastro">Cadastrar</Link>
+          <Link to="/register">Cadastrar</Link>
         </Button>
       </nav>
     </header>
