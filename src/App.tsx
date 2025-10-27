@@ -20,6 +20,7 @@ import Login from "./pages/Login";
 import LandingPage from "./pages/LandingPage"; // Importar a nova LandingPage
 import ConsultationPage from "./pages/Consultation"; // Importar a nova página de Consulta
 import { SessionContextProvider } from "./context/SessionContext";
+import ScrollToTop from "./components/ScrollToTop"; // Importar o novo componente ScrollToTop
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <SessionContextProvider>
+          <ScrollToTop /> {/* Adicionar o ScrollToTop aqui */}
           <Routes>
             <Route path="/" element={<LandingPage />} /> {/* Nova rota inicial */}
             <Route path="/login" element={<Login />} />
