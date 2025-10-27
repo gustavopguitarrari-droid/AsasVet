@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { format } from 'date-fns';
 
-interface User {
+export interface User { // Adicionado 'export' aqui
   id?: string; // Adicionado ID do usuário
   name?: string; // Tornar opcional
   lastName?: string; // Tornar opcional
@@ -17,7 +17,7 @@ interface User {
 
 interface UserContextType {
   user: User | null;
-  setUser: (user: User | null) => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; // Tipagem ajustada
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
