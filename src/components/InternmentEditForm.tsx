@@ -96,8 +96,7 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
   });
 
   return (
-    <Form {...form} onSubmit={onSubmit}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+    <Form form={form} onSubmit={onSubmit} className="space-y-4"> {/* CORREÇÃO AQUI */}
         <FormField
           control={form.control}
           name="bayName"
@@ -309,31 +308,31 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
                     <FormControl>
                       <RadioGroupItem value="Em Observação" />
                     </FormControl>
-                    <label htmlFor="Em Observação" className="font-normal cursor-pointer">Em Observação</label> {/* CORREÇÃO AQUI */}
+                    <label htmlFor="Em Observação" className="font-normal cursor-pointer">Em Observação</label>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
                       <RadioGroupItem value="Estável" />
                     </FormControl>
-                    <label htmlFor="Estável" className="font-normal cursor-pointer">Estável</label> {/* CORREÇÃO AQUI */}
+                    <label htmlFor="Estável" className="font-normal cursor-pointer">Estável</label>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
                       <RadioGroupItem value="Crítico" />
                     </FormControl>
-                    <label htmlFor="Crítico" className="font-normal cursor-pointer">Crítico</label> {/* CORREÇÃO AQUI */}
+                    <label htmlFor="Crítico" className="font-normal cursor-pointer">Crítico</label>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
                       <RadioGroupItem value="Alta" />
                     </FormControl>
-                    <label htmlFor="Alta" className="font-normal cursor-pointer">Alta</label> {/* CORREÇÃO AQUI */}
+                    <label htmlFor="Alta" className="font-normal cursor-pointer">Alta</label>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
                     <FormControl>
                       <RadioGroupItem value="Óbito" />
                     </FormControl>
-                    <label htmlFor="Óbito" className="font-normal cursor-pointer">Óbito</label> {/* CORREÇÃO AQUI */}
+                    <label htmlFor="Óbito" className="font-normal cursor-pointer">Óbito</label>
                   </FormItem>
                 </RadioGroup>
               </FormControl>
