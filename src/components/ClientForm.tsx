@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, User, Mail, Phone, Home, MapPin, Calendar, IdCard, Upload, XCircle, Camera, ChevronDown } from "lucide-react";
+import { PlusCircle, User, Mail, Phone, Home, MapPin, Calendar, IdCard, Upload, XCircle, Camera } from "lucide-react";
 import { format, parseISO, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
@@ -27,11 +27,6 @@ import { showError, showSuccess } from "@/utils/toast";
 import { Textarea } from "@/components/ui/textarea";
 import CameraCaptureDialog from "./CameraCaptureDialog";
 import { Label } from "@/components/ui/label"; // Adicionado importação do Label
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"; // Importar Collapsible
 
 // Esquema de validação do formulário com Zod
 const formSchema = z.object({
@@ -88,7 +83,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
         cep: initialData?.address?.cep || "",
         street: initialData?.address?.street || "",
         number: initialData?.address?.number || "",
-        complement: initialData?.address?.complement || undefined,
+        complement: initialData?.address?.complement || "",
         neighborhood: initialData?.address?.neighborhood || "",
         city: initialData?.address?.city || "",
         state: initialData?.address?.state || "",
@@ -101,7 +96,6 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
   const [previewUrl, setPreviewUrl] = useState<string | null>(initialData?.photoUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isCameraDialogOpen, setIsCameraDialogOpen] = useState(false);
-  const [isAddressCollapsed, setIsAddressCollapsed] = useState<boolean>(!!initialData?.address?.cep); // Inicia aberto se houver CEP
 
   // Efeito para resetar o formulário e o preview da imagem quando o diálogo é aberto/fechado
   useEffect(() => {
@@ -115,7 +109,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
         cep: initialData?.address?.cep || "",
         street: initialData?.address?.street || "",
         number: initialData?.address?.number || "",
-        complement: initialData?.address?.complement || undefined,
+        complement: initialData?.address?.complement || "",
         neighborhood: initialData?.address?.neighborhood || "",
         city: initialData?.address?.city || "",
         state: initialData?.address?.state || "",
@@ -127,7 +121,6 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    setIsAddressCollapsed(!!initialData?.address?.cep); // Reseta o estado da colapsagem
   }, [initialData, form]);
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -314,117 +307,104 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
           )}
         />
 
-        <Collapsible
-          open={isAddressCollapsed}
-          onOpenChange={setIsAddressCollapsed}
-          className="space-y-4"
-        >
-          <CollapsibleTrigger asChild>
-            <Button variant="ghost" className="w-full justify-between text-lg font-semibold px-0">
-              <h3 className="flex items-center">
-                <Home className="h-5 w-5 mr-2 text-muted-foreground" /> Endereço
-              </h3>
-              <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="space-y-4">
-            <FormField
-              control={form.control}
-              name="address.cep"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>CEP</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: 12345-678" {...field} onChange={handleCepChange} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="address.street"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Rua</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Rua das Flores" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="address.number"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Número</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: 123" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="address.complement"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Complemento (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: Apt 101" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <FormField
-              control={form.control}
-              name="address.neighborhood"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bairro</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Centro" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="address.city"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Cidade</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: São Paulo" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="address.state"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Estado (UF)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ex: SP" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+        <h3 className="text-lg font-semibold mt-6 mb-4 flex items-center">
+          <Home className="h-5 w-5 mr-2 text-muted-foreground" /> Endereço
+        </h3>
+        <FormField
+          control={form.control}
+          name="address.cep"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>CEP</FormLabel>
+              <FormControl>
+                <Input placeholder="Ex: 12345-678" {...field} onChange={handleCepChange} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="address.street"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Rua</FormLabel>
+              <FormControl>
+                <Input placeholder="Ex: Rua das Flores" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="address.number"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Número</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: 123" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="address.complement"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Complemento (Opcional)</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: Apt 101" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+        <FormField
+          control={form.control}
+          name="address.neighborhood"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Bairro</FormLabel>
+              <FormControl>
+                <Input placeholder="Ex: Centro" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="address.city"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Cidade</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: São Paulo" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="address.state"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Estado (UF)</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: SP" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}
