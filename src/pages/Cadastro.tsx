@@ -909,9 +909,7 @@ const Cadastro = () => {
                         <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.gender}</TableCell>
                         <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.color}</TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
-                            <Eye className="h-4 w-4" />
-                          </Button>
+                          {/* Botão de "Ver Detalhes" removido */}
                           <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleEditPet(pet); }}>
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -979,9 +977,7 @@ const Cadastro = () => {
                             </div>
                           </div>
                           <div>
-                            <Button variant="ghost" size="sm" onClick={() => handlePetRowClick(pet)}>
-                              <Eye className="h-4 w-4" />
-                            </Button>
+                            {/* Botão de "Ver Detalhes" removido */}
                             <Button variant="ghost" size="sm" onClick={() => handleEditPet(pet)}>
                               <Edit className="h-4 w-4" />
                             </Button>
