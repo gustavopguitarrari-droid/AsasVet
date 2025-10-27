@@ -4,7 +4,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, FileText } from 'lucide-react'; // Adicionado FileText para o PDF
+import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList } from 'lucide-react'; // Removido FileText
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/context/UserContext';
@@ -14,7 +14,7 @@ import { ptBR } from 'date-fns/locale';
 import AppointmentChronometer from '@/components/AppointmentChronometer';
 import { Appointment } from './Appointments'; // Importar a interface Appointment
 import MedicalRecordForm, { MedicalRecordFormValues } from '@/components/consultation/MedicalRecordForm'; // Importar o novo formulário
-import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf'; // Importar a função de geração de PDF
+// Removido: import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf'; // Removido a importação da função de geração de PDF
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -166,20 +166,7 @@ const ConsultationPage: React.FC = () => {
     saveMedicalRecordMutation.mutate(data);
   };
 
-  const handleGeneratePdf = async () => {
-    if (appointment && medicalRecord) {
-      console.log("ConsultationPage: Generating PDF. appUser?.logoUrl:", appUser?.logoUrl); // Adicionado log aqui
-      try {
-        await generateMedicalRecordPdf({ appointment, medicalRecord: initialMedicalRecordData, logoUrl: appUser?.logoUrl }); // NOVO: Passar logoUrl
-        showSuccess("PDF do prontuário gerado com sucesso!");
-      } catch (err: any) {
-        console.error("Erro ao gerar PDF:", err);
-        showError(`Erro ao gerar PDF: ${err.message}`);
-      }
-    } else {
-      showError("Não há dados de consulta ou prontuário para gerar o PDF.");
-    }
-  };
+  // Removido: handleGeneratePdf não é mais necessário aqui
 
   if (isLoading || isLoadingMedicalRecord) {
     return (
@@ -271,13 +258,7 @@ const ConsultationPage: React.FC = () => {
       />
 
       <div className="flex justify-end space-x-2">
-        <Button
-          onClick={handleGeneratePdf}
-          disabled={!appointment || !medicalRecord || saveMedicalRecordMutation.isPending || finalizeAppointmentMutation.isPending}
-          variant="outline"
-        >
-          <FileText className="mr-2 h-5 w-5" /> Gerar PDF
-        </Button>
+        {/* Removido o botão Gerar PDF */}
         <Button
           onClick={handleFinalizeConsultation}
           disabled={finalizeAppointmentMutation.isPending}
