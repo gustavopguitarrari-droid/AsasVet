@@ -330,16 +330,25 @@ const Dashboard = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold">{getGreeting()}</h2>
-          <p className="text-muted-foreground">
-            Visão geral do seu consultório veterinário.
-          </p>
-          {user?.role === "Administrador" && (
-            <p className="text-green-600 font-semibold mt-2">
-              (Você está logado como Administrador e tem acesso total ao sistema.)
-            </p>
+        <div className="flex items-center space-x-4"> {/* Adicionado flex container para logo e texto */}
+          {user?.logoUrl && (
+            <img
+              src={user.logoUrl}
+              alt="Logo da Clínica"
+              className="h-16 w-auto max-w-[150px] object-contain rounded-md shadow-sm" // Estilos para o logo
+            />
           )}
+          <div>
+            <h2 className="text-3xl font-bold">{getGreeting()}</h2>
+            <p className="text-muted-foreground">
+              Visão geral do seu consultório veterinário.
+            </p>
+            {user?.role === "Administrador" && (
+              <p className="text-green-600 font-semibold mt-2">
+                (Você está logado como Administrador e tem acesso total ao sistema.)
+              </p>
+            )}
+          </div>
         </div>
         <Button
           onClick={() => setIsConfiguratorOpen(true)}
