@@ -5,6 +5,7 @@ import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from './UserContext';
 
+// Updated UserProfile to match the extended User interface in UserContext
 interface UserProfile {
   id?: string;
   name?: string;
@@ -12,9 +13,21 @@ interface UserProfile {
   email?: string;
   avatarUrl?: string;
   role?: string;
-  birthday?: string;
-  registeredTime: string;
+  birthday?: string; // YYYY-MM-DD string
+  registeredTime: string; // ISO string
   gender?: string;
+  phone?: string;
+  crmv?: string;
+  cpf?: string;
+  companyName?: string;
+  addressCep?: string;
+  addressStreet?: string;
+  addressNumber?: string;
+  addressComplement?: string;
+  addressNeighborhood?: string;
+  addressCity?: string;
+  addressState?: string;
+  colorTheme?: string;
 }
 
 interface SessionContextType {
@@ -68,13 +81,25 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
 
       const profileToSet: UserProfile = {
         id: supabaseUser.id,
-        name: profileData?.first_name || userMetadata.first_name?.toString() || '',
-        lastName: profileData?.last_name || userMetadata.last_name?.toString() || '',
-        email: supabaseUser.email || '',
+        name: profileData?.first_name || userMetadata.first_name?.toString() || undefined,
+        lastName: profileData?.last_name || userMetadata.last_name?.toString() || undefined,
+        email: supabaseUser.email || undefined,
         avatarUrl: profileData?.avatar_url || userMetadata.avatar_url?.toString() || undefined,
         role: profileData?.role || userMetadata.role?.toString() || 'Usuário',
         birthday: profileData?.birthday || userMetadata.birthday?.toString() || undefined,
         gender: profileData?.gender || userMetadata.gender?.toString() || undefined,
+        phone: profileData?.phone || userMetadata.phone?.toString() || undefined,
+        crmv: profileData?.crmv || userMetadata.crmv?.toString() || undefined,
+        cpf: profileData?.cpf || userMetadata.cpf?.toString() || undefined,
+        companyName: profileData?.company_name || userMetadata.company_name?.toString() || undefined,
+        addressCep: profileData?.address_cep || userMetadata.address_cep?.toString() || undefined,
+        addressStreet: profileData?.address_street || userMetadata.address_street?.toString() || undefined,
+        addressNumber: profileData?.address_number || userMetadata.address_number?.toString() || undefined,
+        addressComplement: profileData?.address_complement || userMetadata.address_complement?.toString() || undefined,
+        addressNeighborhood: profileData?.address_neighborhood || userMetadata.address_neighborhood?.toString() || undefined,
+        addressCity: profileData?.address_city || userMetadata.address_city?.toString() || undefined,
+        addressState: profileData?.address_state || userMetadata.address_state?.toString() || undefined,
+        colorTheme: profileData?.color_theme || userMetadata.color_theme?.toString() || undefined,
         registeredTime: profileData?.registered_time || supabaseUser.created_at,
       };
       console.log('SessionContext: Constructed profileToSet for UserContext:', profileToSet);

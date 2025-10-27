@@ -4,15 +4,27 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { format } from 'date-fns';
 
 interface User {
-  id?: string; // Adicionado ID do usuário
-  name?: string; // Tornar opcional
-  lastName?: string; // Tornar opcional
-  email?: string; // Tornar opcional
+  id?: string;
+  name?: string;
+  lastName?: string;
+  email?: string;
   avatarUrl?: string;
-  role?: string; // Tornar opcional
-  birthday?: string;
-  registeredTime: string;
-  // gender?: string; // REMOVIDO: Adicionado campo de gênero
+  role?: string;
+  birthday?: string; // YYYY-MM-DD string
+  registeredTime: string; // ISO string
+  gender?: string;
+  phone?: string;
+  crmv?: string;
+  cpf?: string;
+  companyName?: string;
+  addressCep?: string;
+  addressStreet?: string;
+  addressNumber?: string;
+  addressComplement?: string;
+  addressNeighborhood?: string;
+  addressCity?: string;
+  addressState?: string;
+  colorTheme?: string;
 }
 
 interface UserContextType {
@@ -22,7 +34,7 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider = ({ children }: { ReactNode }) => {
+export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   return (

@@ -19,11 +19,15 @@ import ProfilePictureUploadDialog from "@/components/ProfilePictureUploadDialog"
 import { useMutation, useQueryClient } from "@tanstack/react-query"; // Importar useMutation e useQueryClient
 import { supabase } from "@/integrations/supabase/client"; // Importar o cliente Supabase
 import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
+import { useAutoSaveProfile } from "@/hooks/useAutoSaveProfile"; // Importar o novo hook de auto-save
 
 const Profile = () => {
   const { user, setUser } = useUser();
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const queryClient = useQueryClient();
+
+  // Integrate auto-save hook
+  useAutoSaveProfile(user);
 
   // Mutation para atualizar o perfil no Supabase
   const updateProfileMutation = useMutation({
@@ -48,6 +52,19 @@ const Profile = () => {
         avatarUrl: data.avatar_url || undefined,
         role: data.role || undefined,
         birthday: data.birthday || undefined,
+        gender: data.gender || undefined,
+        phone: data.phone || undefined,
+        crmv: data.crmv || undefined,
+        cpf: data.cpf || undefined,
+        companyName: data.company_name || undefined,
+        addressCep: data.address_cep || undefined,
+        addressStreet: data.address_street || undefined,
+        addressNumber: data.address_number || undefined,
+        addressComplement: data.address_complement || undefined,
+        addressNeighborhood: data.address_neighborhood || undefined,
+        addressCity: data.address_city || undefined,
+        addressState: data.address_state || undefined,
+        colorTheme: data.color_theme || undefined,
       }));
       queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] }); // Invalida o cache para rebuscar se necessário
       showSuccess("Perfil atualizado com sucesso!");
