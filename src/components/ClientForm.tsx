@@ -381,16 +381,16 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
           <FormField
             control={form.control}
             name="address.city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Cidade</FormLabel>
-                <FormControl>
-                  <Input placeholder="Ex: São Paulo" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Cidade</FormLabel>
+              <FormControl>
+                <Input placeholder="Ex: São Paulo" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
           <FormField
             control={form.control}
             name="address.state"
