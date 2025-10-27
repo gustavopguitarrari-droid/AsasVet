@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock } from "lucide-react";
+import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock, FileText } from "lucide-react"; // Adicionado FileText
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isValid, differenceInSeconds } from "date-fns";
@@ -36,6 +36,25 @@ import {
   AlertDialogTitle as AlertDialogTitleComponent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useMutation, useQueryClient } from "@tanstack/react-query"; // Importar useMutation
+import { supabase } from "@/integrations/supabase/client"; // Importar supabase
+import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
+import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf"; // Importar a função de geração de PDF
+import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm"; // Importar a interface do formulário
+
+// Interface para o prontuário médico (deve corresponder à tabela medical_records)
+interface MedicalRecord {
+  id: string;
+  appointment_id: string;
+  user_id: string;
+  anamnesis?: string | null;
+  physical_exam?: string | null;
+  diagnosis?: string | null;
+  treatment?: string | null;
+  prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
+  created_at: string;
+  updated_at: string;
+}
 
 interface AppointmentHistoryDialogProps {
   isOpen: boolean;
@@ -79,6 +98,49 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   isClearingHistory,
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const queryClient = useQueryClient();
+
+  // Mutação para buscar o prontuário e gerar o PDF
+  const fetchAndGeneratePdfMutation = useMutation({
+    mutationFn: async (appointment: Appointment) => {
+      const { data: medicalRecordData, error } = await supabase
+        .from('medical_records')
+        .select('*')
+        .eq('appointment_id', appointment.id)
+        .eq('user_id', appointment.user_id) // Garante RLS
+        .single();
+
+      if (error) {
+        if (error.code === 'PGRST116') { // No rows found
+          throw new Error("Prontuário médico não encontrado para esta consulta.");
+        }
+        throw error;
+      }
+
+      if (!medicalRecordData) {
+        throw new Error("Prontuário médico não encontrado.");
+      }
+
+      // Mapeia os dados do prontuário para o formato do formulário para a função PDF
+      const medicalRecordForPdf: MedicalRecordFormValues = {
+        anamnesis: medicalRecordData.anamnesis || undefined,
+        physicalExam: medicalRecordData.physical_exam || undefined,
+        diagnosis: medicalRecordData.diagnosis || undefined,
+        treatment: medicalRecordData.treatment || undefined,
+        prescriptions: medicalRecordData.prescriptions || [],
+      };
+
+      await generateMedicalRecordPdf({ appointment, medicalRecord: medicalRecordForPdf });
+      return true;
+    },
+    onSuccess: () => {
+      showSuccess("PDF do prontuário gerado com sucesso!");
+    },
+    onError: (err: any) => {
+      console.error("Erro ao gerar PDF do histórico:", err);
+      showError(`Erro ao gerar PDF: ${err.message}`);
+    },
+  });
 
   const filteredHistory = historyAppointments.filter((appointment) =>
     appointment.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -137,7 +199,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                 <TableHead>Tutor</TableHead>
                 <TableHead>Serviço</TableHead>
                 <TableHead>Veterinário</TableHead>
-                <TableHead>Status</TableHead> {/* Nova coluna para status */}
+                <TableHead>Status</TableHead>
                 <TableHead>Finalização/Cancelamento</TableHead>
                 <TableHead>Duração</TableHead>
                 <TableHead>Tempo de Espera</TableHead>
@@ -191,16 +253,30 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                       <TableCell>{duration}</TableCell>
                       <TableCell>{waitingTime}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm" onClick={() => onViewDetails(appointment)}>
-                          <Eye className="h-4 w-4" />
-                        </Button>
+                        <div className="flex justify-end space-x-2">
+                          <Button variant="ghost" size="sm" onClick={() => onViewDetails(appointment)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => fetchAndGeneratePdfMutation.mutate(appointment)}
+                            disabled={fetchAndGeneratePdfMutation.isPending}
+                          >
+                            {fetchAndGeneratePdfMutation.isPending ? (
+                              <span className="loading-spinner h-4 w-4" />
+                            ) : (
+                              <FileText className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center text-muted-foreground"> {/* colSpan ajustado para 9 */}
+                  <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
                     Nenhuma consulta encontrada no histórico.
                   </TableCell>
                 </TableRow>
