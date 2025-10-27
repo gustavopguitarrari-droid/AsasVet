@@ -424,34 +424,34 @@ const Appointments = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="bg-gray-50 dark:bg-gray-900 text-foreground shadow-md">
+        <Card className="bg-gray-700 text-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Em espera</CardTitle>
-            <CalendarClock className="h-4 w-4 text-muted-foreground" />
+            <CalendarClock className="h-4 w-4 text-white" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalAgendadas}</div>
-            <p className="text-muted-foreground text-xs">Consultas aguardando</p>
+            <p className="text-gray-200 text-xs">Consultas aguardando</p>
           </CardContent>
         </Card>
-        <Card className="bg-gray-50 dark:bg-gray-900 text-foreground shadow-md">
+        <Card className="bg-orange-500 text-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Em Andamento</CardTitle>
-            <CalendarClock className="h-4 w-4 text-muted-foreground" />
+            <CalendarClock className="h-4 w-4 text-white" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalEmAndamento}</div>
-            <p className="text-muted-foreground text-xs">Consultas em progresso</p>
+            <p className="text-white/80 text-xs">Consultas em progresso</p>
           </CardContent>
         </Card>
-        <Card className="bg-gray-50 dark:bg-gray-900 text-foreground shadow-md">
+        <Card className="bg-green-500 text-white shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Realizadas</CardTitle>
-            <CalendarCheck className="h-4 w-4 text-muted-foreground" />
+            <CalendarCheck className="h-4 w-4 text-white" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalRealizadas}</div>
-            <p className="text-muted-foreground text-xs">Consultas concluídas</p>
+            <p className="text-white/80 text-xs">Consultas concluídas</p>
           </CardContent>
         </Card>
         <Card className="bg-destructive text-destructive-foreground shadow-md">
