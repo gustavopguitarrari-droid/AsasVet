@@ -86,7 +86,9 @@ const Login = () => {
                 social_provider_text: 'Entrar com {{provider}}',
                 link_text: '', // Definido explicitamente como string vazia
               },
-              // Removido: sign_up localization, pois agora é uma página separada
+              sign_up: { // Adicionado explicitamente a seção sign_up
+                link_text: '', // Definir o link_text como vazio para evitar renderização
+              },
               forgotten_password: {
                 email_label: 'Email',
                 password_label: 'Sua senha',
