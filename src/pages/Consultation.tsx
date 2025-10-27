@@ -2,10 +2,9 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-// import Layout from '@/components/layout/Layout'; // Removido para evitar duplicação
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList } from 'lucide-react';
+import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, FileText } from 'lucide-react'; // Adicionado FileText para o PDF
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/context/UserContext';
@@ -15,6 +14,7 @@ import { ptBR } from 'date-fns/locale';
 import AppointmentChronometer from '@/components/AppointmentChronometer';
 import { Appointment } from './Appointments'; // Importar a interface Appointment
 import MedicalRecordForm, { MedicalRecordFormValues } from '@/components/consultation/MedicalRecordForm'; // Importar o novo formulário
+import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf'; // Importar a função de geração de PDF
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -166,6 +166,20 @@ const ConsultationPage: React.FC = () => {
     saveMedicalRecordMutation.mutate(data);
   };
 
+  const handleGeneratePdf = async () => {
+    if (appointment && medicalRecord) {
+      try {
+        await generateMedicalRecordPdf({ appointment, medicalRecord: initialMedicalRecordData });
+        showSuccess("PDF do prontuário gerado com sucesso!");
+      } catch (err: any) {
+        console.error("Erro ao gerar PDF:", err);
+        showError(`Erro ao gerar PDF: ${err.message}`);
+      }
+    } else {
+      showError("Não há dados de consulta ou prontuário para gerar o PDF.");
+    }
+  };
+
   if (isLoading || isLoadingMedicalRecord) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -255,7 +269,14 @@ const ConsultationPage: React.FC = () => {
         isSubmitting={saveMedicalRecordMutation.isPending}
       />
 
-      <div className="flex justify-end">
+      <div className="flex justify-end space-x-2">
+        <Button
+          onClick={handleGeneratePdf}
+          disabled={!appointment || !medicalRecord || saveMedicalRecordMutation.isPending || finalizeAppointmentMutation.isPending}
+          variant="outline"
+        >
+          <FileText className="mr-2 h-5 w-5" /> Gerar PDF
+        </Button>
         <Button
           onClick={handleFinalizeConsultation}
           disabled={finalizeAppointmentMutation.isPending}
