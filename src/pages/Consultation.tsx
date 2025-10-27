@@ -88,7 +88,7 @@ const ConsultationPage: React.FC = () => {
         physical_exam: recordData.physicalExam || null,
         diagnosis: recordData.diagnosis || null,
         treatment: recordData.treatment || null,
-        prescriptions: recordData.prescriptions || [], // Alterado de 'null' para '[]'
+        prescriptions: recordData.prescriptions || [],
       };
 
       if (medicalRecord?.id) {
@@ -197,7 +197,7 @@ const ConsultationPage: React.FC = () => {
     physicalExam: medicalRecord?.physical_exam || undefined,
     diagnosis: medicalRecord?.diagnosis || undefined,
     treatment: medicalRecord?.treatment || undefined,
-    prescriptions: medicalRecord?.prescriptions || undefined,
+    prescriptions: medicalRecord?.prescriptions || [], // Garante que seja um array vazio se for null/undefined
   };
 
   return (
