@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { FileDown, CalendarCheck, Clock, User, PawPrint, Stethoscope, Home, MapPin, IdCard, Mail, Phone, Calendar, Palette, Heart, Info } from 'lucide-react';
+import { FileDown, CalendarCheck, Clock, User, PawPrint, Stethoscope, Home, MapPin, IdCard, Mail, Phone, Calendar, Palette, Heart, Info, FlaskConical } from 'lucide-react';
 import { Appointment } from "@/pages/Appointments";
 import { Client, Pet } from "@/types/cadastro";
 import { format, parseISO, isValid, differenceInSeconds } from "date-fns";
