@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle, PawPrint, DollarSign, Users, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import LandingHeader from '@/components/LandingHeader'; // Importar o novo componente
 
 const plans = [
   {
@@ -51,8 +52,10 @@ const plans = [
 const LandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <LandingHeader /> {/* Adiciona o cabeçalho aqui */}
+
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center text-center p-8 login-art-bg">
+      <section className="relative h-screen flex items-center justify-center text-center p-8 login-art-bg pt-20"> {/* Adicionado pt-20 para compensar o header fixo */}
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <div className="relative z-10 max-w-4xl mx-auto text-white space-y-6">
           <PawPrint className="h-24 w-24 mx-auto text-primary-foreground" />
@@ -75,7 +78,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-8 bg-muted text-center">
+      <section id="features" className="py-20 px-8 bg-muted text-center"> {/* Adicionado id="features" */}
         <h2 className="text-4xl font-bold mb-12">Recursos que Transformam</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
           <div className="flex flex-col items-center space-y-4">
@@ -103,7 +106,7 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Plans Section */}
-      <section className="py-20 px-8 bg-background text-center">
+      <section id="plans" className="py-20 px-8 bg-background text-center"> {/* Adicionado id="plans" */}
         <h2 className="text-4xl font-bold mb-12">Escolha o Plano Ideal para Você</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan, index) => (
