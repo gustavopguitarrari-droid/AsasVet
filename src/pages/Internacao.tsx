@@ -570,56 +570,58 @@ const Internacao = () => {
           <TabsTrigger value="mapa-execucao" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
         </TabsList>
 
-        {/* Nova seção para a legenda de risco e botões, fora do TabsContent, mas dentro do Tabs */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-8 p-4 border-t pt-4">
-          {/* Legenda de Risco */}
-          <div className="flex flex-wrap gap-4">
-            {Object.entries(riskColorMap).map(([risk, colorClass]) => (
-              <div key={risk} className="flex items-center space-x-2">
-                <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
-                <span className="text-sm text-muted-foreground">{risk}</span>
-              </div>
-            ))}
-          </div>
-
-          {/* Botões de Ação */}
-          <div className="flex space-x-2">
-            <InternmentHistoryDialog
-              isOpen={isHistoryDialogOpen}
-              onClose={() => setIsHistoryDialogOpen(false)}
-              historyPatients={historyPatients}
-              onClearHistory={() => clearHistoryMutation.mutate()}
-              isClearingHistory={clearHistoryMutation.isPending}
-            />
-            <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
-              <History className="mr-2 h-4 w-4" /> Ver Histórico
-            </Button>
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="font-bold">
-                  <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
-                <DialogHeader>
-                  <DialogTitle>Internar Novo Paciente</DialogTitle>
-                </DialogHeader>
-                <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
-
         <TabsContent value="pacientes-internados" className="mt-4">
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar pacientes internados..."
-              className="pl-9"
-              value={patientSearchTerm}
-              onChange={(e) => setPatientSearchTerm(e.target.value)}
-            />
+          {/* Seção para a legenda de risco, barra de pesquisa e botões */}
+          <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
+            {/* Legenda de Risco */}
+            <div className="flex flex-wrap gap-4 flex-1">
+              {Object.entries(riskColorMap).map(([risk, colorClass]) => (
+                <div key={risk} className="flex items-center space-x-2">
+                  <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
+                  <span className="text-sm text-muted-foreground">{risk}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Barra de Pesquisa */}
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar pacientes internados..."
+                className="pl-9"
+                value={patientSearchTerm}
+                onChange={(e) => setPatientSearchTerm(e.target.value)}
+              />
+            </div>
+
+            {/* Botões de Ação */}
+            <div className="flex space-x-2">
+              <InternmentHistoryDialog
+                isOpen={isHistoryDialogOpen}
+                onClose={() => setIsHistoryDialogOpen(false)}
+                historyPatients={historyPatients}
+                onClearHistory={() => clearHistoryMutation.mutate()}
+                isClearingHistory={clearHistoryMutation.isPending}
+              />
+              <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
+                <History className="mr-2 h-4 w-4" /> Ver Histórico
+              </Button>
+              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="font-bold">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Internar Paciente
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto p-4">
+                  <DialogHeader>
+                    <DialogTitle>Internar Novo Paciente</DialogTitle>
+                  </DialogHeader>
+                  <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
+
           {filteredInternedPatients.length > 0 ? (
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {filteredInternedPatients.map((patient) => {
