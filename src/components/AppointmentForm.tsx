@@ -5,15 +5,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format, parseISO, isValid } from "date-fns";
-import { ptBR } from "date-fns/locale"; // Importar ptBR
+import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar"; // Importar Calendar
-import { CalendarIcon, Search, User, PawPrint } from "lucide-react"; // Ícones para busca e seleção
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon, Search, User, PawPrint } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-  Form, // Importar o componente Form
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -23,8 +23,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
-import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
+import { Client, Pet } from "@/types/cadastro";
+import { showError, showSuccess } from "@/utils/toast";
+import { Label } from "@/components/ui/label"; // Importar o componente Label
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -198,7 +199,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
     : [];
 
   return (
-    <Form form={form} onSubmit={onSubmit} className="space-y-4"> {/* CORREÇÃO AQUI */}
+    <Form form={form} onSubmit={onSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -256,9 +257,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
 
         {/* Busca de Tutor por CPF */}
         <div className="space-y-2 border p-3 rounded-md">
-          <FormLabel className="flex items-center">
+          <Label className="flex items-center"> {/* Alterado de FormLabel para Label */}
             <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor por CPF
-          </FormLabel>
+          </Label>
           <div className="flex space-x-2">
             <Input
               placeholder="Digite o CPF do tutor (somente números)"
@@ -293,9 +294,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
 
         {/* Seleção de Animal */}
         <div className="space-y-2 border p-3 rounded-md">
-          <FormLabel className="flex items-center">
+          <Label className="flex items-center"> {/* Alterado de FormLabel para Label */}
             <PawPrint className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Animal
-          </FormLabel>
+          </Label>
           <FormField
             control={form.control}
             name="selectedPetId"

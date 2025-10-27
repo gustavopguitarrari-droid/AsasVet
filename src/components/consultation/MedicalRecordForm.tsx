@@ -12,6 +12,7 @@ import { PlusCircle, Trash2, Stethoscope, FlaskConical, ClipboardList, HeartPuls
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Label } from "@/components/ui/label"; // Importar o componente Label
 
 // Esquema de validação para um item de prescrição
 const prescriptionItemSchema = z.object({
@@ -131,9 +132,9 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <FormLabel className="flex items-center text-lg font-semibold">
+                <Label className="flex items-center text-lg font-semibold"> {/* Alterado de FormLabel para Label */}
                   <Pill className="h-5 w-5 mr-2" /> Prescrições
-                </FormLabel>
+                </Label>
                 <Button
                   type="button"
                   variant="outline"
