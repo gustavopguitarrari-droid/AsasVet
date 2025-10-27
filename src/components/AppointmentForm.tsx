@@ -196,9 +196,16 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
     ? allPets.filter(pet => pet.ownerId === selectedClientFromSearch.id)
     : [];
 
+  const handleSubmit = (data: AppointmentFormValues) => {
+    console.log("AppointmentForm: Submitting data:", data);
+    console.log("AppointmentForm: selectedClientId (from form data):", data.selectedClientId);
+    console.log("AppointmentForm: selectedPetId (from form data):", data.selectedPetId);
+    onSubmit(data);
+  };
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}

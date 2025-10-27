@@ -169,6 +169,13 @@ const Appointments = () => {
 
       const appointmentDate = format(newAppointmentData.date, "yyyy-MM-dd");
 
+      console.log("addAppointmentMutation: Data being prepared for insert:");
+      console.log("  client_id:", newAppointmentData.selectedClientId);
+      console.log("  pet_id:", newAppointmentData.selectedPetId);
+      console.log("  client_name:", newAppointmentData.client);
+      console.log("  pet_name:", newAppointmentData.pet);
+      // ... rest of the data
+
       const { data, error } = await supabase
         .from('appointments')
         .insert({
@@ -176,9 +183,9 @@ const Appointments = () => {
           date: appointmentDate,
           time: newAppointmentData.time,
           client_name: newAppointmentData.client,
-          client_id: newAppointmentData.selectedClientId, // NOVO: Salva client_id
+          client_id: newAppointmentData.selectedClientId,
           pet_name: newAppointmentData.pet,
-          pet_id: newAppointmentData.selectedPetId,     // NOVO: Salva pet_id
+          pet_id: newAppointmentData.selectedPetId,
           species: newAppointmentData.species,
           service: newAppointmentData.service,
           veterinarian: veterinarianName,
@@ -202,6 +209,11 @@ const Appointments = () => {
   const updateAppointmentMutation = useMutation({
     mutationFn: async (updatedAppointment: Appointment) => {
       if (!userId) throw new Error("User not authenticated.");
+      console.log("updateAppointmentMutation: Data being prepared for update:");
+      console.log("  appointment ID:", updatedAppointment.id);
+      console.log("  client_id:", updatedAppointment.client_id);
+      console.log("  pet_id:", updatedAppointment.pet_id);
+      // ... rest of the data
       const { data, error } = await supabase
         .from('appointments')
         .update({
