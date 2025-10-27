@@ -535,15 +535,6 @@ const Internacao = () => {
         </TabsList>
 
         <TabsContent value="pacientes-internados" className="mt-4">
-          <div className="relative mb-4"> {/* Barra de pesquisa movida para cima */}
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar pacientes internados..."
-              className="pl-9"
-              value={patientSearchTerm}
-              onChange={(e) => setPatientSearchTerm(e.target.value)}
-            />
-          </div>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
             {/* Legenda de Risco */}
             <div className="flex flex-wrap gap-4">
@@ -553,6 +544,16 @@ const Internacao = () => {
                   <span className="text-sm text-muted-foreground">{risk}</span>
                 </div>
               ))}
+            </div>
+            {/* Barra de pesquisa */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar pacientes internados..."
+                className="pl-9"
+                value={patientSearchTerm}
+                onChange={(e) => setPatientSearchTerm(e.target.value)}
+              />
             </div>
             {/* Botões de Ação */}
             <div className="flex space-x-2">
