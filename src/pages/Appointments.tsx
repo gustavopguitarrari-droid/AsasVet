@@ -389,13 +389,6 @@ const Appointments = () => {
   const totalCanceladas = appointments.filter(a => a.status === "Cancelada").length;
   const totalEmAndamento = appointments.filter(a => a.status === "Em Andamento").length;
 
-  // Mapeamento de nomes de abas para exibição no título
-  const tabTitleMap: Record<string, string> = {
-    "em-espera": "Em Espera",
-    "em-andamento": "Em Andamento",
-    "finalizadas": "Finalizadas",
-  };
-
   if (isLoading || isLoadingClients || isLoadingPets || isLoadingHistory) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -414,10 +407,8 @@ const Appointments = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold">
-        {tabTitleMap[activeTab]} - Consultas
-      </h2>
       <div className="flex items-center justify-between">
+        {/* <h2 className="text-3xl font-bold">Gerenciar consultas do dia</h2> */}
         <div className="flex space-x-2">
           <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
             <History className="mr-2 h-4 w-4" /> Ver Histórico
