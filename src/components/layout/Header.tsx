@@ -26,7 +26,8 @@ const Header = () => {
         return "Painel";
       case "/cadastro": // Novo título para Cadastro
         return "Cadastro";
-      // REMOVIDO: case "/consultas": return "Consultas"; // Esta linha estava causando o problema
+      case "/consultas":
+        return "Consultas"; // Manter como base para a página de Consultas
       case "/medical-records":
         return "Agenda";
       case "/financeiro":
@@ -44,7 +45,7 @@ const Header = () => {
       case "/settings":
         return "Configurações";
       default:
-        return "AsasVet"; // Fallback padrão
+        return "AsasVet";
     }
   };
 
