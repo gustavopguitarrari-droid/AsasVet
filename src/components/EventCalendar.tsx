@@ -66,15 +66,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
             className="rounded-md border shadow-md w-full"
             modifiers={modifiers}
             modifiersClassNames={modifiersClassNames}
-            footer={
-              selectedDay && (
-                <div className="mt-4 text-center">
-                  <Button onClick={() => onAddEventClick(selectedDay)}>
-                    Adicionar Agendamento em {format(selectedDay, "PPP", { locale: ptBR })}
-                  </Button>
-                </div>
-              )
-            }
+            // REMOVIDO: O footer com o botão de adicionar agendamento
           />
         </CardContent>
       </Card>
