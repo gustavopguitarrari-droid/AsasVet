@@ -335,7 +335,7 @@ const Dashboard = () => {
             <img
               src={user.logoUrl}
               alt="Logo da Clínica"
-              className="h-16 w-auto max-w-[150px] object-contain rounded-md shadow-sm" // Estilos para o logo
+              className="h-24 w-auto max-w-[150px] object-contain rounded-md shadow-sm" // Estilos para o logo
             />
           )}
           <div>
