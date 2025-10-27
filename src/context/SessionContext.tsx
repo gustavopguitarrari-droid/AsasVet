@@ -25,7 +25,7 @@ interface SessionContextType {
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export const SessionContextProvider = ({ children }: { ReactNode }) => {
+export const SessionContextProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true); // Start as true to indicate initial loading
