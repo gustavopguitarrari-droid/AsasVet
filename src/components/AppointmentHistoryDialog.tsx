@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock } from "lucide-react"; // Adicionado CalendarClock
+import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isValid, differenceInSeconds } from "date-fns";
@@ -31,20 +31,20 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter as AlertDialogFooterComponent, // Renomear para evitar conflito
+  AlertDialogFooter as AlertDialogFooterComponent,
   AlertDialogHeader,
-  AlertDialogTitle as AlertDialogTitleComponent, // Renomear para evitar conflito
+  AlertDialogTitle as AlertDialogTitleComponent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar Tabs
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface AppointmentHistoryDialogProps {
   isOpen: boolean;
   onClose: () => void;
   historyAppointments: Appointment[];
   onViewDetails: (appointment: Appointment) => void;
-  onClearHistory: () => void; // Nova prop para limpar o histórico
-  isClearingHistory: boolean; // Nova prop para indicar se a limpeza está em andamento
+  onClearHistory: () => void;
+  isClearingHistory: boolean;
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -80,7 +80,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   isClearingHistory,
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<string>("consultas"); // Estado para a aba ativa
+  const [activeTab, setActiveTab] = useState<string>("consultas");
 
   const filteredHistory = historyAppointments.filter((appointment) =>
     appointment.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -147,6 +147,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                   <TableHead>Veterinário</TableHead>
                   <TableHead>Finalização</TableHead>
                   <TableHead>Duração</TableHead>
+                  <TableHead>Tempo de Espera</TableHead> {/* Nova coluna aqui */}
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -160,6 +161,19 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                           const end = parseISO(appointment.completion_timestamp);
                           if (isValid(start) && isValid(end)) {
                             const durationSeconds = differenceInSeconds(end, start);
+                            return formatDuration(durationSeconds);
+                          }
+                          return "N/A";
+                        })()
+                      : "N/A";
+
+                    // Calcular o tempo de espera para consultas realizadas
+                    const waitingTime = appointment.created_at && appointment.start_time
+                      ? (() => {
+                          const created = parseISO(appointment.created_at);
+                          const started = parseISO(appointment.start_time);
+                          if (isValid(created) && isValid(started)) {
+                            const durationSeconds = differenceInSeconds(started, created);
                             return formatDuration(durationSeconds);
                           }
                           return "N/A";
@@ -181,6 +195,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                             : "N/A"}
                         </TableCell>
                         <TableCell>{duration}</TableCell>
+                        <TableCell>{waitingTime}</TableCell> {/* Exibir o tempo de espera aqui */}
                         <TableCell className="text-right">
                           <Button variant="ghost" size="sm" onClick={() => onViewDetails(appointment)}>
                             <Eye className="h-4 w-4" />
@@ -191,7 +206,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={8} className="h-24 text-center text-muted-foreground"> {/* colSpan ajustado para 8 */}
                       Nenhuma consulta realizada encontrada no histórico.
                     </TableCell>
                   </TableRow>
@@ -209,7 +224,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                   <TableHead>Serviço</TableHead>
                   <TableHead>Veterinário</TableHead>
                   <TableHead>Cancelamento</TableHead>
-                  <TableHead>Tempo de Espera</TableHead> {/* Nova coluna */}
+                  <TableHead>Tempo de Espera</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
@@ -245,7 +260,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                             ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
                             : "N/A"}
                         </TableCell>
-                        <TableCell>{waitingTime}</TableCell> {/* Exibir o tempo de espera */}
+                        <TableCell>{waitingTime}</TableCell>
                         <TableCell className="text-right">
                           <Button variant="ghost" size="sm" onClick={() => onViewDetails(appointment)}>
                             <Eye className="h-4 w-4" />
@@ -256,7 +271,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="h-24 text-center text-muted-foreground"> {/* CORRIGIDO: colSpan para 7 */}
+                    <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
                       Nenhuma consulta cancelada encontrada no histórico.
                     </TableCell>
                   </TableRow>
