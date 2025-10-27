@@ -574,7 +574,7 @@ const Internacao = () => {
           {/* Seção para a legenda de risco, barra de pesquisa e botões */}
           <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
             {/* Legenda de Risco */}
-            <div className="flex flex-wrap gap-4 flex-1">
+            <div className="flex flex-wrap gap-4"> {/* Removido flex-1 */}
               {Object.entries(riskColorMap).map(([risk, colorClass]) => (
                 <div key={risk} className="flex items-center space-x-2">
                   <span className={cn("h-4 w-4 rounded-full", colorClass)}></span>
@@ -584,7 +584,7 @@ const Internacao = () => {
             </div>
 
             {/* Barra de Pesquisa */}
-            <div className="relative flex-1 min-w-[200px]">
+            <div className="relative w-full md:max-w-xs"> {/* Ajustado para max-w-xs */}
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Buscar pacientes internados..."
