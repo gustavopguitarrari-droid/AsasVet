@@ -233,7 +233,8 @@ const LogoUploadSettings: React.FC = () => {
               <XCircle className="h-4 w-4 mr-2" /> Remover Logo
             </Button>
           </div>
-        </CardContent>
+        </div>
+      </CardContent>
     </Card>
   );
 };
