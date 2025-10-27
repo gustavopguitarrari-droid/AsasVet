@@ -41,6 +41,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf";
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
+import PdfDownloadDialog from "./PdfDownloadDialog"; // NOVO: Importar o diálogo de download de PDF
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -100,8 +101,13 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>("");
   const queryClient = useQueryClient();
 
-  // Mutação para buscar o prontuário e gerar o PDF
-  const fetchAndGeneratePdfMutation = useMutation({
+  // NOVO: Estados para o diálogo de download de PDF
+  const [isPdfDownloadDialogOpen, setIsPdfDownloadDialogOpen] = useState(false);
+  const [pdfAppointmentData, setPdfAppointmentData] = useState<Appointment | null>(null);
+  const [pdfMedicalRecordData, setPdfMedicalRecordData] = useState<MedicalRecordFormValues | null>(null);
+
+  // Mutação para buscar o prontuário e abrir o diálogo de download
+  const fetchAndOpenPdfDialogMutation = useMutation({
     mutationFn: async (appointment: Appointment) => {
       const { data: medicalRecordData, error } = await supabase
         .from('medical_records')
@@ -130,15 +136,16 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         prescriptions: medicalRecordData.prescriptions || [],
       };
 
-      await generateMedicalRecordPdf({ appointment, medicalRecord: medicalRecordForPdf });
-      return true;
+      return { appointment, medicalRecord: medicalRecordForPdf };
     },
-    onSuccess: () => {
-      showSuccess("PDF do prontuário gerado com sucesso!");
+    onSuccess: ({ appointment, medicalRecord }) => {
+      setPdfAppointmentData(appointment);
+      setPdfMedicalRecordData(medicalRecord);
+      setIsPdfDownloadDialogOpen(true); // Abre o diálogo de download
     },
     onError: (err: any) => {
-      console.error("Erro ao gerar PDF do histórico:", err);
-      showError(`Erro ao gerar PDF: ${err.message}`);
+      console.error("Erro ao preparar PDF:", err);
+      showError(`Erro ao preparar PDF: ${err.message}`);
     },
   });
 
@@ -254,14 +261,13 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                       <TableCell>{waitingTime}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end space-x-2">
-                          {/* Botão de "Ver Detalhes" (olho) removido daqui */}
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => fetchAndGeneratePdfMutation.mutate(appointment)}
-                            disabled={fetchAndGeneratePdfMutation.isPending}
+                            onClick={() => fetchAndOpenPdfDialogMutation.mutate(appointment)} // NOVO: Abre o diálogo
+                            disabled={fetchAndOpenPdfDialogMutation.isPending}
                           >
-                            {fetchAndGeneratePdfMutation.isPending ? (
+                            {fetchAndOpenPdfDialogMutation.isPending ? (
                               <span className="loading-spinner h-4 w-4" />
                             ) : (
                               <FileText className="h-4 w-4" />
@@ -310,6 +316,16 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
           </AlertDialog>
         </DialogFooter>
       </DialogContent>
+
+      {/* NOVO: Renderiza o diálogo de download de PDF */}
+      {isPdfDownloadDialogOpen && pdfAppointmentData && pdfMedicalRecordData && (
+        <PdfDownloadDialog
+          isOpen={isPdfDownloadDialogOpen}
+          onClose={() => setIsPdfDownloadDialogOpen(false)}
+          appointment={pdfAppointmentData}
+          medicalRecord={pdfMedicalRecordData}
+        />
+      )}
     </Dialog>
   );
 };
