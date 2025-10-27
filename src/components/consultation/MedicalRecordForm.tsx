@@ -64,8 +64,8 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Form {...form}> {/* CORREÇÃO AQUI: Usando spread operator para 'form' */}
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6"> {/* CORREÇÃO AQUI: 'form.handleSubmit' no elemento HTML 'form' */}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="anamnesis"
