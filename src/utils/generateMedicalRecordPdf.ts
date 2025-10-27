@@ -39,25 +39,29 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
 
   // Função para adicionar cabeçalho (agora assíncrona para o logo)
   const addHeader = async () => {
-    const headerY = yPos;
+    const initialHeaderY = yPos; // Armazena a posição Y inicial para o bloco do cabeçalho
+
+    // Título Principal
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(primaryColor);
-    doc.text('AsasVet - Prontuário Médico', margin, headerY);
-    doc.setTextColor(textColor);
+    doc.text('AsasVet - Prontuário Médico', margin, yPos);
+    yPos += lineHeight * 1.2; // Move para baixo para a data de emissão
+
+    // Data de Emissão (abaixo do título, alinhada à esquerda)
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, 210 - margin, headerY, { align: 'right' });
-    
-    // Adicionar logo se disponível
+    doc.setTextColor(lightTextColor);
+    doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, margin, yPos);
+    yPos += lineHeight * 1.5; // Move para baixo para a linha separadora
+
+    // Adicionar logo se disponível (ainda no canto superior direito, relativo ao initialHeaderY)
     if (logoUrl) {
       try {
         const img = new Image();
         img.src = logoUrl;
         await new Promise((resolve, reject) => {
-          img.onload = () => {
-            resolve(null);
-          };
+          img.onload = () => resolve(null);
           img.onerror = (e) => {
             console.error("Erro ao carregar imagem do logo para PDF:", e);
             reject(e);
@@ -67,17 +71,17 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
         const imgWidth = 30; // Largura fixa para o logo
         const imgHeight = (img.height * imgWidth) / img.width; // Manter proporção
         const imgX = 210 - margin - imgWidth; // Alinhar à direita
-        const imgY = headerY - 5; // Ajustar posição vertical para ficar no topo do cabeçalho
+        const imgY = initialHeaderY - 5; // Posição relativa ao topo do bloco do cabeçalho
         doc.addImage(img, 'PNG', imgX, imgY, imgWidth, imgHeight);
       } catch (e) {
         console.error("Erro ao carregar ou adicionar logo ao PDF:", e);
-        // Continua a gerar o PDF sem o logo se houver erro
       }
     }
-    yPos = headerY + lineHeight * 1.5;
+
+    // Linha separadora
     doc.setDrawColor(primaryColor);
-    doc.line(margin, yPos, 210 - margin, yPos); // Linha separadora
-    yPos += lineHeight * 1.5;
+    doc.line(margin, yPos, 210 - margin, yPos);
+    yPos += lineHeight * 1.5; // Espaço após a linha separadora
   };
 
   // Função para adicionar rodapé
