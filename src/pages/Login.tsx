@@ -84,7 +84,7 @@ const Login = () => {
                 password_input_placeholder: 'Sua senha',
                 button_label: 'Entrar',
                 social_provider_text: 'Entrar com {{provider}}',
-                // Removido: link_text para 'Cadastre-se' aqui, pois agora é uma página separada
+                link_text: '', // Definido explicitamente como string vazia
               },
               // Removido: sign_up localization, pois agora é uma página separada
               forgotten_password: {
