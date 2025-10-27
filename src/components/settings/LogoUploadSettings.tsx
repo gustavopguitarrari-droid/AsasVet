@@ -21,11 +21,22 @@ const LogoUploadSettings: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(user?.logoUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Atualiza o preview quando o logo do usuário muda
+  // Atualiza o preview quando o logo do usuário muda no contexto
   useEffect(() => {
     console.log("LogoUploadSettings: user.logoUrl changed to", user?.logoUrl);
     setPreviewUrl(user?.logoUrl || null);
   }, [user?.logoUrl]);
+
+  // Reset selected file and input when dialog is closed or user changes
+  useEffect(() => {
+    if (!user) {
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  }, [user]);
+
 
   const updateProfileLogoMutation = useMutation({
     mutationFn: async (newLogoUrl: string | null) => {
@@ -74,20 +85,20 @@ const LogoUploadSettings: React.FC = () => {
       if (!file.type.startsWith('image/')) {
         showError("Por favor, selecione um arquivo de imagem válido.");
         setSelectedFile(null);
-        setPreviewUrl(user?.logoUrl || null);
+        setPreviewUrl(user?.logoUrl || null); // Reverte para o logo atual do usuário
         return;
       }
       if (file.size > 5 * 1024 * 1024) { // Limite de 5MB para logos
         showError("A imagem é muito grande. O tamanho máximo permitido é 5MB.");
         setSelectedFile(null);
-        setPreviewUrl(user?.logoUrl || null);
+        setPreviewUrl(user?.logoUrl || null); // Reverte para o logo atual do usuário
         return;
       }
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
     } else {
       setSelectedFile(null);
-      setPreviewUrl(user?.logoUrl || null);
+      setPreviewUrl(user?.logoUrl || null); // Reverte para o logo atual do usuário
     }
   };
 
@@ -109,9 +120,18 @@ const LogoUploadSettings: React.FC = () => {
       if (typeof reader.result === 'string') {
         console.log("handleUploadLogo: FileReader finished, result type string.");
         try {
+          const oldLogoUrl = user.logoUrl; // Get the current logo URL before uploading new one
           const newLogoUrl = await uploadLogoToSupabase(reader.result, user.id);
+          
           if (newLogoUrl) {
             console.log("handleUploadLogo: Logo uploaded to storage, new URL:", newLogoUrl);
+            
+            // If there was an old logo and it's different from the new one, delete it from storage
+            if (oldLogoUrl && oldLogoUrl !== newLogoUrl) {
+              console.log("handleUploadLogo: Old logo detected, attempting to delete:", oldLogoUrl);
+              await deleteLogoFromSupabase(oldLogoUrl);
+            }
+            
             updateProfileLogoMutation.mutate(newLogoUrl);
           } else {
             showError("Falha ao fazer upload do logo para o storage.");
@@ -213,10 +233,9 @@ const LogoUploadSettings: React.FC = () => {
               <XCircle className="h-4 w-4 mr-2" /> Remover Logo
             </Button>
           </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
+        </CardContent>
+      </Card>
+    );
 };
 
 export default LogoUploadSettings;

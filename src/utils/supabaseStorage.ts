@@ -117,18 +117,11 @@ export const uploadLogoToSupabase = async (
       base64Image.indexOf(";")
     );
     const fileExtension = contentType.split('/')[1];
+    // Usar um nome de arquivo fixo para o logo do usuário, ex: 'logo.ext'
+    // Isso permite que `upsert: true` funcione para sobrescrever o logo existente.
     const fileName = `logo.${fileExtension}`; 
     const filePath = `${userId}/${fileName}`; // Caminho: userId/logo.ext
     console.log(`uploadLogoToSupabase: Attempting to upload to filePath: ${filePath} with contentType: ${contentType}`);
-
-    // Tentar remover o logo antigo se existir (para garantir que sempre haja apenas um)
-    // Nota: getPublicUrl pode retornar um URL mesmo que o arquivo não exista,
-    // então a tentativa de remoção pode falhar sem problema se não houver logo.
-    const { data: existingPublicUrlData } = supabase.storage.from(LOGOS_BUCKET_NAME).getPublicUrl(filePath);
-    if (existingPublicUrlData.publicUrl) {
-      console.log(`uploadLogoToSupabase: Found existing logo at ${existingPublicUrlData.publicUrl}, attempting to delete.`);
-      await deleteLogoFromSupabase(existingPublicUrlData.publicUrl);
-    }
 
     const { data, error } = await supabase.storage
       .from(LOGOS_BUCKET_NAME)
@@ -163,12 +156,17 @@ export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean
   }
 
   try {
-    const pathSegments = publicUrl.split(`${LOGOS_BUCKET_NAME}/`);
-    if (pathSegments.length < 2) {
+    // Extrai o caminho do arquivo da URL pública de forma mais robusta
+    // Exemplo publicUrl: https://<project_id>.supabase.co/storage/v1/object/public/logos/user_id/logo.png
+    const url = new URL(publicUrl);
+    const pathSegments = url.pathname.split('/');
+    // O caminho do arquivo no storage é tudo depois de '/storage/v1/object/public/logos/'
+    const bucketIndex = pathSegments.indexOf(LOGOS_BUCKET_NAME);
+    if (bucketIndex === -1 || bucketIndex + 1 >= pathSegments.length) {
       console.warn("deleteLogoFromSupabase: URL pública inválida para exclusão do logo:", publicUrl);
       return false;
     }
-    const filePath = pathSegments[1];
+    const filePath = pathSegments.slice(bucketIndex + 1).join('/'); // user_id/logo.ext
     console.log(`deleteLogoFromSupabase: Attempting to delete filePath: ${filePath} from bucket: ${LOGOS_BUCKET_NAME}`);
 
     const { error } = await supabase.storage
@@ -177,7 +175,6 @@ export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean
 
     if (error) {
       console.error("deleteLogoFromSupabase: Erro ao deletar logo do storage:", error);
-      // Não lançar erro aqui, apenas registrar, pois a função é chamada para "limpar" antes de um novo upload
       return false;
     }
     console.log("deleteLogoFromSupabase: Logo deleted successfully.");
