@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import html2canvas from 'html22canvas'; // Mantido para compatibilidade, mas não usado diretamente
 import { format, parseISO, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Appointment } from '@/pages/Appointments';
@@ -11,109 +11,162 @@ interface MedicalRecordPdfData {
 }
 
 export const generateMedicalRecordPdf = async ({ appointment, medicalRecord }: MedicalRecordPdfData) => {
-  const doc = new jsPDF('p', 'mm', 'a4'); // 'p' for portrait, 'mm' for millimeters, 'a4' for A4 size
-  const margin = 10;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const margin = 15; // Aumentar margem
   let yPos = margin;
-  const lineHeight = 7;
-  const maxWidth = 210 - 2 * margin; // A4 width - 2 * margin
+  const lineHeight = 6; // Ajustar altura da linha
+  const maxWidth = 210 - 2 * margin; // Largura A4 - 2 * margem
 
-  // Set font for pt-BR characters
-  doc.setFont('helvetica'); // Default font, usually supports basic Latin characters. For full pt-BR support, a custom font might be needed.
-  doc.setFontSize(10);
+  // Cores e fontes
+  const primaryColor = '#3b82f6'; // Um azul consistente com o tema
+  const textColor = '#333333';
+  const lightTextColor = '#666666';
+  doc.setFont('helvetica');
+  doc.setTextColor(textColor);
 
-  // Header
-  doc.setFontSize(16);
-  doc.text('Prontuário Médico - AsasVet', margin, yPos);
-  yPos += lineHeight * 2;
+  // Função para adicionar nova página
+  const addPageIfNeeded = () => {
+    if (yPos > 297 - margin - lineHeight * 3) { // Deixar espaço para o rodapé
+      doc.addPage();
+      yPos = margin;
+      addHeader(); // Adicionar cabeçalho em novas páginas
+    }
+  };
 
-  doc.setFontSize(12);
-  doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, margin, yPos);
-  yPos += lineHeight;
-  doc.line(margin, yPos, 210 - margin, yPos); // Horizontal line
-  yPos += lineHeight;
+  // Função para adicionar cabeçalho
+  const addHeader = () => {
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(primaryColor);
+    doc.text('AsasVet - Prontuário Médico', margin, yPos);
+    doc.setTextColor(textColor);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, 210 - margin, yPos, { align: 'right' });
+    yPos += lineHeight * 1.5;
+    doc.setDrawColor(primaryColor);
+    doc.line(margin, yPos, 210 - margin, yPos); // Linha separadora
+    yPos += lineHeight * 1.5;
+  };
 
-  // Appointment Details
+  // Função para adicionar rodapé
+  const addFooter = () => {
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(lightTextColor);
+      doc.text(`Página ${i} de ${pageCount}`, margin, 297 - margin + 5);
+      doc.text('AsasVet - Gestão Veterinária', 210 - margin, 297 - margin + 5, { align: 'right' });
+    }
+  };
+
+  addHeader();
+
+  // Detalhes da Consulta
   doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
   doc.text('Detalhes da Consulta', margin, yPos);
   yPos += lineHeight;
-
+  doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
-  doc.text(`Tutor: ${appointment.client_name}`, margin, yPos);
-  yPos += lineHeight;
-  doc.text(`Animal: ${appointment.pet_name} (${appointment.species})`, margin, yPos);
-  yPos += lineHeight;
-  doc.text(`Serviço: ${appointment.service}`, margin, yPos);
-  yPos += lineHeight;
-  doc.text(`Veterinário: ${appointment.veterinarian}`, margin, yPos);
-  yPos += lineHeight;
-  doc.text(`Data da Consulta: ${format(parseISO(appointment.date), 'dd/MM/yyyy', { locale: ptBR })} às ${appointment.time}`, margin, yPos);
-  yPos += lineHeight;
-  doc.text(`Status: ${appointment.status}`, margin, yPos);
-  yPos += lineHeight;
+  doc.setTextColor(lightTextColor);
+
+  const addDetail = (label: string, value: string | undefined | null) => {
+    if (value) {
+      addPageIfNeeded();
+      doc.text(`${label}: `, margin, yPos);
+      doc.setFont('helvetica', 'bold');
+      doc.text(value, margin + doc.getTextWidth(`${label}: `), yPos);
+      doc.setFont('helvetica', 'normal');
+      yPos += lineHeight;
+    }
+  };
+
+  addDetail('Tutor', appointment.client_name);
+  addDetail('Animal', `${appointment.pet_name} (${appointment.species})`);
+  addDetail('Serviço', appointment.service);
+  addDetail('Veterinário', appointment.veterinarian);
+  addDetail('Data da Consulta', format(parseISO(appointment.date), 'dd/MM/yyyy', { locale: ptBR }));
+  addDetail('Hora', appointment.time);
+  addDetail('Status', appointment.status);
   if (appointment.start_time && isValid(parseISO(appointment.start_time))) {
-    doc.text(`Início: ${format(parseISO(appointment.start_time), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, margin, yPos);
-    yPos += lineHeight;
+    addDetail('Início da Consulta', format(parseISO(appointment.start_time), 'dd/MM/yyyy HH:mm', { locale: ptBR }));
   }
   if (appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))) {
-    doc.text(`Finalização: ${format(parseISO(appointment.completion_timestamp), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, margin, yPos);
-    yPos += lineHeight;
+    addDetail('Finalização da Consulta', format(parseISO(appointment.completion_timestamp), 'dd/MM/yyyy HH:mm', { locale: ptBR }));
   }
-  doc.line(margin, yPos, 210 - margin, yPos); // Horizontal line
-  yPos += lineHeight;
 
-  // Medical Record Sections
-  const addSection = (title: string, content?: string | null) => {
-    if (content) {
-      if (yPos + lineHeight * 2 > 297 - margin) { // Check for page break
-        doc.addPage();
-        yPos = margin;
-      }
+  yPos += lineHeight;
+  doc.setDrawColor(lightTextColor);
+  doc.line(margin, yPos, 210 - margin, yPos);
+  yPos += lineHeight * 1.5;
+
+  // Seções do Prontuário Médico
+  const addMedicalSection = (title: string, content?: string | null) => {
+    if (content && content.trim() !== '') {
+      addPageIfNeeded();
       doc.setFontSize(14);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(primaryColor);
       doc.text(title, margin, yPos);
       yPos += lineHeight;
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(textColor);
       doc.setFontSize(10);
       const splitText = doc.splitTextToSize(content, maxWidth);
       doc.text(splitText, margin, yPos);
       yPos += splitText.length * lineHeight;
-      yPos += lineHeight; // Extra space after section
+      yPos += lineHeight * 1.5; // Espaço extra após a seção
     }
   };
 
-  addSection('Anamnese', medicalRecord.anamnesis);
-  addSection('Exame Físico', medicalRecord.physicalExam);
-  addSection('Diagnóstico', medicalRecord.diagnosis);
-  addSection('Tratamento', medicalRecord.treatment);
+  addMedicalSection('Anamnese', medicalRecord.anamnesis);
+  addMedicalSection('Exame Físico', medicalRecord.physicalExam);
+  addMedicalSection('Diagnóstico', medicalRecord.diagnosis);
+  addMedicalSection('Tratamento', medicalRecord.treatment);
 
-  // Prescriptions
+  // Prescrições
   if (medicalRecord.prescriptions && medicalRecord.prescriptions.length > 0) {
-    if (yPos + lineHeight * 2 > 297 - margin) { // Check for page break
-      doc.addPage();
-      yPos = margin;
-    }
+    addPageIfNeeded();
     doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(primaryColor);
     doc.text('Prescrições', margin, yPos);
     yPos += lineHeight;
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(textColor);
     doc.setFontSize(10);
 
     medicalRecord.prescriptions.forEach((p, index) => {
-      const prescriptionText = `  ${index + 1}. Medicamento: ${p.medication}\n     Dosagem: ${p.dosage}\n     Frequência: ${p.frequency}${p.instructions ? `\n     Instruções: ${p.instructions}` : ''}`;
-      const splitText = doc.splitTextToSize(prescriptionText, maxWidth - 5); // Indent for list
-      
-      if (yPos + splitText.length * lineHeight > 297 - margin) { // Check for page break within prescription
-        doc.addPage();
-        yPos = margin;
-        doc.setFontSize(14);
-        doc.text('Prescrições (continuação)', margin, yPos);
-        yPos += lineHeight;
-        doc.setFontSize(10);
+      addPageIfNeeded();
+      doc.setFont('helvetica', 'bold');
+      doc.text(`${index + 1}. Medicamento: `, margin + 5, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.text(p.medication, margin + 5 + doc.getTextWidth(`${index + 1}. Medicamento: `), yPos);
+      yPos += lineHeight;
+
+      addPageIfNeeded();
+      doc.text(`   Dosagem: ${p.dosage}`, margin + 5, yPos);
+      yPos += lineHeight;
+
+      addPageIfNeeded();
+      doc.text(`   Frequência: ${p.frequency}`, margin + 5, yPos);
+      yPos += lineHeight;
+
+      if (p.instructions && p.instructions.trim() !== '') {
+        addPageIfNeeded();
+        doc.text(`   Instruções: `, margin + 5, yPos);
+        const instructionsText = doc.splitTextToSize(p.instructions, maxWidth - 15);
+        doc.text(instructionsText, margin + 5 + doc.getTextWidth(`   Instruções: `), yPos);
+        yPos += instructionsText.length * lineHeight;
       }
-      doc.text(splitText, margin + 5, yPos); // Indent
-      yPos += splitText.length * lineHeight;
-      yPos += lineHeight / 2; // Small space between prescriptions
+      yPos += lineHeight * 0.5; // Pequeno espaço entre prescrições
     });
-    yPos += lineHeight / 2; // Extra space after prescriptions section
+    yPos += lineHeight; // Espaço extra após a seção de prescrições
   }
 
-  // Save the PDF
+  addFooter();
+
   doc.save(`Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
 };
