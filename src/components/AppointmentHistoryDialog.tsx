@@ -42,6 +42,7 @@ import { showError, showSuccess } from "@/utils/toast";
 import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf";
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
 import PdfDownloadDialog from "./PdfDownloadDialog"; // NOVO: Importar o diálogo de download
+import { useUser } from "@/context/UserContext"; // NOVO: Importar useUser
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -100,6 +101,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const queryClient = useQueryClient();
+  const { user: appUser } = useUser(); // NOVO: Obter o usuário do contexto
 
   // NOVO: Estados para o diálogo de download de PDF
   const [isPdfDownloadDialogOpen, setIsPdfDownloadDialogOpen] = useState(false);
@@ -136,7 +138,12 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         prescriptions: medicalRecordData.prescriptions || [],
       };
 
-      await generateMedicalRecordPdf({ appointment, medicalRecord: medicalRecordForPdf, filename }); // NOVO: Passar filename
+      await generateMedicalRecordPdf({ 
+        appointment, 
+        medicalRecord: medicalRecordForPdf, 
+        logoUrl: appUser?.logoUrl, // NOVO: Passar o logoUrl do usuário
+        filename 
+      }); 
       return true;
     },
     onSuccess: () => {
