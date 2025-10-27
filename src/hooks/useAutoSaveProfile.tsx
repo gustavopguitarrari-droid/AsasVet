@@ -52,6 +52,7 @@ export const useAutoSaveProfile = (currentUser: User | null) => {
             address_city: currentUser.addressCity,
             address_state: currentUser.addressState,
             color_theme: currentUser.colorTheme,
+            logo_url: currentUser.logoUrl, // Adicionado o campo logo_url aqui
             // updated_at is handled by a database trigger
           };
 
