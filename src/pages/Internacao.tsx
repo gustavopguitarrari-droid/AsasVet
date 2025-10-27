@@ -25,6 +25,7 @@ import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { Species } from "@/types/cadastro"; // Importar Species
 import { useLocation, useNavigate } from "react-router-dom"; // Importar useLocation e useNavigate
+import { TeamMember } from "./Veterinarios"; // Importar TeamMember
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -197,6 +198,24 @@ const Internacao = () => {
         throw error;
       }
       console.log("Internacao.tsx: patient_actions fetched:", data);
+      return data;
+    },
+    enabled: !!userId,
+  });
+
+  // NEW: Fetch veterinarians
+  const { data: veterinarians = [], isLoading: isLoadingVeterinarians, error: veterinariansError } = useQuery<TeamMember[]>({
+    queryKey: ['veterinarians', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, email, role')
+        .eq('role', 'Veterinário'); // Filter for veterinarians
+      if (error) {
+        console.error("Internacao.tsx: Error fetching veterinarians:", error);
+        throw error;
+      }
       return data;
     },
     enabled: !!userId,
@@ -506,7 +525,7 @@ const Internacao = () => {
 
   // Removido getPageTitle pois o Header agora lida com isso
 
-  if (isLoadingPatients || isLoadingHistory || isLoadingActions) {
+  if (isLoadingPatients || isLoadingHistory || isLoadingActions || isLoadingVeterinarians) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando dados de internação...</p>
@@ -514,10 +533,10 @@ const Internacao = () => {
     );
   }
 
-  if (patientsError || historyError || actionsError) {
+  if (patientsError || historyError || actionsError || veterinariansError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar dados: {patientsError?.message || historyError?.message || actionsError?.message}</p>
+        <p>Erro ao carregar dados: {patientsError?.message || historyError?.message || actionsError?.message || veterinariansError?.message}</p>
       </div>
     );
   }
@@ -582,7 +601,11 @@ const Internacao = () => {
                   <DialogHeader>
                     <DialogTitle>Internar Novo Paciente</DialogTitle>
                   </DialogHeader>
-                  <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
+                  <InternmentForm 
+                    onSubmit={handleAddInternment} 
+                    onCancel={() => setIsAddDialogOpen(false)} 
+                    veterinarians={veterinarians} // Pass veterinarians here
+                  />
                 </DialogContent>
               </Dialog>
             </div>
