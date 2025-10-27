@@ -121,7 +121,8 @@ const Dashboard = () => {
         .from('interned_patients')
         .select('*', { count: 'exact' })
         .eq('user_id', userId)
-        .not('status', 'in', ['Alta', 'Óbito']); // Filtra por status que não seja 'Alta' ou 'Óbito'
+        .neq('status', 'Alta') // Usando neq para 'Alta'
+        .neq('status', 'Óbito'); // Usando neq para 'Óbito'
       if (error) {
         console.error("Erro ao buscar contagem de pacientes internados:", error);
         throw error;
