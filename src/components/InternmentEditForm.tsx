@@ -45,7 +45,7 @@ const formSchema = z.object({
   }),
   expectedDischargeDate: z.date().nullable().optional(),
   veterinarian: z.string().min(1, "O veterinário responsável é obrigatório."),
-  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], { // Tipo de enumeração
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
     required_error: "A espécie do animal é obrigatória.",
   }),
   risk: z.enum(["Sem risco", "Baixo", "Médio", "Alto", "Emergência"], {
@@ -61,14 +61,14 @@ export type InternmentEditFormValues = z.infer<typeof formSchema>;
 interface InternmentEditFormProps {
   onSubmit: (data: InternmentEditFormValues) => void;
   onCancel: () => void;
-  initialData: Omit<InternedPatient, "user_id" | "created_at" | "admission_date" | "expected_discharge_date" | "bay_name" | "pet_name" | "owner_name" | "species" | "status"> & { // Removido species e status do Omit
+  initialData: Omit<InternedPatient, "user_id" | "created_at" | "admission_date" | "expected_discharge_date" | "bay_name" | "pet_name" | "owner_name" | "species" | "status"> & {
     admissionDate: string;
     expectedDischargeDate?: string | null;
     bayName: string;
     petName: string;
     ownerName: string;
-    species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros"; // Adicionado species aqui
-    status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito"; // Adicionado status aqui
+    species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros";
+    status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
   };
 }
 
@@ -89,7 +89,7 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
       admissionDate: safeParseDate(initialData.admissionDate) || new Date(),
       expectedDischargeDate: safeParseDate(initialData.expectedDischargeDate),
       veterinarian: initialData.veterinarian || mockVeterinarians[0]?.name || "",
-      species: initialData.species || "Cachorro", // Corrigido o tipo aqui
+      species: initialData.species || "Cachorro",
       risk: initialData.risk || "Sem risco",
       status: initialData.status || "Em Observação",
     },
@@ -183,7 +183,7 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
             <FormItem>
               <FormLabel>Motivo da Internação</FormLabel>
               <FormControl>
-                <Textarea placeholder="Descreva o motivo da internação..." {...field} />
+                <Textarea placeholder="Descreva o motivo da internação..." rows={5} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -306,34 +306,24 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
                   className="flex flex-col space-y-1"
                 >
                   <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Em Observação" />
-                    </FormControl>
-                    <label htmlFor="Em Observação" className="font-normal cursor-pointer">Em Observação</label>
+                    <RadioGroupItem value="Em Observação" id="status-observacao" />
+                    <FormLabel htmlFor="status-observacao" className="font-normal cursor-pointer">Em Observação</FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Estável" />
-                    </FormControl>
-                    <label htmlFor="Estável" className="font-normal cursor-pointer">Estável</label>
+                    <RadioGroupItem value="Estável" id="status-estavel" />
+                    <FormLabel htmlFor="status-estavel" className="font-normal cursor-pointer">Estável</FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Crítico" />
-                    </FormControl>
-                    <label htmlFor="Crítico" className="font-normal cursor-pointer">Crítico</label>
+                    <RadioGroupItem value="Crítico" id="status-critico" />
+                    <FormLabel htmlFor="status-critico" className="font-normal cursor-pointer">Crítico</FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Alta" />
-                    </FormControl>
-                    <label htmlFor="Alta" className="font-normal cursor-pointer">Alta</label>
+                    <RadioGroupItem value="Alta" id="status-alta" />
+                    <FormLabel htmlFor="status-alta" className="font-normal cursor-pointer">Alta</FormLabel>
                   </FormItem>
                   <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="Óbito" />
-                    </FormControl>
-                    <label htmlFor="Óbito" className="font-normal cursor-pointer">Óbito</label>
+                    <RadioGroupItem value="Óbito" id="status-obito" />
+                    <FormLabel htmlFor="status-obito" className="font-normal cursor-pointer">Óbito</FormLabel>
                   </FormItem>
                 </RadioGroup>
               </FormControl>
