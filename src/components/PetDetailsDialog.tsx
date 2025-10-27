@@ -74,11 +74,12 @@ const PetDetailsDialog: React.FC<PetDetailsDialogProps> = ({ pet, isOpen, onClos
               )}
             </Avatar>
           </div>
-          <div className="grid grid-cols-3 items-center gap-4">
+          {/* Removido: Exibição do ID do animal */}
+          {/* <div className="grid grid-cols-3 items-center gap-4">
             <p className="text-sm font-medium text-muted-foreground">ID:</p>
             <p className="col-span-2 text-sm">{pet.id}</p>
           </div>
-          <Separator />
+          <Separator /> */}
           <div className="grid grid-cols-3 items-center gap-4">
             <p className="text-sm font-medium text-muted-foreground">Nome:</p>
             <p className="col-span-2 text-sm font-bold">{pet.name}</p>
