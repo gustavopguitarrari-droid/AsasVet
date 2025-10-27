@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -23,6 +23,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
+import { usePageTitle } from "@/context/PageTitleContext"; // NOVO: Importar usePageTitle
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -95,6 +96,7 @@ const Internacao = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id; // Assuming user ID is available from context
+  const { setPageTitle } = usePageTitle(); // NOVO: Obter setPageTitle do contexto
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
@@ -117,6 +119,27 @@ const Internacao = () => {
   const [confirmActionsDate, setConfirmActionsDate] = useState<Date | null>(null);
   const [confirmActionsHour, setConfirmActionsHour] = useState<string | null>(null);
   const [confirmActionsForSlot, setConfirmActionsForSlot] = useState<PatientAction[]>([]);
+
+  // NOVO: Efeito para atualizar o título da página com base na aba ativa
+  useEffect(() => {
+    let tabName = "";
+    switch (activeTab) {
+      case "pacientes-internados":
+        tabName = "Pacientes Internados";
+        break;
+      case "mapa-execucao":
+        tabName = "Mapa de Execução";
+        break;
+      default:
+        tabName = "";
+    }
+    setPageTitle(`Internação - ${tabName}`); // Definir o título dinâmico
+
+    // Função de limpeza para redefinir o título quando o componente for desmontado
+    return () => {
+      setPageTitle(""); 
+    };
+  }, [activeTab, setPageTitle]);
 
   // Fetch interned patients
   const { data: internedPatients = [], isLoading: isLoadingPatients, error: patientsError, refetch: refetchInternedPatients } = useQuery<InternedPatient[]>({
@@ -485,16 +508,7 @@ const Internacao = () => {
     updateActionsCompletionMutation.mutate(updatedActions);
   };
 
-  const getPageTitle = () => {
-    switch (activeTab) {
-      case "pacientes-internados":
-        return ""; // Retorna string vazia para remover o título
-      case "mapa-execucao":
-        return "Mapa de Execução";
-      default:
-        return "Internação";
-    }
-  };
+  // Removido o getPageTitle local, pois o título será definido via useEffect e usePageTitle
 
   if (isLoadingPatients || isLoadingHistory || isLoadingActions) {
     return (
@@ -515,7 +529,7 @@ const Internacao = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">{getPageTitle()}</h2>
+        {/* O título h2 foi removido daqui, pois o título da página será gerenciado pelo Header */}
         <div className="flex space-x-2">
           {activeTab === "pacientes-internados" && (
             <>
