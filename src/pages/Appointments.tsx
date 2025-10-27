@@ -429,7 +429,6 @@ const Appointments = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        {/* <h2 className="text-3xl font-bold">Gerenciar consultas do dia</h2> */}
         <div className="flex space-x-2">
           <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
             <History className="mr-2 h-4 w-4" /> Ver Histórico
@@ -498,23 +497,32 @@ const Appointments = () => {
         </Card>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-muted/50">
-            <TabsTrigger value="em-espera" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">Em Espera</TabsTrigger>
-            <TabsTrigger value="em-andamento" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">Em Andamento</TabsTrigger>
-            <TabsTrigger value="finalizadas" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">Finalizadas</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <div className="relative flex-1 w-full md:w-auto">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar consultas..."
-            className="pl-9"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3 bg-muted/50">
+          <TabsTrigger value="em-espera" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">Em Espera</TabsTrigger>
+          <TabsTrigger value="em-andamento" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">Em Andamento</TabsTrigger>
+          <TabsTrigger value="finalizadas" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">Finalizadas</TabsTrigger>
+        </TabsList>
+        <TabsContent value="em-espera" className="mt-4">
+          {/* Conteúdo da aba Em Espera */}
+        </TabsContent>
+        <TabsContent value="em-andamento" className="mt-4">
+          {/* Conteúdo da aba Em Andamento */}
+        </TabsContent>
+        <TabsContent value="finalizadas" className="mt-4">
+          {/* Conteúdo da aba Finalizadas */}
+        </TabsContent>
+      </Tabs>
+
+      {/* Barra de pesquisa movida para baixo das abas */}
+      <div className="relative flex-1 w-full md:w-auto">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Buscar consultas..."
+          className="pl-9"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
       <div className="rounded-md border">
