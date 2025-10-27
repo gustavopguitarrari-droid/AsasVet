@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin, Eye, Edit, Trash2 } from "lucide-react";
+import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin, Eye, Edit, Trash2, Scale } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SpeciesFilter from "@/components/SpeciesFilter";
 import PetDetailsDialog from "@/components/PetDetailsDialog";
@@ -135,6 +135,7 @@ const Cadastro = () => {
         age: dbPet.age,
         gender: dbPet.gender,
         color: dbPet.color,
+        weight: dbPet.weight || undefined, // Incluindo o campo weight
         observations: dbPet.observations || undefined,
         photoUrl: dbPet.photo_url || undefined,
         ownerId: dbPet.owner_id, // CORREÇÃO AQUI: Mapeando owner_id para ownerId
@@ -398,6 +399,7 @@ const Cadastro = () => {
           age: data.age,
           gender: data.gender,
           color: data.color,
+          weight: data.weight, // Incluindo o campo weight
           observations: data.observations,
           photo_url: null,
         })
@@ -482,6 +484,7 @@ const Cadastro = () => {
           age: data.age,
           gender: data.gender,
           color: data.color,
+          weight: data.weight, // Incluindo o campo weight
           observations: data.observations,
           photo_url: newPhotoUrl,
         })
@@ -872,7 +875,7 @@ const Cadastro = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[60px]">Foto</TableHead><TableHead>Nome</TableHead><TableHead>Espécie</TableHead><TableHead>Raça</TableHead><TableHead>Tutor</TableHead><TableHead>Idade</TableHead><TableHead>Sexo</TableHead><TableHead>Cor</TableHead><TableHead className="text-right">Ações</TableHead>
+                  <TableHead className="w-[60px]">Foto</TableHead><TableHead>Nome</TableHead><TableHead>Espécie</TableHead><TableHead>Raça</TableHead><TableHead>Tutor</TableHead><TableHead>Idade</TableHead><TableHead>Sexo</TableHead><TableHead>Cor</TableHead><TableHead>Peso (KG)</TableHead><TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -899,7 +902,7 @@ const Cadastro = () => {
                         </TableCell><TableCell className="font-bold flex items-center" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
                           <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
                           {pet.name}
-                        </TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.species}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.breed}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{owner ? owner.name : "N/A"}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.age}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.gender}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.color}</TableCell><TableCell className="text-right">
+                        </TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.species}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.breed}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{owner ? owner.name : "N/A"}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.age}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.gender}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.color}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.weight !== undefined && pet.weight !== null ? `${pet.weight.toFixed(1)} KG` : "N/A"}</TableCell><TableCell className="text-right">
                           <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleEditPet(pet); }}>
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -912,7 +915,7 @@ const Cadastro = () => {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-24 text-center">
+                    <TableCell colSpan={10} className="h-24 text-center">
                       Nenhum animal encontrado para a espécie selecionada.
                     </TableCell>
                   </TableRow>
@@ -966,7 +969,7 @@ const Cadastro = () => {
                             </Avatar>
                             <div>
                               <p className="font-medium">{pet.name} ({pet.species})</p>
-                              <p className="text-sm text-muted-foreground">Raça: {pet.breed} | Idade: {pet.age}</p>
+                              <p className="text-sm text-muted-foreground">Raça: {pet.breed} | Idade: {pet.age} | Peso: {pet.weight !== undefined && pet.weight !== null ? `${pet.weight.toFixed(1)} KG` : "N/A"}</p>
                             </div>
                           </div>
                           <div>

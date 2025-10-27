@@ -37,6 +37,10 @@ const formSchema = z.object({
     required_error: "O sexo é obrigatório.",
   }),
   color: z.string().min(1, "A cor é obrigatória."),
+  weight: z.preprocess(
+    (val) => (val === "" ? undefined : Number(val)),
+    z.number().min(0.1, "O peso deve ser um número positivo.").optional()
+  ),
   observations: z.string().optional(),
   photoUrl: z.string().optional(), // Pode ser Base64 ou URL pública
   ownerId: z.string().min(1, "O tutor é obrigatório."),
@@ -63,6 +67,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
       age: initialData?.age || "",
       gender: initialData?.gender || "Desconhecido",
       color: initialData?.color || "",
+      weight: initialData?.weight || undefined, // Adicionado o peso aqui
       observations: initialData?.observations || "",
       photoUrl: initialData?.photoUrl || undefined,
       ownerId: initialData?.ownerId || defaultOwnerId || "",
@@ -81,6 +86,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
       age: initialData?.age || "",
       gender: initialData?.gender || "Desconhecido",
       color: initialData?.color || "",
+      weight: initialData?.weight || undefined, // Resetar peso
       observations: initialData?.observations || "",
       photoUrl: initialData?.photoUrl || undefined,
       ownerId: initialData?.ownerId || defaultOwnerId || "",
@@ -314,19 +320,42 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="color"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cor</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: Dourado, Preto e Branco" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="color"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Cor</FormLabel>
+                <FormControl>
+                  <Input placeholder="Ex: Dourado, Preto e Branco" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="weight"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Peso (KG)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    step="0.1"
+                    min="0.1"
+                    placeholder="Ex: 15.5"
+                    {...field}
+                    value={field.value === undefined ? "" : field.value} // Garante que o input seja controlado
+                    onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <FormField
           control={form.control}

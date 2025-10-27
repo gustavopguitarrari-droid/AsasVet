@@ -26,6 +26,7 @@ export interface Pet {
   age: string; // Novo campo (ex: "2 anos", "6 meses")
   gender: 'Macho' | 'Fêmea' | 'Desconhecido'; // Tipo de enumeração
   color: string; // Novo campo
+  weight?: number; // NOVO CAMPO: Peso do animal em KG
   observations?: string; // Novo campo
   photoUrl?: string; // Novo campo para URL da foto (Base64)
   ownerId: string; // ID do tutor associado (chave estrangeira)

@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, User, Calendar, Palette, Heart, Info, Edit, Trash2 } from "lucide-react"; // Novos ícones
+import { Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, User, Calendar, Palette, Heart, Info, Edit, Trash2, Scale } from "lucide-react"; // Novos ícones
 import { Pet } from "@/types/cadastro"; // Importa a interface Pet
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
 import { Button } from "@/components/ui/button"; // Importar Button
@@ -126,6 +126,18 @@ const PetDetailsDialog: React.FC<PetDetailsDialogProps> = ({ pet, isOpen, onClos
               {pet.color}
             </p>
           </div>
+          {pet.weight !== undefined && pet.weight !== null && ( // Exibir peso se existir
+            <>
+              <Separator />
+              <div className="grid grid-cols-3 items-center gap-4">
+                <p className="text-sm font-medium text-muted-foreground">Peso:</p>
+                <p className="col-span-2 text-sm flex items-center">
+                  <Scale className="h-4 w-4 mr-2 text-muted-foreground" />
+                  {pet.weight.toFixed(1)} KG
+                </p>
+              </div>
+            </>
+          )}
           {pet.observations && (
             <>
               <Separator />
