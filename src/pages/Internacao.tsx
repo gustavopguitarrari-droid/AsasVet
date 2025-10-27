@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react"; // Importado ZoomIn
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
@@ -25,7 +25,6 @@ import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { Species } from "@/types/cadastro"; // Importar Species
 import { useLocation, useNavigate } from "react-router-dom"; // Importar useLocation e useNavigate
-import { Slider } from "@/components/ui/slider"; // Importar Slider
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -108,7 +107,6 @@ const Internacao = () => {
   const [activeTab, setActiveTab] = useState<string>("pacientes-internados");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [patientSearchTerm, setPatientSearchTerm] = useState<string>("");
-  const [cardZoomLevel, setCardZoomLevel] = useState(4); // Novo estado para o zoom dos cards
 
   const [isAddActionDialogOpen, setIsAddActionDialogOpen] = useState(false);
   const [actionPatientId, setActionPatientId] = useState<string | null>(null);
@@ -529,41 +527,7 @@ const Internacao = () => {
       <div className="flex items-center justify-between">
         {/* O título da página foi removido daqui, pois o Header agora o gerencia */}
         <h2 className="text-3xl font-bold"></h2> {/* Título vazio para não duplicar */}
-        <div className="flex space-x-2">
-          {activeTab === "mapa-execucao" && (
-            <div className="flex items-center space-x-2">
-              <Button variant="default" size="icon" onClick={handlePreviousDay}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-[280px] justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={(day) => setSelectedDate(day || new Date())}
-                    initialFocus
-                    locale={ptBR}
-                  />
-                </PopoverContent>
-              </Popover>
-              <Button variant="default" size="icon" onClick={handleNextDay}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </div>
+        {/* O bloco de calendário e navegação de data foi movido para dentro do TabsContent */}
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -573,8 +537,8 @@ const Internacao = () => {
         </TabsList>
 
         <TabsContent value="pacientes-internados" className="mt-4">
-          {/* Seção para a legenda de risco, barra de pesquisa, slider de zoom e botões */}
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
+          {/* Seção para a legenda de risco, barra de pesquisa e botões */}
+          <div className="flex flex-col md:flex-row items-center gap-4 mb-4">
             {/* Legenda de Risco */}
             <div className="flex flex-wrap gap-4">
               {Object.entries(riskColorMap).map(([risk, colorClass]) => (
@@ -586,7 +550,7 @@ const Internacao = () => {
             </div>
 
             {/* Barra de Pesquisa */}
-            <div className="relative w-full md:max-w-[300px] flex-grow">
+            <div className="relative w-full md:max-w-[300px]"> {/* Ajustado para max-w-[300px] */}
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Buscar pacientes internados..."
@@ -596,23 +560,8 @@ const Internacao = () => {
               />
             </div>
 
-            {/* Zoom Slider e Botões de Ação */}
-            <div className="flex items-center space-x-4">
-              {/* Zoom Slider */}
-              <div className="flex items-center space-x-2 w-[150px]">
-                <ZoomIn className="h-4 w-4 text-muted-foreground" />
-                <Slider
-                  defaultValue={[cardZoomLevel]}
-                  max={4}
-                  min={1}
-                  step={1}
-                  onValueChange={(value) => setCardZoomLevel(value[0])}
-                  className="w-full"
-                />
-                <span className="text-sm text-muted-foreground">{cardZoomLevel}x</span>
-              </div>
-
-              {/* Botões de Ação */}
+            {/* Botões de Ação */}
+            <div className="flex space-x-2">
               <InternmentHistoryDialog
                 isOpen={isHistoryDialogOpen}
                 onClose={() => setIsHistoryDialogOpen(false)}
@@ -640,12 +589,7 @@ const Internacao = () => {
           </div>
 
           {filteredInternedPatients.length > 0 ? (
-            <ul className={cn("grid gap-4", {
-              "grid-cols-1": cardZoomLevel === 1,
-              "sm:grid-cols-2": cardZoomLevel === 2,
-              "md:grid-cols-3": cardZoomLevel === 3,
-              "lg:grid-cols-4": cardZoomLevel === 4,
-            })}>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {filteredInternedPatients.map((patient) => {
                 const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
                 const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
