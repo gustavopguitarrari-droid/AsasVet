@@ -44,24 +44,28 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
     if (appUser?.id && !isInitialLoad) {
       const saveThemeToSupabase = async () => {
         try {
+          console.log("ColorThemeContext: Attempting to save theme. User ID:", appUser.id, "Theme:", colorTheme); // Added detailed log
           const { error } = await supabase
             .from('profiles')
             .update({ color_theme: colorTheme })
             .eq('id', appUser.id);
 
           if (error) {
-            console.error("Erro ao salvar tema de cor no Supabase:", error);
+            console.error("ColorThemeContext: Erro ao salvar tema de cor no Supabase:", error); // Updated log
             showError("Erro ao salvar sua preferência de tema.");
           } else {
+            console.log("ColorThemeContext: Tema de cor salvo com sucesso no Supabase."); // Added log
             // Atualiza o contexto do usuário localmente após salvar no DB
             setAppUser(prevUser => prevUser ? { ...prevUser, colorTheme: colorTheme } : null);
           }
         } catch (err) {
-          console.error("Erro inesperado ao salvar tema de cor:", err);
+          console.error("ColorThemeContext: Erro inesperado ao salvar tema de cor:", err); // Updated log
           showError("Erro inesperado ao salvar sua preferência de tema.");
         }
       };
       saveThemeToSupabase();
+    } else {
+      console.log("ColorThemeContext: Skipping theme save. User not logged in or initial load."); // Added log
     }
   }, [colorTheme, appUser, isInitialLoad, setAppUser]);
 
