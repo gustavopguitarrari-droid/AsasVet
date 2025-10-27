@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { useParams, useNavigate } => 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 // import Layout from '@/components/layout/Layout'; // Removido para evitar duplicação
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
