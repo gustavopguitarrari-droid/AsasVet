@@ -598,6 +598,20 @@ const Internacao = () => {
 
             {/* Zoom Slider e Botões de Ação */}
             <div className="flex items-center space-x-4">
+              {/* Zoom Slider */}
+              <div className="flex items-center space-x-2 w-[150px]">
+                <ZoomIn className="h-4 w-4 text-muted-foreground" />
+                <Slider
+                  defaultValue={[cardZoomLevel]}
+                  max={4}
+                  min={1}
+                  step={1}
+                  onValueChange={(value) => setCardZoomLevel(value[0])}
+                  className="w-full"
+                />
+                <span className="text-sm text-muted-foreground">{cardZoomLevel}x</span>
+              </div>
+
               {/* Botões de Ação */}
               <InternmentHistoryDialog
                 isOpen={isHistoryDialogOpen}
@@ -622,20 +636,6 @@ const Internacao = () => {
                   <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
                 </DialogContent>
               </Dialog>
-
-              {/* Zoom Slider */}
-              <div className="flex items-center space-x-2 w-[150px]">
-                <ZoomIn className="h-4 w-4 text-muted-foreground" />
-                <Slider
-                  defaultValue={[cardZoomLevel]}
-                  max={4}
-                  min={1}
-                  step={1}
-                  onValueChange={(value) => setCardZoomLevel(value[0])}
-                  className="w-full"
-                />
-                <span className="text-sm text-muted-foreground">{cardZoomLevel}x</span>
-              </div>
             </div>
           </div>
 
