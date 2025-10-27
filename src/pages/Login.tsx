@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom'; // Importar useLocation
 import { useSession } from '@/context/SessionContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -13,7 +13,12 @@ import SignUpForm from '@/components/SignUpForm'; // Importar o novo componente 
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useSession();
-  const [authView, setAuthView] = useState<'sign_in' | 'sign_up' | 'forgotten_password' | 'update_password'>('sign_in');
+  const location = useLocation(); // Inicializar useLocation
+  const [authView, setAuthView] = useState<'sign_in' | 'sign_up' | 'forgotten_password' | 'update_password'>(() => {
+    // Ler o estado da localização para definir a view inicial
+    const state = location.state as { view?: 'sign_up' };
+    return state?.view || 'sign_in';
+  });
 
   useEffect(() => {
     console.log('Login Page - isLoading:', isLoading, 'session:', session);

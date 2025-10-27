@@ -71,11 +71,11 @@ const LandingPage: React.FC = () => {
               <Link to="/login">Entrar</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="text-white border-white hover:bg-white hover:text-primary">
-              <Link to="/login">Cadastre-se</Link>
+              <Link to="/login" state={{ view: 'sign_up' }}>Cadastre-se</Link>
             </Button>
           </div>
-        </div>
-      </section>
+        </div >
+      </section >
 
       {/* Features Section */}
       <section id="features" className="py-20 px-8 bg-muted text-center"> {/* Adicionado id="features" */}
@@ -136,7 +136,7 @@ const LandingPage: React.FC = () => {
                   plan.highlight ? "bg-primary hover:bg-primary/90 text-primary-foreground" : "bg-secondary hover:bg-secondary/80 text-secondary-foreground"
                 )}
               >
-                <Link to="/login">{plan.buttonText}</Link>
+                <Link to="/login" state={{ view: 'sign_up' }}>{plan.buttonText}</Link>
               </Button>
             </Card>
           ))}
@@ -148,7 +148,7 @@ const LandingPage: React.FC = () => {
         <p>&copy; {new Date().getFullYear()} AsasVet. Todos os direitos reservados.</p>
         <p className="mt-2">Um desenvolvimento Agronegócios Guitarrari®</p>
       </footer>
-    </div>
+    </div >
   );
 };
 
