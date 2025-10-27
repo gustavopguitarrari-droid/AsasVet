@@ -18,6 +18,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -56,8 +57,8 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({ onSubmit, o
   });
 
   return (
-    <Form {...form}> {/* CORREÇÃO AQUI: Usando spread operator para 'form' */}
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4"> {/* CORREÇÃO AQUI: 'form.handleSubmit' no elemento HTML 'form' */}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="description"

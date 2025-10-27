@@ -198,8 +198,8 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
   const isFormSubmitting = form.formState.isSubmitting || isSubmittingParent;
 
   return (
-    <Form {...form}> {/* CORREÇÃO AQUI: Usando spread operator para 'form' */}
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4"> {/* CORREÇÃO AQUI: 'form.handleSubmit' no elemento HTML 'form' */}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="flex flex-col items-center space-y-4 mb-6">
           <Avatar className="h-24 w-24 border-4 border-primary shadow-lg">
             {previewUrl ? (

@@ -25,7 +25,6 @@ import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
 import { Label } from "@/components/ui/label"; // Importar o componente Label
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
-import { User, PawPrint, Search, CalendarIcon } from "lucide-react"; // Importar ícones
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -199,8 +198,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
     : [];
 
   return (
-    <Form {...form}> {/* CORREÇÃO AQUI: Usando spread operator para 'form' */}
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4"> {/* CORREÇÃO AQUI: 'form.handleSubmit' no elemento HTML 'form' */}
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -258,7 +257,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
 
         {/* Busca de Tutor por CPF */}
         <div className="space-y-2 border p-3 rounded-md">
-          <Label className="flex items-center"> {/* Alterado de FormLabel para Label */}
+          <Label className="flex items-center">
             <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor por CPF
           </Label>
           <div className="flex space-x-2">
@@ -295,7 +294,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
 
         {/* Seleção de Animal */}
         <div className="space-y-2 border p-3 rounded-md">
-          <Label className="flex items-center"> {/* Alterado de FormLabel para Label */}
+          <Label className="flex items-center">
             <PawPrint className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Animal
           </Label>
           <FormField
