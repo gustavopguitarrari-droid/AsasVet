@@ -113,7 +113,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
     mutationFn: async ({ appointment, filename }: { appointment: Appointment, filename: string }) => {
       const { data: medicalRecordData, error } = await supabase
         .from('medical_records')
-        .select('*')
+        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at') // Seleção explícita
         .eq('appointment_id', appointment.id)
         .eq('user_id', appointment.user_id) // Garante RLS
         .single();
@@ -132,7 +132,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       // Mapeia os dados do prontuário para o formato do formulário para a função PDF
       const medicalRecordForPdf: MedicalRecordFormValues = {
         anamnesis: medicalRecordData.anamnesis || undefined,
-        physical_exam: medicalRecordData.physical_exam || undefined,
+        physicalExam: medicalRecordData.physical_exam || undefined,
         diagnosis: medicalRecordData.diagnosis || undefined,
         treatment: medicalRecordData.treatment || undefined,
         prescriptions: medicalRecordData.prescriptions || [],

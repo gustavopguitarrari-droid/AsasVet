@@ -61,7 +61,7 @@ const ConsultationPage: React.FC = () => {
       if (!userId || !appointmentId) throw new Error("User or Appointment ID not available.");
       const { data, error } = await supabase
         .from('medical_records')
-        .select('*')
+        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at') // Seleção explícita
         .eq('appointment_id', appointmentId)
         .eq('user_id', userId)
         .single();
