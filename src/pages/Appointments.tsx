@@ -347,14 +347,23 @@ const Appointments = () => {
 
   // NOVO: Handler para abrir o gerador de PDF
   const handleOpenPdfGenerator = (appointment: Appointment) => {
+    console.log("handleOpenPdfGenerator: Iniciando...");
+    console.log("  appointment.client_id:", appointment.client_id);
+    console.log("  appointment.pet_id:", appointment.pet_id);
+    console.log("  clients (total):", clients.length);
+    console.log("  pets (total):", pets.length);
+
     const client = clients.find(c => c.id === appointment.client_id);
     const pet = pets.find(p => p.id === appointment.pet_id);
+
+    console.log("  Client found:", client ? client.name : "NÃO ENCONTRADO");
+    console.log("  Pet found:", pet ? pet.name : "NÃO ENCONTRADO");
 
     if (client && pet) {
       setPdfAppointmentData({ appointment, client, pet });
       setIsPdfDetailsDialogOpen(true);
     } else {
-      showError("Não foi possível carregar os detalhes completos do tutor ou animal para o PDF.");
+      showError("Não foi possível carregar os detalhes completos do tutor ou animal para o PDF. Verifique os logs para mais informações.");
     }
   };
 
