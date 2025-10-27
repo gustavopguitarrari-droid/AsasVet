@@ -29,6 +29,7 @@ import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { Client, Pet } from "@/types/cadastro";
 import { useNavigate } from "react-router-dom";
+import { usePageTitle } from "@/context/PageTitleContext"; // NOVO: Importar usePageTitle
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -71,6 +72,7 @@ const Appointments = () => {
   const userId = appUser?.id;
   const veterinarianName = appUser?.name || "Veterinário Desconhecido";
   const navigate = useNavigate();
+  const { setPageTitle } = usePageTitle(); // NOVO: Obter setPageTitle do contexto
 
   const [activeTab, setActiveTab] = React.useState<string>("em-espera");
   const [searchTerm, setSearchTerm] = React.useState<string>("");
@@ -79,6 +81,25 @@ const Appointments = () => {
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
   const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState<boolean>(false);
+
+  // NOVO: Efeito para atualizar o título da página com base na aba ativa
+  React.useEffect(() => {
+    let tabName = "";
+    switch (activeTab) {
+      case "em-espera":
+        tabName = "Em Espera";
+        break;
+      case "em-andamento":
+        tabName = "Em Andamento";
+        break;
+      case "finalizadas":
+        tabName = "Finalizadas";
+        break;
+      default:
+        tabName = "";
+    }
+    setPageTitle(`${tabName} - Consultas`); // Definir o título dinâmico
+  }, [activeTab, setPageTitle]);
 
   // --- Queries ---
   const { data: appointments = [], isLoading, error } = useQuery<Appointment[]>({

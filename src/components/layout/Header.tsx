@@ -6,11 +6,18 @@ import UserProfile from "@/components/UserProfile";
 import ThemeToggle from "@/components/ThemeToggle"; // Importar o ThemeToggle existente
 import ColorThemeToggle from "@/components/ColorThemeToggle"; // Importar o novo ColorThemeToggle
 import LiveClockCalendar from "@/components/LiveClockCalendar"; // Importar o novo LiveClockCalendar
+import { usePageTitle } from "@/context/PageTitleContext"; // NOVO: Importar usePageTitle
 
 const Header = () => {
   const location = useLocation();
+  const { pageTitle } = usePageTitle(); // NOVO: Obter o título do contexto
+
   const getTitle = () => {
-    // Verifica se a rota começa com /consultation/
+    // Se um título específico da página for definido via contexto, use-o
+    if (pageTitle) {
+      return pageTitle;
+    }
+    // Caso contrário, use a lógica padrão baseada no pathname
     if (location.pathname.startsWith("/consultation/")) {
       return "Consulta em Andamento";
     }
@@ -20,7 +27,7 @@ const Header = () => {
       case "/cadastro": // Novo título para Cadastro
         return "Cadastro";
       case "/consultas":
-        return "Consultas";
+        return "Consultas"; // Manter como base para a página de Consultas
       case "/medical-records":
         return "Agenda";
       case "/financeiro":
@@ -44,7 +51,7 @@ const Header = () => {
 
   return (
     <header className="flex items-center justify-between border-b bg-background p-4 shadow-sm">
-      <h1 className="text-2xl font-semibold">{getTitle()}</h1>
+      <h1 className="text-2xl font-semibold">{getTitle()}</h1> {/* Usar getTitle() */}
       <div className="flex items-center space-x-2">
         <LiveClockCalendar /> {/* Adicionado o LiveClockCalendar aqui */}
         <ColorThemeToggle />

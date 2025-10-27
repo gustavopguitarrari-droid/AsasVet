@@ -22,6 +22,7 @@ import ConsultationPage from "./pages/Consultation"; // Importar a nova página 
 import SignUp from "./pages/SignUp"; // NOVO: Importar a página de cadastro
 import { SessionContextProvider } from "./context/SessionContext";
 import ScrollToTop from "./components/ScrollToTop"; // Importar o novo componente ScrollToTop
+import { PageTitleProvider } from "./context/PageTitleContext"; // NOVO: Importar PageTitleProvider
 
 const queryClient = new QueryClient();
 
@@ -32,112 +33,114 @@ const App = () => (
       <Sonner />
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <SessionContextProvider>
-          <ScrollToTop /> {/* Adicionar o ScrollToTop aqui */}
-          <Routes>
-            <Route path="/" element={<LandingPage />} /> {/* Nova rota inicial */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} /> {/* NOVO: Rota para a página de cadastro */}
-            
-            {/* Rotas Protegidas */}
-            <Route
-              path="/painel"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/cadastro"
-              element={
-                <ProtectedRoute>
-                  <Cadastro />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/consultas"
-              element={
-                <ProtectedRoute>
-                  <Appointments />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/medical-records"
-              element={
-                <ProtectedRoute>
-                  <AgendamentosMedicos />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/financeiro"
-              element={
-                <ProtectedRoute>
-                  <Financeiro />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/caixa"
-              element={
-                <ProtectedRoute>
-                  <Caixa />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/internacao"
-              element={
-                <ProtectedRoute>
-                  <Internacao />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/veterinarios"
-              element={
-                <ProtectedRoute>
-                  <Veterinarios />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/estoque"
-              element={
-                <ProtectedRoute>
-                  <Estoque />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <Profile />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Settings />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/consultation/:appointmentId"
-              element={
-                <ProtectedRoute>
-                  <ConsultationPage />
-                </ProtectedRoute>
-              }
-            />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <PageTitleProvider> {/* NOVO: Envolver com PageTitleProvider */}
+            <ScrollToTop /> {/* Adicionar o ScrollToTop aqui */}
+            <Routes>
+              <Route path="/" element={<LandingPage />} /> {/* Nova rota inicial */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} /> {/* NOVO: Rota para a página de cadastro */}
+              
+              {/* Rotas Protegidas */}
+              <Route
+                path="/painel"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cadastro"
+                element={
+                  <ProtectedRoute>
+                    <Cadastro />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/consultas"
+                element={
+                  <ProtectedRoute>
+                    <Appointments />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/medical-records"
+                element={
+                  <ProtectedRoute>
+                    <AgendamentosMedicos />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/financeiro"
+                element={
+                  <ProtectedRoute>
+                    <Financeiro />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/caixa"
+                element={
+                  <ProtectedRoute>
+                    <Caixa />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/internacao"
+                element={
+                  <ProtectedRoute>
+                    <Internacao />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/veterinarios"
+                element={
+                  <ProtectedRoute>
+                    <Veterinarios />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/estoque"
+                element={
+                  <ProtectedRoute>
+                    <Estoque />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <Settings />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/consultation/:appointmentId"
+                element={
+                  <ProtectedRoute>
+                    <ConsultationPage />
+                  </ProtectedRoute>
+                }
+              />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </PageTitleProvider> {/* NOVO */}
         </SessionContextProvider>
       </BrowserRouter>
     </TooltipProvider>
