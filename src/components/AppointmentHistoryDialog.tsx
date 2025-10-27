@@ -254,9 +254,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                       <TableCell>{waitingTime}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end space-x-2">
-                          <Button variant="ghost" size="sm" onClick={() => onViewDetails(appointment)}>
-                            <Eye className="h-4 w-4" />
-                          </Button>
+                          {/* Botão de "Ver Detalhes" (olho) removido daqui */}
                           <Button
                             variant="outline"
                             size="sm"
