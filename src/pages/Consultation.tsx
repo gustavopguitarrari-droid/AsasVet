@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Layout from '@/components/layout/Layout';
+// import Layout from '@/components/layout/Layout'; // Removido para evitar duplicação
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList } from 'lucide-react';
@@ -163,37 +163,31 @@ const ConsultationPage: React.FC = () => {
 
   if (isLoading || isLoadingMedicalRecord) {
     return (
-      <Layout>
-        <div className="flex items-center justify-center h-full">
-          <p className="text-muted-foreground">Carregando detalhes da consulta...</p>
-        </div>
-      </Layout>
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">Carregando detalhes da consulta...</p>
+      </div>
     );
   }
 
   if (error || medicalRecordError) {
     return (
-      <Layout>
-        <div className="flex items-center justify-center h-full text-destructive">
-          <p>Erro ao carregar consulta: {error?.message || medicalRecordError?.message}</p>
-          <Button onClick={() => navigate('/consultas')} className="ml-4">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
-          </Button>
-        </div>
-      </Layout>
+      <div className="flex items-center justify-center h-full text-destructive">
+        <p>Erro ao carregar consulta: {error?.message || medicalRecordError?.message}</p>
+        <Button onClick={() => navigate('/consultas')} className="ml-4">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
+        </Button>
+      </div>
     );
   }
 
   if (!appointment) {
     return (
-      <Layout>
-        <div className="flex items-center justify-center h-full text-muted-foreground">
-          <p>Consulta não encontrada.</p>
-          <Button onClick={() => navigate('/consultas')} className="ml-4">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
-          </Button>
-        </div>
-      </Layout>
+      <div className="flex items-center justify-center h-full text-muted-foreground">
+        <p>Consulta não encontrada.</p>
+        <Button onClick={() => navigate('/consultas')} className="ml-4">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
+        </Button>
+      </div>
     );
   }
 
@@ -207,68 +201,66 @@ const ConsultationPage: React.FC = () => {
   };
 
   return (
-    <Layout>
-      <div className="space-y-6 max-w-4xl mx-auto">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold flex items-center">
-            <CalendarCheck className="mr-3 h-7 w-7 text-primary" /> Consulta em Andamento
-          </h2>
-          <Button onClick={() => navigate('/consultas')} variant="outline">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
-          </Button>
-        </div>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-2xl font-bold">{appointment.service}</CardTitle>
-            <div className="flex items-center space-x-2">
-              <Clock className="h-5 w-5 text-muted-foreground" />
-              {appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
-            </div>
-          </CardHeader>
-          <CardContent className="grid gap-4 py-4">
-            <div className="flex items-center">
-              <User className="h-5 w-5 mr-2 text-muted-foreground" />
-              <p className="text-lg font-medium">Tutor: <span className="font-semibold">{appointment.client_name}</span></p>
-            </div>
-            <div className="flex items-center">
-              <PawPrint className="h-5 w-5 mr-2 text-muted-foreground" />
-              <p className="text-lg font-medium">Animal: <span className="font-semibold">{appointment.pet_name} ({appointment.species})</span></p>
-            </div>
-            <div className="flex items-center">
-              <Stethoscope className="h-5 w-5 mr-2 text-muted-foreground" />
-              <p className="text-lg font-medium">Veterinário: <span className="font-semibold">{appointment.veterinarian}</span></p>
-            </div>
-            <div className="flex items-center">
-              <CalendarCheck className="h-5 w-5 mr-2 text-muted-foreground" />
-              <p className="text-lg font-medium">Data: <span className="font-semibold">{format(parseISO(appointment.date), "dd/MM/yyyy", { locale: ptBR })}</span></p>
-            </div>
-            <div className="flex items-center">
-              <Clock className="h-5 w-5 mr-2 text-muted-foreground" />
-              <p className="text-lg font-medium">Hora: <span className="font-semibold">{appointment.time}</span></p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Formulário de Prontuário Médico */}
-        <MedicalRecordForm
-          initialData={initialMedicalRecordData}
-          onSubmit={handleSaveMedicalRecord}
-          isSubmitting={saveMedicalRecordMutation.isPending}
-        />
-
-        <div className="flex justify-end">
-          <Button
-            onClick={handleFinalizeConsultation}
-            disabled={finalizeAppointmentMutation.isPending}
-            className="bg-green-600 hover:bg-green-700 text-white"
-          >
-            <CheckCircle className="mr-2 h-5 w-5" />
-            {finalizeAppointmentMutation.isPending ? "Finalizando..." : "Finalizar Consulta"}
-          </Button>
-        </div>
+    <div className="space-y-6 max-w-4xl mx-auto">
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold flex items-center">
+          <CalendarCheck className="mr-3 h-7 w-7 text-primary" /> Consulta em Andamento
+        </h2>
+        <Button onClick={() => navigate('/consultas')} variant="outline">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
+        </Button>
       </div>
-    </Layout>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-2xl font-bold">{appointment.service}</CardTitle>
+          <div className="flex items-center space-x-2">
+            <Clock className="h-5 w-5 text-muted-foreground" />
+            {appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
+          </div>
+        </CardHeader>
+        <CardContent className="grid gap-4 py-4">
+          <div className="flex items-center">
+            <User className="h-5 w-5 mr-2 text-muted-foreground" />
+            <p className="text-lg font-medium">Tutor: <span className="font-semibold">{appointment.client_name}</span></p>
+          </div>
+          <div className="flex items-center">
+            <PawPrint className="h-5 w-5 mr-2 text-muted-foreground" />
+            <p className="text-lg font-medium">Animal: <span className="font-semibold">{appointment.pet_name} ({appointment.species})</span></p>
+          </div>
+          <div className="flex items-center">
+            <Stethoscope className="h-5 w-5 mr-2 text-muted-foreground" />
+            <p className="text-lg font-medium">Veterinário: <span className="font-semibold">{appointment.veterinarian}</span></p>
+          </div>
+          <div className="flex items-center">
+            <CalendarCheck className="h-5 w-5 mr-2 text-muted-foreground" />
+            <p className="text-lg font-medium">Data: <span className="font-semibold">{format(parseISO(appointment.date), "dd/MM/yyyy", { locale: ptBR })}</span></p>
+          </div>
+          <div className="flex items-center">
+            <Clock className="h-5 w-5 mr-2 text-muted-foreground" />
+            <p className="text-lg font-medium">Hora: <span className="font-semibold">{appointment.time}</span></p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Formulário de Prontuário Médico */}
+      <MedicalRecordForm
+        initialData={initialMedicalRecordData}
+        onSubmit={handleSaveMedicalRecord}
+        isSubmitting={saveMedicalRecordMutation.isPending}
+      />
+
+      <div className="flex justify-end">
+        <Button
+          onClick={handleFinalizeConsultation}
+          disabled={finalizeAppointmentMutation.isPending}
+          className="bg-green-600 hover:bg-green-700 text-white"
+        >
+          <CheckCircle className="mr-2 h-5 w-5" />
+          {finalizeAppointmentMutation.isPending ? "Finalizando..." : "Finalizar Consulta"}
+        </Button>
+      </div>
+    </div>
   );
 };
 
