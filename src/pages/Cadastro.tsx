@@ -29,6 +29,7 @@ import { uploadImageToSupabase, deleteImageFromSupabase } from "@/utils/supabase
 import ClientDetailsDialog from "@/components/ClientDetailsDialog"; // Importar o novo ClientDetailsDialog
 import { useLocation } from "react-router-dom"; // Importar useLocation
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
@@ -742,7 +743,7 @@ const Cadastro = () => {
                   <TableHead>CPF</TableHead>
                   <TableHead>Nascimento</TableHead>
                   <TableHead>Contato</TableHead>
-                  <TableHead>Endereço</TableHead>
+                  <TableHead>Endereço</TableHead> {/* Título da coluna de endereço */}
                   <TableHead>Animais</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
@@ -784,16 +785,23 @@ const Cadastro = () => {
                             <span>{client.phone}</span>
                           </div>
                         </TableCell>
-                        <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
-                          <div className="flex items-center text-sm mb-1">
-                            <Home className="h-4 w-4 mr-2 text-muted-foreground" />
-                            <span>{client.address?.street || 'N/A'}, {client.address?.number || 'N/A'} {client.address?.complement || ''}</span>
-                          </div>
-                          <div className="flex items-center text-sm mb-1">
-                            <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-                            <span>{client.address?.neighborhood || 'N/A'}, {client.address?.city || 'N/A'} - {client.address?.state || 'N/A'}</span>
-                          </div>
-                          <p className="text-xs text-muted-foreground ml-6">CEP: {client.address?.cep || 'N/A'}</p>
+                        <TableCell> {/* Célula para o botão do endereço */}
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="outline" size="icon" className="h-8 w-8">
+                                <MapPin className="h-4 w-4" />
+                                <span className="sr-only">Ver Endereço</span>
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-64 p-4 text-sm">
+                              <p className="font-semibold mb-2 flex items-center">
+                                <Home className="h-4 w-4 mr-2 text-muted-foreground" /> Endereço Completo
+                              </p>
+                              <p>{client.address?.street || 'N/A'}, {client.address?.number || 'N/A'} {client.address?.complement || ''}</p>
+                              <p>{client.address?.neighborhood || 'N/A'}, {client.address?.city || 'N/A'} - {client.address?.state || 'N/A'}</p>
+                              <p className="text-xs text-muted-foreground mt-1">CEP: {client.address?.cep || 'N/A'}</p>
+                            </PopoverContent>
+                          </Popover>
                         </TableCell>
                         <TableCell className="text-center">
                           {petsOfClient.length > 0 ? (
