@@ -37,9 +37,10 @@ const serviceOptions = [
 ] as const;
 
 const formSchema = z.object({
+  dateOption: z.enum(["today", "specific"]).default("today"), // NOVO: Campo para a opção de data
   date: z.date({
     required_error: "A data da consulta é obrigatória.",
-  }),
+  }).optional(), // Tornar opcional, pois 'today' não terá uma data específica
   time: z.string().min(1, "A hora da consulta é obrigatória."),
   
   // Campos para seleção de cliente/pet
@@ -73,6 +74,7 @@ interface AppointmentFormProps {
     status?: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
     selectedClientId?: string; // Adicionado para initialData
     selectedPetId?: string;   // Adicionado para initialData
+    dateOption?: "today" | "specific"; // NOVO: Adicionado ao initialData
   };
   allClients: Client[]; // Lista de todos os clientes
   allPets: Pet[];       // Lista de todos os pets
@@ -82,7 +84,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      date: initialData?.date ? parseISO(initialData.date) : new Date(), // Sempre define uma data, padrão para hoje
+      dateOption: initialData?.dateOption || "today", // Definir valor padrão para dateOption
+      date: initialData?.date ? parseISO(initialData.date) : undefined, // Data é opcional
       time: initialData?.time || format(new Date(), "HH:mm"), // Define o horário atual como padrão
       
       cpfSearch: "",
@@ -103,7 +106,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, initialData
   // Reset form and states when initialData changes (e.g., dialog opens for new appointment)
   useEffect(() => {
     form.reset({
-      date: initialData?.date ? parseISO(initialData.date) : new Date(),
+      dateOption: initialData?.dateOption || "today", // Resetar dateOption
+      date: initialData?.date ? parseISO(initialData.date) : undefined,
       time: initialData?.time || format(new Date(), "HH:mm"), // Garante que o horário seja atualizado ao reabrir
       
       cpfSearch: "",

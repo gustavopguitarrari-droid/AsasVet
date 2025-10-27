@@ -30,6 +30,16 @@ import { showError, showSuccess } from "@/utils/toast";
 import { Client, Pet } from "@/types/cadastro";
 import { useNavigate } from "react-router-dom";
 
+// Definir as opções de serviço como um array para reutilização
+const serviceOptions = [
+  "Consulta Geral",
+  "Vacinação",
+  "Exame de Rotina",
+  "Banho e Tosa",
+  "Cirurgia",
+  "Consulta de Retorno",
+] as const;
+
 export interface Appointment {
   id: string;
   user_id: string;
@@ -37,8 +47,8 @@ export interface Appointment {
   time: string; // HH:mm
   client_name: string;
   pet_name: string;
-  species: string;
-  service: string;
+  species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros"; // Tipo de enumeração
+  service: typeof serviceOptions[number]; // Tipo de enumeração
   veterinarian: string;
   status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
   completion_timestamp?: string | null; // Alterado para timestamp ISO (UTC)
@@ -80,7 +90,7 @@ const Appointments = () => {
         .select('*')
         .eq('user_id', userId);
       if (error) throw error;
-      return data;
+      return data as Appointment[]; // Cast para o tipo correto
     },
     enabled: !!userId,
   });
@@ -95,7 +105,7 @@ const Appointments = () => {
         .eq('user_id', userId)
         .in('status', ['Realizada', 'Cancelada']);
       if (error) throw error;
-      return data;
+      return data as Appointment[]; // Cast para o tipo correto
     },
     enabled: !!userId,
   });
@@ -143,10 +153,10 @@ const Appointments = () => {
       return data.map(dbPet => ({
         id: dbPet.id,
         name: dbPet.name,
-        species: dbPet.species,
+        species: dbPet.species as Pet["species"], // Cast para o tipo de enumeração
         breed: dbPet.breed,
         age: dbPet.age,
-        gender: dbPet.gender,
+        gender: dbPet.gender as Pet["gender"], // Cast para o tipo de enumeração
         color: dbPet.color,
         observations: dbPet.observations || undefined,
         photoUrl: dbPet.photo_url || undefined,
@@ -179,7 +189,7 @@ const Appointments = () => {
         .select()
         .single();
       if (error) throw error;
-      return data;
+      return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
@@ -213,7 +223,7 @@ const Appointments = () => {
         .select()
         .single();
       if (error) throw error;
-      return data;
+      return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
@@ -242,7 +252,7 @@ const Appointments = () => {
         .select()
         .single();
       if (error) throw error;
-      return data;
+      return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
@@ -273,7 +283,7 @@ const Appointments = () => {
         .select()
         .single();
       if (error) throw error;
-      return data;
+      return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });

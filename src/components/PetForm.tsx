@@ -58,7 +58,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: initialData?.name || "",
-      species: initialData?.species || "Cachorro",
+      species: initialData?.species || "Cachorro", // Corrigido o tipo aqui
       breed: initialData?.breed || "",
       age: initialData?.age || "",
       gender: initialData?.gender || "Desconhecido",
@@ -76,7 +76,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
   useEffect(() => {
     form.reset({
       name: initialData?.name || "",
-      species: initialData?.species || "Cachorro",
+      species: initialData?.species || "Cachorro", // Corrigido o tipo aqui
       breed: initialData?.breed || "",
       age: initialData?.age || "",
       gender: initialData?.gender || "Desconhecido",

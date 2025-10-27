@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { format } from 'date-fns';
 
-interface User {
+export interface User { // Adicionado 'export' aqui
   id?: string;
   name?: string;
   lastName?: string;
@@ -29,12 +29,12 @@ interface User {
 
 interface UserContextType {
   user: User | null;
-  setUser: (user: User | null) => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>; // Tipo corrigido para aceitar atualizações funcionais
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UserProvider = ({ children }: { children: ReactNode }) => {
+export const UserProvider = ({ children }: { ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
 
   return (

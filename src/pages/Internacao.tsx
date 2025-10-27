@@ -36,8 +36,8 @@ export interface InternedPatient {
   admission_date: string;
   expected_discharge_date?: string | null;
   veterinarian: string;
-  status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
-  species: string;
+  status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito"; // Tipo de enumeração
+  species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros"; // Tipo de enumeração
   risk: RiskLevel;
   created_at: string;
 }
@@ -137,7 +137,7 @@ const Internacao = () => {
       }
       console.log("Internacao.tsx: Supabase returned for interned_patients:", data);
       data.forEach(p => console.log(`Internacao.tsx: Patient ${p.id} - Status: '${p.status}'`));
-      return data;
+      return data as InternedPatient[]; // Cast para o tipo correto
     },
     enabled: !!userId,
   });
@@ -158,7 +158,7 @@ const Internacao = () => {
         throw error;
       }
       console.log("Internacao.tsx: history_patients fetched:", data);
-      return data;
+      return data as InternedPatient[]; // Cast para o tipo correto
     },
     enabled: !!userId,
   });
@@ -178,7 +178,7 @@ const Internacao = () => {
         throw error;
       }
       console.log("Internacao.tsx: patient_actions fetched:", data);
-      return data;
+      return data as PatientAction[]; // Cast para o tipo correto
     },
     enabled: !!userId,
   });
@@ -210,7 +210,7 @@ const Internacao = () => {
         throw error;
       }
       console.log("Internacao.tsx: New patient inserted successfully:", data);
-      return data;
+      return data as InternedPatient; // Cast para o tipo correto
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interned_patients', userId] });
@@ -250,7 +250,7 @@ const Internacao = () => {
         throw error;
       }
       console.log("Internacao.tsx: Patient updated successfully in DB (response):", data);
-      return data;
+      return data as InternedPatient; // Cast para o tipo correto
     },
     onSuccess: async (data) => {
       console.log("Internacao.tsx: updatePatientMutation onSuccess - Data received:", data);

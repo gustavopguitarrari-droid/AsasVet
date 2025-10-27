@@ -45,7 +45,7 @@ const formSchema = z.object({
   }),
   expectedDischargeDate: z.date().nullable().optional(),
   veterinarian: z.string().min(1, "O veterinário responsável é obrigatório."),
-  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], { // Tipo de enumeração
     required_error: "A espécie do animal é obrigatória.",
   }),
   risk: z.enum(["Sem risco", "Baixo", "Médio", "Alto", "Emergência"], {
@@ -61,12 +61,14 @@ export type InternmentEditFormValues = z.infer<typeof formSchema>;
 interface InternmentEditFormProps {
   onSubmit: (data: InternmentEditFormValues) => void;
   onCancel: () => void;
-  initialData: Omit<InternedPatient, "user_id" | "created_at" | "admission_date" | "expected_discharge_date" | "bay_name" | "pet_name" | "owner_name"> & {
+  initialData: Omit<InternedPatient, "user_id" | "created_at" | "admission_date" | "expected_discharge_date" | "bay_name" | "pet_name" | "owner_name" | "species" | "status"> & { // Removido species e status do Omit
     admissionDate: string;
     expectedDischargeDate?: string | null;
     bayName: string;
     petName: string;
     ownerName: string;
+    species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros"; // Adicionado species aqui
+    status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito"; // Adicionado status aqui
   };
 }
 
@@ -87,7 +89,7 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
       admissionDate: safeParseDate(initialData.admissionDate) || new Date(),
       expectedDischargeDate: safeParseDate(initialData.expectedDischargeDate),
       veterinarian: initialData.veterinarian || mockVeterinarians[0]?.name || "",
-      species: initialData.species || "Cachorro",
+      species: initialData.species || "Cachorro", // Corrigido o tipo aqui
       risk: initialData.risk || "Sem risco",
       status: initialData.status || "Em Observação",
     },

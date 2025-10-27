@@ -21,10 +21,10 @@ export interface Client {
 export interface Pet {
   id: string;
   name: string;
-  species: string;
+  species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros"; // Tipo de enumeração
   breed: string;
   age: string; // Novo campo (ex: "2 anos", "6 meses")
-  gender: 'Macho' | 'Fêmea' | 'Desconhecido'; // Novo campo
+  gender: 'Macho' | 'Fêmea' | 'Desconhecido'; // Tipo de enumeração
   color: string; // Novo campo
   observations?: string; // Novo campo
   photoUrl?: string; // Novo campo para URL da foto (Base64)

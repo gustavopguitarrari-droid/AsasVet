@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { Appointment } from "@/pages/Appointments";
 import { format, parseISO, isValid } from "date-fns";
 import { useNavigate, NavigateFunction } from "react-router-dom";
+import { ptBR } from "date-fns/locale"; // Importar ptBR
 
 interface AppointmentDetailsDialogProps {
   appointment: Appointment | null;
@@ -144,6 +145,8 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
               selectedClientId: "", // Não preenche aqui, o formulário busca
               selectedPetId: "",     // Não preenche aqui, o formulário busca
             }}
+            allClients={[]} // Adicione a lista de clientes
+            allPets={[]}    // Adicione a lista de pets
           />
         ) : (
           <div className="grid gap-4 py-4">

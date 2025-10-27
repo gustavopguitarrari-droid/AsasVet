@@ -1,38 +1,16 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
-import { Session, User } from '@supabase/supabase-js';
+import { Session, User as SupabaseUser } from '@supabase/supabase-js'; // Renomeado User do Supabase para evitar conflito
 import { supabase } from '@/integrations/supabase/client';
-import { useUser } from './UserContext';
+import { useUser, User } from './UserContext'; // Importado User exportado
 
 // Updated UserProfile to match the extended User interface in UserContext
-interface UserProfile {
-  id?: string;
-  name?: string;
-  lastName?: string;
-  email?: string;
-  avatarUrl?: string;
-  role?: string;
-  birthday?: string; // YYYY-MM-DD string
-  registeredTime: string; // ISO string
-  gender?: string;
-  phone?: string;
-  crmv?: string;
-  cpf?: string;
-  companyName?: string;
-  addressCep?: string;
-  addressStreet?: string;
-  addressNumber?: string;
-  addressComplement?: string;
-  addressNeighborhood?: string;
-  addressCity?: string;
-  addressState?: string;
-  colorTheme?: string;
-}
+interface UserProfile extends User {} // Agora estende a interface User exportada
 
 interface SessionContextType {
   session: Session | null;
-  user: User | null;
+  user: SupabaseUser | null; // Usar SupabaseUser aqui
   isLoading: boolean; // Indicates if initial session and profile loading is complete
 }
 
@@ -40,12 +18,12 @@ const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
 export const SessionContextProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
-  const [user, setUserState] = useState<User | null>(null);
+  const [user, setUserState] = useState<SupabaseUser | null>(null); // Usar SupabaseUser aqui
   const [isLoading, setIsLoading] = useState(true); // Start as true to indicate initial loading
   const { setUser: setAppUser } = useUser();
 
   // Helper function to fetch profile and set appUser
-  const fetchProfileAndSetAppUser = async (supabaseUser: User | null) => {
+  const fetchProfileAndSetAppUser = async (supabaseUser: SupabaseUser | null) => { // Usar SupabaseUser aqui
     console.log('SessionContext: [START] fetchProfileAndSetAppUser for user:', supabaseUser?.id);
     const startTime = performance.now();
 
