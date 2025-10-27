@@ -101,9 +101,9 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const queryClient = useQueryClient();
-  const { user: appUser } = useUser(); // NOVO: Obter o usuário do contexto
+  const { user: appUser } = useUser(); // Obter o usuário do contexto
 
-  // NOVO: Estados para o diálogo de download de PDF
+  // Estados para o diálogo de download de PDF
   const [isPdfDownloadDialogOpen, setIsPdfDownloadDialogOpen] = useState(false);
   const [pdfDownloadAppointment, setPdfDownloadAppointment] = useState<Appointment | null>(null);
   const [defaultPdfFilename, setDefaultPdfFilename] = useState("");
@@ -141,8 +141,16 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       await generateMedicalRecordPdf({ 
         appointment, 
         medicalRecord: medicalRecordForPdf, 
-        logoUrl: appUser?.logoUrl, // NOVO: Passar o logoUrl do usuário
-        filename 
+        logoUrl: appUser?.logoUrl, // Passar o logoUrl do usuário
+        filename,
+        clinicDetails: { // NOVO: Passar detalhes da clínica
+          companyName: appUser?.companyName || 'AsasVet',
+          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+          phone: appUser?.phone || '',
+          email: appUser?.email || '',
+          veterinarianCrmv: appUser?.crmv || '',
+          veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
+        }
       }); 
       return true;
     },
@@ -182,7 +190,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       .join(":");
   };
 
-  // NOVO: Handler para abrir o diálogo de download de PDF
+  // Handler para abrir o diálogo de download de PDF
   const handleOpenPdfDownloadDialog = (appointment: Appointment) => {
     setPdfDownloadAppointment(appointment);
     const defaultName = `Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`;
@@ -190,7 +198,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
     setIsPdfDownloadDialogOpen(true);
   };
 
-  // NOVO: Handler para confirmar o download do PDF
+  // Handler para confirmar o download do PDF
   const handleConfirmPdfDownload = (filename: string) => {
     if (pdfDownloadAppointment) {
       fetchAndGeneratePdfMutation.mutate({ appointment: pdfDownloadAppointment, filename });
@@ -282,11 +290,10 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                       <TableCell>{waitingTime}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end space-x-2">
-                          {/* Botão de "Ver Detalhes" (olho) removido daqui */}
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleOpenPdfDownloadDialog(appointment)} // NOVO: Abre o diálogo de download
+                            onClick={() => handleOpenPdfDownloadDialog(appointment)}
                             disabled={fetchAndGeneratePdfMutation.isPending}
                           >
                             {fetchAndGeneratePdfMutation.isPending ? (
@@ -339,7 +346,6 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         </DialogFooter>
       </DialogContent>
 
-      {/* NOVO: Renderiza o diálogo de download de PDF */}
       <PdfDownloadDialog
         isOpen={isPdfDownloadDialogOpen}
         onClose={() => setIsPdfDownloadDialogOpen(false)}
