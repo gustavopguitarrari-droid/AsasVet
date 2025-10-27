@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, CalendarX } from "lucide-react";
+import { PlusCircle, CalendarX, Trash2 } from "lucide-react"; // Adicionado Trash2
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import AddEventDialog, { EventFormValues } from "@/components/AddEventDialog";
 import EventCalendar, { CalendarEvent } from "@/components/EventCalendar";
@@ -111,6 +111,26 @@ const AgendamentosMedicos = () => {
     },
   });
 
+  // NOVO: Mutação para limpar todos os eventos
+  const clearAllEventsMutation = useMutation({
+    mutationFn: async () => {
+      if (!userId) throw new Error("User not authenticated.");
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('user_id', userId); // Deleta todos os eventos do usuário logado
+      if (error) throw error;
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events', userId] });
+      showSuccess("Todos os agendamentos foram limpos com sucesso!");
+    },
+    onError: (err) => {
+      showError(`Erro ao limpar agendamentos: ${err.message}`);
+    },
+  });
+
   const handleAddEvent = (data: EventFormValues) => {
     addEventMutation.mutate(data);
   };
@@ -131,6 +151,10 @@ const AgendamentosMedicos = () => {
     }
   };
 
+  const handleClearAllEvents = () => {
+    clearAllEventsMutation.mutate();
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -149,15 +173,51 @@ const AgendamentosMedicos = () => {
 
   return (
     <div className="space-y-6">
-      {/* O botão "Adicionar Agendamento" foi removido daqui */}
-      <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
-          </DialogHeader>
-          <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsAddEventDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
-        </DialogContent>
-      </Dialog>
+      <div className="flex items-center justify-between mb-6"> {/* Novo div para os botões de ação */}
+        <h2 className="text-3xl font-bold">Agenda Médica</h2> {/* Título da página */}
+        <div className="flex space-x-2">
+          <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="font-bold">
+                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
+              </DialogHeader>
+              <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsAddEventDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
+            </DialogContent>
+          </Dialog>
+
+          {/* NOVO: Botão de Limpar Agenda */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" disabled={events.length === 0 || clearAllEventsMutation.isPending}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                {clearAllEventsMutation.isPending ? "Limpando..." : "Limpar Agenda"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitleComponent className="flex items-center">
+                  <Trash2 className="h-5 w-5 mr-2 text-destructive" /> Confirmar Limpeza da Agenda
+                </AlertDialogTitleComponent>
+                <AlertDialogDescription>
+                  Tem certeza que deseja limpar TODOS os agendamentos da sua agenda?
+                  Esta ação não pode ser desfeita e removerá permanentemente todos os seus eventos.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={clearAllEventsMutation.isPending}>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleClearAllEvents} disabled={clearAllEventsMutation.isPending} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  {clearAllEventsMutation.isPending ? "Limpando..." : "Sim, Limpar Tudo"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      </div>
 
       <EventCalendar events={events} onAddEventClick={handleOpenDialogWithDate} onEventClick={handleEventClick} />
 
