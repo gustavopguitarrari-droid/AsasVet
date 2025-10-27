@@ -69,11 +69,12 @@ const ClientDetailsDialog: React.FC<ClientDetailsDialogProps> = ({
               )}
             </Avatar>
           </div>
-          <div className="grid grid-cols-3 items-center gap-4">
+          {/* Removido: Exibição do ID do tutor */}
+          {/* <div className="grid grid-cols-3 items-center gap-4">
             <p className="text-sm font-medium text-muted-foreground">ID:</p>
             <p className="col-span-2 text-sm">{client.id}</p>
           </div>
-          <Separator />
+          <Separator /> */}
           <div className="grid grid-cols-3 items-center gap-4">
             <p className="text-sm font-medium text-muted-foreground">Nome:</p>
             <p className="col-span-2 text-sm font-bold">{client.name}</p>
