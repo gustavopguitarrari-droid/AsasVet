@@ -868,6 +868,7 @@ const Cadastro = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-[60px]">Foto</TableHead> {/* Nova TableHead para a foto do animal */}
                   <TableHead>Nome</TableHead>
                   <TableHead>Espécie</TableHead>
                   <TableHead>Raça</TableHead>
@@ -883,8 +884,20 @@ const Cadastro = () => {
                   filteredPets.map((pet) => {
                     const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
                     const owner = clients.find(client => client.id === pet.ownerId);
+                    const initials = pet.name.charAt(0).toUpperCase(); // Apenas a primeira inicial para pets
                     return (
                       <TableRow key={pet.id} className="cursor-pointer hover:bg-muted/50">
+                        <TableCell className="w-[60px]" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
+                          <Avatar className="h-9 w-9">
+                            {pet.photoUrl ? (
+                              <AvatarImage src={pet.photoUrl} alt={pet.name} />
+                            ) : (
+                              <AvatarFallback className="bg-muted text-muted-foreground text-xs font-bold">
+                                {initials || <Dog className="h-5 w-5" />} {/* Fallback para o ícone Dog se initials for vazio */}
+                              </AvatarFallback>
+                            )}
+                          </Avatar>
+                        </TableCell>
                         <TableCell className="font-bold flex items-center" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
                           <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
                           {pet.name}
@@ -911,7 +924,7 @@ const Cadastro = () => {
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={8} className="h-24 text-center">
+                    <TableCell colSpan={9} className="h-24 text-center">
                       Nenhum animal encontrado para a espécie selecionada.
                     </TableCell>
                   </TableRow>
@@ -947,10 +960,19 @@ const Cadastro = () => {
                   <div className="space-y-3">
                     {petsOfClient.map(pet => {
                       const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
+                      const initials = pet.name.charAt(0).toUpperCase();
                       return (
                         <div key={pet.id} className="flex items-center justify-between p-3 border rounded-md bg-card">
                           <div className="flex items-center">
-                            <IconComponent className="h-5 w-5 mr-3 text-muted-foreground" />
+                            <Avatar className="h-9 w-9 mr-3">
+                              {pet.photoUrl ? (
+                                <AvatarImage src={pet.photoUrl} alt={pet.name} />
+                              ) : (
+                                <AvatarFallback className="bg-muted text-muted-foreground text-xs font-bold">
+                                  {initials || <Dog className="h-5 w-5" />}
+                                </AvatarFallback>
+                              )}
+                            </Avatar>
                             <div>
                               <p className="font-medium">{pet.name} ({pet.species})</p>
                               <p className="text-sm text-muted-foreground">Raça: {pet.breed} | Idade: {pet.age}</p>
