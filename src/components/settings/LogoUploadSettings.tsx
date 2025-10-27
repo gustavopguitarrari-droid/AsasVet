@@ -234,7 +234,6 @@ const LogoUploadSettings: React.FC = () => {
             </Button>
           </div>
         </CardContent>
-      </Card>
     </Card>
   );
 };
