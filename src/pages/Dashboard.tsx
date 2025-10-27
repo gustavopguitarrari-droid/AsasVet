@@ -323,28 +323,23 @@ const Dashboard = () => {
     if (!user) {
       return "Bem-vindo(a) ao AsasVet!";
     }
-    const prefix = user.gender === "Feminino" ? "Dra." : "Dr.";
+    const prefix = user.gender === "Feminino" ? "Dra." : "Dr."; // Ajustado para "Feminino"
     return `Bem-vindo(a) ${prefix} ${user.name}!`;
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center"> {/* Novo flex container para logo e saudação */}
-          {user?.logoUrl && (
-            <img src={user.logoUrl} alt="Logo da Clínica" className="h-12 w-auto max-h-12 mr-4 object-contain" />
-          )}
-          <div>
-            <h2 className="text-3xl font-bold">{getGreeting()}</h2>
-            <p className="text-muted-foreground">
-              Visão geral do seu consultório veterinário.
+        <div>
+          <h2 className="text-3xl font-bold">{getGreeting()}</h2>
+          <p className="text-muted-foreground">
+            Visão geral do seu consultório veterinário.
+          </p>
+          {user?.role === "Administrador" && (
+            <p className="text-green-600 font-semibold mt-2">
+              (Você está logado como Administrador e tem acesso total ao sistema.)
             </p>
-            {user?.role === "Administrador" && (
-              <p className="text-green-600 font-semibold mt-2">
-                (Você está logado como Administrador e tem acesso total ao sistema.)
-              </p>
-            )}
-          </div>
+          )}
         </div>
         <Button
           onClick={() => setIsConfiguratorOpen(true)}
