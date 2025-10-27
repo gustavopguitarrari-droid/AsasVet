@@ -88,9 +88,12 @@ const ConsultationPage: React.FC = () => {
         physical_exam: recordData.physicalExam || null,
         diagnosis: recordData.diagnosis || null,
         treatment: recordData.treatment || null,
-        // Garante que prescriptions seja sempre um array, mesmo que vazio
-        prescriptions: recordData.prescriptions || [], 
+        // Se o array de prescrições estiver vazio, envie 'null' para a coluna nullable jsonb.
+        // Caso contrário, envie o array de prescrições.
+        prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : null,
       };
+
+      console.log("Payload being sent to medical_records:", JSON.stringify(payload, null, 2)); // Log para depuração
 
       if (medicalRecord?.id) {
         // Update existing record
@@ -119,6 +122,7 @@ const ConsultationPage: React.FC = () => {
       showSuccess("Prontuário salvo com sucesso!");
     },
     onError: (err) => {
+      console.error("Error saving medical record:", err); // Log detalhado do erro
       showError(`Erro ao salvar prontuário: ${err.message}`);
     },
   });
