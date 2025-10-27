@@ -621,7 +621,7 @@ const Internacao = () => {
                 return (
                   <li
                     key={patient.id}
-                    className="relative p-3 border rounded-md bg-white dark:bg-gray-800 shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                    className="relative p-3 border rounded-md bg-gray-50 dark:bg-gray-900 shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                     onClick={() => handleCardClick(patient)}
                   >
                     <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
