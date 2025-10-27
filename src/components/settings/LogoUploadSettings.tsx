@@ -23,12 +23,17 @@ const LogoUploadSettings: React.FC = () => {
 
   // Atualiza o preview quando o logo do usuário muda
   useEffect(() => {
+    console.log("LogoUploadSettings: user.logoUrl changed to", user?.logoUrl);
     setPreviewUrl(user?.logoUrl || null);
   }, [user?.logoUrl]);
 
   const updateProfileLogoMutation = useMutation({
     mutationFn: async (newLogoUrl: string | null) => {
-      if (!user?.id) throw new Error("User not authenticated.");
+      if (!user?.id) {
+        console.error("updateProfileLogoMutation: User not authenticated.");
+        throw new Error("User not authenticated.");
+      }
+      console.log("updateProfileLogoMutation: Attempting to update profile with logo_url:", newLogoUrl);
 
       const { data, error } = await supabase
         .from('profiles')
@@ -36,10 +41,15 @@ const LogoUploadSettings: React.FC = () => {
         .eq('id', user.id)
         .select()
         .single();
-      if (error) throw error;
+      if (error) {
+        console.error("updateProfileLogoMutation: Error updating profile in DB:", error);
+        throw error;
+      }
+      console.log("updateProfileLogoMutation: Profile updated successfully in DB:", data);
       return data;
     },
     onSuccess: (data) => {
+      console.log("updateProfileLogoMutation: onSuccess, data:", data);
       setUser((prevUser) => ({
         ...prevUser!,
         logoUrl: data.logo_url || undefined,
@@ -52,12 +62,14 @@ const LogoUploadSettings: React.FC = () => {
       }
     },
     onError: (error) => {
+      console.error("updateProfileLogoMutation: onError, error:", error);
       showError(`Erro ao atualizar logo: ${error.message}`);
     },
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+    console.log("handleFileChange: Selected file:", file);
     if (file) {
       if (!file.type.startsWith('image/')) {
         showError("Por favor, selecione um arquivo de imagem válido.");
@@ -80,55 +92,72 @@ const LogoUploadSettings: React.FC = () => {
   };
 
   const handleUploadLogo = async () => {
+    console.log("handleUploadLogo: Initiating upload process.");
     if (!user?.id) {
       showError("Usuário não autenticado.");
+      console.error("handleUploadLogo: User ID is missing.");
       return;
     }
     if (!selectedFile) {
       showError("Nenhum arquivo selecionado para upload.");
+      console.warn("handleUploadLogo: No file selected.");
       return;
     }
 
     const reader = new FileReader();
     reader.onloadend = async () => {
       if (typeof reader.result === 'string') {
+        console.log("handleUploadLogo: FileReader finished, result type string.");
         try {
           const newLogoUrl = await uploadLogoToSupabase(reader.result, user.id);
           if (newLogoUrl) {
+            console.log("handleUploadLogo: Logo uploaded to storage, new URL:", newLogoUrl);
             updateProfileLogoMutation.mutate(newLogoUrl);
           } else {
             showError("Falha ao fazer upload do logo para o storage.");
+            console.error("handleUploadLogo: uploadLogoToSupabase returned null.");
           }
         } catch (err: any) {
           showError(`Erro no upload: ${err.message}`);
+          console.error("handleUploadLogo: Error during uploadLogoToSupabase or mutation:", err);
         }
+      } else {
+        console.error("handleUploadLogo: FileReader result is not a string.");
+        showError("Erro ao ler o arquivo de imagem.");
       }
     };
     reader.onerror = () => {
+      console.error("handleUploadLogo: FileReader error.");
       showError("Erro ao ler o arquivo de imagem.");
     };
     reader.readAsDataURL(selectedFile);
   };
 
   const handleRemoveLogo = async () => {
+    console.log("handleRemoveLogo: Initiating remove process.");
     if (!user?.id) {
       showError("Usuário não autenticado.");
+      console.error("handleRemoveLogo: User ID is missing.");
       return;
     }
     if (!user.logoUrl) {
       showSuccess("Nenhum logo para remover.");
+      console.warn("handleRemoveLogo: No logo URL found in user context.");
       return;
     }
 
     try {
       const success = await deleteLogoFromSupabase(user.logoUrl);
       if (success) {
+        console.log("handleRemoveLogo: Logo deleted from storage.");
         updateProfileLogoMutation.mutate(null); // Remove o URL do logo do perfil
       } else {
         showError("Falha ao remover o logo do storage.");
+        console.error("handleRemoveLogo: deleteLogoFromSupabase returned false.");
       }
     } catch (err: any) {
       showError(`Erro na remoção: ${err.message}`);
+      console.error("handleRemoveLogo: Error during deleteLogoFromSupabase or mutation:", err);
     }
   };
 

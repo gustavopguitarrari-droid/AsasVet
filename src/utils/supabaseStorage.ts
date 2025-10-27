@@ -106,7 +106,10 @@ export const uploadLogoToSupabase = async (
   base64Image: string,
   userId: string,
 ): Promise<string | null> => {
-  if (!base64Image) return null;
+  if (!base64Image) {
+    console.log("uploadLogoToSupabase: No base64Image provided.");
+    return null;
+  }
 
   try {
     const contentType = base64Image.substring(
@@ -114,12 +117,18 @@ export const uploadLogoToSupabase = async (
       base64Image.indexOf(";")
     );
     const fileExtension = contentType.split('/')[1];
-    // Usar um nome de arquivo fixo ou baseado no ID do usuário para garantir que só haja um logo por usuário
     const fileName = `logo.${fileExtension}`; 
     const filePath = `${userId}/${fileName}`; // Caminho: userId/logo.ext
+    console.log(`uploadLogoToSupabase: Attempting to upload to filePath: ${filePath} with contentType: ${contentType}`);
 
-    // Primeiro, tentar remover o logo antigo se existir
-    await deleteLogoFromSupabase(`${supabase.storage.from(LOGOS_BUCKET_NAME).getPublicUrl(filePath).data.publicUrl}`);
+    // Tentar remover o logo antigo se existir (para garantir que sempre haja apenas um)
+    // Nota: getPublicUrl pode retornar um URL mesmo que o arquivo não exista,
+    // então a tentativa de remoção pode falhar sem problema se não houver logo.
+    const { data: existingPublicUrlData } = supabase.storage.from(LOGOS_BUCKET_NAME).getPublicUrl(filePath);
+    if (existingPublicUrlData.publicUrl) {
+      console.log(`uploadLogoToSupabase: Found existing logo at ${existingPublicUrlData.publicUrl}, attempting to delete.`);
+      await deleteLogoFromSupabase(existingPublicUrlData.publicUrl);
+    }
 
     const { data, error } = await supabase.storage
       .from(LOGOS_BUCKET_NAME)
@@ -129,44 +138,52 @@ export const uploadLogoToSupabase = async (
       });
 
     if (error) {
-      console.error("Erro ao fazer upload do logo:", error);
+      console.error("uploadLogoToSupabase: Erro ao fazer upload do logo:", error);
       throw error;
     }
+    console.log("uploadLogoToSupabase: Upload successful, data:", data);
 
     const { data: publicUrlData } = supabase.storage
       .from(LOGOS_BUCKET_NAME)
       .getPublicUrl(filePath);
 
+    console.log("uploadLogoToSupabase: Public URL obtained:", publicUrlData.publicUrl);
     return publicUrlData.publicUrl;
 
   } catch (error) {
-    console.error("Erro no processo de upload do logo:", error);
+    console.error("uploadLogoToSupabase: Erro no processo de upload do logo:", error);
     return null;
   }
 };
 
 export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean> => {
-  if (!publicUrl) return true;
+  if (!publicUrl) {
+    console.log("deleteLogoFromSupabase: No publicUrl provided, nothing to delete.");
+    return true;
+  }
 
   try {
     const pathSegments = publicUrl.split(`${LOGOS_BUCKET_NAME}/`);
     if (pathSegments.length < 2) {
-      console.warn("URL pública inválida para exclusão do logo:", publicUrl);
+      console.warn("deleteLogoFromSupabase: URL pública inválida para exclusão do logo:", publicUrl);
       return false;
     }
     const filePath = pathSegments[1];
+    console.log(`deleteLogoFromSupabase: Attempting to delete filePath: ${filePath} from bucket: ${LOGOS_BUCKET_NAME}`);
 
     const { error } = await supabase.storage
       .from(LOGOS_BUCKET_NAME)
       .remove([filePath]);
 
     if (error) {
-      console.error("Erro ao deletar logo do storage:", error);
-      throw error;
+      console.error("deleteLogoFromSupabase: Erro ao deletar logo do storage:", error);
+      // Não lançar erro aqui, apenas registrar, pois a função é chamada para "limpar" antes de um novo upload
+      return false;
     }
+    console.log("deleteLogoFromSupabase: Logo deleted successfully.");
     return true;
   } catch (error) {
-    console.error("Erro no processo de exclusão do logo:", error);
+    console.error("deleteLogoFromSupabase: Erro no processo de exclusão do logo:", error);
     return false;
   }
 };
