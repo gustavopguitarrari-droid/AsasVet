@@ -499,7 +499,7 @@ const Internacao = () => {
   const getPageTitle = () => {
     switch (activeTab) {
       case "pacientes-internados":
-        return "Pacientes Internados";
+        return "Internação"; // Alterado para "Internação"
       case "mapa-execucao":
         return "Mapa de Execução";
       default:
