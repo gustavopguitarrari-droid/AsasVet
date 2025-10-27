@@ -17,7 +17,7 @@ import AppointmentsWeeklyChart from "@/components/charts/AppointmentsWeeklyChart
 import RevenueMonthlyChart from "@/components/charts/RevenueMonthlyChart";
 import PetsBySpeciesChart from "@/components/charts/PetsBySpeciesChart";
 import AverageWaitingTimeCard from "@/components/AverageWaitingTimeCard"; // Importar o card de tempo de espera
-import AverageConsultationTimeCard from "@/components/Average/ConsultationTimeCard"; // Importar o novo card de tempo de consulta
+import AverageConsultationTimeCard from "@/components/AverageConsultationTimeCard"; // Importar o novo card de tempo de consulta
 import UpcomingEventsCard from "@/components/UpcomingEventsCard"; // Importar o novo componente de Próximos Eventos
 
 interface DashboardItemConfig {
