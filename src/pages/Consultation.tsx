@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Layout from '@/components/layout/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/context/UserContext';
@@ -14,6 +14,21 @@ import { format, parseISO, differenceInSeconds, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import AppointmentChronometer from '@/components/AppointmentChronometer';
 import { Appointment } from './Appointments'; // Importar a interface Appointment
+import MedicalRecordForm, { MedicalRecordFormValues } from '@/components/consultation/MedicalRecordForm'; // Importar o novo formulário
+
+// Interface para o prontuário médico (deve corresponder à tabela medical_records)
+interface MedicalRecord {
+  id: string;
+  appointment_id: string;
+  user_id: string;
+  anamnesis?: string | null;
+  physical_exam?: string | null;
+  diagnosis?: string | null;
+  treatment?: string | null;
+  prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
+  created_at: string;
+  updated_at: string;
+}
 
 const ConsultationPage: React.FC = () => {
   const { appointmentId } = useParams<{ appointmentId: string }>();
@@ -37,6 +52,74 @@ const ConsultationPage: React.FC = () => {
       return data;
     },
     enabled: !!userId && !!appointmentId,
+  });
+
+  // Query para buscar o prontuário médico da consulta
+  const { data: medicalRecord, isLoading: isLoadingMedicalRecord, error: medicalRecordError } = useQuery<MedicalRecord>({
+    queryKey: ['medicalRecord', appointmentId, userId],
+    queryFn: async () => {
+      if (!userId || !appointmentId) throw new Error("User or Appointment ID not available.");
+      const { data, error } = await supabase
+        .from('medical_records')
+        .select('*')
+        .eq('appointment_id', appointmentId)
+        .eq('user_id', userId)
+        .single();
+      if (error) {
+        if (error.code === 'PGRST116') { // No rows found
+          return null; // Retorna null se não houver prontuário
+        }
+        throw error;
+      }
+      return data;
+    },
+    enabled: !!userId && !!appointmentId,
+  });
+
+  // Mutação para salvar/atualizar o prontuário médico
+  const saveMedicalRecordMutation = useMutation({
+    mutationFn: async (recordData: MedicalRecordFormValues) => {
+      if (!userId || !appointmentId) throw new Error("User or Appointment ID not available.");
+
+      const payload = {
+        user_id: userId,
+        appointment_id: appointmentId,
+        anamnesis: recordData.anamnesis || null,
+        physical_exam: recordData.physicalExam || null,
+        diagnosis: recordData.diagnosis || null,
+        treatment: recordData.treatment || null,
+        prescriptions: recordData.prescriptions || null, // Supabase handles JSONB directly
+      };
+
+      if (medicalRecord?.id) {
+        // Update existing record
+        const { data, error } = await supabase
+          .from('medical_records')
+          .update(payload)
+          .eq('id', medicalRecord.id)
+          .eq('user_id', userId)
+          .select()
+          .single();
+        if (error) throw error;
+        return data;
+      } else {
+        // Insert new record
+        const { data, error } = await supabase
+          .from('medical_records')
+          .insert(payload)
+          .select()
+          .single();
+        if (error) throw error;
+        return data;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
+      showSuccess("Prontuário salvo com sucesso!");
+    },
+    onError: (err) => {
+      showError(`Erro ao salvar prontuário: ${err.message}`);
+    },
   });
 
   // Mutação para finalizar a consulta
@@ -74,7 +157,11 @@ const ConsultationPage: React.FC = () => {
     }
   };
 
-  if (isLoading) {
+  const handleSaveMedicalRecord = (data: MedicalRecordFormValues) => {
+    saveMedicalRecordMutation.mutate(data);
+  };
+
+  if (isLoading || isLoadingMedicalRecord) {
     return (
       <Layout>
         <div className="flex items-center justify-center h-full">
@@ -84,11 +171,11 @@ const ConsultationPage: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (error || medicalRecordError) {
     return (
       <Layout>
         <div className="flex items-center justify-center h-full text-destructive">
-          <p>Erro ao carregar consulta: {error.message}</p>
+          <p>Erro ao carregar consulta: {error?.message || medicalRecordError?.message}</p>
           <Button onClick={() => navigate('/consultas')} className="ml-4">
             <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
           </Button>
@@ -109,6 +196,15 @@ const ConsultationPage: React.FC = () => {
       </Layout>
     );
   }
+
+  // Mapeia os dados do prontuário para o formato do formulário
+  const initialMedicalRecordData: MedicalRecordFormValues = {
+    anamnesis: medicalRecord?.anamnesis || undefined,
+    physicalExam: medicalRecord?.physical_exam || undefined,
+    diagnosis: medicalRecord?.diagnosis || undefined,
+    treatment: medicalRecord?.treatment || undefined,
+    prescriptions: medicalRecord?.prescriptions || undefined,
+  };
 
   return (
     <Layout>
@@ -154,19 +250,12 @@ const ConsultationPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Conteúdo da consulta aqui (ex: formulários de prontuário, observações, etc.) */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Prontuário e Observações</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              (Espaço para adicionar campos de prontuário, exames, medicações, etc.)
-            </p>
-            {/* Exemplo de um campo de texto para observações */}
-            {/* <Textarea placeholder="Adicione observações da consulta..." rows={5} /> */}
-          </CardContent>
-        </Card>
+        {/* Formulário de Prontuário Médico */}
+        <MedicalRecordForm
+          initialData={initialMedicalRecordData}
+          onSubmit={handleSaveMedicalRecord}
+          isSubmitting={saveMedicalRecordMutation.isPending}
+        />
 
         <div className="flex justify-end">
           <Button
