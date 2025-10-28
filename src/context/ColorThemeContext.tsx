@@ -1,6 +1,10 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useUser } from './UserContext'; // Importar useUser
+import { useMutation, useQueryClient } from '@tanstack/react-query'; // Importar useMutation e useQueryClient
+import { supabase } from '@/integrations/supabase/client'; // Importar supabase
+import { showError, showSuccess } from '@/utils/toast'; // Importar toasts
 
 type ColorTheme = 'default' | 'green' | 'purple' | 'orange' | 'teal' | 'pink' | 'brown';
 
@@ -12,31 +16,63 @@ interface ColorThemeContextType {
 const ColorThemeContext = createContext<ColorThemeContextType | undefined>(undefined);
 
 export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [colorTheme, setColorThemeState] = useState<ColorTheme>(() => {
-    // Tenta carregar o tema salvo no localStorage
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('color-theme');
-      return (savedTheme as ColorTheme) || 'default';
-    }
-    return 'default';
+  const { user, setUser } = useUser(); // Obter o usuário e a função setUser do UserContext
+  const queryClient = useQueryClient();
+
+  // O tema de cor agora vem do perfil do usuário. Se não houver usuário ou tema, usa 'default'.
+  const currentColorTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'default';
+
+  // Mutação para atualizar o tema de cor no perfil do usuário
+  const updateColorThemeMutation = useMutation({
+    mutationFn: async (newTheme: ColorTheme) => {
+      if (!user?.id) {
+        throw new Error("Usuário não autenticado.");
+      }
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ color_theme: newTheme })
+        .eq('id', user.id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      // Atualiza o contexto do usuário com o novo tema
+      setUser((prevUser) => ({
+        ...prevUser!,
+        colorTheme: data.color_theme || undefined,
+      }));
+      queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] }); // Invalida o cache para rebuscar se necessário
+      showSuccess("Tema de cor atualizado com sucesso!");
+    },
+    onError: (error) => {
+      showError(`Erro ao atualizar tema de cor: ${error.message}`);
+    },
   });
 
   useEffect(() => {
     const root = window.document.documentElement;
-    // Remove a classe do tema anterior
+    // Remove todas as classes de tema existentes
     root.classList.remove('theme-default', 'theme-green', 'theme-purple', 'theme-orange', 'theme-teal', 'theme-pink', 'theme-brown');
-    // Adiciona a classe do tema atual
-    root.classList.add(`theme-${colorTheme}`);
-    // Salva o tema no localStorage
-    localStorage.setItem('color-theme', colorTheme);
-  }, [colorTheme]);
+    // Adiciona a classe do tema atual do usuário
+    root.classList.add(`theme-${currentColorTheme}`);
+  }, [currentColorTheme]); // Depende do tema de cor do usuário
 
   const setColorTheme = (theme: ColorTheme) => {
-    setColorThemeState(theme);
+    if (user?.id) {
+      updateColorThemeMutation.mutate(theme);
+    } else {
+      showError("Faça login para salvar seu tema de cor.");
+      // Fallback para aplicar o tema visualmente mesmo sem salvar se não houver usuário
+      const root = window.document.documentElement;
+      root.classList.remove('theme-default', 'theme-green', 'theme-purple', 'theme-orange', 'theme-teal', 'theme-pink', 'theme-brown');
+      root.classList.add(`theme-${theme}`);
+    }
   };
 
   return (
-    <ColorThemeContext.Provider value={{ colorTheme, setColorTheme }}>
+    <ColorThemeContext.Provider value={{ colorTheme: currentColorTheme, setColorTheme }}>
       {children}
     </ColorThemeContext.Provider>
   );
