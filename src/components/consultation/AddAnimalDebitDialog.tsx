@@ -28,6 +28,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Product } from "@/types/cashier"; // Importar Product
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Label } from "@/components/ui/label"; // Importar Label do shadcn/ui
 
 const formSchema = z.object({
   description: z.string().min(1, "A descrição é obrigatória."),
@@ -143,9 +144,9 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4">
             <div className="space-y-2">
-              <FormLabel className="flex items-center">
+              <Label className="flex items-center"> {/* Usando Label aqui */}
                 <SearchIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Produto/Serviço
-              </FormLabel>
+              </Label>
               <Select onValueChange={handleProductSelect} value={selectedProductId}>
                 <SelectTrigger>
                   <SelectValue placeholder="Buscar ou selecionar um item existente" />
