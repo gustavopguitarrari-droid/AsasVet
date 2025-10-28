@@ -24,7 +24,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // Importar Tooltip
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const AgendamentosMedicos = () => {
   const queryClient = useQueryClient();
@@ -187,30 +187,29 @@ const AgendamentosMedicos = () => {
           />
         </div>
         <div className="flex space-x-2 shrink-0">
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
+          <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                {/* DialogTrigger é o filho direto de TooltipTrigger */}
                 <DialogTrigger asChild>
                   <Button className="font-bold" disabled={!organizationId}>
                     <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
-                  </DialogHeader>
-                  <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsAddEventDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
-                </DialogContent>
-              </Dialog>
-            </TooltipTrigger>
-            {!organizationId && (
-              <TooltipContent side="bottom">
-                Carregando informações da organização...
-              </TooltipContent>
-            )}
-          </Tooltip>
-
-          {/* O botão de Limpar Agenda foi movido para dentro do EventCalendar */}
+              </TooltipTrigger>
+              {!organizationId && (
+                <TooltipContent side="bottom">
+                  Carregando informações da organização...
+                </TooltipContent>
+              )}
+            </Tooltip>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
+              </DialogHeader>
+              <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsAddEventDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
