@@ -174,7 +174,7 @@ const AgendamentosMedicos = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-6"> {/* Novo div para os botões de ação */}
-        <h2 className="text-3xl font-bold">Agenda Médica</h2> {/* Título da página */}
+        {/* Removido: <h2 className="text-3xl font-bold">Agenda Médica</h2> */} {/* Título da página */}
         <div className="flex space-x-2">
           <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
             <DialogTrigger asChild>
