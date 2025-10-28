@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useRef, useState } from 'react'; // Adicionado useRef e useState
+import React, { useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, Hospital } from 'lucide-react'; // Adicionado Hospital
+import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, Hospital, AlertTriangle } from 'lucide-react'; // Adicionado Hospital e AlertTriangle
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/context/UserContext';
@@ -15,6 +15,17 @@ import AppointmentChronometer from '@/components/AppointmentChronometer';
 import { Appointment } from './Appointments'; // Importar a interface Appointment
 import MedicalRecordForm, { MedicalRecordFormValues, MedicalRecordFormInstance } from '@/components/consultation/MedicalRecordForm'; // Importar o novo formulário e a interface da instância
 import ForwardToInternmentDialog from '@/components/ForwardToInternmentDialog'; // NOVO: Importar o diálogo de encaminhamento
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"; // Importar AlertDialog
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -37,7 +48,8 @@ const ConsultationPage: React.FC = () => {
   const { user: appUser } = useUser();
   const userId = appUser?.id;
 
-  const [isForwardToInternmentDialogOpen, setIsForwardToInternmentDialogOpen] = React.useState(false); // NOVO: Estado para o diálogo de internação
+  const [isForwardToInternmentDialogOpen, setIsForwardToInternmentDialogOpen] = React.useState(false);
+  const [isFinalizeConfirmDialogOpen, setIsFinalizeConfirmDialogOpen] = useState(false); // Novo estado para o diálogo de confirmação
 
   // Ref para acessar a instância do formulário MedicalRecordForm
   const medicalRecordFormRef = useRef<MedicalRecordFormInstance>(null);
@@ -169,8 +181,16 @@ const ConsultationPage: React.FC = () => {
     },
   });
 
-  const handleFinalizeConsultation = async () => {
+  // Função para lidar com o clique no botão "Finalizar Consulta"
+  const handleFinalizeConsultationClick = () => {
+    setIsFinalizeConfirmDialogOpen(true); // Abre o diálogo de confirmação
+  };
+
+  // Nova função que será chamada após a confirmação no AlertDialog
+  const handleConfirmFinalize = async () => {
     setIsAttemptingFinalize(true);
+    setIsFinalizeConfirmDialogOpen(false); // Fecha o diálogo de confirmação
+
     const isValid = await medicalRecordFormRef.current?.trigger(); // Disparar validação do formulário
     if (isValid) {
       // Se o formulário é válido, submeta-o. O onSuccess da mutação de salvar prontuário
@@ -283,14 +303,42 @@ const ConsultationPage: React.FC = () => {
       />
 
       <div className="flex justify-end space-x-2">
-        <Button
-          onClick={handleFinalizeConsultation}
-          disabled={!isMedicalRecordFormValid || finalizeAppointmentMutation.isPending || saveMedicalRecordMutation.isPending || isAttemptingFinalize}
-          className="bg-green-600 hover:bg-green-700 text-white"
-        >
-          <CheckCircle className="mr-2 h-5 w-5" />
-          {finalizeAppointmentMutation.isPending || isAttemptingFinalize ? "Finalizando..." : "Finalizar Consulta"}
-        </Button>
+        <AlertDialog open={isFinalizeConfirmDialogOpen} onOpenChange={setIsFinalizeConfirmDialogOpen}>
+          <AlertDialogTrigger asChild>
+            <Button
+              onClick={handleFinalizeConsultationClick}
+              disabled={!isMedicalRecordFormValid || finalizeAppointmentMutation.isPending || saveMedicalRecordMutation.isPending || isAttemptingFinalize}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              <CheckCircle className="mr-2 h-5 w-5" />
+              {finalizeAppointmentMutation.isPending || isAttemptingFinalize ? "Finalizando..." : "Finalizar Consulta"}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center">
+                <AlertTriangle className="h-5 w-5 mr-2 text-orange-500" /> Confirmar Finalização da Consulta
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta ação não pode ser desfeita. Uma vez finalizada, a consulta será movida para o histórico.
+                <br /><br />
+                Você revisou todo o prontuário médico e confirmou que todas as informações estão corretas e completas?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={finalizeAppointmentMutation.isPending || saveMedicalRecordMutation.isPending || isAttemptingFinalize}>
+                Cancelar
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmFinalize}
+                disabled={finalizeAppointmentMutation.isPending || saveMedicalRecordMutation.isPending || isAttemptingFinalize}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                {finalizeAppointmentMutation.isPending || isAttemptingFinalize ? "Finalizando..." : "Sim, Finalizar Consulta"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       {/* NOVO: Diálogo de Encaminhamento para Internação */}
