@@ -19,7 +19,11 @@ interface SinglePrescriptionInput {
   instructions: string;
 }
 
-const PrescriptionsTabContent: React.FC = () => {
+interface PrescriptionsTabContentProps {
+  onGenerateRecipePdf: (prescriptions: MedicalRecordFormValues['prescriptions']) => void;
+}
+
+const PrescriptionsTabContent: React.FC<PrescriptionsTabContentProps> = ({ onGenerateRecipePdf }) => {
   const { control, getValues, trigger } = useFormContext<MedicalRecordFormValues>();
   const { fields, append, remove } = useFieldArray({
     control: control,
@@ -76,8 +80,7 @@ const PrescriptionsTabContent: React.FC = () => {
       showError("Adicione prescrições à lista antes de gerar a receita.");
       return;
     }
-    console.log("Gerar Receita button clicked! Prescrições:", getValues("prescriptions"));
-    showSuccess("Funcionalidade 'Gerar Receita' em desenvolvimento!");
+    onGenerateRecipePdf(fields); // Call the prop to generate PDF
   };
 
   return (

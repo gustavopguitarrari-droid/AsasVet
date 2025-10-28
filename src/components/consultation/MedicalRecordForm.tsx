@@ -51,9 +51,10 @@ interface MedicalRecordFormProps {
   isSubmitting: boolean;
   formRef?: React.Ref<MedicalRecordFormInstance>;
   onValidationChange?: (isValid: boolean) => void;
+  onGenerateRecipePdf: (prescriptions: MedicalRecordFormValues['prescriptions']) => void; // NOVO: Prop para gerar PDF
 }
 
-const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSubmit, isSubmitting, formRef, onValidationChange }) => {
+const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSubmit, isSubmitting, formRef, onValidationChange, onGenerateRecipePdf }) => {
   const form = useForm<MedicalRecordFormValues>({
     resolver: zodResolver(medicalRecordFormSchema),
     defaultValues: {
@@ -123,7 +124,7 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
                   <TreatmentTabContent />
                 </TabsContent>
                 <TabsContent value="prescriptions">
-                  <PrescriptionsTabContent />
+                  <PrescriptionsTabContent onGenerateRecipePdf={onGenerateRecipePdf} /> {/* Passa a prop aqui */}
                 </TabsContent>
               </div>
             </Tabs>

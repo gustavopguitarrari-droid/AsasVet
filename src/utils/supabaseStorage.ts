@@ -2,7 +2,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { v4 as uuidv4 } from 'uuid';
 
 const AVATARS_BUCKET_NAME = 'avatars';
-const LOGOS_BUCKET_NAME = 'logos'; // NOVO: Nome do bucket para logos
+const LOGOS_BUCKET_NAME = 'logos';
+const RECIPES_BUCKET_NAME = 'recipes'; // NOVO: Nome do bucket para receitas
 
 /**
  * Converte uma string Base64 em um Blob.
@@ -101,7 +102,7 @@ export const deleteImageFromSupabase = async (publicUrl: string): Promise<boolea
   }
 };
 
-// NOVO: Funções para upload e exclusão de logos
+// Funções para upload e exclusão de logos
 export const uploadLogoToSupabase = async (
   base64Image: string,
   userId: string,
@@ -180,6 +181,68 @@ export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean
     return true;
   } catch (error) {
     console.error("deleteLogoFromSupabase: Erro no processo de exclusão do logo:", error);
+    return false;
+  }
+};
+
+// NOVO: Funções para upload e exclusão de PDFs de receitas
+export const uploadRecipePdfToSupabase = async (
+  pdfBlob: Blob,
+  userId: string,
+  appointmentId: string,
+): Promise<string | null> => {
+  try {
+    const fileName = `receita_${appointmentId}_${uuidv4()}.pdf`;
+    const filePath = `${userId}/${appointmentId}/${fileName}`; // Caminho: userId/appointmentId/uuid.pdf
+
+    const { data, error } = await supabase.storage
+      .from(RECIPES_BUCKET_NAME)
+      .upload(filePath, pdfBlob, {
+        contentType: 'application/pdf',
+        upsert: false,
+      });
+
+    if (error) {
+      console.error("uploadRecipePdfToSupabase: Erro ao fazer upload do PDF da receita:", error);
+      throw error;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(RECIPES_BUCKET_NAME)
+      .getPublicUrl(filePath);
+
+    return publicUrlData.publicUrl;
+
+  } catch (error) {
+    console.error("uploadRecipePdfToSupabase: Erro no processo de upload do PDF da receita:", error);
+    return null;
+  }
+};
+
+export const deleteRecipePdfFromSupabase = async (publicUrl: string): Promise<boolean> => {
+  if (!publicUrl) return true;
+
+  try {
+    const url = new URL(publicUrl);
+    const pathSegments = url.pathname.split('/');
+    const bucketIndex = pathSegments.indexOf(RECIPES_BUCKET_NAME);
+    if (bucketIndex === -1 || bucketIndex + 1 >= pathSegments.length) {
+      console.warn("deleteRecipePdfFromSupabase: URL pública inválida para exclusão do PDF da receita:", publicUrl);
+      return false;
+    }
+    const filePath = pathSegments.slice(bucketIndex + 1).join('/');
+
+    const { error } = await supabase.storage
+      .from(RECIPES_BUCKET_NAME)
+      .remove([filePath]);
+
+    if (error) {
+      console.error("deleteRecipePdfFromSupabase: Erro ao deletar PDF da receita do storage:", error);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("deleteRecipePdfFromSupabase: Erro no processo de exclusão do PDF da receita:", error);
     return false;
   }
 };
