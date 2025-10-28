@@ -8,7 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Cadastro from "./pages/Cadastro";
 import Appointments from "./pages/Appointments";
 import AgendamentosMedicos from "./pages/AgendamentosMedicos";
-// import Financeiro from "./pages/Financeiro"; // Removido
+import Financeiro from "./pages/Financeiro"; // Restaurado
 // import Caixa from "./pages/Caixa"; // Removido
 import Internacao from "./pages/Internacao";
 import Veterinarios from "./pages/Veterinarios";
