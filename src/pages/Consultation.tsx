@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, Hospital, AlertTriangle } from 'lucide-react'; // Adicionado Hospital e AlertTriangle
+import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, Hospital, AlertTriangle } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/context/UserContext';
@@ -12,9 +12,9 @@ import { showError, showSuccess } from '@/utils/toast';
 import { format, parseISO, differenceInSeconds, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import AppointmentChronometer from '@/components/AppointmentChronometer';
-import { Appointment } from './Appointments'; // Importar a interface Appointment
-import MedicalRecordForm, { MedicalRecordFormValues, MedicalRecordFormInstance } from '@/components/consultation/MedicalRecordForm'; // Importar o novo formulário e a interface da instância
-import ForwardToInternmentDialog from '@/components/ForwardToInternmentDialog'; // NOVO: Importar o diálogo de encaminhamento
+import { Appointment } from './Appointments';
+import MedicalRecordForm, { MedicalRecordFormValues, MedicalRecordFormInstance } from '@/components/consultation/MedicalRecordForm';
+import ForwardToInternmentDialog from '@/components/ForwardToInternmentDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -25,10 +25,10 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"; // Importar AlertDialog
-import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf'; // NOVO: Importar função de PDF de receita
-import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase } from '@/utils/supabaseStorage'; // NOVO: Funções de storage para receita
-import PdfPreviewDialog from '@/components/PdfPreviewDialog'; // NOVO: Diálogo de pré-visualização de PDF
+} from "@/components/ui/alert-dialog";
+import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf';
+import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase } from '@/utils/supabaseStorage';
+import PdfPreviewDialog from '@/components/PdfPreviewDialog';
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -39,8 +39,8 @@ interface MedicalRecord {
   physical_exam?: string | null;
   diagnosis?: string | null;
   treatment?: string | null;
-  prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
-  recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
+  prescriptions: { medication: string; dosage: string; frequency: string; instructions?: string }[]; // Alterado para array não nulo
+  recipe_pdf_url?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -53,14 +53,12 @@ const ConsultationPage: React.FC = () => {
   const userId = appUser?.id;
 
   const [isForwardToInternmentDialogOpen, setIsForwardToInternmentDialogOpen] = React.useState(false);
-  const [isFinalizeConfirmDialogOpen, setIsFinalizeConfirmDialogOpen] = useState(false); // Novo estado para o diálogo de confirmação
+  const [isFinalizeConfirmDialogOpen, setIsFinalizeConfirmDialogOpen] = useState(false);
 
-  // Ref para acessar a instância do formulário MedicalRecordForm
   const medicalRecordFormRef = useRef<MedicalRecordFormInstance>(null);
   const [isMedicalRecordFormValid, setIsMedicalRecordFormValid] = useState(false);
   const [isAttemptingFinalize, setIsAttemptingFinalize] = useState(false);
 
-  // Estados para o diálogo de pré-visualização de PDF de receita
   const [isRecipePdfPreviewDialogOpen, setIsRecipePdfPreviewDialogOpen] = useState(false);
   const [recipePdfBlob, setRecipePdfBlob] = useState<Blob | null>(null);
   const [recipePdfFilename, setRecipePdfFilename] = useState("");
@@ -83,23 +81,30 @@ const ConsultationPage: React.FC = () => {
   });
 
   // Query para buscar o prontuário médico da consulta
-  const { data: medicalRecord, isLoading: isLoadingMedicalRecord, error: medicalRecordError } = useQuery<MedicalRecord>({
+  const { data: medicalRecord, isLoading: isLoadingMedicalRecord, error: medicalRecordError } = useQuery<MedicalRecord | null>({
     queryKey: ['medicalRecord', appointmentId, userId],
     queryFn: async () => {
       if (!userId || !appointmentId) throw new Error("User or Appointment ID not available.");
       const { data, error } = await supabase
         .from('medical_records')
-        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, recipe_pdf_url, created_at, updated_at') // Seleção explícita com recipe_pdf_url
+        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, recipe_pdf_url, created_at, updated_at')
         .eq('appointment_id', appointmentId)
         .eq('user_id', userId)
         .single();
       if (error) {
-        if (error.code === 'PGRST116') { // No rows found
-          return null; // Retorna null se não houver prontuário
+        if (error.code === 'PGRST116') {
+          console.log("ConsultationPage: No medical record found for appointment", appointmentId);
+          return null;
         }
+        console.error("ConsultationPage: Error fetching medical record:", error);
         throw error;
       }
-      return data;
+      console.log("ConsultationPage: Raw medical record data from Supabase:", data);
+      // Garante que prescriptions seja sempre um array
+      return {
+        ...data,
+        prescriptions: data.prescriptions || [],
+      } as MedicalRecord;
     },
     enabled: !!userId && !!appointmentId,
   });
@@ -116,14 +121,13 @@ const ConsultationPage: React.FC = () => {
         physical_exam: recordData.physicalExam || null,
         diagnosis: recordData.diagnosis || null,
         treatment: recordData.treatment || null,
-        prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : [], // Alterado para []
-        recipe_pdf_url: recordData.recipe_pdf_url || null, // Incluir recipe_pdf_url no payload
+        prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : [],
+        recipe_pdf_url: recordData.recipe_pdf_url || null,
       };
 
-      console.log("Payload being sent to medical_records:", JSON.stringify(payload, null, 2)); // Log para depuração
+      console.log("Payload being sent to medical_records:", JSON.stringify(payload, null, 2));
 
       if (medicalRecord?.id) {
-        // Update existing record
         const { data, error } = await supabase
           .from('medical_records')
           .update(payload)
@@ -134,7 +138,6 @@ const ConsultationPage: React.FC = () => {
         if (error) throw error;
         return data;
       } else {
-        // Insert new record
         const { data, error } = await supabase
           .from('medical_records')
           .insert(payload)
@@ -148,15 +151,14 @@ const ConsultationPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
       showSuccess("Prontuário salvo com sucesso!");
       if (isAttemptingFinalize) {
-        // Se a intenção era finalizar, agora que o prontuário foi salvo, finalize a consulta
         finalizeAppointmentMutation.mutate(appointmentId!);
       }
-      setIsAttemptingFinalize(false); // Resetar o estado de tentativa de finalização
+      setIsAttemptingFinalize(false);
     },
     onError: (err) => {
-      console.error("Error saving medical record:", err); // Log detalhado do erro
+      console.error("Error saving medical record:", err);
       showError(`Erro ao salvar prontuário: ${err.message}`);
-      setIsAttemptingFinalize(false); // Resetar o estado de tentativa de finalização em caso de erro
+      setIsAttemptingFinalize(false);
     },
   });
 
@@ -169,7 +171,7 @@ const ConsultationPage: React.FC = () => {
         .from('appointments')
         .update({
           status: "Realizada",
-          completion_timestamp: now.toISOString(), // Salvar como ISO string (UTC)
+          completion_timestamp: now.toISOString(),
         })
         .eq('id', id)
         .eq('user_id', userId)
@@ -182,7 +184,7 @@ const ConsultationPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       showSuccess("Consulta finalizada com sucesso!");
-      navigate('/consultas'); // Redireciona de volta para a lista de consultas
+      navigate('/consultas');
     },
     onError: (err) => {
       showError(`Erro ao finalizar consulta: ${err.message}`);
@@ -204,10 +206,8 @@ const ConsultationPage: React.FC = () => {
         veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
       };
 
-      // Determine the medical record ID to use (either existing or new)
       let currentMedicalRecordId = medicalRecord?.id;
 
-      // If no medical record exists, create a minimal one first
       if (!currentMedicalRecordId) {
         console.log("ConsultationPage: generateAndSaveRecipePdfMutation - No existing medical record found, creating a new one for recipe PDF.");
         const { data: newRecord, error: insertRecordError } = await supabase
@@ -215,12 +215,11 @@ const ConsultationPage: React.FC = () => {
           .insert({
             user_id: userId,
             appointment_id: appointmentId,
-            // Other fields can be null initially, they will be filled by saveMedicalRecordMutation
             anamnesis: null,
             physical_exam: null,
             diagnosis: null,
             treatment: null,
-            prescriptions: [], // Alterado para []
+            prescriptions: [],
           })
           .select('id')
           .single();
@@ -230,11 +229,9 @@ const ConsultationPage: React.FC = () => {
         }
         currentMedicalRecordId = newRecord.id;
         console.log("ConsultationPage: generateAndSaveRecipePdfMutation - New medical record created with ID:", currentMedicalRecordId);
-        // Invalidate the medicalRecord query so the next fetch gets the new record
         queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
       }
 
-      // Fetch the current recipe_pdf_url for the determined medical record ID
       const { data: existingRecipePdfUrlData, error: fetchPdfUrlError } = await supabase
         .from('medical_records')
         .select('recipe_pdf_url')
@@ -243,7 +240,6 @@ const ConsultationPage: React.FC = () => {
 
       if (fetchPdfUrlError) {
         console.warn("ConsultationPage: generateAndSaveRecipePdfMutation - Failed to fetch existing recipe_pdf_url for medical record ID:", currentMedicalRecordId, fetchPdfUrlError);
-        // Continue without deleting if fetch fails
       } else if (existingRecipePdfUrlData?.recipe_pdf_url) {
         console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Existing recipe PDF found, attempting to delete:", existingRecipePdfUrlData.recipe_pdf_url);
         await deleteRecipePdfFromSupabase(existingRecipePdfUrlData.recipe_pdf_url);
@@ -261,11 +257,10 @@ const ConsultationPage: React.FC = () => {
 
       if (!newPdfUrl) throw new Error("Falha ao fazer upload do PDF da receita.");
 
-      // Update medical record with new PDF URL
       const { data, error } = await supabase
         .from('medical_records')
-        .update({ recipe_pdf_url: newPdfUrl, prescriptions: prescriptions }) // Also update prescriptions here
-        .eq('id', currentMedicalRecordId) // Use the determined ID
+        .update({ recipe_pdf_url: newPdfUrl, prescriptions: prescriptions })
+        .eq('id', currentMedicalRecordId)
         .eq('user_id', userId)
         .select()
         .single();
@@ -287,24 +282,20 @@ const ConsultationPage: React.FC = () => {
     },
   });
 
-  // Função para lidar com o clique no botão "Finalizar Consulta"
   const handleFinalizeConsultationClick = () => {
-    setIsFinalizeConfirmDialogOpen(true); // Abre o diálogo de confirmação
+    setIsFinalizeConfirmDialogOpen(true);
   };
 
-  // Nova função que será chamada após a confirmação no AlertDialog
   const handleConfirmFinalize = async () => {
     setIsAttemptingFinalize(true);
-    setIsFinalizeConfirmDialogOpen(false); // Fecha o diálogo de confirmação
+    setIsFinalizeConfirmDialogOpen(false);
 
-    const isValid = await medicalRecordFormRef.current?.trigger(); // Disparar validação do formulário
+    const isValid = await medicalRecordFormRef.current?.trigger();
     if (isValid) {
-      // Se o formulário é válido, submeta-o. O onSuccess da mutação de salvar prontuário
-      // verificará isAttemptingFinalize e chamará finalizeAppointmentMutation.
       medicalRecordFormRef.current?.handleSubmit(handleSaveMedicalRecord)();
     } else {
       showError("Por favor, preencha todos os campos obrigatórios do prontuário antes de finalizar.");
-      setIsAttemptingFinalize(false); // Resetar se a validação falhar
+      setIsAttemptingFinalize(false);
     }
   };
 
@@ -361,13 +352,12 @@ const ConsultationPage: React.FC = () => {
     );
   }
 
-  // Mapeia os dados do prontuário para o formato do formulário
   const initialMedicalRecordData: MedicalRecordFormValues = {
     anamnesis: medicalRecord?.anamnesis || undefined,
     physicalExam: medicalRecord?.physical_exam || undefined,
     diagnosis: medicalRecord?.diagnosis || undefined,
     treatment: medicalRecord?.treatment || undefined,
-    prescriptions: medicalRecord?.prescriptions || [], // Garante que seja um array vazio se for null/undefined
+    prescriptions: medicalRecord?.prescriptions || [],
   };
 
   return (
@@ -420,10 +410,10 @@ const ConsultationPage: React.FC = () => {
         isSubmitting={saveMedicalRecordMutation.isPending}
         formRef={medicalRecordFormRef}
         onValidationChange={setIsMedicalRecordFormValid}
-        onGenerateRecipePdf={handleGenerateRecipePdf} // Passa a função para gerar PDF
+        onGenerateRecipePdf={handleGenerateRecipePdf}
       />
 
-      <div className="flex justify-end space-x-2"> {/* Botões de ação agrupados aqui */}
+      <div className="flex justify-end space-x-2">
         <Button onClick={() => setIsForwardToInternmentDialogOpen(true)} variant="secondary" disabled={!appointment}>
           <Hospital className="mr-2 h-4 w-4" /> Encaminhar para Internação
         </Button>
@@ -458,14 +448,13 @@ const ConsultationPage: React.FC = () => {
                 disabled={finalizeAppointmentMutation.isPending || saveMedicalRecordMutation.isPending || isAttemptingFinalize}
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
-                {finalizeAppointmentMutation.isPending || isAttemptingFinalize ? "Finalizando..." : "Sim, Finalizar Consulta"}
+                {finalizeAppointmentMutation.isPending || isAttemptingFinalize ? "Sim, Finalizar Consulta" : "Sim, Finalizar Consulta"}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
       </div>
 
-      {/* NOVO: Diálogo de Encaminhamento para Internação */}
       {appointment && (
         <ForwardToInternmentDialog
           isOpen={isForwardToInternmentDialogOpen}
@@ -474,7 +463,6 @@ const ConsultationPage: React.FC = () => {
         />
       )}
 
-      {/* NOVO: Diálogo de Pré-visualização de PDF da Receita */}
       <PdfPreviewDialog
         isOpen={isRecipePdfPreviewDialogOpen}
         onClose={() => setIsRecipePdfPreviewDialogOpen(false)}
