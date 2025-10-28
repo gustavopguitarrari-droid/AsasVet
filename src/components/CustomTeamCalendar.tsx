@@ -32,7 +32,7 @@ import {
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
-  AlertDialogFooter,
+  AlertDialogFooter as AlertDialogFooterComponent, // Renomear para evitar conflito
   AlertDialogHeader,
   AlertDialogTitle as AlertDialogTitleComponent,
   AlertDialogTrigger,
@@ -139,7 +139,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
 
   return (
     <div className="w-full max-w-full overflow-x-auto">
-      <div className="rounded-md border p-4 bg-background shadow-sm">
+      <div className="rounded-md border p-4 bg-background shadow-sm relative"> {/* Adicionado 'relative' aqui */}
         <div className="flex justify-between items-center p-2 mb-4">
           <Button variant="ghost" size="icon" onClick={goToPreviousMonth}>
             <ChevronLeft className="h-4 w-4" />
@@ -151,6 +151,29 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
+
+        {/* Botão de Limpar Escala movido para aqui */}
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" size="sm" className="absolute top-4 right-4 flex items-center">
+              <Eraser className="h-4 w-4" />
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitleComponent>Tem certeza que deseja limpar a escala?</AlertDialogTitleComponent>
+              <AlertDialogDescription>
+                Esta ação não pode ser desfeita. Todos os agendamentos de escala serão permanentemente excluídos.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooterComponent>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleClearSchedule} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                Limpar Escala
+              </AlertDialogAction>
+            </AlertDialogFooterComponent>
+          </AlertDialogContent>
+        </AlertDialog>
 
         <div className="grid grid-cols-7 gap-1 text-center text-sm font-medium text-muted-foreground">
           {weekdays.map((day) => (
@@ -195,29 +218,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
         </div>
       </div>
 
-      <div className="flex justify-end mt-4">
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive" className="flex items-center">
-              <Eraser className="h-4 w-4 mr-2" /> Limpar Escala
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitleComponent>Tem certeza que deseja limpar a escala?</AlertDialogTitleComponent>
-              <AlertDialogDescription>
-                Esta ação não pode ser desfeita. Todos os agendamentos de escala serão permanentemente excluídos.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-              <AlertDialogAction onClick={handleClearSchedule} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                Limpar Escala
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
+      {/* O div com o botão de limpar escala foi removido daqui */}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
