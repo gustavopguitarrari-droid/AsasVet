@@ -15,6 +15,18 @@ export interface SaleItem {
   organization_id: string; // Matches sale_items table
 }
 
+export interface AnimalDebit { // NOVO: Interface para débitos de animais
+  id: string;
+  user_id: string;
+  pet_id: string;
+  appointment_id?: string | null;
+  description: string;
+  amount: number;
+  is_paid: boolean;
+  transaction_id?: string | null;
+  created_at: string;
+}
+
 export interface Transaction {
   id: string;
   description: string;

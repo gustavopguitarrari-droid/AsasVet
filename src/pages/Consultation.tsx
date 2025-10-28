@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, Hospital, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, Hospital, AlertTriangle, PlusCircle, DollarSign, ReceiptText, XCircle } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/context/UserContext';
@@ -31,6 +31,11 @@ import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase } from '@/utils/
 import PdfPreviewDialog from '@/components/PdfPreviewDialog';
 import { Client, Pet } from '@/types/cadastro'; // Importar Client e Pet
 import { TeamMember } from '@/pages/Veterinarios'; // Importar TeamMember
+import AddAnimalDebitDialog, { AddAnimalDebitFormValues } from '@/components/consultation/AddAnimalDebitDialog'; // NOVO: Importar o diálogo de débito
+import { AnimalDebit, Product } from '@/types/cashier'; // NOVO: Importar AnimalDebit e Product
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'; // NOVO: Importar componentes de tabela
+import { Badge } from '@/components/ui/badge'; // NOVO: Importar Badge
+import { cn } from '@/lib/utils'; // NOVO: Importar cn
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -53,6 +58,7 @@ const ConsultationPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id;
+  const organizationId = appUser?.organizationId;
 
   const [isForwardToInternmentDialogOpen, setIsForwardToInternmentDialogOpen] = React.useState(false);
   const [isFinalizeConfirmDialogOpen, setIsFinalizeConfirmDialogOpen] = useState(false);
@@ -64,6 +70,9 @@ const ConsultationPage: React.FC = () => {
   const [isRecipePdfPreviewDialogOpen, setIsRecipePdfPreviewDialogOpen] = useState(false);
   const [recipePdfBlob, setRecipePdfBlob] = useState<Blob | null>(null);
   const [recipePdfFilename, setRecipePdfFilename] = useState("");
+
+  // NOVO: Estados para o diálogo de adicionar débito
+  const [isAddAnimalDebitDialogOpen, setIsAddAnimalDebitDialogOpen] = useState(false);
 
   // Query para buscar os detalhes da consulta
   const { data: appointment, isLoading, error } = useQuery<Appointment>({
@@ -183,6 +192,37 @@ const ConsultationPage: React.FC = () => {
       return data as TeamMember[];
     },
     enabled: !!userId,
+  });
+
+  // NOVO: Query para buscar todos os produtos/serviços
+  const { data: products = [], isLoading: isLoadingProducts } = useQuery<Product[]>({
+    queryKey: ['productsConsultation', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('user_id', userId);
+      if (error) throw error;
+      return data as Product[];
+    },
+    enabled: !!userId,
+  });
+
+  // NOVO: Query para buscar débitos do animal para esta consulta
+  const { data: animalDebits = [], isLoading: isLoadingAnimalDebits, error: animalDebitsError } = useQuery<AnimalDebit[]>({
+    queryKey: ['animalDebits', appointmentId, userId],
+    queryFn: async () => {
+      if (!userId || !appointmentId) return [];
+      const { data, error } = await supabase
+        .from('animal_debits')
+        .select('*')
+        .eq('appointment_id', appointmentId)
+        .eq('user_id', userId);
+      if (error) throw error;
+      return data as AnimalDebit[];
+    },
+    enabled: !!userId && !!appointmentId,
   });
 
   // Mutação para salvar/atualizar o prontuário médico
@@ -381,6 +421,117 @@ const ConsultationPage: React.FC = () => {
     },
   });
 
+  // NOVO: Mutação para adicionar um débito ao animal
+  const addAnimalDebitMutation = useMutation({
+    mutationFn: async (debitData: AddAnimalDebitFormValues) => {
+      if (!userId || !appointmentId || !appointment?.pet_id) {
+        throw new Error("User, Appointment, or Pet ID not available.");
+      }
+      const { data, error } = await supabase
+        .from('animal_debits')
+        .insert({
+          user_id: userId,
+          pet_id: appointment.pet_id,
+          appointment_id: appointmentId,
+          description: debitData.description,
+          amount: debitData.amount,
+          is_paid: false, // Sempre inicia como não pago
+          transaction_id: null,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId] });
+      showSuccess("Débito adicionado ao animal com sucesso!");
+      setIsAddAnimalDebitDialogOpen(false);
+    },
+    onError: (err) => {
+      showError(`Erro ao adicionar débito: ${err.message}`);
+    },
+  });
+
+  // NOVO: Mutação para marcar um débito como pago
+  const markDebitAsPaidMutation = useMutation({
+    mutationFn: async (debitId: string) => {
+      if (!userId || !organizationId) {
+        throw new Error("User or Organization ID not available.");
+      }
+
+      // 1. Fetch the debit details
+      const { data: debitToPay, error: fetchDebitError } = await supabase
+        .from('animal_debits')
+        .select('*')
+        .eq('id', debitId)
+        .eq('user_id', userId)
+        .single();
+
+      if (fetchDebitError || !debitToPay) {
+        throw fetchDebitError || new Error("Débito não encontrado.");
+      }
+
+      if (debitToPay.is_paid) {
+        throw new Error("Este débito já foi pago.");
+      }
+
+      // 2. Create a new transaction
+      const now = new Date();
+      const transactionDate = format(now, "yyyy-MM-dd");
+      const transactionTime = format(now, "HH:mm");
+
+      const { data: transactionData, error: transactionError } = await supabase
+        .from('transactions')
+        .insert({
+          user_id: userId,
+          organization_id: organizationId,
+          description: `Pagamento de débito: ${debitToPay.description} (Animal: ${appointment?.pet_name})`,
+          type: "Entrada",
+          amount: debitToPay.amount,
+          date: transactionDate,
+          time: transactionTime,
+          payment_method: "Dinheiro", // Default to cash, could be expanded
+        })
+        .select('id')
+        .single();
+
+      if (transactionError || !transactionData) {
+        throw transactionError || new Error("Falha ao criar a transação de pagamento.");
+      }
+
+      const transactionId = transactionData.id;
+
+      // 3. Update the animal debit to mark as paid and link to transaction
+      const { data: updatedDebit, error: updateDebitError } = await supabase
+        .from('animal_debits')
+        .update({
+          is_paid: true,
+          transaction_id: transactionId,
+        })
+        .eq('id', debitId)
+        .eq('user_id', userId)
+        .select()
+        .single();
+
+      if (updateDebitError) {
+        // If updating debit fails, try to roll back the transaction
+        await supabase.from('transactions').delete().eq('id', transactionId);
+        throw updateDebitError;
+      }
+
+      return updatedDebit;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId] });
+      queryClient.invalidateQueries({ queryKey: ['transactions', userId] }); // Invalida transações para atualizar o financeiro
+      showSuccess("Débito marcado como pago e transação registrada!");
+    },
+    onError: (err: any) => {
+      showError(`Erro ao marcar débito como pago: ${err.message}`);
+    },
+  });
+
   const handleFinalizeConsultationClick = () => {
     setIsFinalizeConfirmDialogOpen(true);
   };
@@ -421,7 +572,17 @@ const ConsultationPage: React.FC = () => {
     }
   };
 
-  if (isLoading || isLoadingMedicalRecord || isLoadingClients || isLoadingPets || isLoadingVeterinarians) {
+  // NOVO: Handler para adicionar débito
+  const handleAddAnimalDebit = (data: AddAnimalDebitFormValues) => {
+    addAnimalDebitMutation.mutate(data);
+  };
+
+  // NOVO: Handler para marcar débito como pago
+  const handleMarkDebitAsPaid = (debitId: string) => {
+    markDebitAsPaidMutation.mutate(debitId);
+  };
+
+  if (isLoading || isLoadingMedicalRecord || isLoadingClients || isLoadingPets || isLoadingVeterinarians || isLoadingProducts || isLoadingAnimalDebits) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando detalhes da consulta...</p>
@@ -429,10 +590,10 @@ const ConsultationPage: React.FC = () => {
     );
   }
 
-  if (error || medicalRecordError || clientsError || petsError || veterinariansError) {
+  if (error || medicalRecordError || clientsError || petsError || veterinariansError || productsError || animalDebitsError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar consulta: {error?.message || medicalRecordError?.message || clientsError?.message || petsError?.message || veterinariansError?.message}</p>
+        <p>Erro ao carregar consulta: {error?.message || medicalRecordError?.message || clientsError?.message || petsError?.message || veterinariansError?.message || productsError?.message || animalDebitsError?.message}</p>
         <Button onClick={() => navigate('/consultas')} className="ml-4">
           <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
         </Button>
@@ -502,6 +663,61 @@ const ConsultationPage: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* Seção de Débitos do Animal */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center">
+            <ReceiptText className="mr-2 h-5 w-5" /> Débitos do Animal
+          </CardTitle>
+          <Button onClick={() => setIsAddAnimalDebitDialogOpen(true)} size="sm">
+            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Débito
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {animalDebits.length === 0 ? (
+            <p className="text-muted-foreground text-center py-4">Nenhum débito registrado para este animal nesta consulta.</p>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Descrição</TableHead>
+                    <TableHead>Valor</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {animalDebits.map((debit) => (
+                    <TableRow key={debit.id} className={cn(debit.is_paid && "bg-green-50/50 dark:bg-green-900/20")}>
+                      <TableCell className="font-medium">{debit.description}</TableCell>
+                      <TableCell>R$ {debit.amount.toFixed(2).replace('.', ',')}</TableCell>
+                      <TableCell>
+                        <Badge variant={debit.is_paid ? "default" : "destructive"} className={cn(debit.is_paid ? "bg-green-500" : "bg-orange-500")}>
+                          {debit.is_paid ? "Pago" : "Pendente"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {!debit.is_paid && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleMarkDebitAsPaid(debit.id)}
+                            disabled={markDebitAsPaidMutation.isPending}
+                          >
+                            <DollarSign className="mr-2 h-4 w-4" /> Marcar como Pago
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Formulário de Prontuário Médico */}
       <MedicalRecordForm
         initialData={initialMedicalRecordData}
@@ -564,6 +780,14 @@ const ConsultationPage: React.FC = () => {
           allVeterinarians={allVeterinarians} // Passando allVeterinarians
         />
       )}
+
+      <AddAnimalDebitDialog
+        isOpen={isAddAnimalDebitDialogOpen}
+        onClose={() => setIsAddAnimalDebitDialogOpen(false)}
+        onSubmit={handleAddAnimalDebit}
+        isSubmitting={addAnimalDebitMutation.isPending}
+        products={products}
+      />
 
       <PdfPreviewDialog
         isOpen={isRecipePdfPreviewDialogOpen}
