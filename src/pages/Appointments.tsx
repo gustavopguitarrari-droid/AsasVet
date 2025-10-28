@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react"; // Adicionado useState aqui
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -404,7 +404,7 @@ const Appointments = () => {
         logoUrl: appUser?.logoUrl,
         clinicDetails: {
           companyName: appUser?.companyName || 'AsasVet',
-          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
           phone: appUser?.phone || '',
           email: appUser?.email || '',
           veterinarianCrmv: appUser?.crmv || '',
