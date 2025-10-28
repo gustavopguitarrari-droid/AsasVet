@@ -3,11 +3,11 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarDays } from "lucide-react";
-import { format, startOfWeek, endOfWeek, isWithinInterval, parseISO } from "date-fns";
+import { format, startOfWeek, endOfWeek, isWithinInterval, isSameDay, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { CalendarEvent } from "@/components/EventCalendar"; // Import the interface
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Importar Tabs
 
 // Mock de eventos (reutilizado de AgendamentosMedicos para demonstração)
 const mockEvents: CalendarEvent[] = [
@@ -35,40 +35,59 @@ const categoryColorMap: Record<CalendarEvent["category"], string> = {
 
 const UpcomingEventsCard: React.FC = () => {
   const today = new Date();
-  // Define o início e o fim da semana, começando no domingo (0)
   const startOfCurrentWeek = startOfWeek(today, { locale: ptBR });
   const endOfCurrentWeek = endOfWeek(today, { locale: ptBR });
 
-  const upcomingEvents = mockEvents
-    .filter(event => isWithinInterval(event.date, { start: today, end: endOfCurrentWeek }))
+  const eventsToday = mockEvents
+    .filter(event => isSameDay(event.date, today))
+    .sort((a, b) => a.time.localeCompare(b.time));
+
+  const eventsThisWeek = mockEvents
+    .filter(event => isWithinInterval(event.date, { start: today, end: endOfCurrentWeek }) && !isSameDay(event.date, today))
     .sort((a, b) => a.date.getTime() - b.date.getTime() || a.time.localeCompare(b.time));
+
+  const renderEventList = (eventsToRender: CalendarEvent[]) => {
+    if (eventsToRender.length === 0) {
+      return <p className="text-muted-foreground text-sm">Nenhum evento agendado.</p>;
+    }
+    return (
+      <div className="space-y-3">
+        {eventsToRender.map((event) => (
+          <div key={event.id} className="flex items-center justify-between p-2 rounded-md border bg-card">
+            <div className="flex flex-col">
+              <p className="font-medium">{event.title}</p>
+              <p className="text-sm text-muted-foreground">
+                {format(event.date, "dd/MM", { locale: ptBR })} às {event.time}
+              </p>
+            </div>
+            <Badge className={cn("text-white", categoryColorMap[event.category])}>
+              {event.category}
+            </Badge>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <Card className="col-span-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-lg font-semibold">Próximos Eventos (Esta Semana)</CardTitle>
+        <CardTitle className="text-lg font-semibold">Próximos Eventos</CardTitle>
         <CalendarDays className="h-5 w-5 text-muted-foreground" />
       </CardHeader>
       <CardContent className="pt-4">
-        {upcomingEvents.length > 0 ? (
-          <div className="space-y-3">
-            {upcomingEvents.map((event) => (
-              <div key={event.id} className="flex items-center justify-between p-2 rounded-md border bg-card">
-                <div className="flex flex-col">
-                  <p className="font-medium">{event.title}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {format(event.date, "dd/MM", { locale: ptBR })} às {event.time}
-                  </p>
-                </div>
-                <Badge className={cn("text-white", categoryColorMap[event.category])}>
-                  {event.category}
-                </Badge>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-muted-foreground text-sm">Nenhum evento agendado para esta semana.</p>
-        )}
+        <Tabs defaultValue="today" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="today">Hoje ({eventsToday.length})</TabsTrigger>
+            <TabsTrigger value="this-week">Esta Semana ({eventsThisWeek.length})</TabsTrigger>
+          </TabsList>
+          <TabsContent value="today" className="mt-4">
+            {renderEventList(eventsToday)}
+          </TabsContent>
+          <TabsContent value="this-week" className="mt-4">
+            {renderEventList(eventsThisWeek)}
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );
