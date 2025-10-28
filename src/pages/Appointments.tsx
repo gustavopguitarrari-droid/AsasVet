@@ -58,6 +58,7 @@ export interface Appointment {
   completion_timestamp?: string | null; // Alterado para timestamp ISO (UTC)
   created_at: string;
   start_time?: string | null;
+  prescriptions_count?: number; // NOVO: Contagem de prescrições
 }
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
@@ -136,10 +137,20 @@ const Appointments = () => {
       if (!userId) return [];
       const { data, error } = await supabase
         .from('appointments')
-        .select('*')
+        .select(`
+          *,
+          medical_records (
+            prescriptions
+          )
+        `)
         .eq('user_id', userId);
       if (error) throw error;
-      return data as Appointment[]; // Cast para o tipo correto
+      return data.map(app => ({
+        ...app,
+        // Assuming medical_records is an array, take the first one if it exists
+        // and extract prescriptions. Handle null/undefined cases.
+        prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0
+      })) as Appointment[];
     },
     enabled: !!userId,
   });
@@ -150,11 +161,19 @@ const Appointments = () => {
       if (!userId) return [];
       const { data, error } = await supabase
         .from('appointments')
-        .select('*')
+        .select(`
+          *,
+          medical_records (
+            prescriptions
+          )
+        `)
         .eq('user_id', userId)
         .in('status', ['Realizada', 'Cancelada']);
       if (error) throw error;
-      return data as Appointment[]; // Cast para o tipo correto
+      return data.map(app => ({
+        ...app,
+        prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0
+      })) as Appointment[];
     },
     enabled: !!userId,
   });
@@ -652,6 +671,7 @@ const Appointments = () => {
                 {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
                 {activeTab === "finalizadas" && <TableHead>Finalização</TableHead>}
                 {activeTab === "finalizadas" && <TableHead>Duração</TableHead>}
+                {activeTab === "finalizadas" && <TableHead>Receitas</TableHead>} {/* NOVO: Coluna Receitas */}
                 {activeTab === "finalizadas" ? (
                   <TableHead className="text-right">Prontuário</TableHead>
                 ) : (
@@ -742,6 +762,7 @@ const Appointments = () => {
                               : "N/A"}
                           </TableCell>
                           <TableCell>{duration}</TableCell>
+                          <TableCell>{appointment.prescriptions_count || 0}</TableCell> {/* NOVO: Exibe a contagem de prescrições */}
                         </>
                       )}
                       <TableCell className="text-right">
@@ -793,7 +814,7 @@ const Appointments = () => {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={activeTab === "em-andamento" ? 7 : (activeTab === "finalizadas" ? 8 : 5)} className="h-24 text-center"> {/* Ajustado colspan */}
+                  <TableCell colSpan={activeTab === "em-andamento" ? 7 : (activeTab === "finalizadas" ? 9 : 5)} className="h-24 text-center"> {/* Ajustado colspan */}
                     Nenhuma consulta encontrada.
                   </TableCell>
                 </TableRow>
