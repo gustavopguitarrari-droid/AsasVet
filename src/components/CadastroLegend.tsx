@@ -7,16 +7,16 @@ import { cn } from "@/lib/utils";
 
 const CadastroLegend: React.FC = () => {
   return (
-    <Card className="bg-primary text-primary-foreground shadow-lg">
-      <CardContent className="p-4 flex flex-col md:flex-row items-center justify-center space-y-3 md:space-y-0 md:space-x-6">
-        <div className="flex items-center space-x-2">
-          <UserPlus className="h-6 w-6 text-primary-foreground" />
-          <span className="font-semibold text-lg">1. Adicione um Tutor</span>
+    <Card className="border-none shadow-none bg-transparent"> {/* Removido borda e sombra, fundo transparente */}
+      <CardContent className="p-0 flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-4 text-muted-foreground"> {/* Reduzido padding e espaçamento, texto muted */}
+        <div className="flex items-center space-x-1"> {/* Reduzido space-x */}
+          <UserPlus className="h-5 w-5" /> {/* Ícone menor */}
+          <span className="font-medium text-base">1. Adicione um Tutor</span> {/* Texto menor */}
         </div>
-        <ArrowRight className="h-5 w-5 text-primary-foreground" />
-        <div className="flex items-center space-x-2">
-          <PawPrint className="h-6 w-6 text-primary-foreground" />
-          <span className="font-semibold text-lg">2. Adicione o(s) Animal(is)</span>
+        <ArrowRight className="h-4 w-4" /> {/* Ícone menor */}
+        <div className="flex items-center space-x-1"> {/* Reduzido space-x */}
+          <PawPrint className="h-5 w-5" /> {/* Ícone menor */}
+          <span className="font-medium text-base">2. Adicione o(s) Animal(is)</span> {/* Texto menor */}
         </div>
       </CardContent>
     </Card>
