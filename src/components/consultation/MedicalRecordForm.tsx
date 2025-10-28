@@ -1,18 +1,22 @@
 "use client";
 
 import React from "react";
-import { useForm, useFieldArray, UseFormReturn } from "react-hook-form"; // Importar UseFormReturn
+import { useForm, UseFormReturn, FormProvider } from "react-hook-form"; // Importar FormProvider
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { PlusCircle, Trash2, Stethoscope, FlaskConical, ClipboardList, HeartPulse, Pill } from "lucide-react";
+import { Form } from "@/components/ui/form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Label } from "@/components/ui/label"; // Importar o componente Label
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar Tabs
+import { ClipboardList, Stethoscope, HeartPulse, FlaskConical, Pill } from "lucide-react"; // Importar ícones
+
+// Importar os novos componentes de conteúdo das abas
+import AnamnesisTabContent from "./AnamnesisTabContent";
+import PhysicalExamTabContent from "./PhysicalExamTabContent";
+import DiagnosisTabContent from "./DiagnosisTabContent";
+import TreatmentTabContent from "./TreatmentTabContent";
+import PrescriptionsTabContent from "./PrescriptionsTabContent";
 
 // Esquema de validação para um item de prescrição
 const prescriptionItemSchema = z.object({
@@ -24,10 +28,10 @@ const prescriptionItemSchema = z.object({
 
 // Esquema de validação para o formulário completo do prontuário médico
 const medicalRecordFormSchema = z.object({
-  anamnesis: z.string().min(1, "A anamnese é obrigatória."), // Tornando obrigatório
-  physicalExam: z.string().min(1, "O exame físico é obrigatório."), // Tornando obrigatório
-  diagnosis: z.string().min(1, "O diagnóstico é obrigatório."), // Tornando obrigatório
-  treatment: z.string().min(1, "O tratamento é obrigatório."), // Tornando obrigatório
+  anamnesis: z.string().min(1, "A anamnese é obrigatória."),
+  physicalExam: z.string().min(1, "O exame físico é obrigatório."),
+  diagnosis: z.string().min(1, "O diagnóstico é obrigatório."),
+  treatment: z.string().min(1, "O tratamento é obrigatório."),
   prescriptions: z.array(prescriptionItemSchema).optional(),
 });
 
@@ -45,8 +49,8 @@ interface MedicalRecordFormProps {
   initialData?: MedicalRecordFormValues;
   onSubmit: (data: MedicalRecordFormValues) => void;
   isSubmitting: boolean;
-  formRef?: React.Ref<MedicalRecordFormInstance>; // Nova prop para expor a instância do formulário
-  onValidationChange?: (isValid: boolean) => void; // Nova prop para notificar sobre a validade
+  formRef?: React.Ref<MedicalRecordFormInstance>;
+  onValidationChange?: (isValid: boolean) => void;
 }
 
 const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSubmit, isSubmitting, formRef, onValidationChange }) => {
@@ -59,11 +63,6 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
       treatment: initialData?.treatment || "",
       prescriptions: initialData?.prescriptions || [],
     },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "prescriptions",
   });
 
   // Expor a instância do formulário através do ref
@@ -88,163 +87,46 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
           <ClipboardList className="mr-2 h-5 w-5" /> Prontuário Médico
         </CardTitle>
       </CardHeader>
-      <CardContent className="overflow-y-auto max-h-[calc(100vh-200px)]"> {/* Adicionado overflow-y-auto e max-h */}
-        <Form {...form}>
+      <CardContent>
+        <FormProvider {...form}> {/* Envolve o formulário com FormProvider */}
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="anamnesis"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center">
-                    <Stethoscope className="h-4 w-4 mr-2 text-muted-foreground" /> Anamnese
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Histórico do paciente, queixas principais..." rows={5} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Tabs defaultValue="anamnesis" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1">
+                <TabsTrigger value="anamnesis" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm py-2 font-bold flex items-center">
+                  <Stethoscope className="h-4 w-4 mr-1" /> Anamnese
+                </TabsTrigger>
+                <TabsTrigger value="physicalExam" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm py-2 font-bold flex items-center">
+                  <HeartPulse className="h-4 w-4 mr-1" /> Exame Físico
+                </TabsTrigger>
+                <TabsTrigger value="diagnosis" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm py-2 font-bold flex items-center">
+                  <FlaskConical className="h-4 w-4 mr-1" /> Diagnóstico
+                </TabsTrigger>
+                <TabsTrigger value="treatment" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm py-2 font-bold flex items-center">
+                  <Pill className="h-4 w-4 mr-1" /> Tratamento
+                </TabsTrigger>
+                <TabsTrigger value="prescriptions" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm py-2 font-bold flex items-center">
+                  <Pill className="h-4 w-4 mr-1" /> Prescrições
+                </TabsTrigger>
+              </TabsList>
 
-            <FormField
-              control={form.control}
-              name="physicalExam"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center">
-                    <HeartPulse className="h-4 w-4 mr-2 text-muted-foreground" /> Exame Físico
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Resultados do exame físico..." rows={5} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="diagnosis"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center">
-                    <FlaskConical className="h-4 w-4 mr-2 text-muted-foreground" /> Diagnóstico
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Diagnóstico da condição do paciente..." rows={3} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="treatment"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center">
-                    <Pill className="h-4 w-4 mr-2 text-muted-foreground" /> Tratamento
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Plano de tratamento e recomendações..." rows={5} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="space-y-4 mt-6"> {/* Adicionado mt-6 para espaçamento */}
-              <div className="flex items-center justify-between mb-4"> {/* Adicionado mb-4 para espaçamento */}
-                <Label className="flex items-center text-lg font-semibold">
-                  <Pill className="h-5 w-5 mr-2" /> Prescrições
-                </Label>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => append({ medication: "", dosage: "", frequency: "", instructions: "" })}
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Prescrição
-                </Button>
+              <div className="mt-4 p-4 border rounded-md bg-muted/20">
+                <TabsContent value="anamnesis">
+                  <AnamnesisTabContent />
+                </TabsContent>
+                <TabsContent value="physicalExam">
+                  <PhysicalExamTabContent />
+                </TabsContent>
+                <TabsContent value="diagnosis">
+                  <DiagnosisTabContent />
+                </TabsContent>
+                <TabsContent value="treatment">
+                  <TreatmentTabContent />
+                </TabsContent>
+                <TabsContent value="prescriptions">
+                  <PrescriptionsTabContent />
+                </TabsContent>
               </div>
-              {fields.length === 0 && (
-                <p className="text-muted-foreground text-sm">Nenhuma prescrição adicionada ainda.</p>
-              )}
-              <ScrollArea className="max-h-[300px] pr-4">
-                <div className="space-y-4">
-                  {fields.map((field, index) => (
-                    <div key={field.id} className="relative border p-4 rounded-md space-y-3 bg-muted/20">
-                      <h4 className="text-md font-semibold text-muted-foreground">Prescrição #{index + 1}</h4>
-                      <FormField
-                        control={form.control}
-                        name={`prescriptions.${index}.medication`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Medicamento</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Nome do medicamento" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name={`prescriptions.${index}.dosage`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Dosagem</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Ex: 5mg, 1 comprimido" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                        <FormField
-                          control={form.control}
-                          name={`prescriptions.${index}.frequency`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Frequência</FormLabel>
-                              <FormControl>
-                                <Input placeholder="Ex: 12/12h, 1x ao dia" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      </div>
-                      <FormField
-                        control={form.control}
-                        name={`prescriptions.${index}.instructions`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Instruções (Opcional)</FormLabel>
-                            <FormControl>
-                              <Textarea placeholder="Instruções adicionais de uso..." rows={2} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        className="absolute top-2 right-2 h-8 w-8"
-                        onClick={() => remove(index)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        <span className="sr-only">Remover Prescrição</span>
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
+            </Tabs>
 
             <Separator />
 
@@ -252,7 +134,7 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
               {isSubmitting ? "Salvando Prontuário..." : "Salvar Prontuário"}
             </Button>
           </form>
-        </Form>
+        </FormProvider>
       </CardContent>
     </Card>
   );
