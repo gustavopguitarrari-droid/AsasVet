@@ -663,34 +663,36 @@ const Cadastro = () => {
         </TabsList>
 
         <TabsContent value="tutores" className="mt-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Buscar tutores..."
-                className="pl-9"
-                value={clientSearchTerm}
-                onChange={(e) => setClientSearchTerm(e.target.value)}
-              />
-            </div>
-            <Dialog open={isAddClientDialogOpen} onOpenChange={setIsAddClientDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="font-bold ml-2">
-                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Adicionar Novo Tutor</DialogTitle>
-                </DialogHeader>
-                <ClientForm
-                  key={isAddClientDialogOpen ? "open" : "closed"}
-                  onSubmit={handleAddClient}
-                  onCancel={() => setIsAddClientDialogOpen(false)}
-                  isSubmittingParent={addClientMutation.isPending}
+          <div className="flex items-center justify-end mb-4">
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar tutores..."
+                  className="pl-9 w-64"
+                  value={clientSearchTerm}
+                  onChange={(e) => setClientSearchTerm(e.target.value)}
                 />
-              </DialogContent>
-            </Dialog>
+              </div>
+              <Dialog open={isAddClientDialogOpen} onOpenChange={setIsAddClientDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="font-bold">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>Adicionar Novo Tutor</DialogTitle>
+                  </DialogHeader>
+                  <ClientForm
+                    key={isAddClientDialogOpen ? "open" : "closed"}
+                    onSubmit={handleAddClient}
+                    onCancel={() => setIsAddClientDialogOpen(false)}
+                    isSubmittingParent={addClientMutation.isPending}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
 
           <div className="rounded-md border">
