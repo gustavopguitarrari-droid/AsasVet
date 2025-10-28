@@ -27,6 +27,7 @@ import { DialogFooter } from "@/components/ui/dialog";
 import RiskSelector from "./RiskSelector";
 import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
 import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
+import { Label } from "@/components/ui/label"; // Importar Label
 
 // Mock de veterinários
 const mockVeterinarians = [
@@ -231,9 +232,9 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
 
         {/* Busca de Tutor por CPF */}
         <div className="space-y-2 border p-3 rounded-md">
-          <FormLabel className="flex items-center">
+          <Label className="flex items-center"> {/* Alterado de FormLabel para Label */}
             <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor por CPF
-          </FormLabel>
+          </Label>
           <div className="flex space-x-2">
             <Input
               placeholder="Digite o CPF do tutor (somente números)"
@@ -269,9 +270,9 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
 
         {/* Seleção de Animal */}
         <div className="space-y-2 border p-3 rounded-md">
-          <FormLabel className="flex items-center">
+          <Label className="flex items-center"> {/* Alterado de FormLabel para Label */}
             <PawPrint className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Animal
-          </FormLabel>
+          </Label>
           <FormField
             control={form.control}
             name="selectedPetId"

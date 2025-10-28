@@ -30,8 +30,8 @@ import { Product } from "@/types/cashier";
 const formSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório."),
   price: z.preprocess(
-    (val) => Number(val),
-    z.number().min(0.01, "O preço deve ser maior que zero.")
+    (val) => (val === "" ? undefined : Number(val)), // Converte string vazia para undefined, depois para número
+    z.number().min(0.01, "O preço deve ser maior que zero.").optional() // Torna opcional para permitir campo vazio temporariamente
   ),
   category: z.enum(["Serviço", "Produto"], {
     required_error: "A categoria é obrigatória.",
@@ -53,7 +53,7 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({ isOpen, onClose, on
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: initialData?.name || "", // Use initialData
-      price: initialData?.price || 0, // Use initialData
+      price: initialData?.price || undefined, // Use initialData, ou undefined para campo vazio
       category: (initialData?.category as "Serviço" | "Produto") || "Produto", // Use initialData
     },
   });
@@ -62,7 +62,7 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({ isOpen, onClose, on
     if (isOpen) {
       form.reset({ // Reset form with initialData when dialog opens
         name: initialData?.name || "",
-        price: initialData?.price || 0,
+        price: initialData?.price || undefined,
         category: (initialData?.category as "Serviço" | "Produto") || "Produto",
       });
     } else {
@@ -113,7 +113,11 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({ isOpen, onClose, on
                       min="0.01"
                       placeholder="0.00"
                       {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
+                      value={field.value === undefined ? "" : field.value} // Garante que o valor seja string ou vazio
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        field.onChange(value === "" ? undefined : parseFloat(value));
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
