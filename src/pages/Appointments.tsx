@@ -961,7 +961,7 @@ const Appointments = () => {
                       "cursor-pointer hover:bg-muted/50"
                     )}
                   >
-                    {columns.map(col => col.render(appointment))}
+                    {columns.map(col => <React.Fragment key={col.id}>{col.render(appointment)}</React.Fragment>)}
                   </TableRow>
                 ))
               ) : (
