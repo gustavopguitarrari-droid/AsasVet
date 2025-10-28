@@ -423,17 +423,14 @@ const Appointments = () => {
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
         .eq('appointment_id', appointment.id)
         .eq('user_id', currentUserId)
-        .single();
+        .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
 
       if (fetchError) {
-        if (fetchError.code === 'PGRST116') {
-          throw new Error("Prontuário médico não encontrado para esta consulta.");
-        }
         throw fetchError;
       }
 
       if (!medicalRecordData) {
-        throw new Error("Prontuário médico não encontrado.");
+        throw new Error("Prontuário médico não encontrado para esta consulta.");
       }
 
       // Map medical record data to form values for PDF generation
@@ -496,12 +493,9 @@ const Appointments = () => {
         .select('id, prescriptions')
         .eq('appointment_id', appointment.id)
         .eq('user_id', currentUserId)
-        .single();
+        .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
 
       if (fetchError) {
-        if (fetchError.code === 'PGRST116') {
-          throw new Error("Prontuário médico não encontrado para esta consulta.");
-        }
         throw fetchError;
       }
 

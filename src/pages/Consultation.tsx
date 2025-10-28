@@ -90,14 +90,14 @@ const ConsultationPage: React.FC = () => {
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, recipe_pdf_url, created_at, updated_at')
         .eq('appointment_id', appointmentId)
         .eq('user_id', userId)
-        .single();
+        .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
       if (error) {
-        if (error.code === 'PGRST116') {
-          console.log("ConsultationPage: No medical record found for appointment", appointmentId);
-          return null;
-        }
         console.error("ConsultationPage: Error fetching medical record:", error);
         throw error;
+      }
+      if (!data) {
+        console.log("ConsultationPage: No medical record found for appointment", appointmentId, ". Returning null.");
+        return null;
       }
       console.log("ConsultationPage: Raw medical record data from Supabase:", data);
       // Garante que prescriptions seja sempre um array
@@ -236,7 +236,7 @@ const ConsultationPage: React.FC = () => {
         .from('medical_records')
         .select('recipe_pdf_url')
         .eq('id', currentMedicalRecordId)
-        .single();
+        .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
 
       if (fetchPdfUrlError) {
         console.warn("ConsultationPage: generateAndSaveRecipePdfMutation - Failed to fetch existing recipe_pdf_url for medical record ID:", currentMedicalRecordId, fetchPdfUrlError);
