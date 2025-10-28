@@ -254,8 +254,6 @@ const Veterinarios = () => {
 
   return (
     <div className="space-y-6">
-      {/* O botão "Adicionar Membro" foi movido para dentro da aba "equipe" */}
-
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
           <TabsTrigger value="equipe" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Equipe</TabsTrigger>
@@ -274,30 +272,28 @@ const Veterinarios = () => {
         </TabsContent>
 
         <TabsContent value="equipe" className="mt-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4"> {/* Ajustado para flex-col em mobile e flex-row em md+ */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <RoleFilter selectedRole={selectedRole} onSelectRole={handleSelectRole} />
-            {isAdmin ? (
-              <Button onClick={() => setIsAddMemberDialogOpen(true)}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
-              </Button>
-            ) : (
-              <p className="text-destructive font-semibold flex items-center">
-                <AlertCircle className="h-5 w-5 mr-2" /> Apenas administradores podem adicionar membros.
-              </p>
-            )}
-          </div>
-
-          <div className="flex items-center space-x-2 mt-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Buscar membros da equipe..."
-                className="pl-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+            <div className="flex items-center gap-2 w-full md:w-auto"> {/* Novo contêiner para busca e botão */}
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar membros da equipe..."
+                  className="pl-9"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              {isAdmin ? (
+                <Button onClick={() => setIsAddMemberDialogOpen(true)} className="shrink-0">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
+                </Button>
+              ) : (
+                <p className="text-destructive font-semibold flex items-center shrink-0">
+                  <AlertCircle className="h-5 w-5 mr-2" /> Apenas administradores podem adicionar membros.
+                </p>
+              )}
             </div>
-            {/* Botão "Filtrar" removido daqui */}
           </div>
 
           <div className="rounded-md border mt-6">
