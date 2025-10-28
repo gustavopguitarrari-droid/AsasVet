@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import *s z from "zod";
 import { format, parseISO, isValid } from "date-fns";
-import { CalendarIcon, Search, User, PawPrint, Horse, Cow } from "lucide-react"; // Adicionado Horse e Cow
+import { CalendarIcon, Search, User, PawPrint, MoreHorizontal } from "lucide-react"; // Removido Horse e Cow, adicionado MoreHorizontal
 import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";

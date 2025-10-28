@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin, Eye, Edit, Trash2, Scale, Horse, Cow } from "lucide-react"; // Adicionado Horse e Cow
+import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin, Eye, Edit, Trash2, Scale } from "lucide-react"; // Removido Horse e Cow
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SpeciesFilter from "@/components/SpeciesFilter";
 import PetDetailsDialog from "@/components/PetDetailsDialog";
@@ -40,8 +40,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
-  Equino: Horse, // Adicionado Equino
-  Bovino: Cow,   // Adicionado Bovino
+  Equino: MoreHorizontal, // Adicionado Equino
+  Bovino: MoreHorizontal,   // Adicionado Bovino
   Outros: MoreHorizontal,
 };
 
