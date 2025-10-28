@@ -77,6 +77,10 @@ const Financeiro = () => {
     },
   });
 
+  const handleAddTransaction = (data: TransactionFormValues) => {
+    addTransactionMutation.mutate(data);
+  };
+
   const filteredTransactions = transactions.filter((transaction) =>
     transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     transaction.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
