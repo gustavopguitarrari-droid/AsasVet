@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock, FileText } from "lucide-react";
+import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock, FileText, Pill } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { format, parseISO, isValid, differenceInSeconds } from "date-fns";
@@ -254,7 +254,8 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                   <TableHead>Finalização/Cancelamento</TableHead>
                   <TableHead>Duração</TableHead>
                   <TableHead>Tempo de Espera</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+                  <TableHead>Receitas</TableHead> {/* NOVO: Coluna Receitas */}
+                  <TableHead className="text-right">Prontuário</TableHead> {/* Alterado de 'Ações' para 'Prontuário' */}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -303,12 +304,33 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                         </TableCell>
                         <TableCell>{duration}</TableCell>
                         <TableCell>{waitingTime}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
+                                showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
+                              } else {
+                                showError("Nenhuma prescrição encontrada para esta consulta.");
+                              }
+                            }}
+                            className="flex items-center justify-center gap-1"
+                          >
+                            <Pill className="h-4 w-4" />
+                            <span>{appointment.prescriptions_count || 0}</span>
+                          </Button>
+                        </TableCell> {/* NOVO: Exibe a contagem de prescrições */}
                         <TableCell className="text-right">
                           <div className="flex justify-end space-x-2">
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleOpenPdfPreviewDialog(appointment)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenPdfPreviewDialog(appointment);
+                              }}
                               disabled={fetchAndGeneratePdfMutation.isPending}
                             >
                               {fetchAndGeneratePdfMutation.isPending ? (
@@ -324,7 +346,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
+                    <TableCell colSpan={10} className="h-24 text-center text-muted-foreground">
                       Nenhuma consulta encontrada no histórico.
                     </TableCell>
                   </TableRow>
