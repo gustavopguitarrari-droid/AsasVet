@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight } from "lucide-react"; // Importar ArrowRight
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText } from "lucide-react"; // Importar ArrowRight e FileText
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -30,6 +30,9 @@ import { showError, showSuccess } from "@/utils/toast";
 import { Client, Pet } from "@/types/cadastro";
 import { useNavigate } from "react-router-dom";
 import { usePageTitle } from "@/context/PageTitleContext"; // NOVO: Importar usePageTitle
+import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf"; // Importar função de PDF
+import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm"; // Importar tipo de formulário
+import PdfPreviewDialog from "@/components/PdfPreviewDialog"; // Importar diálogo de pré-visualização
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -57,6 +60,20 @@ export interface Appointment {
   start_time?: string | null;
 }
 
+// Interface para o prontuário médico (deve corresponder à tabela medical_records)
+interface MedicalRecord {
+  id: string;
+  appointment_id: string;
+  user_id: string;
+  anamnesis?: string | null;
+  physical_exam?: string | null;
+  diagnosis?: string | null;
+  treatment?: string | null;
+  prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
+  created_at: string;
+  updated_at: string;
+}
+
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
   Gato: Cat,
@@ -81,6 +98,12 @@ const Appointments = () => {
   const [selectedAppointment, setSelectedAppointment] = React.useState<Appointment | null>(null);
   const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState<boolean>(false);
+
+  // Estados para o diálogo de pré-visualização de PDF
+  const [isPdfPreviewDialogOpen, setIsPdfPreviewDialogOpen] = useState(false);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [pdfFilename, setPdfFilename] = useState("");
+  const [pdfAppointment, setPdfAppointment] = useState<Appointment | null>(null);
 
   // NOVO: Efeito para atualizar o título da página com base na aba ativa
   React.useEffect(() => {
@@ -343,6 +366,66 @@ const Appointments = () => {
     },
   });
 
+  // Mutation to fetch the medical record and generate the PDF
+  const fetchAndGeneratePdfMutation = useMutation({
+    mutationFn: async ({ appointment }: { appointment: Appointment }) => {
+      // First, fetch the medical record
+      const { data: medicalRecordData, error: fetchError } = await supabase
+        .from('medical_records')
+        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
+        .eq('appointment_id', appointment.id)
+        .eq('user_id', appointment.user_id)
+        .single();
+
+      if (fetchError) {
+        if (fetchError.code === 'PGRST116') {
+          throw new Error("Prontuário médico não encontrado para esta consulta.");
+        }
+        throw fetchError;
+      }
+
+      if (!medicalRecordData) {
+        throw new Error("Prontuário médico não encontrado.");
+      }
+
+      // Map medical record data to form values for PDF generation
+      const medicalRecordForPdf: MedicalRecordFormValues = {
+        anamnesis: medicalRecordData.anamnesis || undefined,
+        physicalExam: medicalRecordData.physical_exam || undefined,
+        diagnosis: medicalRecordData.diagnosis || undefined,
+        treatment: medicalRecordData.treatment || undefined,
+        prescriptions: medicalRecordData.prescriptions || [],
+      };
+
+      // Generate the PDF
+      const blob = await generateMedicalRecordPdf({ 
+        appointment, 
+        medicalRecord: medicalRecordForPdf, 
+        logoUrl: appUser?.logoUrl,
+        clinicDetails: {
+          companyName: appUser?.companyName || 'AsasVet',
+          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+          phone: appUser?.phone || '',
+          email: appUser?.email || '',
+          veterinarianCrmv: appUser?.crmv || '',
+          veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
+        }
+      });
+
+      return { blob, appointment };
+    },
+    onSuccess: ({ blob, appointment }) => {
+      setPdfBlob(blob);
+      setPdfFilename(`Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
+      setPdfAppointment(appointment);
+      setIsPdfPreviewDialogOpen(true);
+    },
+    onError: (err: any) => {
+      console.error("Erro ao gerar PDF do histórico:", err);
+      showError(`Erro ao gerar PDF: ${err.message || "Erro desconhecido"}`);
+    },
+  });
+
   const handleAddAppointment = (data: AppointmentFormValues) => {
     addAppointmentMutation.mutate(data);
   };
@@ -415,6 +498,40 @@ const Appointments = () => {
   const totalCanceladas = appointments.filter(a => a.status === "Cancelada").length;
   const totalEmAndamento = appointments.filter(a => a.status === "Em Andamento").length;
 
+  // Helper function to format time as HH:mm:ss
+  const formatDuration = (totalSeconds: number) => {
+    if (totalSeconds < 0) return "N/A";
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return [hours, minutes, seconds]
+      .map(v => v < 10 ? "0" + v : v)
+      .join(":");
+  };
+
+  // Handler to open PDF preview dialog
+  const handleOpenPdfPreviewDialog = (appointment: Appointment) => {
+    fetchAndGeneratePdfMutation.mutate({ appointment });
+  };
+
+  // Handler to confirm PDF download
+  const handleConfirmPdfDownload = (filename: string) => {
+    if (pdfBlob) {
+      // Create a download link
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showSuccess("PDF do prontuário baixado com sucesso!");
+      setIsPdfPreviewDialogOpen(false);
+    }
+  };
+
   if (isLoading || isLoadingClients || isLoadingPets || isLoadingHistory) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -432,249 +549,282 @@ const Appointments = () => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Removido o div flex items-center justify-between que continha os botões */}
+    <>
+      <div className="space-y-6">
+        {/* Removido o div flex items-center justify-between que continha os botões */}
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="bg-gray-700 text-white shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Em espera</CardTitle>
-            <CalendarClock className="h-4 w-4 text-white" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalAgendadas}</div>
-            <p className="text-gray-200 text-xs">Consultas aguardando</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-orange-500 text-white shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Em Andamento</CardTitle>
-            <CalendarClock className="h-4 w-4 text-white" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalEmAndamento}</div>
-            <p className="text-white/80 text-xs">Consultas em progresso</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-green-500 text-white shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Realizadas</CardTitle>
-            <CalendarCheck className="h-4 w-4 text-white" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalRealizadas}</div>
-            <p className="text-white/80 text-xs">Consultas concluídas</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-destructive text-destructive-foreground shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Canceladas</CardTitle>
-            <CalendarX className="h-4 w-4 text-destructive-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalCanceladas}</div>
-            <p className="text-destructive-foreground/80 text-xs">Consultas canceladas</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto flex-1"> {/* Adicionado flex-1 */}
-          <TabsList className="grid w-full grid-cols-3 bg-muted/50">
-            <TabsTrigger value="em-espera" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">Em Espera</TabsTrigger>
-            <TabsTrigger value="em-andamento" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">Em Andamento</TabsTrigger>
-            <TabsTrigger value="finalizadas" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">Finalizadas</TabsTrigger>
-          </TabsList>
-        </Tabs>
-        <div className="relative flex-1 w-full md:w-auto">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar consultas..."
-            className="pl-9"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card className="bg-gray-700 text-white shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Em espera</CardTitle>
+              <CalendarClock className="h-4 w-4 text-white" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalAgendadas}</div>
+              <p className="text-gray-200 text-xs">Consultas aguardando</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-orange-500 text-white shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Em Andamento</CardTitle>
+              <CalendarClock className="h-4 w-4 text-white" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalEmAndamento}</div>
+              <p className="text-white/80 text-xs">Consultas em progresso</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-green-500 text-white shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Realizadas</CardTitle>
+              <CalendarCheck className="h-4 w-4 text-white" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalRealizadas}</div>
+              <p className="text-white/80 text-xs">Consultas concluídas</p>
+            </CardContent>
+          </Card>
+          <Card className="bg-destructive text-destructive-foreground shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Canceladas</CardTitle>
+              <CalendarX className="h-4 w-4 text-destructive-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalCanceladas}</div>
+              <p className="text-destructive-foreground/80 text-xs">Consultas canceladas</p>
+            </CardContent>
+          </Card>
         </div>
-        {/* Botões movidos para cá, alinhados à direita */}
-        <div className="flex space-x-2 mt-4 md:mt-0"> {/* Adicionado margem superior para mobile */}
-          <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
-            <History className="mr-2 h-4 w-4" /> Ver Histórico
-          </Button>
-          <Dialog open={isAddAppointmentDialogOpen} onOpenChange={setIsAddAppointmentDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar consulta a fila
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-4xl max-h-[60vh] overflow-y-auto p-6">
-              <DialogHeader>
-                <DialogTitle>Incluir Nova Consulta</DialogTitle>
-              </DialogHeader>
-              <AppointmentForm
-                onSubmit={handleAddAppointment}
-                onCancel={() => setIsAddAppointmentDialogOpen(false)} // Passa o handler de cancelamento
-                allClients={clients}
-                allPets={pets}
-              />
-            </DialogContent>
-          </Dialog>
+
+        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto flex-1"> {/* Adicionado flex-1 */}
+            <TabsList className="grid w-full grid-cols-3 bg-muted/50">
+              <TabsTrigger value="em-espera" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">Em Espera</TabsTrigger>
+              <TabsTrigger value="em-andamento" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">Em Andamento</TabsTrigger>
+              <TabsTrigger value="finalizadas" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">Finalizadas</TabsTrigger>
+            </TabsList>
+          </Tabs>
+          <div className="relative flex-1 w-full md:w-auto">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar consultas..."
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          {/* Botões movidos para cá, alinhados à direita */}
+          <div className="flex space-x-2 mt-4 md:mt-0"> {/* Adicionado margem superior para mobile */}
+            <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
+              <History className="mr-2 h-4 w-4" /> Ver Histórico
+            </Button>
+            <Dialog open={isAddAppointmentDialogOpen} onOpenChange={setIsAddAppointmentDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar consulta a fila
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-4xl max-h-[60vh] overflow-y-auto p-6">
+                <DialogHeader>
+                  <DialogTitle>Incluir Nova Consulta</DialogTitle>
+                </DialogHeader>
+                <AppointmentForm
+                  onSubmit={handleAddAppointment}
+                  onCancel={() => setIsAddAppointmentDialogOpen(false)} // Passa o handler de cancelamento
+                  allClients={clients}
+                  allPets={pets}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
-      </div>
 
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Paciente</TableHead>
-              <TableHead>Tutor</TableHead>
-              <TableHead>Serviço</TableHead>
-              {activeTab === "em-espera" && <TableHead>Tempo de Espera</TableHead>}
-              {activeTab === "em-andamento" && <TableHead>Veterinário</TableHead>}
-              {activeTab === "em-andamento" && <TableHead>Tempo de Consulta</TableHead>}
-              {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
-              {activeTab === "finalizadas" && <TableHead>Finalização</TableHead>}
-              {activeTab === "finalizadas" && <TableHead>Duração</TableHead>}
-              <TableHead className="text-right">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredAppointments.length > 0 ? (
-              filteredAppointments.map((appointment) => {
-                const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
-                const isCancelled = activeTab === "finalizadas" && appointment.status === "Cancelada";
-                const isRealizada = activeTab === "finalizadas" && appointment.status === "Realizada";
-                const isEmAndamento = activeTab === "em-andamento" && appointment.status === "Em Andamento";
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Paciente</TableHead>
+                <TableHead>Tutor</TableHead>
+                <TableHead>Serviço</TableHead>
+                {activeTab === "em-espera" && <TableHead>Tempo de Espera</TableHead>}
+                {activeTab === "em-andamento" && <TableHead>Veterinário</TableHead>}
+                {activeTab === "em-andamento" && <TableHead>Tempo de Consulta</TableHead>}
+                {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
+                {activeTab === "finalizadas" && <TableHead>Finalização</TableHead>}
+                {activeTab === "finalizadas" && <TableHead>Duração</TableHead>}
+                <TableHead className="text-right">Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredAppointments.length > 0 ? (
+                filteredAppointments.map((appointment) => {
+                  const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
+                  const isCancelled = activeTab === "finalizadas" && appointment.status === "Cancelada";
+                  const isRealizada = activeTab === "finalizadas" && appointment.status === "Realizada";
+                  const isEmAndamento = activeTab === "em-andamento" && appointment.status === "Em Andamento";
 
-                // Cálculo da duração
-                const duration = appointment.start_time && appointment.completion_timestamp
-                  ? (() => {
-                      const start = parseISO(appointment.start_time);
-                      const end = parseISO(appointment.completion_timestamp);
-                      if (isValid(start) && isValid(end)) {
-                        const durationSeconds = differenceInSeconds(end, start);
-                        const hours = Math.floor(durationSeconds / 3600);
-                        const minutes = Math.floor((durationSeconds % 3600) / 60);
-                        const seconds = durationSeconds % 60;
-                        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                      }
-                      return "N/A";
-                    })()
-                  : "N/A";
+                  // Cálculo da duração
+                  const duration = appointment.start_time && appointment.completion_timestamp
+                    ? (() => {
+                        const start = parseISO(appointment.start_time);
+                        const end = parseISO(appointment.completion_timestamp);
+                        if (isValid(start) && isValid(end)) {
+                          const durationSeconds = differenceInSeconds(end, start);
+                          return formatDuration(durationSeconds);
+                        }
+                        return "N/A";
+                      })()
+                    : "N/A";
 
-                return (
-                  <TableRow
-                    key={appointment.id}
-                    onClick={() => handleRowClick(appointment)}
-                    className={cn(
-                      "cursor-pointer hover:bg-muted/50"
-                    )}
-                  >
-                    <TableCell className="font-medium flex items-center">
-                      <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
-                      {appointment.pet_name}
-                    </TableCell>
-                    <TableCell>{appointment.client_name}</TableCell>
-                    <TableCell>{appointment.service}</TableCell>
-                    {activeTab === "em-espera" && (
-                      <TableCell>
-                        <AppointmentChronometer startTime={appointment.created_at} />
+                  // Calculate Waiting Time
+                  const waitingTime = appointment.created_at && (appointment.start_time || appointment.completion_timestamp)
+                    ? (() => {
+                        const created = parseISO(appointment.created_at);
+                        const referenceTime = isRealizada && appointment.start_time ? parseISO(appointment.start_time) : (isCancelled && appointment.completion_timestamp ? parseISO(appointment.completion_timestamp) : null);
+                        return isValid(created) && isValid(referenceTime!) ? formatDuration(differenceInSeconds(referenceTime!, created)) : "N/A";
+                      })()
+                    : "N/A";
+
+                  return (
+                    <TableRow
+                      key={appointment.id}
+                      onClick={() => handleRowClick(appointment)}
+                      className={cn(
+                        "cursor-pointer hover:bg-muted/50"
+                      )}
+                    >
+                      <TableCell className="font-medium flex items-center">
+                        <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
+                        {appointment.pet_name}
                       </TableCell>
-                    )}
-                    {activeTab === "em-andamento" && (
-                      <>
-                        <TableCell className="flex items-center">
-                          {appointment.veterinarian || "N/A"}
-                          <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
-                            Iniciada
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
-                        </TableCell>
-                      </>
-                    )}
-                    {activeTab === "finalizadas" && (
-                      <>
-                        <TableCell className="flex items-center">
-                          {appointment.veterinarian || "N/A"}
-                          {isCancelled && (
-                            <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
-                              Cancelada
-                            </Badge>
-                          )}
-                          {isRealizada && (
-                            <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
-                              Concluída
-                            </Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))
-                            ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
-                            : "N/A"}
-                        </TableCell>
-                        <TableCell>{duration}</TableCell>
-                      </>
-                    )}
-                    <TableCell className="text-right">
+                      <TableCell>{appointment.client_name}</TableCell>
+                      <TableCell>{appointment.service}</TableCell>
                       {activeTab === "em-espera" && (
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleStartAppointment(appointment.id);
-                          }}
-                          disabled={startAppointmentMutation.isPending}
-                        >
-                          <Play className="mr-2 h-4 w-4" /> Iniciar
-                        </Button>
+                        <TableCell>
+                          <AppointmentChronometer startTime={appointment.created_at} />
+                        </TableCell>
                       )}
                       {activeTab === "em-andamento" && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/consultation/${appointment.id}`);
-                          }}
-                        >
-                          <ArrowRight className="mr-2 h-4 w-4" /> Voltar para Consulta
-                        </Button>
+                        <>
+                          <TableCell className="flex items-center">
+                            {appointment.veterinarian || "N/A"}
+                            <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
+                              Iniciada
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
+                          </TableCell>
+                        </>
                       )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
-              <TableRow>
-                <TableCell colSpan={activeTab === "em-andamento" ? 7 : (activeTab === "finalizadas" ? 8 : 5)} className="h-24 text-center"> {/* Ajustado colspan */}
-                  Nenhuma consulta encontrada.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+                      {activeTab === "finalizadas" && (
+                        <>
+                          <TableCell className="flex items-center">
+                            {appointment.veterinarian || "N/A"}
+                            {isCancelled && (
+                              <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
+                                Cancelada
+                              </Badge>
+                            )}
+                            {isRealizada && (
+                              <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
+                                Concluída
+                              </Badge>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))
+                              ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
+                              : "N/A"}
+                          </TableCell>
+                          <TableCell>{duration}</TableCell>
+                        </>
+                      )}
+                      <TableCell className="text-right">
+                        {activeTab === "em-espera" && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStartAppointment(appointment.id);
+                            }}
+                            disabled={startAppointmentMutation.isPending}
+                          >
+                            <Play className="mr-2 h-4 w-4" /> Iniciar
+                          </Button>
+                        )}
+                        {activeTab === "em-andamento" && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(`/consultation/${appointment.id}`);
+                            }}
+                          >
+                            <ArrowRight className="mr-2 h-4 w-4" /> Voltar para Consulta
+                          </Button>
+                        )}
+                        {activeTab === "finalizadas" && isRealizada && ( // Apenas para consultas realizadas
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenPdfPreviewDialog(appointment);
+                            }}
+                            disabled={fetchAndGeneratePdfMutation.isPending}
+                          >
+                            {fetchAndGeneratePdfMutation.isPending ? (
+                              <span className="loading-spinner h-4 w-4" />
+                            ) : (
+                              <FileText className="h-4 w-4" />
+                            )}
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={activeTab === "em-andamento" ? 7 : (activeTab === "finalizadas" ? 8 : 5)} className="h-24 text-center"> {/* Ajustado colspan */}
+                    Nenhuma consulta encontrada.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        <AppointmentDetailsDialog
+          appointment={selectedAppointment}
+          isOpen={isDetailsDialogOpen}
+          onClose={() => setIsDetailsDialogOpen(false)}
+          onUpdate={handleUpdateAppointment}
+          onCancelAppointment={handleCancelAppointment}
+          onStartAppointment={handleStartAppointment}
+        />
+
+        <AppointmentHistoryDialog
+          isOpen={isHistoryDialogOpen}
+          onClose={() => setIsHistoryDialogOpen(false)}
+          historyAppointments={historyAppointments}
+          onViewDetails={handleViewHistoryDetails}
+          onClearHistory={() => clearHistoryAppointmentsMutation.mutate()}
+          isClearingHistory={clearHistoryAppointmentsMutation.isPending}
+        />
       </div>
 
-      <AppointmentDetailsDialog
-        appointment={selectedAppointment}
-        isOpen={isDetailsDialogOpen}
-        onClose={() => setIsDetailsDialogOpen(false)}
-        onUpdate={handleUpdateAppointment}
-        onCancelAppointment={handleCancelAppointment}
-        onStartAppointment={handleStartAppointment}
+      <PdfPreviewDialog
+        isOpen={isPdfPreviewDialogOpen}
+        onClose={() => setIsPdfPreviewDialogOpen(false)}
+        pdfBlob={pdfBlob}
+        filename={pdfFilename}
+        onConfirmDownload={handleConfirmPdfDownload}
       />
-
-      <AppointmentHistoryDialog
-        isOpen={isHistoryDialogOpen}
-        onClose={() => setIsHistoryDialogOpen(false)}
-        historyAppointments={historyAppointments}
-        onViewDetails={handleViewHistoryDetails}
-        onClearHistory={() => clearHistoryAppointmentsMutation.mutate()}
-        isClearingHistory={clearHistoryAppointmentsMutation.isPending}
-      />
-    </div>
+    </>
   );
 };
 
