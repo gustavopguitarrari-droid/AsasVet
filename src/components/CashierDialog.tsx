@@ -298,6 +298,8 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
           </SheetTitle>
         </SheetHeader>
         <div className="space-y-6 flex-1 overflow-y-auto p-4"> {/* Adicionado p-4 para padding interno */}
+          {/* Removidos os cards de lucro bruto, entradas e saídas */}
+          {/*
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card className={cn("text-white shadow-md", totalBalance >= 0 ? "bg-green-700" : "bg-red-700")}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
@@ -330,6 +332,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
               </CardContent>
             </Card>
           </div>
+          */}
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 h-auto p-1">
