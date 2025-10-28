@@ -108,8 +108,9 @@ const Internacao = () => {
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<InternedPatient | null>(null);
   const [activeTab, setActiveTab] = useState<string>("pacientes-internados");
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [patientSearchTerm, setPatientSearchTerm] = useState<string>("");
+  const [executionMapSearchTerm, setExecutionMapSearchTerm] = useState<string>(""); // NOVO: Estado para a pesquisa do mapa de execução
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   const [isAddActionDialogOpen, setIsAddActionDialogOpen] = useState(false);
   const [actionPatientId, setActionPatientId] = useState<string | null>(null);
@@ -544,8 +545,17 @@ const Internacao = () => {
   };
 
   const patientsForExecutionMap = useMemo(() => {
-    return internedPatients;
-  }, [internedPatients]);
+    const lowerCaseSearchTerm = executionMapSearchTerm.toLowerCase();
+    return internedPatients.filter(patient =>
+      patient.pet_name.toLowerCase().includes(lowerCaseSearchTerm) ||
+      patient.owner_name.toLowerCase().includes(lowerCaseSearchTerm) ||
+      patient.bay_name.toLowerCase().includes(lowerCaseSearchTerm) ||
+      patient.veterinarian.toLowerCase().includes(lowerCaseSearchTerm) ||
+      patient.species.toLowerCase().includes(lowerCaseSearchTerm) ||
+      patient.status.toLowerCase().includes(lowerCaseSearchTerm) ||
+      patient.risk.toLowerCase().includes(lowerCaseSearchTerm)
+    );
+  }, [internedPatients, executionMapSearchTerm]);
 
   const handlePreviousDay = () => {
     setSelectedDate((prevDate) => subDays(prevDate, 1));
@@ -723,9 +733,18 @@ const Internacao = () => {
         </TabsContent>
 
         <TabsContent value="mapa-execucao" className="mt-4">
-          <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
+          <div className="flex flex-col gap-4 mb-4"> {/* Contêiner flexível para os elementos do cabeçalho */}
             <ExecutionMapLegend />
-            <div className="flex items-center space-x-2">
+            <div className="relative w-full"> {/* Barra de pesquisa para o mapa de execução */}
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar pacientes no mapa de execução..."
+                className="pl-9"
+                value={executionMapSearchTerm}
+                onChange={(e) => setExecutionMapSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="flex items-center justify-center space-x-2"> {/* Seletor de data */}
               <Button variant="default" size="icon" onClick={handlePreviousDay}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
