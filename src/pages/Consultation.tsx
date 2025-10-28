@@ -29,6 +29,8 @@ import {
 import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf';
 import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase } from '@/utils/supabaseStorage';
 import PdfPreviewDialog from '@/components/PdfPreviewDialog';
+import { Client, Pet } from '@/types/cadastro'; // Importar Client e Pet
+import { TeamMember } from '@/pages/Veterinarios'; // Importar TeamMember
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -107,6 +109,80 @@ const ConsultationPage: React.FC = () => {
       } as MedicalRecord;
     },
     enabled: !!userId && !!appointmentId,
+  });
+
+  // Fetch all clients
+  const { data: allClients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
+    queryKey: ['allClientsConsultation', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('user_id', userId);
+      if (error) throw error;
+      return data.map(dbClient => ({
+        id: dbClient.id,
+        name: dbClient.name,
+        email: dbClient.email,
+        phone: dbClient.phone,
+        cpf: dbClient.cpf,
+        dateOfBirth: dbClient.date_of_birth,
+        address: {
+          cep: dbClient.address_cep || '',
+          street: dbClient.address_street || '',
+          number: dbClient.address_number || '',
+          complement: dbClient.address_complement || undefined,
+          neighborhood: dbClient.address_neighborhood || '',
+          city: dbClient.address_city || '',
+          state: dbClient.address_state || '',
+        },
+        observations: dbClient.observations || undefined,
+        photoUrl: dbClient.photo_url || undefined,
+      }));
+    },
+    enabled: !!userId,
+  });
+
+  // Fetch all pets
+  const { data: allPets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
+    queryKey: ['allPetsConsultation', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('pets')
+        .select('*');
+      if (error) throw error;
+      return data.map(dbPet => ({
+        id: dbPet.id,
+        name: dbPet.name,
+        species: dbPet.species as Pet["species"],
+        breed: dbPet.breed,
+        age: dbPet.age,
+        gender: dbPet.gender as Pet["gender"],
+        color: dbPet.color,
+        weight: dbPet.weight || undefined,
+        observations: dbPet.observations || undefined,
+        photoUrl: dbPet.photo_url || undefined,
+        ownerId: dbPet.owner_id,
+      }));
+    },
+    enabled: !!userId,
+  });
+
+  // Fetch all veterinarians (team members with role 'Veterinário')
+  const { data: allVeterinarians = [], isLoading: isLoadingVeterinarians, error: veterinariansError } = useQuery<TeamMember[]>({
+    queryKey: ['allVeterinariansConsultation', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, email, phone, crmv, role')
+        .eq('role', 'Veterinário');
+      if (error) throw error;
+      return data as TeamMember[];
+    },
+    enabled: !!userId,
   });
 
   // Mutação para salvar/atualizar o prontuário médico
@@ -345,7 +421,7 @@ const ConsultationPage: React.FC = () => {
     }
   };
 
-  if (isLoading || isLoadingMedicalRecord) {
+  if (isLoading || isLoadingMedicalRecord || isLoadingClients || isLoadingPets || isLoadingVeterinarians) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando detalhes da consulta...</p>
@@ -353,10 +429,10 @@ const ConsultationPage: React.FC = () => {
     );
   }
 
-  if (error || medicalRecordError) {
+  if (error || medicalRecordError || clientsError || petsError || veterinariansError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar consulta: {error?.message || medicalRecordError?.message}</p>
+        <p>Erro ao carregar consulta: {error?.message || medicalRecordError?.message || clientsError?.message || petsError?.message || veterinariansError?.message}</p>
         <Button onClick={() => navigate('/consultas')} className="ml-4">
           <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
         </Button>
@@ -483,6 +559,9 @@ const ConsultationPage: React.FC = () => {
           isOpen={isForwardToInternmentDialogOpen}
           onClose={() => setIsForwardToInternmentDialogOpen(false)}
           appointment={appointment}
+          allClients={allClients} // Passando allClients
+          allPets={allPets}     // Passando allPets
+          allVeterinarians={allVeterinarians} // Passando allVeterinarians
         />
       )}
 
