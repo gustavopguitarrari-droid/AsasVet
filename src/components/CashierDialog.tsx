@@ -105,7 +105,9 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
 
   const finalizeSaleMutation = useMutation({
     mutationFn: async (paymentMethod: string) => {
-      if (!organizationId) throw new Error("Organization ID not available.");
+      if (!organizationId) {
+        throw new Error("Organization ID not available."); // Lança erro se organizationId não estiver disponível
+      }
       if (cartItems.length === 0) throw new Error("Não há itens no carrinho para finalizar a venda.");
 
       const now = new Date();

@@ -47,7 +47,9 @@ const Financeiro = () => {
   // Mutação para adicionar uma nova transação
   const addTransactionMutation = useMutation({
     mutationFn: async (newTransactionData: TransactionFormValues) => {
-      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
+      if (!organizationId) {
+        throw new Error("Organization ID not available."); // Lança erro se organizationId não estiver disponível
+      }
       const { data, error } = await supabase
         .from('transactions')
         .insert({

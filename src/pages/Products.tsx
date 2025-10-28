@@ -81,7 +81,9 @@ const Products = () => {
   // Add product mutation (reusing from cashier)
   const addProductMutation = useMutation({
     mutationFn: async (newProductData: AddProductFormValues) => {
-      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
+      if (!organizationId) {
+        throw new Error("Organization ID not available."); // Lança erro se organizationId não estiver disponível
+      }
       const { data, error } = await supabase
         .from('products')
         .insert({
@@ -108,7 +110,9 @@ const Products = () => {
   // Update product mutation
   const updateProductMutation = useMutation({
     mutationFn: async (updatedProductData: Product) => {
-      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
+      if (!organizationId) {
+        throw new Error("Organization ID not available."); // Lança erro se organizationId não estiver disponível
+      }
       const { data, error } = await supabase
         .from('products')
         .update({
@@ -136,7 +140,9 @@ const Products = () => {
   // Delete product mutation
   const deleteProductMutation = useMutation({
     mutationFn: async (productId: string) => {
-      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
+      if (!organizationId) {
+        throw new Error("Organization ID not available."); // Lança erro se organizationId não estiver disponível
+      }
       const { error } = await supabase
         .from('products')
         .delete()
