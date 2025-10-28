@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText } from "lucide-react"; // Importar ArrowRight e FileText
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText, Pill } from "lucide-react"; // Importar ArrowRight, FileText e Pill
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -762,7 +762,24 @@ const Appointments = () => {
                               : "N/A"}
                           </TableCell>
                           <TableCell>{duration}</TableCell>
-                          <TableCell>{appointment.prescriptions_count || 0}</TableCell> {/* NOVO: Exibe a contagem de prescrições */}
+                          <TableCell>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
+                                  showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
+                                } else {
+                                  showError("Nenhuma prescrição encontrada para esta consulta.");
+                                }
+                              }}
+                              className="flex items-center justify-center gap-1"
+                            >
+                              <Pill className="h-4 w-4" />
+                              <span>{appointment.prescriptions_count || 0}</span>
+                            </Button>
+                          </TableCell> {/* NOVO: Exibe a contagem de prescrições */}
                         </>
                       )}
                       <TableCell className="text-right">
@@ -814,7 +831,7 @@ const Appointments = () => {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={activeTab === "em-andamento" ? 7 : (activeTab === "finalizadas" ? 9 : 5)} className="h-24 text-center"> {/* Ajustado colspan */}
+                  <TableCell colSpan={activeTab === "em-andamento" ? 7 : (activeTab === "finalizadas" ? 10 : 5)} className="h-24 text-center"> {/* Ajustado colspan */}
                     Nenhuma consulta encontrada.
                   </TableCell>
                 </TableRow>
