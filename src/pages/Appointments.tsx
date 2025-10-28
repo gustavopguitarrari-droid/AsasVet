@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText, Pill, Horse, Cow } from "lucide-react"; // Importar ArrowRight, FileText e Pill, Horse, Cow
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText, Pill } from "lucide-react"; // Importar ArrowRight, FileText e Pill
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -86,8 +86,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
-  Equino: Horse, // Adicionado Equino
-  Bovino: Cow,   // Adicionado Bovino
+  Equino: MoreHorizontal, // Usando MoreHorizontal como fallback
+  Bovino: MoreHorizontal, // Usando MoreHorizontal como fallback
   Outros: MoreHorizontal,
 };
 
@@ -991,8 +991,8 @@ const Appointments = () => {
           isOpen={isDetailsDialogOpen}
           onClose={() => setIsDetailsDialogOpen(false)}
           onUpdate={handleUpdateAppointment}
-          onCancel={handleCancelAppointment}
-          onStart={handleStartAppointment}
+          onCancelAppointment={handleCancelAppointment}
+          onStartAppointment={handleStartAppointment}
         />
 
         <AppointmentHistoryDialog
@@ -1010,7 +1010,6 @@ const Appointments = () => {
           pdfBlob={pdfBlob}
           filename={pdfFilename}
           onConfirmDownload={handleConfirmPdfDownload}
-          downloadUrl={pdfAppointment?.id ? `/api/download-medical-record/${pdfAppointment.id}` : undefined} // Exemplo de URL de download
         />
 
         <PdfPreviewDialog
@@ -1020,7 +1019,6 @@ const Appointments = () => {
           pdfUrl={recipePdfUrl} // Passa a URL direta se disponível
           filename={recipePdfFilename}
           onConfirmDownload={handleConfirmRecipePdfDownload}
-          downloadUrl={recipePdfUrl || undefined} // Usa a URL direta para download
         />
       </div>
     </>

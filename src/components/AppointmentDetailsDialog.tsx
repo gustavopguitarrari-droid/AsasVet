@@ -41,6 +41,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
+  Equino: MoreHorizontal, // Usando MoreHorizontal como fallback
+  Bovino: MoreHorizontal, // Usando MoreHorizontal como fallback
   Outros: MoreHorizontal,
 };
 

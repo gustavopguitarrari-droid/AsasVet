@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, Dog, Camera, XCircle, Upload, Search, User, Horse, Cow } from "lucide-react"; // Adicionado Horse e Cow
+import { PlusCircle, Dog, Camera, XCircle, Upload, Search, User, MoreHorizontal } from "lucide-react"; // Removido Horse e Cow, adicionado MoreHorizontal
 
 import { Button } from "@/components/ui/button";
 import {
