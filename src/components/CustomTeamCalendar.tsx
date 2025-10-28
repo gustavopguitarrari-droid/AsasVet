@@ -139,20 +139,22 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
 
   return (
     <div className="w-full max-w-full overflow-x-auto">
-      <div className="rounded-md border p-4 bg-background shadow-sm relative"> {/* Adicionado 'relative' aqui */}
-        <div className="flex justify-between items-center p-2 mb-4">
-          <Button variant="ghost" size="icon" onClick={goToPreviousMonth}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <h2 className="text-lg font-semibold">
-            {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
-          </h2>
-          <Button variant="ghost" size="icon" onClick={goToNextMonth}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+      <div className="rounded-md border p-4 bg-background shadow-sm relative">
+        <div className="flex justify-center items-center p-2 mb-4"> {/* Centralizado o conteúdo */}
+          <div className="flex items-center space-x-2"> {/* Novo div para agrupar setas e mês/ano */}
+            <Button variant="ghost" size="icon" onClick={goToPreviousMonth}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <h2 className="text-lg font-semibold">
+              {format(currentMonth, "MMMM yyyy", { locale: ptBR })}
+            </h2>
+            <Button variant="ghost" size="icon" onClick={goToNextMonth}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
-        {/* Botão de Limpar Escala movido para aqui */}
+        {/* Botão de Limpar Escala */}
         <AlertDialog>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" size="sm" className="absolute top-4 right-4 flex items-center">
@@ -196,7 +198,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
                 key={dayKey}
                 variant="ghost"
                 className={cn(
-                  "h-24 w-full flex flex-col p-1 text-sm font-normal relative", // Removido items-center justify-start
+                  "h-24 w-full flex flex-col p-1 text-sm font-normal relative",
                   "hover:bg-accent hover:text-accent-foreground",
                   isCurrentDay && "bg-accent text-accent-foreground",
                   isSelected && "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",
@@ -205,7 +207,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
                 onClick={() => handleDayClick(day)}
               >
                 <span className="absolute top-2 right-2 font-bold">{format(day, "d")}</span>
-                <div className="flex flex-wrap justify-center gap-0.5 mt-auto mb-1"> {/* Adicionado mt-auto para empurrar os badges para baixo */}
+                <div className="flex flex-wrap justify-center gap-0.5 mt-auto mb-1">
                   {vetsOnDuty.map((vetName, index) => (
                     <Badge key={index} variant="secondary" className="text-[0.6rem] h-auto px-1 py-0.5 leading-none">
                       {vetName}
@@ -217,8 +219,6 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
           })}
         </div>
       </div>
-
-      {/* O div com o botão de limpar escala foi removido daqui */}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
