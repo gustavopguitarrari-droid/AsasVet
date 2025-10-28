@@ -815,42 +815,41 @@ const Cadastro = () => {
         </TabsContent>
 
         <TabsContent value="animais" className="mt-4">
-          <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
+          <div className="flex flex-col md:flex-row items-center justify-between flex-wrap gap-4 mb-4">
             <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
-          </div>
-
-          <div className="flex items-center space-x-2 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Buscar animais por nome, raça ou tutor..."
-                className="pl-9"
-                value={petSearchTerm}
-                onChange={(e) => setPetSearchTerm(e.target.value)}
-              />
-            </div>
-            <Dialog open={isAddPetDialogOpen} onOpenChange={setIsAddPetDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="font-bold" disabled={clients.length === 0}>
-                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>
-                    {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
-                  </DialogTitle>
-                </DialogHeader>
-                <PetForm
-                  key={isAddPetDialogOpen ? "open" : "closed"}
-                  onSubmit={handleAddPet}
-                  onCancel={() => setIsAddPetDialogOpen(false)}
-                  allClients={clients}
-                  defaultOwnerId={defaultOwnerIdForPet}
-                  defaultOwnerName={defaultOwnerNameForPet}
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar animais por nome, raça ou tutor..."
+                  className="pl-9 w-64"
+                  value={petSearchTerm}
+                  onChange={(e) => setPetSearchTerm(e.target.value)}
                 />
-              </DialogContent>
-            </Dialog>
+              </div>
+              <Dialog open={isAddPetDialogOpen} onOpenChange={setIsAddPetDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="font-bold" disabled={clients.length === 0}>
+                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                  <DialogHeader>
+                    <DialogTitle>
+                      {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <PetForm
+                    key={isAddPetDialogOpen ? "open" : "closed"}
+                    onSubmit={handleAddPet}
+                    onCancel={() => setIsAddPetDialogOpen(false)}
+                    allClients={clients}
+                    defaultOwnerId={defaultOwnerIdForPet}
+                    defaultOwnerName={defaultOwnerNameForPet}
+                  />
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
 
           <div className="rounded-md border">
