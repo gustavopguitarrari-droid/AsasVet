@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import *s z from "zod";
+import * as z from "zod"; // Corrigido de '*s z' para '* as z'
 import { format, isValid, addDays, parseISO, isEqual, isAfter, isBefore } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Plus, Trash2, Syringe, Utensils, Eye, FlaskConical } from "lucide-react";
