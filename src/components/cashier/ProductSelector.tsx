@@ -10,26 +10,15 @@ import { cn } from "@/lib/utils";
 
 interface ProductSelectorProps {
   onAddProduct: (product: Product, quantity: number) => void;
+  products: Product[]; // Agora recebe produtos como prop
+  isLoadingProducts: boolean; // Novo: estado de carregamento
 }
 
-const mockProducts: Product[] = [
-  { id: "PROD001", name: "Consulta Geral", price: 150.00, category: "Serviço" },
-  { id: "PROD002", name: "Vacina V8", price: 120.00, category: "Serviço" },
-  { id: "PROD003", name: "Ração Premium 1kg", price: 85.50, category: "Produto" },
-  { id: "PROD004", name: "Shampoo Hipoalergênico", price: 45.00, category: "Produto" },
-  { id: "PROD005", name: "Exame de Sangue Completo", price: 200.00, category: "Serviço" },
-  { id: "PROD006", name: "Brinquedo Mordedor", price: 30.00, category: "Produto" },
-  { id: "PROD007", name: "Anti-pulgas (Pequeno)", price: 70.00, category: "Produto" },
-  { id: "PROD008", name: "Castração (Cão)", price: 600.00, category: "Serviço" },
-  { id: "PROD009", name: "Hospedagem Diária", price: 50.00, category: "Serviço" },
-  { id: "PROD010", name: "Coleira Anti-latido", price: 110.00, category: "Produto" },
-];
-
-const ProductSelector: React.FC<ProductSelectorProps> = ({ onAddProduct }) => {
+const ProductSelector: React.FC<ProductSelectorProps> = ({ onAddProduct, products, isLoadingProducts }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [quantityInput, setQuantityInput] = useState<{ [key: string]: number }>({});
 
-  const filteredProducts = mockProducts.filter((product) =>
+  const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     product.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -60,7 +49,9 @@ const ProductSelector: React.FC<ProductSelectorProps> = ({ onAddProduct }) => {
         />
       </div>
       <ScrollArea className="h-[300px] rounded-md border p-4">
-        {filteredProducts.length === 0 ? (
+        {isLoadingProducts ? (
+          <p className="text-center text-muted-foreground">Carregando produtos...</p>
+        ) : filteredProducts.length === 0 ? (
           <p className="text-center text-muted-foreground">Nenhum produto ou serviço encontrado.</p>
         ) : (
           <div className="space-y-2">

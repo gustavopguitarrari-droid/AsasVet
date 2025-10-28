@@ -9,31 +9,154 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, DollarSign, ShoppingCart, History } from "lucide-react";
+import { PlusCircle, Search, DollarSign, ShoppingCart, History, Package } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { format, isToday, parseISO } from "date-fns";
 
 import ProductSelector from "@/components/cashier/ProductSelector";
-import SalePanel from "@/components/cashier/SalePanel"; // Importa o novo SalePanel
+import SalePanel from "@/components/cashier/SalePanel";
+import AddProductDialog, { AddProductFormValues } from "@/components/cashier/AddProductDialog"; // Importar o novo diálogo
 import { Product, SaleItem, Transaction } from "@/types/cashier";
-import { showSuccess } from "@/utils/toast";
-import { cn } from "@/lib/utils"; // Importar cn para classes condicionais
-
-const initialMockCaixa: Transaction[] = [
-  { id: "CX001", description: "Pagamento Consulta Rex", type: "Entrada", amount: 150.00, date: "2024-10-26", time: "10:15" },
-  { id: "CX002", description: "Pagamento Vacina Miau", type: "Entrada", amount: 120.00, date: "2024-10-26", time: "14:45" },
-  { id: "CX003", description: "Retirada para suprimentos", type: "Saída", amount: 200.00, date: "2024-10-25", time: "11:00" },
-  { id: "CX004", description: "Pagamento Consulta Dory", type: "Entrada", amount: 80.00, date: format(new Date(), "yyyy-MM-dd"), time: "09:00" },
-  { id: "CX005", description: "Compra de ração", type: "Saída", amount: 100.00, date: format(new Date(), "yyyy-MM-dd"), time: "12:30" },
-];
+import { showSuccess, showError } from "@/utils/toast";
+import { cn } from "@/lib/utils";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@/context/UserContext";
 
 const Caixa = () => {
-  const [transactions, setTransactions] = React.useState<Transaction[]>(initialMockCaixa);
+  const queryClient = useQueryClient();
+  const { user: appUser } = useUser();
+  const userId = appUser?.id;
+
   const [currentSaleItems, setCurrentSaleItems] = React.useState<SaleItem[]>([]);
   const [activeTab, setActiveTab] = React.useState<string>("nova-venda");
   const [historySearchTerm, setHistorySearchTerm] = React.useState<string>("");
+  const [isAddProductDialogOpen, setIsAddProductDialogOpen] = React.useState(false);
+
+  // --- Queries ---
+  const { data: products = [], isLoading: isLoadingProducts, error: productsError } = useQuery<Product[]>({
+    queryKey: ['products', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('products')
+        .select('*')
+        .eq('user_id', userId);
+      if (error) throw error;
+      return data as Product[];
+    },
+    enabled: !!userId,
+  });
+
+  const { data: transactions = [], isLoading: isLoadingTransactions, error: transactionsError } = useQuery<Transaction[]>({
+    queryKey: ['transactions', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('transactions')
+        .select(`
+          *,
+          sale_items (
+            id, product_id, name, price, quantity, total
+          )
+        `)
+        .eq('user_id', userId);
+      if (error) throw error;
+      return data.map(dbTransaction => ({
+        id: dbTransaction.id,
+        description: dbTransaction.description,
+        type: dbTransaction.type as "Entrada" | "Saída",
+        amount: dbTransaction.amount,
+        date: dbTransaction.date,
+        time: dbTransaction.time,
+        items: dbTransaction.sale_items || [],
+        paymentMethod: dbTransaction.payment_method || undefined,
+      })) as Transaction[];
+    },
+    enabled: !!userId,
+  });
+
+  // --- Mutations ---
+  const addProductMutation = useMutation({
+    mutationFn: async (newProductData: AddProductFormValues) => {
+      if (!userId) throw new Error("User not authenticated.");
+      const { data, error } = await supabase
+        .from('products')
+        .insert({
+          user_id: userId,
+          name: newProductData.name,
+          price: newProductData.price,
+          category: newProductData.category,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products', userId] });
+      showSuccess("Item adicionado ao catálogo com sucesso!");
+      setIsAddProductDialogOpen(false);
+    },
+    onError: (err) => {
+      showError(`Erro ao adicionar item: ${err.message}`);
+    },
+  });
+
+  const addTransactionMutation = useMutation({
+    mutationFn: async (newTransaction: { transaction: Omit<Transaction, 'id' | 'created_at' | 'items'>; items: SaleItem[] }) => {
+      if (!userId) throw new Error("User not authenticated.");
+
+      const { data: insertedTransaction, error: transactionError } = await supabase
+        .from('transactions')
+        .insert({
+          user_id: userId,
+          description: newTransaction.transaction.description,
+          type: newTransaction.transaction.type,
+          amount: newTransaction.transaction.amount,
+          date: newTransaction.transaction.date,
+          time: newTransaction.transaction.time,
+          payment_method: newTransaction.transaction.paymentMethod,
+        })
+        .select('id')
+        .single();
+
+      if (transactionError || !insertedTransaction) {
+        throw transactionError || new Error("Failed to create transaction.");
+      }
+
+      if (newTransaction.items.length > 0) {
+        const saleItemsPayload = newTransaction.items.map(item => ({
+          transaction_id: insertedTransaction.id,
+          product_id: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          total: item.total,
+        }));
+        const { error: saleItemsError } = await supabase
+          .from('sale_items')
+          .insert(saleItemsPayload);
+        if (saleItemsError) {
+          // Optionally, roll back the transaction if sale items fail
+          await supabase.from('transactions').delete().eq('id', insertedTransaction.id);
+          throw saleItemsError;
+        }
+      }
+      return insertedTransaction;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions', userId] });
+      showSuccess("Venda finalizada com sucesso!");
+      setCurrentSaleItems([]); // Clear the cart
+      setActiveTab("historico"); // Optionally switch to history tab
+    },
+    onError: (err) => {
+      showError(`Erro ao finalizar venda: ${err.message}`);
+    },
+  });
 
   const handleAddItemToSale = (product: Product, quantity: number) => {
     setCurrentSaleItems((prevItems) => {
@@ -69,25 +192,21 @@ const Caixa = () => {
 
   const handleFinalizeSale = (paymentMethod: string) => {
     if (currentSaleItems.length === 0) {
-      return; // Should be prevented by PaymentSection, but good to have
+      showError("Adicione itens à venda antes de finalizar.");
+      return;
     }
 
     const totalAmount = currentSaleItems.reduce((sum, item) => sum + item.total, 0);
-    const newTransaction: Transaction = {
-      id: `CX${(transactions.length + 1).toString().padStart(3, '0')}`,
-      description: `Venda de ${currentSaleItems.length} itens`,
+    const newTransaction: Omit<Transaction, 'id' | 'created_at' | 'items'> = {
+      description: `Venda de ${currentSaleItems.length} item(s)`,
       type: "Entrada",
       amount: totalAmount,
       date: format(new Date(), "yyyy-MM-dd"),
       time: format(new Date(), "HH:mm"),
-      items: currentSaleItems,
       paymentMethod,
     };
 
-    setTransactions((prev) => [...prev, newTransaction]);
-    setCurrentSaleItems([]); // Clear the cart
-    showSuccess("Venda finalizada com sucesso!");
-    setActiveTab("historico"); // Optionally switch to history tab
+    addTransactionMutation.mutate({ transaction: newTransaction, items: currentSaleItems });
   };
 
   const handleCancelSale = () => {
@@ -122,14 +241,28 @@ const Caixa = () => {
     (transaction.items && transaction.items.some(item => item.name.toLowerCase().includes(historySearchTerm.toLowerCase())))
   );
 
+  if (isLoadingProducts || isLoadingTransactions) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <p className="text-muted-foreground">Carregando dados do caixa...</p>
+      </div>
+    );
+  }
+
+  if (productsError || transactionsError) {
+    return (
+      <div className="flex items-center justify-center h-full text-destructive">
+        <p>Erro ao carregar dados: {productsError?.message || transactionsError?.message}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      {/* O título "Caixa" foi removido daqui */}
-
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         <Card className={cn("text-white shadow-md", totalBalance >= 0 ? "bg-green-700" : "bg-red-700")}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-            <CardTitle className="text-xs font-medium">Lucro bruto Diário</CardTitle> {/* Título alterado aqui */}
+            <CardTitle className="text-xs font-medium">Lucro bruto Diário</CardTitle>
             <DollarSign className="h-4 w-4 text-white" />
           </CardHeader>
           <CardContent className="p-3 pt-0">
@@ -170,8 +303,27 @@ const Caixa = () => {
         </TabsList>
 
         <TabsContent value="nova-venda" className="mt-4">
+          <div className="flex justify-end mb-4">
+            <Dialog open={isAddProductDialogOpen} onOpenChange={setIsAddProductDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="font-bold">
+                  <Package className="mr-2 h-4 w-4" /> Adicionar Produto/Serviço
+                </Button>
+              </DialogTrigger>
+              <AddProductDialog
+                isOpen={isAddProductDialogOpen}
+                onClose={() => setIsAddProductDialogOpen(false)}
+                onSubmit={addProductMutation.mutate}
+                isSubmitting={addProductMutation.isPending}
+              />
+            </Dialog>
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <ProductSelector onAddProduct={handleAddItemToSale} />
+            <ProductSelector
+              onAddProduct={handleAddItemToSale}
+              products={products}
+              isLoadingProducts={isLoadingProducts}
+            />
             <SalePanel
               items={currentSaleItems}
               onUpdateQuantity={handleUpdateItemQuantity}
