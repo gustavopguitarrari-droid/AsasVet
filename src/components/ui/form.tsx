@@ -31,7 +31,7 @@ export function FormField<
 ) {
   return (
     <FormFieldContext.Provider value={{ name: props.name }}>
-      <Controller<TFieldValues, TName> {...props} />
+      <Controller {...props} />
     </FormFieldContext.Provider>
   );
 }
