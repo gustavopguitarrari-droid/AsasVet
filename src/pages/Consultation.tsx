@@ -204,17 +204,56 @@ const ConsultationPage: React.FC = () => {
         veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
       };
 
+      // Determine the medical record ID to use (either existing or new)
+      let currentMedicalRecordId = medicalRecord?.id;
+
+      // If no medical record exists, create a minimal one first
+      if (!currentMedicalRecordId) {
+        console.log("No existing medical record found, creating a new one for recipe PDF.");
+        const { data: newRecord, error: insertRecordError } = await supabase
+          .from('medical_records')
+          .insert({
+            user_id: userId,
+            appointment_id: appointmentId,
+            // Other fields can be null initially, they will be filled by saveMedicalRecordMutation
+            anamnesis: null,
+            physical_exam: null,
+            diagnosis: null,
+            treatment: null,
+            prescriptions: null,
+          })
+          .select('id')
+          .single();
+
+        if (insertRecordError || !newRecord) {
+          throw insertRecordError || new Error("Failed to create a new medical record for recipe PDF.");
+        }
+        currentMedicalRecordId = newRecord.id;
+        // Invalidate the medicalRecord query so the next fetch gets the new record
+        queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
+      }
+
+      // Fetch the current recipe_pdf_url for the determined medical record ID
+      const { data: existingRecipePdfUrlData, error: fetchPdfUrlError } = await supabase
+        .from('medical_records')
+        .select('recipe_pdf_url')
+        .eq('id', currentMedicalRecordId)
+        .single();
+
+      if (fetchPdfUrlError) {
+        console.warn("Failed to fetch existing recipe_pdf_url for medical record ID:", currentMedicalRecordId, fetchPdfUrlError);
+        // Continue without deleting if fetch fails
+      } else if (existingRecipePdfUrlData?.recipe_pdf_url) {
+        console.log("Existing recipe PDF found, attempting to delete:", existingRecipePdfUrlData.recipe_pdf_url);
+        await deleteRecipePdfFromSupabase(existingRecipePdfUrlData.recipe_pdf_url);
+      }
+
       const pdfBlob = await generatePrescriptionPdf({
         appointment,
         prescriptions,
         logoUrl: appUser?.logoUrl,
         clinicDetails,
       });
-
-      // Delete old PDF if exists
-      if (medicalRecord?.recipe_pdf_url) {
-        await deleteRecipePdfFromSupabase(medicalRecord.recipe_pdf_url);
-      }
 
       const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, userId, appointmentId);
 
@@ -223,8 +262,8 @@ const ConsultationPage: React.FC = () => {
       // Update medical record with new PDF URL
       const { data, error } = await supabase
         .from('medical_records')
-        .update({ recipe_pdf_url: newPdfUrl })
-        .eq('id', medicalRecord?.id || '') // Use existing medicalRecord ID or throw error if not found
+        .update({ recipe_pdf_url: newPdfUrl, prescriptions: prescriptions }) // Also update prescriptions here
+        .eq('id', currentMedicalRecordId) // Use the determined ID
         .eq('user_id', userId)
         .select()
         .single();
