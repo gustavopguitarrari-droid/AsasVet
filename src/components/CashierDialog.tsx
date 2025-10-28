@@ -11,16 +11,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, DollarSign, ShoppingCart, History, Package, X, User, PawPrint } from "lucide-react";
+import { PlusCircle, Search, DollarSign, ShoppingCart, History, Package, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter as OriginalDialogFooter } from "@/components/ui/dialog";
+  Sheet, // Alterado de Dialog para Sheet
+  SheetContent, // Alterado de DialogContent para SheetContent
+  SheetHeader, // Alterado de DialogHeader para SheetHeader
+  SheetTitle, // Alterado de DialogTitle para SheetTitle
+  SheetFooter, // Alterado de DialogFooter para SheetFooter
+} from "@/components/ui/sheet"; // Importar Sheet
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter as OriginalDialogFooter } from "@/components/ui/dialog"; // Manter Dialog para o AddProductDialog
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { format, isToday, parseISO } from "date-fns";
 
@@ -33,19 +33,6 @@ import { cn } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
-import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
-
-// NOVO: Interface para AnimalDebit
-interface AnimalDebit {
-  id: string;
-  pet_id: string;
-  description: string;
-  amount: number;
-  is_paid: boolean;
-  transaction_id: string | null;
-  created_at: string;
-  pet_name?: string; // Adicionado para exibição
-}
 
 interface CashierDialogProps {
   isOpen: boolean;
@@ -61,11 +48,6 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
   const [activeTab, setActiveTab] = React.useState<string>("nova-venda");
   const [historySearchTerm, setHistorySearchTerm] = React.useState<string>("");
   const [isAddProductDialogOpen, setIsAddProductDialogOpen] = React.useState(false);
-
-  // NOVO: Estados para busca de CPF e débitos
-  const [cpfInput, setCpfInput] = React.useState<string>("");
-  const [foundClient, setFoundClient] = React.useState<Client | null>(null);
-  const [unpaidDebits, setUnpaidDebits] = React.useState<AnimalDebit[]>([]);
 
   // --- Queries ---
   const { data: products = [], isLoading: isLoadingProducts, error: productsError } = useQuery<Product[]>({
@@ -106,81 +88,6 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
         items: dbTransaction.sale_items || [],
         paymentMethod: dbTransaction.payment_method || undefined,
       })) as Transaction[];
-    },
-    enabled: !!userId,
-  });
-
-  // NOVO: Query para buscar clientes
-  const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
-    queryKey: ['cashierClients', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-      const { data, error } = await supabase
-        .from('clients')
-        .select('*')
-        .eq('user_id', userId);
-      if (error) throw error;
-      return data.map(dbClient => ({
-        id: dbClient.id,
-        name: dbClient.name,
-        email: dbClient.email,
-        phone: dbClient.phone,
-        cpf: dbClient.cpf,
-        dateOfBirth: dbClient.date_of_birth,
-        address: {
-          cep: dbClient.address_cep || '',
-          street: dbClient.address_street || '',
-          number: dbClient.address_number || '',
-          complement: dbClient.address_complement || undefined,
-          neighborhood: dbClient.address_neighborhood || '',
-          city: dbClient.address_city || '',
-          state: dbClient.address_state || '',
-        },
-        observations: dbClient.observations || undefined,
-        photoUrl: dbClient.photo_url || undefined,
-      }));
-    },
-    enabled: !!userId,
-  });
-
-  // NOVO: Query para buscar pets
-  const { data: pets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
-    queryKey: ['cashierPets', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-      const { data, error } = await supabase
-        .from('pets')
-        .select('*');
-      if (error) throw error;
-      return data.map(dbPet => ({
-        id: dbPet.id,
-        name: dbPet.name,
-        species: dbPet.species,
-        breed: dbPet.breed,
-        age: dbPet.age,
-        gender: dbPet.gender,
-        color: dbPet.color,
-        weight: dbPet.weight || undefined,
-        observations: dbPet.observations || undefined,
-        photoUrl: dbPet.photo_url || undefined,
-        ownerId: dbPet.owner_id,
-      }));
-    },
-    enabled: !!userId,
-  });
-
-  // NOVO: Query para buscar débitos de animais
-  const { data: animalDebits = [], isLoading: isLoadingAnimalDebits, error: animalDebitsError, refetch: refetchAnimalDebits } = useQuery<AnimalDebit[]>({
-    queryKey: ['animalDebits', userId],
-    queryFn: async () => {
-      if (!userId) return [];
-      const { data, error } = await supabase
-        .from('animal_debits')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('is_paid', false); // Apenas débitos não pagos
-      if (error) throw error;
-      return data as AnimalDebit[];
     },
     enabled: !!userId,
   });
@@ -251,34 +158,13 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
           await supabase.from('transactions').delete().eq('id', insertedTransaction.id);
           throw saleItemsError;
         }
-
-        // NOVO: Atualizar débitos de animais como pagos
-        const debitIdsToUpdate = newTransaction.items
-          .filter(item => item.debitId)
-          .map(item => item.debitId);
-
-        if (debitIdsToUpdate.length > 0) {
-          const { error: updateDebitsError } = await supabase
-            .from('animal_debits')
-            .update({ is_paid: true, transaction_id: insertedTransaction.id })
-            .in('id', debitIdsToUpdate)
-            .eq('user_id', userId); // Garantir que apenas os débitos do usuário sejam atualizados
-          if (updateDebitsError) {
-            console.error("Erro ao atualizar débitos de animais:", updateDebitsError);
-            // Não lançar erro fatal aqui, pois a transação principal já foi criada
-          }
-        }
       }
       return insertedTransaction;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions', userId] });
-      queryClient.invalidateQueries({ queryKey: ['animalDebits', userId] }); // Invalidar débitos para refletir pagamentos
       showSuccess("Venda finalizada com sucesso!");
       setCurrentSaleItems([]); // Clear the cart
-      setFoundClient(null); // Limpar cliente encontrado
-      setUnpaidDebits([]); // Limpar débitos exibidos
-      setCpfInput(""); // Limpar input de CPF
       setActiveTab("historico"); // Optionally switch to history tab
     },
     onError: (err) => {
@@ -286,17 +172,17 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
     },
   });
 
-  const handleAddItemToSale = (product: Product, quantity: number, debitId?: string) => {
+  const handleAddItemToSale = (product: Product, quantity: number) => {
     setCurrentSaleItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.productId === product.id && item.debitId === debitId);
+      const existingItem = prevItems.find((item) => item.productId === product.id);
       if (existingItem) {
         return prevItems.map((item) =>
-          item.productId === product.id && item.debitId === debitId
+          item.productId === product.id
             ? { ...item, quantity: item.quantity + quantity, total: (item.quantity + quantity) * product.price }
             : item
         );
       } else {
-        return [...prevItems, { productId: product.id, name: product.name, price: product.price, quantity, total: quantity * product.price, debitId }];
+        return [...prevItems, { productId: product.id, name: product.name, price: product.price, quantity, total: quantity * product.price }];
       }
     });
   };
@@ -339,9 +225,6 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
 
   const handleCancelSale = () => {
     setCurrentSaleItems([]);
-    setFoundClient(null);
-    setUnpaidDebits([]);
-    setCpfInput("");
     showSuccess("Venda cancelada.");
   };
 
@@ -372,63 +255,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
     (transaction.items && transaction.items.some(item => item.name.toLowerCase().includes(historySearchTerm.toLowerCase())))
   );
 
-  // NOVO: Lógica de busca por CPF e carregamento de débitos
-  const handleSearchCpf = async () => {
-    if (!userId) {
-      showError("Usuário não autenticado.");
-      return;
-    }
-    const cleanCpf = cpfInput.replace(/\D/g, '');
-    if (cleanCpf.length !== 11) {
-      showError("CPF inválido. Digite 11 dígitos.");
-      setFoundClient(null);
-      setUnpaidDebits([]);
-      return;
-    }
-
-    const client = clients.find(c => c.cpf.replace(/\D/g, '') === cleanCpf);
-
-    if (client) {
-      setFoundClient(client);
-      showSuccess(`Tutor ${client.name} encontrado!`);
-
-      const clientPets = pets.filter(p => p.ownerId === client.id);
-      const clientPetIds = clientPets.map(p => p.id);
-
-      // Filtrar débitos em aberto para os pets encontrados
-      const debitsForClientPets = animalDebits
-        .filter(debit => clientPetIds.includes(debit.pet_id))
-        .map(debit => ({
-          ...debit,
-          pet_name: clientPets.find(p => p.id === debit.pet_id)?.name || "Animal Desconhecido"
-        }));
-      setUnpaidDebits(debitsForClientPets);
-    } else {
-      showError("Tutor não encontrado com este CPF.");
-      setFoundClient(null);
-      setUnpaidDebits([]);
-    }
-  };
-
-  const handleAddDebitToSale = (debit: AnimalDebit) => {
-    // Verificar se o débito já está no carrinho
-    const alreadyInCart = currentSaleItems.some(item => item.debitId === debit.id);
-    if (alreadyInCart) {
-      showError("Este débito já foi adicionado ao carrinho.");
-      return;
-    }
-
-    const product: Product = {
-      id: `debit-${debit.id}`, // ID único para o item de débito
-      name: `${debit.description} (Animal: ${debit.pet_name})`,
-      price: debit.amount,
-      category: "Débito",
-    };
-    handleAddItemToSale(product, 1, debit.id); // Adicionar com quantity 1 e o debitId
-    showSuccess(`Débito de ${debit.description} adicionado à venda.`);
-  };
-
-  if (isLoadingProducts || isLoadingTransactions || isLoadingClients || isLoadingPets || isLoadingAnimalDebits) {
+  if (isLoadingProducts || isLoadingTransactions) {
     return (
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent side="right" className="w-full md:w-[700px] lg:w-[900px] flex flex-col">
@@ -445,7 +272,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
     );
   }
 
-  if (productsError || transactionsError || clientsError || petsError || animalDebitsError) {
+  if (productsError || transactionsError) {
     return (
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent side="right" className="w-full md:w-[700px] lg:w-[900px] flex flex-col">
@@ -455,7 +282,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
             </SheetTitle>
           </SheetHeader>
           <div className="flex items-center justify-center h-full text-destructive">
-            <p>Erro ao carregar dados: {productsError?.message || transactionsError?.message || clientsError?.message || petsError?.message || animalDebitsError?.message}</p>
+            <p>Erro ao carregar dados: {productsError?.message || transactionsError?.message}</p>
           </div>
         </SheetContent>
       </Sheet>
@@ -470,7 +297,43 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
             <ShoppingCart className="h-5 w-5 mr-2" /> Caixa
           </SheetTitle>
         </SheetHeader>
-        <div className="space-y-6 flex-1 overflow-y-auto p-4">
+        <div className="space-y-6 flex-1 overflow-y-auto p-4"> {/* Adicionado p-4 para padding interno */}
+          {/* Removidos os cards de lucro bruto, entradas e saídas */}
+          {/*
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card className={cn("text-white shadow-md", totalBalance >= 0 ? "bg-green-700" : "bg-red-700")}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+                <CardTitle className="text-xs font-medium">Lucro bruto Diário</CardTitle>
+                <DollarSign className="h-4 w-4 text-white" />
+              </CardHeader>
+              <CardContent className="p-3 pt-0">
+                <div className="text-xl font-bold">R$ {totalBalance.toFixed(2).replace('.', ',')}</div>
+                <p className="text-xs text-white/80">Total de entradas menos saídas do dia</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+                <CardTitle className="text-xs font-medium">Entradas Hoje</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="p-3 pt-0">
+                <div className="text-xl font-bold">R$ {entriesToday.toFixed(2).replace('.', ',')}</div>
+                <p className="text-xs text-muted-foreground">{transactionsToday.filter(t => t.type === "Entrada").length} transações</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
+                <CardTitle className="text-xs font-medium">Saídas Hoje</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="p-3 pt-0">
+                <div className="text-xl font-bold">R$ {exitsToday.toFixed(2).replace('.', ',')}</div>
+                <p className="text-xs text-muted-foreground">{transactionsToday.filter(t => t.type === "Saída").length} transações</p>
+              </CardContent>
+            </Card>
+          </div>
+          */}
+
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 h-auto p-1">
               <TabsTrigger value="nova-venda" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">
@@ -497,62 +360,6 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
                   />
                 </Dialog>
               </div>
-
-              {/* NOVO: Seção de Busca por CPF e Débitos em Aberto */}
-              <Card className="mb-6">
-                <CardHeader>
-                  <CardTitle className="flex items-center text-lg">
-                    <User className="h-5 w-5 mr-2" /> Buscar Débitos por Tutor
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex space-x-2">
-                    <Input
-                      placeholder="CPF do Tutor (somente números)"
-                      value={cpfInput}
-                      onChange={(e) => setCpfInput(e.target.value.replace(/\D/g, ''))}
-                      maxLength={11}
-                      className="flex-1"
-                    />
-                    <Button onClick={handleSearchCpf} disabled={!cpfInput || cpfInput.length !== 11}>
-                      <Search className="h-4 w-4 mr-2" /> Buscar
-                    </Button>
-                  </div>
-                  {foundClient && (
-                    <p className="text-sm text-muted-foreground">
-                      Tutor encontrado: <span className="font-semibold">{foundClient.name}</span>
-                    </p>
-                  )}
-
-                  {unpaidDebits.length > 0 && (
-                    <div className="space-y-2">
-                      <h4 className="font-semibold flex items-center">
-                        <DollarSign className="h-4 w-4 mr-2" /> Débitos em Aberto
-                      </h4>
-                      <div className="max-h-40 overflow-y-auto border rounded-md p-2">
-                        {unpaidDebits.map(debit => (
-                          <div key={debit.id} className="flex items-center justify-between p-2 border-b last:border-b-0">
-                            <div>
-                              <p className="font-medium">{debit.description}</p>
-                              <p className="text-sm text-muted-foreground">
-                                <PawPrint className="h-3 w-3 inline-block mr-1" /> {debit.pet_name} - R$ {debit.amount.toFixed(2).replace('.', ',')}
-                              </p>
-                            </div>
-                            <Button
-                              size="sm"
-                              onClick={() => handleAddDebitToSale(debit)}
-                              disabled={currentSaleItems.some(item => item.debitId === debit.id)}
-                            >
-                              <PlusCircle className="h-4 w-4 mr-2" /> Adicionar
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <ProductSelector
                   onAddProduct={handleAddItemToSale}
