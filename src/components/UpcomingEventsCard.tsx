@@ -2,15 +2,17 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, CheckCircle } from "lucide-react"; // Importar CheckCircle
 import { format, startOfWeek, endOfWeek, isWithinInterval, isSameDay, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { useQuery } from "@tanstack/react-query"; // Importar useQuery
-import { supabase } from "@/integrations/supabase/client"; // Importar supabase
-import { useUser } from "@/context/UserContext"; // Importar useUser
-import { CalendarEvent } from "@/components/EventCalendar"; // Importar a interface CalendarEvent
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; // Importar useMutation e useQueryClient
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@/context/UserContext";
+import { CalendarEvent } from "@/components/EventCalendar";
+import { Button } from "@/components/ui/button"; // Importar Button
+import { showSuccess, showError } from "@/utils/toast"; // Importar toasts
 
 // Mapeamento de cores para as categorias de eventos (já definido em globals.css)
 const categoryColorMap: Record<CalendarEvent["category"], string> = {
@@ -25,18 +27,19 @@ const categoryColorMap: Record<CalendarEvent["category"], string> = {
 const UpcomingEventsCard: React.FC = () => {
   const { user: appUser } = useUser();
   const userId = appUser?.id;
+  const queryClient = useQueryClient(); // Inicializar queryClient
 
   // Query para buscar eventos do Supabase
   const { data: events = [], isLoading, error } = useQuery<CalendarEvent[]>({
-    queryKey: ['upcomingEvents', userId], // Chave de query única
+    queryKey: ['upcomingEvents', userId],
     queryFn: async () => {
       if (!userId) return [];
       const { data, error } = await supabase
         .from('events')
         .select('*')
         .eq('user_id', userId)
-        .eq('status', 'Agendada') // Apenas eventos agendados
-        .gte('date', format(new Date(), 'yyyy-MM-dd')) // Apenas eventos a partir de hoje
+        .neq('status', 'Cancelada') // Excluir eventos cancelados
+        .gte('date', format(new Date(), 'yyyy-MM-dd'))
         .order('date', { ascending: true })
         .order('time', { ascending: true });
 
@@ -44,18 +47,45 @@ const UpcomingEventsCard: React.FC = () => {
         console.error("Erro ao buscar eventos para o card 'Próximos Eventos':", error);
         throw error;
       }
-      // Mapeia os dados do Supabase para o formato CalendarEvent
       return data.map(event => ({
         id: event.id,
         title: event.title,
-        date: parseISO(event.date), // Converte a string ISO para objeto Date
+        date: parseISO(event.date),
         time: event.time,
         category: event.category as CalendarEvent["category"],
         status: (event.status || "Agendada") as CalendarEvent["status"],
       }));
     },
-    enabled: !!userId, // Só executa a query se o userId estiver disponível
+    enabled: !!userId,
   });
+
+  // Mutação para atualizar o status do evento
+  const updateEventStatusMutation = useMutation({
+    mutationFn: async ({ eventId, newStatus }: { eventId: string; newStatus: CalendarEvent["status"] }) => {
+      if (!userId) throw new Error("User not authenticated.");
+      const { data, error } = await supabase
+        .from('events')
+        .update({ status: newStatus })
+        .eq('id', eventId)
+        .eq('user_id', userId)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['upcomingEvents', userId] }); // Invalida a query para refetch
+      queryClient.invalidateQueries({ queryKey: ['events', userId] }); // Invalida a query da agenda principal
+      showSuccess("Evento confirmado como realizado!");
+    },
+    onError: (err) => {
+      showError(`Erro ao confirmar evento: ${err.message}`);
+    },
+  });
+
+  const handleConfirmEvent = (eventId: string) => {
+    updateEventStatusMutation.mutate({ eventId, newStatus: "Realizada" });
+  };
 
   const today = new Date();
   const endOfCurrentWeek = endOfWeek(today, { locale: ptBR });
@@ -80,19 +110,44 @@ const UpcomingEventsCard: React.FC = () => {
     }
     return (
       <div className="space-y-3">
-        {eventsToRender.map((event) => (
-          <div key={event.id} className="flex items-center justify-between p-2 rounded-md border bg-card">
-            <div className="flex flex-col">
-              <p className="font-medium">{event.title}</p>
-              <p className="text-sm text-muted-foreground">
-                {format(event.date, "dd/MM", { locale: ptBR })} às {event.time}
-              </p>
+        {eventsToRender.map((event) => {
+          const isCompleted = event.status === "Realizada";
+          return (
+            <div
+              key={event.id}
+              className={cn(
+                "flex items-center justify-between p-2 rounded-md border bg-card",
+                isCompleted && "opacity-70" // Reduz a opacidade se o evento estiver completo
+              )}
+            >
+              <div className="flex flex-col">
+                <p className={cn("font-medium", isCompleted && "line-through text-muted-foreground")}>
+                  {event.title}
+                </p>
+                <p className={cn("text-sm text-muted-foreground", isCompleted && "line-through")}>
+                  {format(event.date, "dd/MM", { locale: ptBR })} às {event.time}
+                </p>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Badge className={cn("text-white", categoryColorMap[event.category])}>
+                  {event.category}
+                </Badge>
+                {!isCompleted && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-green-600 hover:bg-green-100"
+                    onClick={() => handleConfirmEvent(event.id)}
+                    disabled={updateEventStatusMutation.isPending}
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                    <span className="sr-only">Confirmar Evento</span>
+                  </Button>
+                )}
+              </div>
             </div>
-            <Badge className={cn("text-white", categoryColorMap[event.category])}>
-              {event.category}
-            </Badge>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   };

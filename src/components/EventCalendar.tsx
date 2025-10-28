@@ -16,7 +16,7 @@ export interface CalendarEvent {
   date: Date;
   time: string;
   category: "Consulta" | "Cirurgia" | "Vacina" | "Exame" | "Retorno" | "Outros";
-  status?: "Agendada" | "Cancelada"; // Adicionado status
+  status?: "Agendada" | "Cancelada" | "Realizada"; // Adicionado status "Realizada"
 }
 
 interface EventCalendarProps {
