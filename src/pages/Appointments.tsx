@@ -73,7 +73,7 @@ interface MedicalRecord {
   physical_exam?: string | null;
   diagnosis?: string | null;
   treatment?: string | null;
-  prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
+  prescriptions: { medication: string; dosage: string; frequency: string; instructions?: string }[]; // Alterado para array não nulo
   recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
   created_at: string;
   updated_at: string;
@@ -402,12 +402,17 @@ const Appointments = () => {
   // Mutation to fetch the medical record and generate the PDF
   const fetchAndGeneratePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
+      if (!userId) {
+        throw new Error("User not authenticated.");
+      }
+      const currentUserId: string = userId;
+
       // First, fetch the medical record
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
         .eq('appointment_id', appointment.id)
-        .eq('user_id', appointment.user_id)
+        .eq('user_id', currentUserId)
         .single();
 
       if (fetchError) {
@@ -462,6 +467,11 @@ const Appointments = () => {
   // NOVO: Mutação para buscar o prontuário médico e gerar o PDF da receita
   const fetchAndGenerateRecipePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
+      if (!userId) {
+        throw new Error("User not authenticated.");
+      }
+      const currentUserId: string = userId;
+
       console.log("Appointments: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url);
       // Se já existe uma URL de PDF de receita, use-a diretamente
       if (appointment.recipe_pdf_url) {
@@ -475,7 +485,7 @@ const Appointments = () => {
         .from('medical_records')
         .select('id, prescriptions')
         .eq('appointment_id', appointment.id)
-        .eq('user_id', appointment.user_id)
+        .eq('user_id', currentUserId)
         .single();
 
       if (fetchError) {
@@ -506,7 +516,7 @@ const Appointments = () => {
       });
 
       // Upload the newly generated PDF and get its URL
-      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, userId!, appointment.id);
+      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, currentUserId, appointment.id);
       console.log("Appointments: fetchAndGenerateRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
       if (!newPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF da receita.");
@@ -517,7 +527,7 @@ const Appointments = () => {
         .from('medical_records')
         .update({ recipe_pdf_url: newPdfUrl })
         .eq('id', medicalRecordData.id)
-        .eq('user_id', userId);
+        .eq('user_id', currentUserId);
       console.log("Appointments: fetchAndGenerateRecipePdfMutation - Medical record updated with new recipe_pdf_url.");
 
       return { pdfBlob, pdfUrl: newPdfUrl, appointment };
@@ -654,6 +664,177 @@ const Appointments = () => {
     setIsRecipePdfPreviewDialogOpen(false);
   };
 
+  // Define as colunas da tabela dinamicamente
+  const getColumns = (currentTab: string) => {
+    const baseColumns = [
+      { id: 'pet', header: 'Paciente', render: (appointment: Appointment) => {
+        const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
+        return (
+          <TableCell className="font-medium flex items-center">
+            <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
+            {appointment.pet_name}
+          </TableCell>
+        );
+      }},
+      { id: 'client', header: 'Tutor', render: (appointment: Appointment) => <TableCell>{appointment.client_name}</TableCell> },
+      { id: 'service', header: 'Serviço', render: (appointment: Appointment) => <TableCell>{appointment.service}</TableCell> },
+    ];
+
+    if (currentTab === "em-espera") {
+      return [
+        ...baseColumns,
+        { id: 'waitingTime', header: 'Tempo de Espera', render: (appointment: Appointment) => (
+          <TableCell>
+            <AppointmentChronometer startTime={appointment.created_at} />
+          </TableCell>
+        )},
+        { id: 'actions', header: 'Ações', className: 'text-right', render: (appointment: Appointment) => (
+          <TableCell className="text-right">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={(e) => { e.stopPropagation(); handleStartAppointment(appointment.id); }}
+              disabled={startAppointmentMutation.isPending}
+            >
+              <Play className="mr-2 h-4 w-4" /> Iniciar
+            </Button>
+          </TableCell>
+        )},
+      ];
+    } else if (currentTab === "em-andamento") {
+      return [
+        ...baseColumns,
+        { id: 'veterinarian', header: 'Veterinário', render: (appointment: Appointment) => (
+          <TableCell className="flex items-center">
+            {appointment.veterinarian || "N/A"}
+            <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
+              Iniciada
+            </Badge>
+          </TableCell>
+        )},
+        { id: 'consultationTime', header: 'Tempo de Consulta', render: (appointment: Appointment) => (
+          <TableCell>
+            {appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
+          </TableCell>
+        )},
+        { id: 'actions', header: 'Ações', className: 'text-right', render: (appointment: Appointment) => (
+          <TableCell className="text-right">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => { e.stopPropagation(); navigate(`/consultation/${appointment.id}`); }}
+            >
+              <ArrowRight className="mr-2 h-4 w-4" /> Voltar para Consulta
+            </Button>
+          </TableCell>
+        )},
+      ];
+    } else if (currentTab === "finalizadas") {
+      return [
+        ...baseColumns,
+        { id: 'veterinarian', header: 'Veterinário', render: (appointment: Appointment) => (
+          <TableCell className="flex items-center">
+            {appointment.veterinarian || "N/A"}
+            {appointment.status === "Cancelada" && (
+              <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
+                Cancelada
+              </Badge>
+            )}
+            {appointment.status === "Realizada" && (
+              <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
+                Concluída
+              </Badge>
+            )}
+          </TableCell>
+        )},
+        { id: 'completion', header: 'Finalização', render: (appointment: Appointment) => (
+          <TableCell>
+            {appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))
+              ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
+              : "N/A"}
+          </TableCell>
+        )},
+        { id: 'duration', header: 'Duração', render: (appointment: Appointment) => (
+          <TableCell>{
+            appointment.start_time && appointment.completion_timestamp
+              ? (() => {
+                  const start = parseISO(appointment.start_time);
+                  const end = parseISO(appointment.completion_timestamp);
+                  return isValid(start) && isValid(end) ? formatDuration(differenceInSeconds(end, start)) : "N/A";
+                })()
+              : "N/A"
+          }</TableCell>
+        )},
+        { id: 'waitingTime', header: 'Tempo de Espera', render: (appointment: Appointment) => (
+          <TableCell>{
+            appointment.created_at && (appointment.start_time || appointment.completion_timestamp)
+              ? (() => {
+                  const created = parseISO(appointment.created_at);
+                  const referenceTime = appointment.status === "Realizada" && appointment.start_time ? parseISO(appointment.start_time) : (appointment.status === "Cancelada" && appointment.completion_timestamp ? parseISO(appointment.completion_timestamp) : null);
+                  return isValid(created) && isValid(referenceTime!) ? formatDuration(differenceInSeconds(referenceTime!, created)) : "N/A";
+                })()
+              : "N/A"
+          }</TableCell>
+        )},
+        { id: 'prescriptions', header: 'Receitas', render: (appointment: Appointment) => (
+          <TableCell>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
+                  showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
+                } else {
+                  showError("Nenhuma prescrição encontrada para esta consulta.");
+                }
+              }}
+              className="flex items-center justify-center gap-1"
+            >
+              <Pill className="h-4 w-4" />
+              <span>{appointment.prescriptions_count || 0}</span>
+            </Button>
+          </TableCell>
+        )},
+        { id: 'pdfActions', header: 'Prontuário / Receita', className: 'text-right', render: (appointment: Appointment) => (
+          <TableCell className="text-right">
+            <div className="flex justify-end space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => { e.stopPropagation(); handleOpenMedicalRecordPdfPreviewDialog(appointment); }}
+                disabled={fetchAndGeneratePdfMutation.isPending}
+              >
+                {fetchAndGeneratePdfMutation.isPending ? (
+                  <span className="loading-spinner h-4 w-4" />
+                ) : (
+                  <FileText className="h-4 w-4" />
+                )}
+              </Button>
+              {appointment.recipe_pdf_url && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => { e.stopPropagation(); handleOpenRecipePdfPreviewDialog(appointment); }}
+                  disabled={fetchAndGenerateRecipePdfMutation.isPending}
+                >
+                  {fetchAndGenerateRecipePdfMutation.isPending ? (
+                    <span className="loading-spinner h-4 w-4" />
+                  ) : (
+                    <Pill className="h-4 w-4" />
+                  )}
+                </Button>
+              )}
+            </div>
+          </TableCell>
+        )},
+      ];
+    }
+    return []; // Fallback, though all tabs should be covered
+  };
+
+  const columns = getColumns(activeTab);
+
   if (isLoading || isLoadingClients || isLoadingPets || isLoadingHistory) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -765,193 +946,27 @@ const Appointments = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Paciente</TableHead>
-                <TableHead>Tutor</TableHead>
-                <TableHead>Serviço</TableHead>
-                {activeTab === "em-espera" && <TableHead>Tempo de Espera</TableHead>}
-                {activeTab === "em-andamento" && <TableHead>Veterinário</TableHead>}
-                {activeTab === "em-andamento" && <TableHead>Tempo de Consulta</TableHead>}
-                {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
-                {activeTab === "finalizadas" && <TableHead>Finalização</TableHead>}
-                {activeTab === "finalizadas" && <TableHead>Duração</TableHead>}
-                {activeTab === "finalizadas" && <TableHead>Receitas</TableHead>} {/* NOVO: Coluna Receitas */}
-                {activeTab === "finalizadas" ? (
-                  <TableHead className="text-right">Prontuário / Receita</TableHead>
-                ) : (
-                  <TableHead className="text-right">Ações</TableHead>
-                )}
+                {columns.map(col => (
+                  <TableHead key={col.id} className={col.className}>{col.header}</TableHead>
+                ))}
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredAppointments.length > 0 ? (
-                filteredAppointments.map((appointment) => {
-                  const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
-                  const isCancelled = appointment.status === "Cancelada";
-                  const isRealizada = appointment.status === "Realizada";
-
-                  // Cálculo da duração
-                  const duration = appointment.start_time && appointment.completion_timestamp
-                    ? (() => {
-                        const start = parseISO(appointment.start_time);
-                        const end = parseISO(appointment.completion_timestamp);
-                        if (isValid(start) && isValid(end)) {
-                          const durationSeconds = differenceInSeconds(end, start);
-                          return formatDuration(durationSeconds);
-                        }
-                        return "N/A";
-                      })()
-                    : "N/A";
-
-                  // Calculate Waiting Time
-                  const waitingTime = appointment.created_at && (appointment.start_time || appointment.completion_timestamp)
-                    ? (() => {
-                        const created = parseISO(appointment.created_at);
-                        const referenceTime = isRealizada && appointment.start_time ? parseISO(appointment.start_time) : (isCancelled && appointment.completion_timestamp ? parseISO(appointment.completion_timestamp) : null);
-                        return isValid(created) && isValid(referenceTime!) ? formatDuration(differenceInSeconds(referenceTime!, created)) : "N/A";
-                      })()
-                    : "N/A";
-
-                  return (
-                    <TableRow
-                      key={appointment.id}
-                      onClick={() => handleRowClick(appointment)}
-                      className={cn(
-                        "cursor-pointer hover:bg-muted/50"
-                      )}
-                    >
-                      <TableCell className="font-medium flex items-center">
-                        <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
-                        {appointment.pet_name}
-                      </TableCell>
-                      <TableCell>{appointment.client_name}</TableCell>
-                      <TableCell>{appointment.service}</TableCell>
-
-                      {/* Conditional cells based on activeTab */}
-                      {activeTab === "em-espera" && (
-                        <TableCell>
-                          <AppointmentChronometer startTime={appointment.created_at} />
-                        </TableCell>
-                      )}
-                      {(activeTab === "em-andamento" || activeTab === "finalizadas") && (
-                        <TableCell className="flex items-center">
-                          {appointment.veterinarian || "N/A"}
-                          {activeTab === "em-andamento" && (
-                            <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
-                              Iniciada
-                            </Badge>
-                          )}
-                          {activeTab === "finalizadas" && isCancelled && (
-                            <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
-                              Cancelada
-                            </Badge>
-                          )}
-                          {activeTab === "finalizadas" && isRealizada && (
-                            <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
-                              Concluída
-                            </Badge>
-                          )}
-                        </TableCell>
-                      )}
-                      {(activeTab === "em-andamento" || activeTab === "finalizadas") && (
-                        <TableCell>
-                          {activeTab === "em-andamento" && appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
-                          {activeTab === "finalizadas" && appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))
-                            ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
-                            : "N/A"}
-                        </TableCell>
-                      )}
-                      {activeTab === "finalizadas" && (
-                        <TableCell>{duration}</TableCell>
-                      )}
-                      {activeTab === "finalizadas" && (
-                        <TableCell>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
-                                showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
-                              } else {
-                                showError("Nenhuma prescrição encontrada para esta consulta.");
-                              }
-                            }}
-                            className="flex items-center justify-center gap-1"
-                          >
-                            <Pill className="h-4 w-4" />
-                            <span>{appointment.prescriptions_count || 0}</span>
-                          </Button>
-                        </TableCell>
-                      )}
-                      <TableCell className="text-right">
-                        {activeTab === "em-espera" && (
-                          <Button
-                            variant="default"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleStartAppointment(appointment.id);
-                            }}
-                            disabled={startAppointmentMutation.isPending}
-                          >
-                            <Play className="mr-2 h-4 w-4" /> Iniciar
-                          </Button>
-                        )}
-                        {activeTab === "em-andamento" && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              navigate(`/consultation/${appointment.id}`);
-                            }}
-                          >
-                            <ArrowRight className="mr-2 h-4 w-4" /> Voltar para Consulta
-                          </Button>
-                        )}
-                        {activeTab === "finalizadas" && isRealizada && ( // Apenas para consultas realizadas
-                          <div className="flex justify-end space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenMedicalRecordPdfPreviewDialog(appointment);
-                              }}
-                              disabled={fetchAndGeneratePdfMutation.isPending}
-                            >
-                              {fetchAndGeneratePdfMutation.isPending ? (
-                                <span className="loading-spinner h-4 w-4" />
-                              ) : (
-                                <FileText className="h-4 w-4" />
-                              )}
-                            </Button>
-                            {appointment.recipe_pdf_url && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleOpenRecipePdfPreviewDialog(appointment);
-                                }}
-                                disabled={fetchAndGenerateRecipePdfMutation.isPending}
-                              >
-                                {fetchAndGenerateRecipePdfMutation.isPending ? (
-                                  <span className="loading-spinner h-4 w-4" />
-                                ) : (
-                                  <Pill className="h-4 w-4" />
-                                )}
-                              </Button>
-                            )}
-                          </div>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
+                filteredAppointments.map((appointment) => (
+                  <TableRow
+                    key={appointment.id}
+                    onClick={() => handleRowClick(appointment)}
+                    className={cn(
+                      "cursor-pointer hover:bg-muted/50"
+                    )}
+                  >
+                    {columns.map(col => col.render(appointment))}
+                  </TableRow>
+                ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={activeTab === "em-andamento" ? 7 : (activeTab === "finalizadas" ? 10 : 5)} className="h-24 text-center"> {/* Ajustado colspan */}
+                  <TableCell colSpan={columns.length} className="h-24 text-center">
                     Nenhuma consulta encontrada.
                   </TableCell>
                 </TableRow>
@@ -992,7 +1007,7 @@ const Appointments = () => {
         isOpen={isRecipePdfPreviewDialogOpen}
         onClose={() => setIsRecipePdfPreviewDialogOpen(false)}
         pdfBlob={recipePdfBlob}
-        pdfUrl={recipePdfUrl} // Passa a URL direta
+        pdfUrl={recipePdfUrl}
         filename={recipePdfFilename}
         onConfirmDownload={handleConfirmRecipePdfDownload}
       />
