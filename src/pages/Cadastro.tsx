@@ -663,10 +663,19 @@ const Cadastro = () => {
         </TabsList>
 
         <TabsContent value="tutores" className="mt-4">
-          <div className="flex justify-end mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar tutores..."
+                className="pl-9"
+                value={clientSearchTerm}
+                onChange={(e) => setClientSearchTerm(e.target.value)}
+              />
+            </div>
             <Dialog open={isAddClientDialogOpen} onOpenChange={setIsAddClientDialogOpen}>
               <DialogTrigger asChild>
-                <Button className="font-bold">
+                <Button className="font-bold ml-2">
                   <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
                 </Button>
               </DialogTrigger>
@@ -683,27 +692,25 @@ const Cadastro = () => {
               </DialogContent>
             </Dialog>
           </div>
-          
-          <div className="flex items-center space-x-2 mb-6">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Buscar tutores por nome, email, telefone, CPF ou cidade..." className="pl-9" value={clientSearchTerm} onChange={(e) => setClientSearchTerm(e.target.value)} />
-            </div>
-          </div>
 
           <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[60px]">Foto</TableHead><TableHead>Nome</TableHead><TableHead>CPF</TableHead><TableHead>Nascimento</TableHead><TableHead>Contato</TableHead><TableHead>Endereço</TableHead><TableHead>Animais</TableHead><TableHead className="text-right">Ações</TableHead>
+                  <TableHead className="w-[60px]">Foto</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>CPF</TableHead>
+                  <TableHead>Nascimento</TableHead>
+                  <TableHead>Contato</TableHead>
+                  <TableHead>Endereço</TableHead>
+                  <TableHead>Animais</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredClients.length > 0 ? (
                   filteredClients.map((client) => {
-                    const petsOfClient = pets.filter(pet => {
-                      return pet.ownerId === client.id;
-                    });
+                    const petsOfClient = pets.filter(pet => pet.ownerId === client.id);
                     const firstNameInitial = client.name ? client.name.charAt(0) : '';
                     const lastNameInitial = client.name.split(' ').pop()?.charAt(0) || '';
                     const initials = `${firstNameInitial}${lastNameInitial}`.toUpperCase();
@@ -723,11 +730,19 @@ const Cadastro = () => {
                               </AvatarFallback>
                             )}
                           </Avatar>
-                        </TableCell><TableCell className="font-medium" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>{client.name}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>{client.cpf}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
+                        </TableCell>
+                        <TableCell className="font-medium" onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
+                          {client.name}
+                        </TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
+                          {client.cpf}
+                        </TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
                           {client.dateOfBirth && isValid(parseISO(client.dateOfBirth))
                             ? format(parseISO(client.dateOfBirth), "dd/MM/yyyy")
                             : "N/A"}
-                        </TableCell><TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
+                        </TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handleClientRowClick(client); }}>
                           <div className="flex items-center text-sm mb-1">
                             <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
                             <span>{client.email}</span>
@@ -736,7 +751,8 @@ const Cadastro = () => {
                             <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
                             <span>{client.phone}</span>
                           </div>
-                        </TableCell><TableCell>
+                        </TableCell>
+                        <TableCell>
                           <Tooltip delayDuration={0}>
                             <TooltipTrigger asChild>
                               <Button
@@ -756,7 +772,8 @@ const Cadastro = () => {
                               <p className="text-xs text-muted-foreground">CEP: {client.address.cep}</p>
                             </TooltipContent>
                           </Tooltip>
-                        </TableCell><TableCell className="text-center">
+                        </TableCell>
+                        <TableCell className="text-center">
                           {petsOfClient.length > 0 ? (
                             <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleViewClientPets(client); }}>
                               {petsOfClient.length} Animal{petsOfClient.length > 1 ? 's' : ''}
@@ -764,7 +781,8 @@ const Cadastro = () => {
                           ) : (
                             <span className="text-muted-foreground text-sm">Nenhum</span>
                           )}
-                        </TableCell><TableCell className="text-right">
+                        </TableCell>
+                        <TableCell className="text-right">
                           <div className="flex items-center justify-end space-x-2">
                             <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleAddPetForClient(client); }}>
                               Adicionar Animal
@@ -835,7 +853,16 @@ const Cadastro = () => {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[60px]">Foto</TableHead><TableHead>Nome</TableHead><TableHead>Espécie</TableHead><TableHead>Raça</TableHead><TableHead>Tutor</TableHead><TableHead>Idade</TableHead><TableHead>Sexo</TableHead><TableHead>Cor</TableHead><TableHead>Peso (KG)</TableHead><TableHead className="text-right">Ações</TableHead>
+                  <TableHead className="w-[60px]">Foto</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Espécie</TableHead>
+                  <TableHead>Raça</TableHead>
+                  <TableHead>Tutor</TableHead>
+                  <TableHead>Idade</TableHead>
+                  <TableHead>Sexo</TableHead>
+                  <TableHead>Cor</TableHead>
+                  <TableHead>Peso (KG)</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -859,10 +886,33 @@ const Cadastro = () => {
                               </AvatarFallback>
                             )}
                           </Avatar>
-                        </TableCell><TableCell className="font-bold flex items-center" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
+                        </TableCell>
+                        <TableCell className="font-bold flex items-center" onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
                           <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
                           {pet.name}
-                        </TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.species}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.breed}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{owner ? owner.name : "N/A"}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.age}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.gender}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.color}</TableCell><TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>{pet.weight !== undefined && pet.weight !== null ? `${pet.weight.toFixed(1)} KG` : "N/A"}</TableCell><TableCell className="text-right">
+                        </TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
+                          {pet.species}
+                        </TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
+                          {pet.breed}
+                        </TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
+                          {owner ? owner.name : "N/A"}
+                        </TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
+                          {pet.age}
+                        </TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
+                          {pet.gender}
+                        </TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
+                          {pet.color}
+                        </TableCell>
+                        <TableCell onClick={(e) => { e.stopPropagation(); handlePetRowClick(pet); }}>
+                          {pet.weight !== undefined && pet.weight !== null ? `${pet.weight.toFixed(1)} KG` : "N/A"}
+                        </TableCell>
+                        <TableCell className="text-right">
                           <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); handleEditPet(pet); }}>
                             <Edit className="h-4 w-4" />
                           </Button>
