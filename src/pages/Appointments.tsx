@@ -88,6 +88,14 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Outros: MoreHorizontal,
 };
 
+// Definir um tipo para a definição da coluna
+interface ColumnDefinition {
+  id: string;
+  header: string;
+  className?: string; // Torna className opcional
+  render: (appointment: Appointment) => React.ReactNode;
+}
+
 const Appointments = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
@@ -667,8 +675,8 @@ const Appointments = () => {
   };
 
   // Define as colunas da tabela dinamicamente
-  const getColumns = (currentTab: string) => {
-    const baseColumns = [
+  const getColumns = (currentTab: string): ColumnDefinition[] => { // Usando o tipo ColumnDefinition
+    const baseColumns: ColumnDefinition[] = [
       { id: 'pet', header: 'Paciente', render: (appointment: Appointment) => {
         const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
         return (
@@ -949,7 +957,7 @@ const Appointments = () => {
             <TableHeader>
               <TableRow>
                 {columns.map(col => (
-                  <TableHead key={col.id} className={col.className}>{col.header}</TableHead>
+                  <TableHead key={col.id} className={cn(col.className)}>{col.header}</TableHead>
                 ))}
               </TableRow>
             </TableHeader>
