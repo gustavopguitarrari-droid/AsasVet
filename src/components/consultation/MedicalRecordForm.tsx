@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, UseFormReturn } from "react-hook-form"; // Importar UseFormReturn
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,22 +24,32 @@ const prescriptionItemSchema = z.object({
 
 // Esquema de validação para o formulário completo do prontuário médico
 const medicalRecordFormSchema = z.object({
-  anamnesis: z.string().optional(),
-  physicalExam: z.string().optional(),
-  diagnosis: z.string().optional(),
-  treatment: z.string().optional(),
+  anamnesis: z.string().min(1, "A anamnese é obrigatória."), // Tornando obrigatório
+  physicalExam: z.string().min(1, "O exame físico é obrigatório."), // Tornando obrigatório
+  diagnosis: z.string().min(1, "O diagnóstico é obrigatório."), // Tornando obrigatório
+  treatment: z.string().min(1, "O tratamento é obrigatório."), // Tornando obrigatório
   prescriptions: z.array(prescriptionItemSchema).optional(),
 });
 
 export type MedicalRecordFormValues = z.infer<typeof medicalRecordFormSchema>;
 
+// Definir a interface para a instância do formulário que será exposta
+export interface MedicalRecordFormInstance {
+  handleSubmit: UseFormReturn<MedicalRecordFormValues>['handleSubmit'];
+  trigger: UseFormReturn<MedicalRecordFormValues>['trigger'];
+  formState: UseFormReturn<MedicalRecordFormValues>['formState'];
+  getValues: UseFormReturn<MedicalRecordFormValues>['getValues'];
+}
+
 interface MedicalRecordFormProps {
   initialData?: MedicalRecordFormValues;
   onSubmit: (data: MedicalRecordFormValues) => void;
   isSubmitting: boolean;
+  formRef?: React.Ref<MedicalRecordFormInstance>; // Nova prop para expor a instância do formulário
+  onValidationChange?: (isValid: boolean) => void; // Nova prop para notificar sobre a validade
 }
 
-const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSubmit, isSubmitting }) => {
+const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSubmit, isSubmitting, formRef, onValidationChange }) => {
   const form = useForm<MedicalRecordFormValues>({
     resolver: zodResolver(medicalRecordFormSchema),
     defaultValues: {
@@ -55,6 +65,21 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
     control: form.control,
     name: "prescriptions",
   });
+
+  // Expor a instância do formulário através do ref
+  React.useImperativeHandle(formRef, () => ({
+    handleSubmit: form.handleSubmit,
+    trigger: form.trigger,
+    formState: form.formState,
+    getValues: form.getValues,
+  }));
+
+  // Notificar o componente pai sobre as mudanças na validade do formulário
+  React.useEffect(() => {
+    if (onValidationChange) {
+      onValidationChange(form.formState.isValid);
+    }
+  }, [form.formState.isValid, onValidationChange]);
 
   return (
     <Card className="w-full">
@@ -173,7 +198,7 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
                               <FormLabel>Dosagem</FormLabel>
                               <FormControl>
                                 <Input placeholder="Ex: 5mg, 1 comprimido" {...field} />
-                              </FormControl> {/* MISSING CLOSING TAG FOR FormItem WAS HERE */}
+                              </FormControl>
                               <FormMessage />
                             </FormItem>
                           )}

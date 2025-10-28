@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useRef, useState } from 'react'; // Adicionado useRef e useState
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ import { format, parseISO, differenceInSeconds, isValid } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import AppointmentChronometer from '@/components/AppointmentChronometer';
 import { Appointment } from './Appointments'; // Importar a interface Appointment
-import MedicalRecordForm, { MedicalRecordFormValues } from '@/components/consultation/MedicalRecordForm'; // Importar o novo formulário
+import MedicalRecordForm, { MedicalRecordFormValues, MedicalRecordFormInstance } from '@/components/consultation/MedicalRecordForm'; // Importar o novo formulário e a interface da instância
 import ForwardToInternmentDialog from '@/components/ForwardToInternmentDialog'; // NOVO: Importar o diálogo de encaminhamento
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
@@ -38,6 +38,11 @@ const ConsultationPage: React.FC = () => {
   const userId = appUser?.id;
 
   const [isForwardToInternmentDialogOpen, setIsForwardToInternmentDialogOpen] = React.useState(false); // NOVO: Estado para o diálogo de internação
+
+  // Ref para acessar a instância do formulário MedicalRecordForm
+  const medicalRecordFormRef = useRef<MedicalRecordFormInstance>(null);
+  const [isMedicalRecordFormValid, setIsMedicalRecordFormValid] = useState(false);
+  const [isAttemptingFinalize, setIsAttemptingFinalize] = useState(false);
 
   // Query para buscar os detalhes da consulta
   const { data: appointment, isLoading, error } = useQuery<Appointment>({
@@ -122,10 +127,16 @@ const ConsultationPage: React.FC = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
       showSuccess("Prontuário salvo com sucesso!");
+      if (isAttemptingFinalize) {
+        // Se a intenção era finalizar, agora que o prontuário foi salvo, finalize a consulta
+        finalizeAppointmentMutation.mutate(appointmentId!);
+      }
+      setIsAttemptingFinalize(false); // Resetar o estado de tentativa de finalização
     },
     onError: (err) => {
       console.error("Error saving medical record:", err); // Log detalhado do erro
       showError(`Erro ao salvar prontuário: ${err.message}`);
+      setIsAttemptingFinalize(false); // Resetar o estado de tentativa de finalização em caso de erro
     },
   });
 
@@ -158,9 +169,16 @@ const ConsultationPage: React.FC = () => {
     },
   });
 
-  const handleFinalizeConsultation = () => {
-    if (appointmentId) {
-      finalizeAppointmentMutation.mutate(appointmentId);
+  const handleFinalizeConsultation = async () => {
+    setIsAttemptingFinalize(true);
+    const isValid = await medicalRecordFormRef.current?.trigger(); // Disparar validação do formulário
+    if (isValid) {
+      // Se o formulário é válido, submeta-o. O onSuccess da mutação de salvar prontuário
+      // verificará isAttemptingFinalize e chamará finalizeAppointmentMutation.
+      medicalRecordFormRef.current?.handleSubmit(handleSaveMedicalRecord)();
+    } else {
+      showError("Por favor, preencha todos os campos obrigatórios do prontuário antes de finalizar.");
+      setIsAttemptingFinalize(false); // Resetar se a validação falhar
     }
   };
 
@@ -227,7 +245,7 @@ const ConsultationPage: React.FC = () => {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-2xl font-bold">{appointment.service}</CardTitle>
           <div className="flex items-center space-x-2">
-            <Clock className="h-5 w-5 text-muted-foreground" />
+            <Clock className="h-5 w-5 mr-2 text-muted-foreground" />
             {appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
           </div>
         </CardHeader>
@@ -260,16 +278,18 @@ const ConsultationPage: React.FC = () => {
         initialData={initialMedicalRecordData}
         onSubmit={handleSaveMedicalRecord}
         isSubmitting={saveMedicalRecordMutation.isPending}
+        formRef={medicalRecordFormRef}
+        onValidationChange={setIsMedicalRecordFormValid}
       />
 
       <div className="flex justify-end space-x-2">
         <Button
           onClick={handleFinalizeConsultation}
-          disabled={finalizeAppointmentMutation.isPending}
+          disabled={!isMedicalRecordFormValid || finalizeAppointmentMutation.isPending || saveMedicalRecordMutation.isPending || isAttemptingFinalize}
           className="bg-green-600 hover:bg-green-700 text-white"
         >
           <CheckCircle className="mr-2 h-5 w-5" />
-          {finalizeAppointmentMutation.isPending ? "Finalizando..." : "Finalizar Consulta"}
+          {finalizeAppointmentMutation.isPending || isAttemptingFinalize ? "Finalizando..." : "Finalizar Consulta"}
         </Button>
       </div>
 
