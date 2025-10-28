@@ -271,6 +271,9 @@ const ConsultationPage: React.FC = () => {
     },
     onSuccess: ({ pdfBlob, newPdfUrl }) => {
       queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
+      // NOVO: Invalidar as queries de agendamentos e histórico
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       showSuccess("Receita PDF gerada e salva com sucesso!");
       setRecipePdfBlob(pdfBlob);
       setRecipePdfFilename(`Receita_${appointment?.pet_name}_${format(parseISO(appointment?.date || new Date().toISOString()), 'yyyyMMdd')}.pdf`);
