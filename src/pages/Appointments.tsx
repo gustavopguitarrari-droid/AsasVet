@@ -781,9 +781,8 @@ const Appointments = () => {
               {filteredAppointments.length > 0 ? (
                 filteredAppointments.map((appointment) => {
                   const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
-                  const isCancelled = activeTab === "finalizadas" && appointment.status === "Cancelada";
-                  const isRealizada = activeTab === "finalizadas" && appointment.status === "Realizada";
-                  const isEmAndamento = activeTab === "em-andamento" && appointment.status === "Em Andamento";
+                  const isCancelled = appointment.status === "Cancelada";
+                  const isRealizada = appointment.status === "Realizada";
 
                   // Cálculo da duração
                   const duration = appointment.start_time && appointment.completion_timestamp
@@ -821,64 +820,63 @@ const Appointments = () => {
                       </TableCell>
                       <TableCell>{appointment.client_name}</TableCell>
                       <TableCell>{appointment.service}</TableCell>
+
+                      {/* Conditional cells based on activeTab */}
                       {activeTab === "em-espera" && (
                         <TableCell>
                           <AppointmentChronometer startTime={appointment.created_at} />
                         </TableCell>
                       )}
-                      {activeTab === "em-andamento" && (
-                        <>
-                          <TableCell className="flex items-center">
-                            {appointment.veterinarian || "N/A"}
+                      {(activeTab === "em-andamento" || activeTab === "finalizadas") && (
+                        <TableCell className="flex items-center">
+                          {appointment.veterinarian || "N/A"}
+                          {activeTab === "em-andamento" && (
                             <Badge className={cn("ml-2", getStatusBadgeVariant("Em Andamento"))}>
                               Iniciada
                             </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
-                          </TableCell>
-                        </>
+                          )}
+                          {activeTab === "finalizadas" && isCancelled && (
+                            <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
+                              Cancelada
+                            </Badge>
+                          )}
+                          {activeTab === "finalizadas" && isRealizada && (
+                            <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
+                              Concluída
+                            </Badge>
+                          )}
+                        </TableCell>
+                      )}
+                      {(activeTab === "em-andamento" || activeTab === "finalizadas") && (
+                        <TableCell>
+                          {activeTab === "em-andamento" && appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
+                          {activeTab === "finalizadas" && appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))
+                            ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
+                            : "N/A"}
+                        </TableCell>
                       )}
                       {activeTab === "finalizadas" && (
-                        <>
-                          <TableCell className="flex items-center">
-                            {appointment.veterinarian || "N/A"}
-                            {isCancelled && (
-                              <Badge className={cn("ml-2", getStatusBadgeVariant("Cancelada"))}>
-                                Cancelada
-                              </Badge>
-                            )}
-                            {isRealizada && (
-                              <Badge className={cn("ml-2", getStatusBadgeVariant("Realizada"))}>
-                                Concluída
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))
-                              ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
-                              : "N/A"}
-                          </TableCell>
-                          <TableCell>{duration}</TableCell>
-                          <TableCell>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
-                                  showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
-                                } else {
-                                  showError("Nenhuma prescrição encontrada para esta consulta.");
-                                }
-                              }}
-                              className="flex items-center justify-center gap-1"
-                            >
-                              <Pill className="h-4 w-4" />
-                              <span>{appointment.prescriptions_count || 0}</span>
-                            </Button>
-                          </TableCell> {/* NOVO: Exibe a contagem de prescrições */}
-                        </>
+                        <TableCell>{duration}</TableCell>
+                      )}
+                      {activeTab === "finalizadas" && (
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
+                                showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
+                              } else {
+                                showError("Nenhuma prescrição encontrada para esta consulta.");
+                              }
+                            }}
+                            className="flex items-center justify-center gap-1"
+                          >
+                            <Pill className="h-4 w-4" />
+                            <span>{appointment.prescriptions_count || 0}</span>
+                          </Button>
+                        </TableCell>
                       )}
                       <TableCell className="text-right">
                         {activeTab === "em-espera" && (
@@ -948,7 +946,7 @@ const Appointments = () => {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={activeTab === "em-andamento" ? 7 : (activeTab === "finalizadas" ? 10 : 5)} className="h-24 text-center"> {/* Ajustado colspan */}
+                  <TableCell colSpan={activeTab === "em-espera" ? 5 : (activeTab === "em-andamento" ? 6 : 8)} className="h-24 text-center"> {/* Ajustado colspan */}
                     Nenhuma consulta encontrada.
                   </TableCell>
                 </TableRow>
