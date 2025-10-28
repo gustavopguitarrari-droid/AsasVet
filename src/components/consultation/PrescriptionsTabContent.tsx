@@ -8,15 +8,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { PlusCircle, Trash2, Pill } from "lucide-react";
+import { PlusCircle, Trash2, Pill, FileText } from "lucide-react"; // Adicionado FileText
 import { MedicalRecordFormValues } from "./MedicalRecordForm";
+import { showSuccess } from "@/utils/toast"; // Importar showSuccess
 
 const PrescriptionsTabContent: React.FC = () => {
-  const { control } = useFormContext<MedicalRecordFormValues>();
+  const { control, getValues } = useFormContext<MedicalRecordFormValues>(); // Adicionado getValues
   const { fields, append, remove } = useFieldArray({
     control: control,
     name: "prescriptions",
   });
+
+  const handleGeneratePrescription = () => {
+    const currentPrescriptions = getValues("prescriptions");
+    if (!currentPrescriptions || currentPrescriptions.length === 0) {
+      showSuccess("Adicione prescrições antes de gerar a receita.");
+      return;
+    }
+    // Lógica futura para gerar PDF da receita
+    console.log("Gerar Receita button clicked! Prescrições:", currentPrescriptions);
+    showSuccess("Funcionalidade 'Gerar Receita' em desenvolvimento!");
+  };
 
   return (
     <div className="space-y-4">
@@ -35,7 +47,7 @@ const PrescriptionsTabContent: React.FC = () => {
       {fields.length === 0 && (
         <p className="text-muted-foreground text-sm">Nenhuma prescrição adicionada ainda.</p>
       )}
-      <ScrollArea className="max-h-[300px] pr-4">
+      <ScrollArea className="max-h-[400px] pr-4"> {/* Altura máxima aumentada */}
         <div className="space-y-4">
           {fields.map((field, index) => (
             <div key={field.id} className="relative border p-4 rounded-md space-y-3 bg-muted/20">
@@ -108,6 +120,15 @@ const PrescriptionsTabContent: React.FC = () => {
           ))}
         </div>
       </ScrollArea>
+
+      <Button
+        type="button"
+        onClick={handleGeneratePrescription}
+        className="w-full mt-4"
+        disabled={fields.length === 0} // Desabilita se não houver prescrições
+      >
+        <FileText className="mr-2 h-4 w-4" /> Gerar Receita
+      </Button>
     </div>
   );
 };
