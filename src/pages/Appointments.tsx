@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText, Pill } from "lucide-react"; // Importar ArrowRight, FileText e Pill
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText, Pill, Horse, Cow } from "lucide-react"; // Importar ArrowRight, FileText e Pill, Horse, Cow
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -53,7 +53,7 @@ export interface Appointment {
   time: string; // HH:mm
   client_name: string;
   pet_name: string;
-  species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros"; // Tipo de enumeração
+  species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros" | "Equino" | "Bovino"; // Tipo de enumeração atualizado
   service: typeof serviceOptions[number]; // Tipo de enumeração
   veterinarian: string;
   status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
@@ -62,6 +62,7 @@ export interface Appointment {
   start_time?: string | null;
   prescriptions_count?: number; // NOVO: Contagem de prescrições
   recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
+  pet_id: string | null; // NOVO: Adicionado pet_id e tornado obrigatório (ou null)
 }
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
@@ -85,6 +86,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
+  Equino: Horse, // Adicionado Equino
+  Bovino: Cow,   // Adicionado Bovino
   Outros: MoreHorizontal,
 };
 
@@ -171,6 +174,7 @@ const Appointments = () => {
         // and extract prescriptions. Handle null/undefined cases.
         prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
         recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
+        pet_id: app.pet_id || null, // Ensure pet_id is always present, even if null
       })) as Appointment[];
     },
     enabled: !!userId,
@@ -197,6 +201,7 @@ const Appointments = () => {
         ...app,
         prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
         recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
+        pet_id: app.pet_id || null, // Ensure pet_id is always present, even if null
       })) as Appointment[];
     },
     enabled: !!userId,
@@ -277,6 +282,7 @@ const Appointments = () => {
           service: newAppointmentData.service,
           veterinarian: veterinarianName,
           status: "Agendada",
+          pet_id: newAppointmentData.selectedPetId, // Adicionado pet_id
         })
         .select()
         .single();
@@ -309,6 +315,7 @@ const Appointments = () => {
           status: updatedAppointment.status,
           completion_timestamp: updatedAppointment.completion_timestamp,
           start_time: updatedAppointment.start_time,
+          pet_id: updatedAppointment.pet_id, // Adicionado pet_id
         })
         .eq('id', updatedAppointment.id)
         .eq('user_id', userId)
@@ -904,7 +911,7 @@ const Appointments = () => {
         </div>
 
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full md:w-auto flex-1"> {/* Adicionado flex-1 */}
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "em-espera" | "em-andamento" | "finalizadas")} className="w-full md:w-auto flex-1"> {/* Adicionado flex-1 */}
             <TabsList className="grid w-full grid-cols-3 bg-muted/50">
               <TabsTrigger value="em-espera" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">Em Espera</TabsTrigger>
               <TabsTrigger value="em-andamento" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">Em Andamento</TabsTrigger>
@@ -965,13 +972,13 @@ const Appointments = () => {
                       "cursor-pointer hover:bg-muted/50"
                     )}
                   >
-                    {columns.map(col => <React.Fragment key={col.id}>{col.render(appointment)}</React.Fragment>)}
+                    {columns.map(col => col.render(appointment))}
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-24 text-center">
-                    Nenhuma consulta encontrada.
+                    Nenhuma consulta encontrada para esta aba.
                   </TableCell>
                 </TableRow>
               )}
@@ -984,8 +991,8 @@ const Appointments = () => {
           isOpen={isDetailsDialogOpen}
           onClose={() => setIsDetailsDialogOpen(false)}
           onUpdate={handleUpdateAppointment}
-          onCancelAppointment={handleCancelAppointment}
-          onStartAppointment={handleStartAppointment}
+          onCancel={handleCancelAppointment}
+          onStart={handleStartAppointment}
         />
 
         <AppointmentHistoryDialog
@@ -993,28 +1000,29 @@ const Appointments = () => {
           onClose={() => setIsHistoryDialogOpen(false)}
           historyAppointments={historyAppointments}
           onViewDetails={handleViewHistoryDetails}
-          onClearHistory={() => clearHistoryAppointmentsMutation.mutate()}
+          onClearHistory={clearHistoryAppointmentsMutation.mutate}
           isClearingHistory={clearHistoryAppointmentsMutation.isPending}
         />
+
+        <PdfPreviewDialog
+          isOpen={isPdfPreviewDialogOpen}
+          onClose={() => setIsPdfPreviewDialogOpen(false)}
+          pdfBlob={pdfBlob}
+          filename={pdfFilename}
+          onConfirmDownload={handleConfirmPdfDownload}
+          downloadUrl={pdfAppointment?.id ? `/api/download-medical-record/${pdfAppointment.id}` : undefined} // Exemplo de URL de download
+        />
+
+        <PdfPreviewDialog
+          isOpen={isRecipePdfPreviewDialogOpen}
+          onClose={() => setIsRecipePdfPreviewDialogOpen(false)}
+          pdfBlob={recipePdfBlob}
+          pdfUrl={recipePdfUrl} // Passa a URL direta se disponível
+          filename={recipePdfFilename}
+          onConfirmDownload={handleConfirmRecipePdfDownload}
+          downloadUrl={recipePdfUrl || undefined} // Usa a URL direta para download
+        />
       </div>
-
-      <PdfPreviewDialog
-        isOpen={isPdfPreviewDialogOpen}
-        onClose={() => setIsPdfPreviewDialogOpen(false)}
-        pdfBlob={pdfBlob}
-        filename={pdfFilename}
-        onConfirmDownload={handleConfirmPdfDownload}
-      />
-
-      {/* NOVO: Diálogo de Pré-visualização de PDF da Receita */}
-      <PdfPreviewDialog
-        isOpen={isRecipePdfPreviewDialogOpen}
-        onClose={() => setIsRecipePdfPreviewDialogOpen(false)}
-        pdfBlob={recipePdfBlob}
-        pdfUrl={recipePdfUrl}
-        filename={recipePdfFilename}
-        onConfirmDownload={handleConfirmRecipePdfDownload}
-      />
     </>
   );
 };
