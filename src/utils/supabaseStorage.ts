@@ -191,9 +191,11 @@ export const uploadRecipePdfToSupabase = async (
   userId: string,
   appointmentId: string,
 ): Promise<string | null> => {
+  console.log("uploadRecipePdfToSupabase: Iniciando upload do PDF da receita.");
   try {
     const fileName = `receita_${appointmentId}_${uuidv4()}.pdf`;
     const filePath = `${userId}/${appointmentId}/${fileName}`; // Caminho: userId/appointmentId/uuid.pdf
+    console.log(`uploadRecipePdfToSupabase: Tentando upload para filePath: ${filePath} no bucket: ${PRESCRIPTIONS_BUCKET_NAME}`);
 
     const { data, error } = await supabase.storage
       .from(PRESCRIPTIONS_BUCKET_NAME)
@@ -206,11 +208,13 @@ export const uploadRecipePdfToSupabase = async (
       console.error("uploadRecipePdfToSupabase: Erro ao fazer upload do PDF da receita:", error);
       throw error;
     }
+    console.log("uploadRecipePdfToSupabase: Upload bem-sucedido, data:", data);
 
     const { data: publicUrlData } = supabase.storage
       .from(PRESCRIPTIONS_BUCKET_NAME)
       .getPublicUrl(filePath);
 
+    console.log("uploadRecipePdfToSupabase: URL pública obtida:", publicUrlData.publicUrl);
     return publicUrlData.publicUrl;
 
   } catch (error) {
@@ -220,7 +224,11 @@ export const uploadRecipePdfToSupabase = async (
 };
 
 export const deleteRecipePdfFromSupabase = async (publicUrl: string): Promise<boolean> => {
-  if (!publicUrl) return true;
+  console.log("deleteRecipePdfFromSupabase: Iniciando exclusão do PDF da receita para URL:", publicUrl);
+  if (!publicUrl) {
+    console.log("deleteRecipePdfFromSupabase: Nenhuma publicUrl fornecida, nada para deletar.");
+    return true;
+  }
 
   try {
     const url = new URL(publicUrl);
@@ -231,6 +239,7 @@ export const deleteRecipePdfFromSupabase = async (publicUrl: string): Promise<bo
       return false;
     }
     const filePath = pathSegments.slice(bucketIndex + 1).join('/');
+    console.log(`deleteRecipePdfFromSupabase: Tentando deletar filePath: ${filePath} do bucket: ${PRESCRIPTIONS_BUCKET_NAME}`);
 
     const { error } = await supabase.storage
       .from(PRESCRIPTIONS_BUCKET_NAME)
@@ -240,6 +249,7 @@ export const deleteRecipePdfFromSupabase = async (publicUrl: string): Promise<bo
       console.error("deleteRecipePdfFromSupabase: Erro ao deletar PDF da receita do storage:", error);
       return false;
     }
+    console.log("deleteRecipePdfFromSupabase: PDF da receita deletado com sucesso.");
     return true;
   } catch (error) {
     console.error("deleteRecipePdfFromSupabase: Erro no processo de exclusão do PDF da receita:", error);

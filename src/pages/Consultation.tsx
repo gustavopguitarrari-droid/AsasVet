@@ -194,8 +194,15 @@ const ConsultationPage: React.FC = () => {
   // NOVO: Mutação para gerar e salvar o PDF da receita
   const generateAndSaveRecipePdfMutation = useMutation({
     mutationFn: async (prescriptions: MedicalRecordFormValues['prescriptions']) => {
-      if (!userId || !appointmentId || !appointment) throw new Error("Dados da consulta ou usuário não disponíveis.");
-      if (!prescriptions || prescriptions.length === 0) throw new Error("Nenhuma prescrição para gerar a receita.");
+      console.log("generateAndSaveRecipePdfMutation: Iniciando...");
+      if (!userId || !appointmentId || !appointment) {
+        console.error("generateAndSaveRecipePdfMutation: Dados da consulta ou usuário não disponíveis.");
+        throw new Error("Dados da consulta ou usuário não disponíveis.");
+      }
+      if (!prescriptions || prescriptions.length === 0) {
+        console.error("generateAndSaveRecipePdfMutation: Nenhuma prescrição para gerar a receita.");
+        throw new Error("Nenhuma prescrição para gerar a receita.");
+      }
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
@@ -207,6 +214,7 @@ const ConsultationPage: React.FC = () => {
       };
 
       let currentMedicalRecordId = medicalRecord?.id;
+      console.log("generateAndSaveRecipePdfMutation: medicalRecord?.id inicial:", currentMedicalRecordId);
 
       if (!currentMedicalRecordId) {
         console.log("ConsultationPage: generateAndSaveRecipePdfMutation - No existing medical record found, creating a new one for recipe PDF.");
@@ -225,6 +233,7 @@ const ConsultationPage: React.FC = () => {
           .single();
 
         if (insertRecordError || !newRecord) {
+          console.error("generateAndSaveRecipePdfMutation: Erro ao criar novo prontuário:", insertRecordError);
           throw insertRecordError || new Error("Failed to create a new medical record for recipe PDF.");
         }
         currentMedicalRecordId = newRecord.id;
@@ -245,18 +254,25 @@ const ConsultationPage: React.FC = () => {
         await deleteRecipePdfFromSupabase(existingRecipePdfUrlData.recipe_pdf_url);
       }
 
+      console.log("generateAndSaveRecipePdfMutation: Gerando PDF da receita...");
       const pdfBlob = await generatePrescriptionPdf({
         appointment,
         prescriptions,
         logoUrl: appUser?.logoUrl,
         clinicDetails,
       });
+      console.log("generateAndSaveRecipePdfMutation: PDF Blob gerado:", pdfBlob);
 
+      console.log("generateAndSaveRecipePdfMutation: Fazendo upload do PDF para o Supabase Storage...");
       const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, userId, appointmentId);
       console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Uploaded new PDF to URL:", newPdfUrl);
 
-      if (!newPdfUrl) throw new Error("Falha ao fazer upload do PDF da receita.");
+      if (!newPdfUrl) {
+        console.error("generateAndSaveRecipePdfMutation: Falha ao fazer upload do PDF da receita.");
+        throw new Error("Falha ao fazer upload do PDF da receita.");
+      }
 
+      console.log("generateAndSaveRecipePdfMutation: Atualizando medical_records com a nova URL e prescrições...");
       const { data, error } = await supabase
         .from('medical_records')
         .update({ recipe_pdf_url: newPdfUrl, prescriptions: prescriptions })
@@ -265,11 +281,15 @@ const ConsultationPage: React.FC = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("generateAndSaveRecipePdfMutation: Erro ao atualizar medical_records:", error);
+        throw error;
+      }
       console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Medical record updated with new recipe_pdf_url:", data.recipe_pdf_url);
       return { pdfBlob, newPdfUrl };
     },
     onSuccess: ({ pdfBlob, newPdfUrl }) => {
+      console.log("generateAndSaveRecipePdfMutation: onSuccess - Invalidando queries e mostrando sucesso.");
       queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
       // NOVO: Invalidar as queries de agendamentos e histórico
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
