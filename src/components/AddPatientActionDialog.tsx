@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
+import *s z from "zod";
 import { format, isValid, addDays, parseISO, isEqual, isAfter, isBefore } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Plus, Trash2, Syringe, Utensils, Eye, FlaskConical } from "lucide-react";
@@ -243,185 +243,187 @@ const AddPatientActionDialog: React.FC<AddPatientActionDialogProps> = ({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 flex-1 overflow-hidden">
-            <div className="space-y-4 overflow-y-auto pr-2">
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleAddAction)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="type"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Tipo de Ação</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o tipo de ação" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Medicação">Medicação</SelectItem>
-                            <SelectItem value="Alimentação">Alimentação</SelectItem>
-                            <SelectItem value="Observação">Observação</SelectItem>
-                            <SelectItem value="Outro">Outro</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Descrição da Ação</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Ex: Administrar 5ml de antibiótico" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {typeWatch === "Medicação" && (
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="quantity"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Quantidade</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Ex: 5ml" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="route"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Via de Adm.</FormLabel>
-                            <FormControl>
-                              <Input placeholder="Ex: Oral, IV, SC" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  )}
-
-                  <FormField
-                    control={form.control}
-                    name="frequency"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Frequência</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione a frequência" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="SID">SID (Uma vez ao dia)</SelectItem>
-                            <SelectItem value="BID">BID (Duas vezes ao dia)</SelectItem>
-                            <SelectItem value="TID">TID (Três vezes ao dia)</SelectItem>
-                            <SelectItem value="QID">QID (Quatro vezes ao dia)</SelectItem>
-                            <SelectItem value="Outro">Outro</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  {frequencyWatch !== "Outro" && (
+          <ScrollArea className="flex-1 overflow-y-auto pr-2"> {/* Adicionado ScrollArea aqui */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleAddAction)} className="space-y-4">
                     <FormField
                       control={form.control}
-                      name="durationInDays"
+                      name="type"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Duração (dias)</FormLabel>
+                          <FormLabel>Tipo de Ação</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o tipo de ação" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="Medicação">Medicação</SelectItem>
+                              <SelectItem value="Alimentação">Alimentação</SelectItem>
+                              <SelectItem value="Observação">Observação</SelectItem>
+                              <SelectItem value="Outro">Outro</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Descrição da Ação</FormLabel>
                           <FormControl>
-                            <Input
-                              type="number"
-                              min="1"
-                              placeholder="1"
-                              {...field}
-                              // Garante que o valor seja um número ou 1 como fallback
-                              onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 1)}
-                            />
+                            <Textarea placeholder="Ex: Administrar 5ml de antibiótico" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  )}
-                  <Button type="submit" className="w-full">
-                    <Plus className="mr-2 h-4 w-4" /> Adicionar/Atualizar Ação
-                  </Button>
-                </form>
-              </Form>
-            </div>
 
-            <div className="space-y-4 flex flex-col">
-              <h3 className="text-lg font-semibold">Ações Agendadas para o Paciente</h3>
-              <ScrollArea className="flex-1 rounded-md border p-4">
-                {editedActions.length === 0 ? (
-                  <p className="text-center text-muted-foreground">Nenhuma ação adicionada ainda.</p>
-                ) : (
-                  <div className="space-y-4">
-                    {sortedDates.map(dateKey => (
-                      <div key={dateKey} className="border-b pb-2 last:border-b-0">
-                        <p className="font-bold text-md mb-2">
-                          {format(parseISO(dateKey), "PPP", { locale: ptBR })}
-                        </p>
-                        <div className="space-y-2">
-                          {Object.keys(actionsGroupedByDateAndHour[dateKey]).sort().map(hour => (
-                            <div key={`${dateKey}-${hour}`} className="mb-2">
-                              <p className="font-semibold text-sm mb-1">{hour}:00</p>
-                              {actionsGroupedByDateAndHour[dateKey][hour].map((action) => {
-                                const ActionIcon = actionTypeIconMap[action.type] || FlaskConical;
-                                return (
-                                  <div key={action.id} className="flex items-center justify-between p-2 border rounded-md bg-card mb-1">
-                                    <div className="flex items-center">
-                                      <ActionIcon className="h-5 w-5 mr-2 text-muted-foreground" />
-                                      <p className="font-medium text-sm">
-                                        {action.description}
-                                        {action.type === "Medicação" && action.quantity && action.route && (
-                                          <span className="text-xs text-muted-foreground ml-2">
-                                            ({action.quantity} - {action.route})
-                                          </span>
-                                        )}
-                                      </p>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                      {action.frequency && (
-                                        <Badge variant="secondary" className="text-xs">{action.frequency}</Badge>
-                                      )}
-                                      <Badge variant="secondary" className="mr-2">{action.type}</Badge>
-                                      <Button variant="destructive" size="icon" className="h-7 w-7" onClick={() => handleRemoveAction(action)}>
-                                        <Trash2 className="h-4 w-4" />
-                                        <span className="sr-only">Remover</span>
-                                      </Button>
-                                    </div>
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          ))}
-                        </div>
+                    {typeWatch === "Medicação" && (
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="quantity"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Quantidade</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Ex: 5ml" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="route"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Via de Adm.</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Ex: Oral, IV, SC" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
-                    ))}
-                  </div>
-                )}
-              </ScrollArea>
+                    )}
+
+                    <FormField
+                      control={form.control}
+                      name="frequency"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Frequência</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione a frequência" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="SID">SID (Uma vez ao dia)</SelectItem>
+                              <SelectItem value="BID">BID (Duas vezes ao dia)</SelectItem>
+                              <SelectItem value="TID">TID (Três vezes ao dia)</SelectItem>
+                              <SelectItem value="QID">QID (Quatro vezes ao dia)</SelectItem>
+                              <SelectItem value="Outro">Outro</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {frequencyWatch !== "Outro" && (
+                      <FormField
+                        control={form.control}
+                        name="durationInDays"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Duração (dias)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="1"
+                                placeholder="1"
+                                {...field}
+                                // Garante que o valor seja um número ou 1 como fallback
+                                onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 1)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    )}
+                    <Button type="submit" className="w-full">
+                      <Plus className="mr-2 h-4 w-4" /> Adicionar/Atualizar Ação
+                    </Button>
+                  </form>
+                </Form>
+              </div>
+
+              <div className="space-y-4 flex flex-col">
+                <h3 className="text-lg font-semibold">Ações Agendadas para o Paciente</h3>
+                <ScrollArea className="flex-1 rounded-md border p-4">
+                  {editedActions.length === 0 ? (
+                    <p className="text-center text-muted-foreground">Nenhuma ação adicionada ainda.</p>
+                  ) : (
+                    <div className="space-y-4">
+                      {sortedDates.map(dateKey => (
+                        <div key={dateKey} className="border-b pb-2 last:border-b-0">
+                          <p className="font-bold text-md mb-2">
+                            {format(parseISO(dateKey), "PPP", { locale: ptBR })}
+                          </p>
+                          <div className="space-y-2">
+                            {Object.keys(actionsGroupedByDateAndHour[dateKey]).sort().map(hour => (
+                              <div key={`${dateKey}-${hour}`} className="mb-2">
+                                <p className="font-semibold text-sm mb-1">{hour}:00</p>
+                                {actionsGroupedByDateAndHour[dateKey][hour].map((action) => {
+                                  const ActionIcon = actionTypeIconMap[action.type] || FlaskConical;
+                                  return (
+                                    <div key={action.id} className="flex items-center justify-between p-2 border rounded-md bg-card mb-1">
+                                      <div className="flex items-center">
+                                        <ActionIcon className="h-5 w-5 mr-2 text-muted-foreground" />
+                                        <p className="font-medium text-sm">
+                                          {action.description}
+                                          {action.type === "Medicação" && action.quantity && action.route && (
+                                            <span className="text-xs text-muted-foreground ml-2">
+                                              ({action.quantity} - {action.route})
+                                            </span>
+                                          )}
+                                        </p>
+                                      </div>
+                                      <div className="flex items-center space-x-2">
+                                        {action.frequency && (
+                                          <Badge variant="secondary" className="text-xs">{action.frequency}</Badge>
+                                        )}
+                                        <Badge variant="secondary" className="mr-2">{action.type}</Badge>
+                                        <Button variant="destructive" size="icon" className="h-7 w-7" onClick={() => handleRemoveAction(action)}>
+                                          <Trash2 className="h-4 w-4" />
+                                          <span className="sr-only">Remover</span>
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
             </div>
-          </div>
+          </ScrollArea>
 
           <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
             <Button variant="outline" onClick={handleCancelAndClose} type="button">
