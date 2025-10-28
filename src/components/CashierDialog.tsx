@@ -28,23 +28,24 @@ interface CashierDialogProps {
 const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
-  const organizationId = appUser?.organizationId;
+  const userId = appUser?.id; // Current user's ID
+  const organizationId = appUser?.organizationId; // Current user's organization ID
 
   const [cartItems, setCartItems] = useState<SaleItem[]>([]);
 
   // Fetch products for the selector
   const { data: products = [], isLoading: isLoadingProducts } = useQuery<Product[]>({
-    queryKey: ['products', organizationId],
+    queryKey: ['products', userId], // Changed to userId
     queryFn: async () => {
-      if (!organizationId) return [];
+      if (!userId) return []; // Changed to userId
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('organization_id', organizationId);
+        .eq('user_id', userId); // Changed to user_id
       if (error) throw error;
       return data as Product[];
     },
-    enabled: !!organizationId,
+    enabled: !!userId, // Changed to userId
   });
 
   const totalAmount = useMemo(() => {
@@ -74,7 +75,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
             price: product.price,
             quantity: quantity,
             total: quantity * product.price,
-            organization_id: organizationId!, // Ensure organizationId is present
+            organization_id: organizationId!, // Use organizationId for SaleItem
           },
         ];
       }
@@ -105,8 +106,8 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
 
   const finalizeSaleMutation = useMutation({
     mutationFn: async (paymentMethod: string) => {
-      if (!organizationId) {
-        throw new Error("Organization ID not available."); // Lança erro se organizationId não estiver disponível
+      if (!userId || !organizationId) { // Ensure both userId and organizationId are available
+        throw new Error("User or Organization ID not available.");
       }
       if (cartItems.length === 0) throw new Error("Não há itens no carrinho para finalizar a venda.");
 
@@ -118,7 +119,8 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
       const { data: transactionData, error: transactionError } = await supabase
         .from('transactions')
         .insert({
-          organization_id: organizationId,
+          user_id: userId, // Add user_id (NOT NULL)
+          organization_id: organizationId, // Keep organization_id (NULLABLE)
           description: `Venda de produtos/serviços`,
           type: "Entrada",
           amount: totalAmount,
@@ -137,7 +139,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
 
       // 2. Create the sale items
       const saleItemsPayload = cartItems.map(item => ({
-        organization_id: organizationId,
+        organization_id: item.organization_id, // Use organization_id from SaleItem
         transaction_id: transactionId,
         product_id: item.productId,
         name: item.name,
@@ -159,8 +161,8 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
       return { transactionId };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions', organizationId] });
-      queryClient.invalidateQueries({ queryKey: ['products', organizationId] }); // Invalidate products in case stock management is added later
+      queryClient.invalidateQueries({ queryKey: ['transactions', userId] }); // Changed to userId
+      queryClient.invalidateQueries({ queryKey: ['products', userId] }); // Changed to userId
       setCartItems([]);
       showSuccess("Venda finalizada com sucesso!");
       onClose(); // Close cashier after successful sale

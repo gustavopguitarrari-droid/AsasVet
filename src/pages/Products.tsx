@@ -49,7 +49,8 @@ const productCategoryOptions: FilterOption[] = [
 const Products = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
-  const organizationId = appUser?.organizationId; // Usar organizationId
+  const userId = appUser?.id; // Use userId for products table
+  const organizationId = appUser?.organizationId; // Keep organizationId for transactions/sale_items if needed
   const { setPageTitle } = usePageTitle();
 
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -65,29 +66,29 @@ const Products = () => {
 
   // Fetch products
   const { data: products = [], isLoading, error } = useQuery<Product[]>({
-    queryKey: ['products', organizationId], // Alterado para usar organizationId
+    queryKey: ['products', userId], // Changed to use userId
     queryFn: async () => {
-      if (!organizationId) return []; // Usar organizationId
+      if (!userId) return []; // Use userId
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('organization_id', organizationId); // Filtrar por organization_id
+        .eq('user_id', userId); // Filter by user_id
       if (error) throw error;
       return data as Product[];
     },
-    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
+    enabled: !!userId, // Enable query only if userId is available
   });
 
   // Add product mutation (reusing from cashier)
   const addProductMutation = useMutation({
     mutationFn: async (newProductData: AddProductFormValues) => {
-      if (!organizationId) {
-        throw new Error("Organization ID not available."); // Lança erro se organizationId não estiver disponível
+      if (!userId) { // Changed to userId
+        throw new Error("User ID not available."); // Lança erro se userId não estiver disponível
       }
       const { data, error } = await supabase
         .from('products')
         .insert({
-          organization_id: organizationId, // NOVO: Adicionar organization_id
+          user_id: userId, // Changed to user_id
           name: newProductData.name,
           price: newProductData.price,
           category: newProductData.category,
@@ -98,7 +99,7 @@ const Products = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', organizationId] }); // Invalida a query com organizationId
+      queryClient.invalidateQueries({ queryKey: ['products', userId] }); // Changed to userId
       showSuccess("Produto/Serviço adicionado com sucesso!");
       setIsAddProductDialogOpen(false);
     },
@@ -110,8 +111,8 @@ const Products = () => {
   // Update product mutation
   const updateProductMutation = useMutation({
     mutationFn: async (updatedProductData: Product) => {
-      if (!organizationId) {
-        throw new Error("Organization ID not available."); // Lança erro se organizationId não estiver disponível
+      if (!userId) { // Changed to userId
+        throw new Error("User ID not available."); // Lança erro se userId não estiver disponível
       }
       const { data, error } = await supabase
         .from('products')
@@ -121,14 +122,14 @@ const Products = () => {
           category: updatedProductData.category,
         })
         .eq('id', updatedProductData.id)
-        .eq('organization_id', organizationId) // Filtrar por organization_id
+        .eq('user_id', userId) // Filter by user_id
         .select()
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', organizationId] }); // Invalida a query com organizationId
+      queryClient.invalidateQueries({ queryKey: ['products', userId] }); // Changed to userId
       showSuccess("Produto/Serviço atualizado com sucesso!");
       setIsEditProductDialogOpen(false);
     },
@@ -140,19 +141,19 @@ const Products = () => {
   // Delete product mutation
   const deleteProductMutation = useMutation({
     mutationFn: async (productId: string) => {
-      if (!organizationId) {
-        throw new Error("Organization ID not available."); // Lança erro se organizationId não estiver disponível
+      if (!userId) { // Changed to userId
+        throw new Error("User ID not available."); // Lança erro se userId não estiver disponível
       }
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', productId)
-        .eq('organization_id', organizationId); // Filtrar por organization_id
+        .eq('user_id', userId); // Filter by user_id
       if (error) throw error;
       return productId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', organizationId] }); // Invalida a query com organizationId
+      queryClient.invalidateQueries({ queryKey: ['products', userId] }); // Changed to userId
       showSuccess("Produto/Serviço excluído com sucesso!");
     },
     onError: (err) => {

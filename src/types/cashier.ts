@@ -3,7 +3,7 @@ export interface Product {
   name: string;
   price: number;
   category: string; // Ex: "Serviço", "Produto"
-  user_id: string; // ALTERADO: De organization_id para user_id
+  user_id: string; // Matches products table
 }
 
 export interface SaleItem {
@@ -12,7 +12,7 @@ export interface SaleItem {
   price: number;
   quantity: number;
   total: number;
-  user_id: string; // ALTERADO: De organization_id para user_id
+  organization_id: string; // Matches sale_items table
 }
 
 export interface Transaction {
@@ -24,5 +24,6 @@ export interface Transaction {
   time: string;
   items?: SaleItem[]; // Opcional, para transações de venda detalhadas
   paymentMethod?: string; // Opcional, para transações de venda
-  user_id: string; // ALTERADO: De organization_id para user_id
+  user_id: string; // Matches transactions table (NOT NULL)
+  organization_id?: string; // Matches transactions table (NULLABLE)
 }

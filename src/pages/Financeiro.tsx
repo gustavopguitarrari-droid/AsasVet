@@ -23,37 +23,39 @@ import { showError, showSuccess } from "@/utils/toast";
 const Financeiro = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
-  const organizationId = appUser?.organizationId; // Usar organizationId
+  const userId = appUser?.id; // Current user's ID
+  const organizationId = appUser?.organizationId; // Current user's organization ID
 
   const [searchTerm, setSearchTerm] = React.useState<string>("");
   const [isAddTransactionDialogOpen, setIsAddTransactionDialogOpen] = React.useState(false);
 
   // Query para buscar transações
   const { data: transactions = [], isLoading, error } = useQuery<Transaction[]>({
-    queryKey: ['transactions', organizationId], // Alterado para usar organizationId
+    queryKey: ['transactions', userId], // Changed to userId
     queryFn: async () => {
-      if (!organizationId) return []; // Usar organizationId
+      if (!userId) return []; // Changed to userId
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
-        .eq('organization_id', organizationId) // Filtrar por organization_id
+        .eq('user_id', userId) // Filter by user_id
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data as Transaction[];
     },
-    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
+    enabled: !!userId, // Enable query only if userId is available
   });
 
   // Mutação para adicionar uma nova transação
   const addTransactionMutation = useMutation({
     mutationFn: async (newTransactionData: TransactionFormValues) => {
-      if (!organizationId) {
-        throw new Error("Organization ID not available."); // Lança erro se organizationId não estiver disponível
+      if (!userId || !organizationId) { // Ensure both userId and organizationId are available
+        throw new Error("User or Organization ID not available.");
       }
       const { data, error } = await supabase
         .from('transactions')
         .insert({
-          organization_id: organizationId, // NOVO: Adicionar organization_id
+          user_id: userId, // Add user_id
+          organization_id: organizationId, // Add organization_id
           description: newTransactionData.description,
           type: newTransactionData.type,
           amount: parseFloat(newTransactionData.amount),
@@ -66,7 +68,7 @@ const Financeiro = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions', organizationId] }); // Invalida a query com organizationId
+      queryClient.invalidateQueries({ queryKey: ['transactions', userId] }); // Changed to userId
       showSuccess("Transação adicionada com sucesso!");
       setIsAddTransactionDialogOpen(false);
     },
@@ -74,10 +76,6 @@ const Financeiro = () => {
       showError(`Erro ao adicionar transação: ${err.message}`);
     },
   });
-
-  const handleAddTransaction = (data: TransactionFormValues) => {
-    addTransactionMutation.mutate(data);
-  };
 
   const filteredTransactions = transactions.filter((transaction) =>
     transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
