@@ -213,7 +213,11 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         throw fetchError;
       }
 
-      if (!medicalRecordData || !medicalRecordData.prescriptions || medicalRecordData.prescriptions.length === 0) {
+      if (!medicalRecordData) {
+        throw new Error("Prontuário médico não encontrado.");
+      }
+      console.log("AppointmentHistoryDialog: Fetched medicalRecordData.prescriptions:", medicalRecordData.prescriptions); // ADD THIS LOG
+      if (!medicalRecordData.prescriptions || medicalRecordData.prescriptions.length === 0) {
         throw new Error("Nenhuma prescrição encontrada no prontuário para gerar a receita.");
       }
 

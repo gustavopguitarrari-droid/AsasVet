@@ -116,7 +116,7 @@ const ConsultationPage: React.FC = () => {
         physical_exam: recordData.physicalExam || null,
         diagnosis: recordData.diagnosis || null,
         treatment: recordData.treatment || null,
-        prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : null,
+        prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : [], // Alterado para []
         recipe_pdf_url: recordData.recipe_pdf_url || null, // Incluir recipe_pdf_url no payload
       };
 
@@ -220,7 +220,7 @@ const ConsultationPage: React.FC = () => {
             physical_exam: null,
             diagnosis: null,
             treatment: null,
-            prescriptions: null,
+            prescriptions: [], // Alterado para []
           })
           .select('id')
           .single();
