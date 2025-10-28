@@ -96,7 +96,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
     setCustomDescription(e.target.value);
     form.setValue("description", e.target.value);
     form.setValue("productId", undefined); // Clear product selection if custom description is used
-    form.setValue("amount", undefined); // Clear amount if custom description is used
+    // NÃO LIMPAR O CAMPO 'amount' AQUI, permitindo entrada manual
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
