@@ -660,9 +660,7 @@ const Cadastro = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Cadastro de Tutores e Animais</h2>
-      </div>
+      {/* Removido o subtítulo "Cadastro de Tutores e Animais" */}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
