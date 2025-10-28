@@ -31,6 +31,7 @@ import { useLocation } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ImagePreviewDialog from "@/components/ImagePreviewDialog";
+import CadastroLegend from "@/components/CadastroLegend"; // Importar o novo componente
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
@@ -663,6 +664,7 @@ const Cadastro = () => {
         </TabsList>
 
         <TabsContent value="tutores" className="mt-4">
+          <CadastroLegend /> {/* Adicionado o componente de legenda aqui */}
           <div className="flex items-center justify-end mb-4">
             <div className="flex items-center space-x-2">
               <div className="relative">
