@@ -8,7 +8,9 @@ import Header from "./Header";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import { cn } from "@/lib/utils";
 import FloatingChatButton from "@/components/FloatingChatButton";
-import ChatDialog from "@/components/ChatDialog"; // Importar o novo componente ChatDialog
+import ChatDialog from "@/components/ChatDialog";
+import FloatingCashierButton from "@/components/FloatingCashierButton"; // NOVO: Importar o botão do caixa
+import CashierDialog from "@/components/CashierDialog"; // NOVO: Importar o diálogo do caixa
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,14 +18,19 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
-  const [isChatDialogOpen, setIsChatDialogOpen] = React.useState(false); // Novo estado para o diálogo do chat
+  const [isChatDialogOpen, setIsChatDialogOpen] = React.useState(false);
+  const [isCashierDialogOpen, setIsCashierDialogOpen] = React.useState(false); // NOVO: Estado para o diálogo do caixa
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
   };
 
   const handleChatButtonClick = () => {
-    setIsChatDialogOpen(true); // Abre o diálogo do chat
+    setIsChatDialogOpen(true);
+  };
+
+  const handleCashierButtonClick = () => { // NOVO: Handler para o botão do caixa
+    setIsCashierDialogOpen(true);
   };
 
   // Ajusta os tamanhos do sidebar com base no estado de recolhimento
@@ -50,8 +57,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
+      <FloatingCashierButton onClick={handleCashierButtonClick} /> {/* NOVO: Botão do caixa */}
       <FloatingChatButton onClick={handleChatButtonClick} />
-      <ChatDialog isOpen={isChatDialogOpen} onClose={() => setIsChatDialogOpen(false)} /> {/* Renderiza o ChatDialog */}
+      <ChatDialog isOpen={isChatDialogOpen} onClose={() => setIsChatDialogOpen(false)} />
+      <CashierDialog isOpen={isCashierDialogOpen} onClose={() => setIsCashierDialogOpen(false)} /> {/* NOVO: Diálogo do caixa */}
     </div>
   );
 };

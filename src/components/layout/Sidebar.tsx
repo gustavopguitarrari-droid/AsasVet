@@ -59,15 +59,11 @@ const allNavItems: NavItem[] = [
     path: "/estoque",
   },
   {
-    name: "Caixa",
-    icon: ReceiptText,
-    path: "/caixa",
-  },
-  {
     name: "Financeiro",
     icon: DollarSign,
     path: "/financeiro",
   },
+  // Removido o item "Caixa"
 ];
 
 interface SidebarProps {

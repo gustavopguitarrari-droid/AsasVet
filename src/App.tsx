@@ -3,13 +3,13 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ProtectedRoute from "./components/ProtectedRoute"; // Importar ProtectedRoute
+import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Cadastro from "./pages/Cadastro";
 import Appointments from "./pages/Appointments";
 import AgendamentosMedicos from "./pages/AgendamentosMedicos";
-import Financeiro from "./pages/Financeiro";
-import Caixa from "./pages/Caixa";
+// import Financeiro from "./pages/Financeiro"; // Removido
+// import Caixa from "./pages/Caixa"; // Removido
 import Internacao from "./pages/Internacao";
 import Veterinarios from "./pages/Veterinarios";
 import Estoque from "./pages/Estoque";
@@ -17,12 +17,12 @@ import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
-import LandingPage from "./pages/LandingPage"; // Importar a nova LandingPage
-import ConsultationPage from "./pages/Consultation"; // Importar a nova página de Consulta
-import SignUp from "./pages/SignUp"; // NOVO: Importar a página de cadastro
+import LandingPage from "./pages/LandingPage";
+import ConsultationPage from "./pages/Consultation";
+import SignUp from "./pages/SignUp";
 import { SessionContextProvider } from "./context/SessionContext";
-import ScrollToTop from "./components/ScrollToTop"; // Importar o novo componente ScrollToTop
-import { PageTitleProvider } from "./context/PageTitleContext"; // NOVO: Importar PageTitleProvider
+import ScrollToTop from "./components/ScrollToTop";
+import { PageTitleProvider } from "./context/PageTitleContext";
 
 const queryClient = new QueryClient();
 
@@ -33,12 +33,12 @@ const App = () => (
       <Sonner />
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <SessionContextProvider>
-          <PageTitleProvider> {/* NOVO: Envolver com PageTitleProvider */}
-            <ScrollToTop /> {/* Adicionar o ScrollToTop aqui */}
+          <PageTitleProvider>
+            <ScrollToTop />
             <Routes>
-              <Route path="/" element={<LandingPage />} /> {/* Nova rota inicial */}
+              <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<SignUp />} /> {/* NOVO: Rota para a página de cadastro */}
+              <Route path="/signup" element={<SignUp />} />
               
               {/* Rotas Protegidas */}
               <Route
@@ -81,14 +81,7 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/caixa"
-                element={
-                  <ProtectedRoute>
-                    <Caixa />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Removida a rota /caixa */}
               <Route
                 path="/internacao"
                 element={
@@ -140,7 +133,7 @@ const App = () => (
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </PageTitleProvider> {/* NOVO */}
+          </PageTitleProvider>
         </SessionContextProvider>
       </BrowserRouter>
     </TooltipProvider>
