@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, Dog, Camera, XCircle, Upload } from "lucide-react";
+import { PlusCircle, Dog, Camera, XCircle, Upload, Search, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,7 +23,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CameraCaptureDialog from "./CameraCaptureDialog";
 import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
-import { Label } from "@/components/ui/label"; // Adicionado importação do Label
+import { Label } from "@/components/ui/label";
+import { useUser } from "@/context/UserContext";
+import { supabase } from "@/integrations/supabase/client";
 
 // Esquema de validação do formulário com Zod
 const formSchema = z.object({
@@ -43,7 +45,8 @@ const formSchema = z.object({
   ),
   observations: z.string().optional(),
   photoUrl: z.string().optional(), // Pode ser Base64 ou URL pública
-  ownerId: z.string().min(1, "O tutor é obrigatório."),
+  ownerId: z.string().min(1, "O tutor é obrigatório."), // Este campo será preenchido pela busca
+  cpfSearch: z.string().optional(), // Campo para input de CPF na UI
 });
 
 export type PetFormValues = z.infer<typeof formSchema>;
@@ -54,23 +57,26 @@ interface PetFormProps {
   initialData?: Pet;
   allClients: Client[]; // Lista de todos os tutores para seleção
   defaultOwnerId?: string; // Para pré-selecionar um tutor
-  defaultOwnerName?: string; // NOVO: Nome do tutor padrão
+  defaultOwnerName?: string; // Nome do tutor padrão
 }
 
 const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allClients, defaultOwnerId, defaultOwnerName }) => {
+  const { user: appUser } = useUser();
+  const userId = appUser?.id;
+
   const form = useForm<PetFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: initialData?.name || "",
-      species: initialData?.species || "Cachorro", // Corrigido o tipo aqui
+      species: initialData?.species || "Cachorro",
       breed: initialData?.breed || "",
       age: initialData?.age || "",
       gender: initialData?.gender || "Desconhecido",
       color: initialData?.color || "",
-      weight: initialData?.weight || undefined, // Adicionado o peso aqui
+      weight: initialData?.weight || undefined,
       observations: initialData?.observations || "",
-      photoUrl: initialData?.photoUrl || undefined,
       ownerId: initialData?.ownerId || defaultOwnerId || "",
+      cpfSearch: "", // Inicializa o campo de busca de CPF
     },
   });
 
@@ -78,24 +84,95 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isCameraDialogOpen, setIsCameraDialogOpen] = useState(false);
 
+  const [cpfInput, setCpfInput] = useState<string>("");
+  const [foundClient, setFoundClient] = useState<Client | null>(null);
+
   useEffect(() => {
     form.reset({
       name: initialData?.name || "",
-      species: initialData?.species || "Cachorro", // Corrigido o tipo aqui
+      species: initialData?.species || "Cachorro",
       breed: initialData?.breed || "",
       age: initialData?.age || "",
       gender: initialData?.gender || "Desconhecido",
       color: initialData?.color || "",
-      weight: initialData?.weight || undefined, // Resetar peso
+      weight: initialData?.weight || undefined,
       observations: initialData?.observations || "",
-      photoUrl: initialData?.photoUrl || undefined,
       ownerId: initialData?.ownerId || defaultOwnerId || "",
+      cpfSearch: "", // Reseta o campo de busca de CPF
     });
     setPreviewUrl(initialData?.photoUrl || null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  }, [initialData, form, defaultOwnerId, defaultOwnerName]); // Adicionado defaultOwnerName às dependências
+
+    // Lida com os dados iniciais do tutor para edição ou adição a partir da visualização do cliente
+    let initialOwner: Client | null = null;
+    let initialCpf = "";
+
+    if (initialData?.ownerId) {
+      initialOwner = allClients.find(c => c.id === initialData.ownerId) || null;
+    } else if (defaultOwnerId) {
+      initialOwner = allClients.find(c => c.id === defaultOwnerId) || null;
+    }
+
+    if (initialOwner) {
+      initialCpf = initialOwner.cpf;
+      setFoundClient(initialOwner);
+      form.setValue("ownerId", initialOwner.id);
+    } else {
+      setFoundClient(null);
+      form.setValue("ownerId", "");
+    }
+    setCpfInput(initialCpf);
+
+  }, [initialData, form, allClients, defaultOwnerId, defaultOwnerName]);
+
+  const handleCpfInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, ''); // Apenas números
+    setCpfInput(value);
+  };
+
+  const handleSearchCpf = async () => {
+    if (!userId) {
+      showError("Usuário não autenticado.");
+      return;
+    }
+    const cleanCpf = cpfInput.replace(/\D/g, '');
+    if (cleanCpf.length !== 11) {
+      showError("CPF inválido. Digite 11 dígitos.");
+      setFoundClient(null);
+      form.setValue("ownerId", "");
+      return;
+    }
+
+    try {
+      const { data: foundClientData, error } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('cpf', cleanCpf)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 significa que nenhuma linha foi encontrada
+        throw error;
+      }
+
+      if (foundClientData) {
+        setFoundClient(foundClientData);
+        form.setValue("ownerId", foundClientData.id);
+        showSuccess(`Tutor ${foundClientData.name} encontrado!`);
+      } else {
+        showError("Tutor não encontrado com este CPF.");
+        setFoundClient(null);
+        form.setValue("ownerId", "");
+      }
+    } catch (err: any) {
+      console.error("Erro ao buscar cliente por CPF:", err.message);
+      showError(`Erro ao buscar tutor: ${err.message}`);
+      setFoundClient(null);
+      form.setValue("ownerId", "");
+    }
+  };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -105,7 +182,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
         setPreviewUrl(initialData?.photoUrl || null);
         return;
       }
-      if (file.size > 2 * 1024 * 1024) { // 2MB limit
+      if (file.size > 2 * 1024 * 1024) { // Limite de 2MB
         showError("A imagem é muito grande. O tamanho máximo permitido é 2MB.");
         setPreviewUrl(initialData?.photoUrl || null);
         return;
@@ -146,11 +223,10 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
   };
 
   const currentName = form.watch("name");
-  // Garante que initials seja uma string não vazia para evitar problemas de renderização
-  const initials = currentName.charAt(0).toUpperCase() || ''; 
+  const initials = currentName.charAt(0).toUpperCase() || '';
 
   const handleSubmit = (data: PetFormValues) => {
-    console.log("PetForm (handleSubmit): Dados do formulário sendo submetidos:", data); // Log para depuração
+    console.log("PetForm (handleSubmit): Dados do formulário sendo submetidos:", data);
     onSubmit(data);
   };
 
@@ -164,7 +240,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
                 <AvatarImage src={previewUrl} alt="Preview" />
               ) : (
                 <AvatarFallback className="bg-muted text-muted-foreground text-3xl font-bold">
-                  {initials || <Dog className="h-12 w-12" />} {/* Fallback para o ícone Dog se initials for vazio */}
+                  {initials || <Dog className="h-12 w-12" />}
                 </AvatarFallback>
               )}
             </Avatar>
@@ -196,37 +272,48 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
             </div>
           </div>
 
-          <FormField
-            control={form.control}
-            name="ownerId"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  {defaultOwnerName ? `Tutor: ${defaultOwnerName}` : "Tutor"}
-                </FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  // Desabilita se defaultOwnerId for fornecido
-                  disabled={!!defaultOwnerId} 
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o tutor" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {allClients.map((client) => (
-                      <SelectItem key={client.id} value={client.id}>
-                        {client.name} (CPF: {client.cpf})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
+          {/* Busca de Tutor por CPF */}
+          <div className="space-y-2 border p-3 rounded-md">
+            <Label className="flex items-center">
+              <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor por CPF
+            </Label>
+            <div className="flex space-x-2">
+              <Input
+                placeholder="Digite o CPF do tutor (somente números)"
+                value={cpfInput}
+                onChange={handleCpfInputChange}
+                maxLength={11}
+                className="flex-1"
+                disabled={!!defaultOwnerId} // Desabilita se defaultOwnerId for fornecido
+              />
+              <Button type="button" onClick={handleSearchCpf} size="icon" disabled={!!defaultOwnerId}>
+                <Search className="h-4 w-4" />
+                <span className="sr-only">Buscar Tutor</span>
+              </Button>
+            </div>
+            {foundClient ? (
+              <p className="text-sm text-muted-foreground mt-2">
+                Tutor selecionado: <span className="font-semibold">{foundClient.name}</span>
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground mt-2">
+                {defaultOwnerName ? `Tutor padrão: ${defaultOwnerName}` : "Nenhum tutor selecionado."}
+              </p>
             )}
-          />
+            {/* Campo oculto para ownerId, valor definido pela busca ou initialData */}
+            <FormField
+              control={form.control}
+              name="ownerId"
+              render={({ field }) => (
+                <FormItem className="hidden">
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           <FormField
             control={form.control}
@@ -348,7 +435,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
                       min="0.1"
                       placeholder="Ex: 15.5"
                       {...field}
-                      value={field.value === undefined ? "" : field.value} // Garante que o input seja controlado
+                      value={field.value === undefined ? "" : field.value}
                       onChange={(e) => field.onChange(e.target.value === "" ? undefined : Number(e.target.value))}
                     />
                   </FormControl>
