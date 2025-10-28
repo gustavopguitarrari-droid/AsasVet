@@ -125,7 +125,7 @@ const ConsultationPage: React.FC = () => {
         recipe_pdf_url: recordData.recipe_pdf_url || null,
       };
 
-      console.log("Payload being sent to medical_records:", JSON.stringify(payload, null, 2));
+      console.log("ConsultationPage: Payload being sent to medical_records:", JSON.stringify(payload, null, 2)); // Adicionado log aqui
 
       if (medicalRecord?.id) {
         const { data, error } = await supabase
