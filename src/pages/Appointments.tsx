@@ -33,8 +33,7 @@ import { usePageTitle } from "@/context/PageTitleContext"; // NOVO: Importar use
 import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf"; // Importar função de PDF
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm"; // Importar tipo de formulário
 import PdfPreviewDialog from "@/components/PdfPreviewDialog"; // Importar diálogo de pré-visualização
-import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf'; // NOVO: Importar função de PDF de receita
-import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase } from '@/utils/supabaseStorage'; // NOVO: Funções de storage para receita
+import { generatePrescriptionPdf } from "@/utils/generatePrescriptionPdf"; // NOVO: Importar generatePrescriptionPdf
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -74,9 +73,9 @@ interface MedicalRecord {
   diagnosis?: string | null;
   treatment?: string | null;
   prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
-  recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
   created_at: string;
   updated_at: string;
+  recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -109,11 +108,6 @@ const Appointments = () => {
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [pdfFilename, setPdfFilename] = useState("");
   const [pdfAppointment, setPdfAppointment] = useState<Appointment | null>(null);
-
-  // Estados para o diálogo de pré-visualização de PDF de receita
-  const [isRecipePdfPreviewDialogOpen, setIsRecipePdfPreviewDialogOpen] = useState(false);
-  const [recipePdfBlob, setRecipePdfBlob] = useState<Blob | null>(null);
-  const [recipePdfFilename, setRecipePdfFilename] = useState("");
 
   // NOVO: Efeito para atualizar o título da página com base na aba ativa
   React.useEffect(() => {
@@ -160,7 +154,7 @@ const Appointments = () => {
         // Assuming medical_records is an array, take the first one if it exists
         // and extract prescriptions. Handle null/undefined cases.
         prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
-        recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
+        recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null, // NOVO: Extrair recipe_pdf_url
       })) as Appointment[];
     },
     enabled: !!userId,
@@ -185,7 +179,7 @@ const Appointments = () => {
       return data.map(app => ({
         ...app,
         prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
-        recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
+        recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null, // NOVO: Extrair recipe_pdf_url
       })) as Appointment[];
     },
     enabled: !!userId,
@@ -400,11 +394,11 @@ const Appointments = () => {
 
   // Mutation to fetch the medical record and generate the PDF
   const fetchAndGeneratePdfMutation = useMutation({
-    mutationFn: async ({ appointment }: { appointment: Appointment }) => {
+    mutationFn: async ({ appointment, pdfType }: { appointment: Appointment, pdfType: 'medicalRecord' | 'prescription' }) => {
       // First, fetch the medical record
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
-        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
+        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at, recipe_pdf_url')
         .eq('appointment_id', appointment.id)
         .eq('user_id', appointment.user_id)
         .single();
@@ -420,66 +414,6 @@ const Appointments = () => {
         throw new Error("Prontuário médico não encontrado.");
       }
 
-      // Map medical record data to form values for PDF generation
-      const medicalRecordForPdf: MedicalRecordFormValues = {
-        anamnesis: medicalRecordData.anamnesis || undefined,
-        physicalExam: medicalRecordData.physical_exam || undefined,
-        diagnosis: medicalRecordData.diagnosis || undefined,
-        treatment: medicalRecordData.treatment || undefined,
-        prescriptions: medicalRecordData.prescriptions || [],
-      };
-
-      // Generate the PDF
-      const blob = await generateMedicalRecordPdf({ 
-        appointment, 
-        medicalRecord: medicalRecordForPdf, 
-        logoUrl: appUser?.logoUrl,
-        clinicDetails: {
-          companyName: appUser?.companyName || 'AsasVet',
-          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
-          phone: appUser?.phone || '',
-          email: appUser?.email || '',
-          veterinarianCrmv: appUser?.crmv || '',
-          veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
-        }
-      });
-
-      return { blob, appointment };
-    },
-    onSuccess: ({ blob, appointment }) => {
-      setPdfBlob(blob);
-      setPdfFilename(`Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
-      setPdfAppointment(appointment);
-      setIsPdfPreviewDialogOpen(true);
-    },
-    onError: (err: any) => {
-      console.error("Erro ao gerar PDF do histórico:", err);
-      showError(`Erro ao gerar PDF: ${err.message || "Erro desconhecido"}`);
-    },
-  });
-
-  // NOVO: Mutação para buscar o prontuário médico e gerar o PDF da receita
-  const fetchAndGenerateRecipePdfMutation = useMutation({
-    mutationFn: async ({ appointment }: { appointment: Appointment }) => {
-      // First, fetch the medical record to get prescriptions
-      const { data: medicalRecordData, error: fetchError } = await supabase
-        .from('medical_records')
-        .select('id, prescriptions')
-        .eq('appointment_id', appointment.id)
-        .eq('user_id', appointment.user_id)
-        .single();
-
-      if (fetchError) {
-        if (fetchError.code === 'PGRST116') {
-          throw new Error("Prontuário médico não encontrado para esta consulta.");
-        }
-        throw fetchError;
-      }
-
-      if (!medicalRecordData || !medicalRecordData.prescriptions || medicalRecordData.prescriptions.length === 0) {
-        throw new Error("Nenhuma prescrição encontrada no prontuário para gerar a receita.");
-      }
-
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
         address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
@@ -489,23 +423,51 @@ const Appointments = () => {
         veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
       };
 
-      const pdfBlob = await generatePrescriptionPdf({
-        appointment,
-        prescriptions: medicalRecordData.prescriptions,
-        logoUrl: appUser?.logoUrl,
-        clinicDetails,
-      });
+      let blob: Blob;
+      let filename: string;
 
-      return { pdfBlob, appointment };
+      if (pdfType === 'medicalRecord') {
+        // Map medical record data to form values for PDF generation
+        const medicalRecordForPdf: MedicalRecordFormValues = {
+          anamnesis: medicalRecordData.anamnesis || undefined,
+          physicalExam: medicalRecordData.physical_exam || undefined,
+          diagnosis: medicalRecordData.diagnosis || undefined,
+          treatment: medicalRecordData.treatment || undefined,
+          prescriptions: medicalRecordData.prescriptions || [],
+          recipePdfUrl: medicalRecordData.recipe_pdf_url || null,
+        };
+        blob = await generateMedicalRecordPdf({ 
+          appointment, 
+          medicalRecord: medicalRecordForPdf, 
+          logoUrl: appUser?.logoUrl,
+          clinicDetails,
+        });
+        filename = `Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`;
+      } else { // pdfType === 'prescription'
+        if (!medicalRecordData.prescriptions || medicalRecordData.prescriptions.length === 0) {
+          throw new Error("Nenhuma prescrição encontrada para gerar a receita.");
+        }
+        blob = await generatePrescriptionPdf({
+          petName: appointment.pet_name,
+          ownerName: appointment.client_name,
+          prescriptions: medicalRecordData.prescriptions,
+          logoUrl: appUser?.logoUrl,
+          clinicDetails,
+        });
+        filename = `Receita_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`;
+      }
+
+      return { blob, appointment, filename };
     },
-    onSuccess: ({ pdfBlob, appointment }) => {
-      setRecipePdfBlob(pdfBlob);
-      setRecipePdfFilename(`Receita_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
-      setIsRecipePdfPreviewDialogOpen(true);
+    onSuccess: ({ blob, appointment, filename }) => {
+      setPdfBlob(blob);
+      setPdfFilename(filename);
+      setPdfAppointment(appointment);
+      setIsPdfPreviewDialogOpen(true);
     },
     onError: (err: any) => {
-      console.error("Erro ao gerar PDF da receita do histórico:", err);
-      showError(`Erro ao gerar receita: ${err.message || "Erro desconhecido"}`);
+      console.error("Erro ao gerar PDF do histórico:", err);
+      showError(`Erro ao gerar PDF: ${err.message || "Erro desconhecido"}`);
     },
   });
 
@@ -593,13 +555,8 @@ const Appointments = () => {
   };
 
   // Handler to open PDF preview dialog
-  const handleOpenMedicalRecordPdfPreviewDialog = (appointment: Appointment) => {
-    fetchAndGeneratePdfMutation.mutate({ appointment });
-  };
-
-  // Handler to open Recipe PDF preview dialog
-  const handleOpenRecipePdfPreviewDialog = (appointment: Appointment) => {
-    fetchAndGenerateRecipePdfMutation.mutate({ appointment });
+  const handleOpenPdfPreviewDialog = (appointment: Appointment, pdfType: 'medicalRecord' | 'prescription') => {
+    fetchAndGeneratePdfMutation.mutate({ appointment, pdfType });
   };
 
   // Handler to confirm PDF download
@@ -617,21 +574,6 @@ const Appointments = () => {
       
       showSuccess("PDF do prontuário baixado com sucesso!");
       setIsPdfPreviewDialogOpen(false);
-    }
-  };
-
-  const handleConfirmRecipePdfDownload = (filename: string) => {
-    if (recipePdfBlob) {
-      const url = URL.createObjectURL(recipePdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showSuccess("PDF da receita baixado com sucesso!");
-      setIsRecipePdfPreviewDialogOpen(false);
     }
   };
 
@@ -757,7 +699,7 @@ const Appointments = () => {
                 {activeTab === "finalizadas" && <TableHead>Duração</TableHead>}
                 {activeTab === "finalizadas" && <TableHead>Receitas</TableHead>} {/* NOVO: Coluna Receitas */}
                 {activeTab === "finalizadas" ? (
-                  <TableHead className="text-right">Prontuário / Receita</TableHead>
+                  <TableHead className="text-right">Prontuário</TableHead>
                 ) : (
                   <TableHead className="text-right">Ações</TableHead>
                 )}
@@ -853,12 +795,13 @@ const Appointments = () => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
-                                  showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
+                                  handleOpenPdfPreviewDialog(appointment, 'prescription');
                                 } else {
                                   showError("Nenhuma prescrição encontrada para esta consulta.");
                                 }
                               }}
                               className="flex items-center justify-center gap-1"
+                              disabled={fetchAndGeneratePdfMutation.isPending}
                             >
                               <Pill className="h-4 w-4" />
                               <span>{appointment.prescriptions_count || 0}</span>
@@ -893,40 +836,21 @@ const Appointments = () => {
                           </Button>
                         )}
                         {activeTab === "finalizadas" && isRealizada && ( // Apenas para consultas realizadas
-                          <div className="flex justify-end space-x-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenMedicalRecordPdfPreviewDialog(appointment);
-                              }}
-                              disabled={fetchAndGeneratePdfMutation.isPending}
-                            >
-                              {fetchAndGeneratePdfMutation.isPending ? (
-                                <span className="loading-spinner h-4 w-4" />
-                              ) : (
-                                <FileText className="h-4 w-4" />
-                              )}
-                            </Button>
-                            {appointment.recipe_pdf_url && (
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleOpenRecipePdfPreviewDialog(appointment);
-                                }}
-                                disabled={fetchAndGenerateRecipePdfMutation.isPending}
-                              >
-                                {fetchAndGenerateRecipePdfMutation.isPending ? (
-                                  <span className="loading-spinner h-4 w-4" />
-                                ) : (
-                                  <Pill className="h-4 w-4" />
-                                )}
-                              </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenPdfPreviewDialog(appointment, 'medicalRecord');
+                            }}
+                            disabled={fetchAndGeneratePdfMutation.isPending}
+                          >
+                            {fetchAndGeneratePdfMutation.isPending ? (
+                              <span className="loading-spinner h-4 w-4" />
+                            ) : (
+                              <FileText className="h-4 w-4" />
                             )}
-                          </div>
+                          </Button>
                         )}
                       </TableCell>
                     </TableRow>
@@ -968,15 +892,6 @@ const Appointments = () => {
         pdfBlob={pdfBlob}
         filename={pdfFilename}
         onConfirmDownload={handleConfirmPdfDownload}
-      />
-
-      {/* NOVO: Diálogo de Pré-visualização de PDF da Receita */}
-      <PdfPreviewDialog
-        isOpen={isRecipePdfPreviewDialogOpen}
-        onClose={() => setIsRecipePdfPreviewDialogOpen(false)}
-        pdfBlob={recipePdfBlob}
-        filename={recipePdfFilename}
-        onConfirmDownload={handleConfirmRecipePdfDownload}
       />
     </>
   );

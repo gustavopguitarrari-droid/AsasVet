@@ -26,9 +26,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"; // Importar AlertDialog
-import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf'; // NOVO: Importar função de PDF de receita
-import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase } from '@/utils/supabaseStorage'; // NOVO: Funções de storage para receita
-import PdfPreviewDialog from '@/components/PdfPreviewDialog'; // NOVO: Diálogo de pré-visualização de PDF
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -40,9 +37,9 @@ interface MedicalRecord {
   diagnosis?: string | null;
   treatment?: string | null;
   prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
-  recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
   created_at: string;
   updated_at: string;
+  recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
 }
 
 const ConsultationPage: React.FC = () => {
@@ -59,11 +56,6 @@ const ConsultationPage: React.FC = () => {
   const medicalRecordFormRef = useRef<MedicalRecordFormInstance>(null);
   const [isMedicalRecordFormValid, setIsMedicalRecordFormValid] = useState(false);
   const [isAttemptingFinalize, setIsAttemptingFinalize] = useState(false);
-
-  // Estados para o diálogo de pré-visualização de PDF de receita
-  const [isRecipePdfPreviewDialogOpen, setIsRecipePdfPreviewDialogOpen] = useState(false);
-  const [recipePdfBlob, setRecipePdfBlob] = useState<Blob | null>(null);
-  const [recipePdfFilename, setRecipePdfFilename] = useState("");
 
   // Query para buscar os detalhes da consulta
   const { data: appointment, isLoading, error } = useQuery<Appointment>({
@@ -89,7 +81,7 @@ const ConsultationPage: React.FC = () => {
       if (!userId || !appointmentId) throw new Error("User or Appointment ID not available.");
       const { data, error } = await supabase
         .from('medical_records')
-        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, recipe_pdf_url, created_at, updated_at') // Seleção explícita com recipe_pdf_url
+        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at, recipe_pdf_url') // Seleção explícita
         .eq('appointment_id', appointmentId)
         .eq('user_id', userId)
         .single();
@@ -106,7 +98,7 @@ const ConsultationPage: React.FC = () => {
 
   // Mutação para salvar/atualizar o prontuário médico
   const saveMedicalRecordMutation = useMutation({
-    mutationFn: async (recordData: MedicalRecordFormValues & { recipe_pdf_url?: string | null }) => {
+    mutationFn: async (recordData: MedicalRecordFormValues) => {
       if (!userId || !appointmentId) throw new Error("User or Appointment ID not available.");
 
       const payload = {
@@ -117,7 +109,7 @@ const ConsultationPage: React.FC = () => {
         diagnosis: recordData.diagnosis || null,
         treatment: recordData.treatment || null,
         prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : null,
-        recipe_pdf_url: recordData.recipe_pdf_url || null, // Incluir recipe_pdf_url no payload
+        recipe_pdf_url: recordData.recipePdfUrl || null, // NOVO: Incluir recipePdfUrl no payload
       };
 
       console.log("Payload being sent to medical_records:", JSON.stringify(payload, null, 2)); // Log para depuração
@@ -189,62 +181,6 @@ const ConsultationPage: React.FC = () => {
     },
   });
 
-  // NOVO: Mutação para gerar e salvar o PDF da receita
-  const generateAndSaveRecipePdfMutation = useMutation({
-    mutationFn: async (prescriptions: MedicalRecordFormValues['prescriptions']) => {
-      if (!userId || !appointmentId || !appointment) throw new Error("Dados da consulta ou usuário não disponíveis.");
-      if (!prescriptions || prescriptions.length === 0) throw new Error("Nenhuma prescrição para gerar a receita.");
-
-      const clinicDetails = {
-        companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
-        phone: appUser?.phone || '',
-        email: appUser?.email || '',
-        veterinarianCrmv: appUser?.crmv || '',
-        veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
-      };
-
-      const pdfBlob = await generatePrescriptionPdf({
-        appointment,
-        prescriptions,
-        logoUrl: appUser?.logoUrl,
-        clinicDetails,
-      });
-
-      // Delete old PDF if exists
-      if (medicalRecord?.recipe_pdf_url) {
-        await deleteRecipePdfFromSupabase(medicalRecord.recipe_pdf_url);
-      }
-
-      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, userId, appointmentId);
-
-      if (!newPdfUrl) throw new Error("Falha ao fazer upload do PDF da receita.");
-
-      // Update medical record with new PDF URL
-      const { data, error } = await supabase
-        .from('medical_records')
-        .update({ recipe_pdf_url: newPdfUrl })
-        .eq('id', medicalRecord?.id || '') // Use existing medicalRecord ID or throw error if not found
-        .eq('user_id', userId)
-        .select()
-        .single();
-
-      if (error) throw error;
-      return { pdfBlob, newPdfUrl };
-    },
-    onSuccess: ({ pdfBlob, newPdfUrl }) => {
-      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
-      showSuccess("Receita PDF gerada e salva com sucesso!");
-      setRecipePdfBlob(pdfBlob);
-      setRecipePdfFilename(`Receita_${appointment?.pet_name}_${format(parseISO(appointment?.date || new Date().toISOString()), 'yyyyMMdd')}.pdf`);
-      setIsRecipePdfPreviewDialogOpen(true);
-    },
-    onError: (err: any) => {
-      console.error("Erro ao gerar e salvar PDF da receita:", err);
-      showError(`Erro ao gerar receita: ${err.message || "Erro desconhecido"}`);
-    },
-  });
-
   // Função para lidar com o clique no botão "Finalizar Consulta"
   const handleFinalizeConsultationClick = () => {
     setIsFinalizeConfirmDialogOpen(true); // Abre o diálogo de confirmação
@@ -268,25 +204,6 @@ const ConsultationPage: React.FC = () => {
 
   const handleSaveMedicalRecord = (data: MedicalRecordFormValues) => {
     saveMedicalRecordMutation.mutate(data);
-  };
-
-  const handleGenerateRecipePdf = (prescriptions: MedicalRecordFormValues['prescriptions']) => {
-    generateAndSaveRecipePdfMutation.mutate(prescriptions);
-  };
-
-  const handleConfirmRecipePdfDownload = (filename: string) => {
-    if (recipePdfBlob) {
-      const url = URL.createObjectURL(recipePdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showSuccess("PDF da receita baixado com sucesso!");
-      setIsRecipePdfPreviewDialogOpen(false);
-    }
   };
 
   if (isLoading || isLoadingMedicalRecord) {
@@ -326,6 +243,7 @@ const ConsultationPage: React.FC = () => {
     diagnosis: medicalRecord?.diagnosis || undefined,
     treatment: medicalRecord?.treatment || undefined,
     prescriptions: medicalRecord?.prescriptions || [], // Garante que seja um array vazio se for null/undefined
+    recipePdfUrl: medicalRecord?.recipe_pdf_url || null, // NOVO: Passar recipePdfUrl
   };
 
   return (
@@ -378,7 +296,9 @@ const ConsultationPage: React.FC = () => {
         isSubmitting={saveMedicalRecordMutation.isPending}
         formRef={medicalRecordFormRef}
         onValidationChange={setIsMedicalRecordFormValid}
-        onGenerateRecipePdf={handleGenerateRecipePdf} // Passa a função para gerar PDF
+        appointmentId={appointmentId!} // Passar o ID da consulta
+        petName={appointment.pet_name} // Passar o nome do pet
+        ownerName={appointment.client_name} // Passar o nome do tutor
       />
 
       <div className="flex justify-end space-x-2"> {/* Botões de ação agrupados aqui */}
@@ -431,15 +351,6 @@ const ConsultationPage: React.FC = () => {
           appointment={appointment}
         />
       )}
-
-      {/* NOVO: Diálogo de Pré-visualização de PDF da Receita */}
-      <PdfPreviewDialog
-        isOpen={isRecipePdfPreviewDialogOpen}
-        onClose={() => setIsRecipePdfPreviewDialogOpen(false)}
-        pdfBlob={recipePdfBlob}
-        filename={recipePdfFilename}
-        onConfirmDownload={handleConfirmRecipePdfDownload}
-      />
     </div>
   );
 };

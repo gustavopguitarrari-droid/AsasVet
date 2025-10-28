@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const AVATARS_BUCKET_NAME = 'avatars';
 const LOGOS_BUCKET_NAME = 'logos';
-const RECIPES_BUCKET_NAME = 'recipes'; // NOVO: Nome do bucket para receitas
+const PRESCRIPTIONS_BUCKET_NAME = 'prescriptions'; // NOVO: Nome do bucket para prescrições
 
 /**
  * Converte uma string Base64 em um Blob.
@@ -185,64 +185,72 @@ export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean
   }
 };
 
-// NOVO: Funções para upload e exclusão de PDFs de receitas
-export const uploadRecipePdfToSupabase = async (
+// NOVO: Funções para upload e exclusão de PDFs de prescrição
+export const uploadPrescriptionPdfToSupabase = async (
   pdfBlob: Blob,
   userId: string,
   appointmentId: string,
+  filename: string
 ): Promise<string | null> => {
   try {
-    const fileName = `receita_${appointmentId}_${uuidv4()}.pdf`;
-    const filePath = `${userId}/${appointmentId}/${fileName}`; // Caminho: userId/appointmentId/uuid.pdf
+    const filePath = `${userId}/${appointmentId}/${filename}`; // Caminho: userId/appointmentId/filename.pdf
+    console.log(`uploadPrescriptionPdfToSupabase: Attempting to upload to filePath: ${filePath}`);
 
     const { data, error } = await supabase.storage
-      .from(RECIPES_BUCKET_NAME)
+      .from(PRESCRIPTIONS_BUCKET_NAME)
       .upload(filePath, pdfBlob, {
         contentType: 'application/pdf',
-        upsert: false,
+        upsert: true, // Sobrescrever se já existir um PDF com o mesmo nome para esta consulta
       });
 
     if (error) {
-      console.error("uploadRecipePdfToSupabase: Erro ao fazer upload do PDF da receita:", error);
+      console.error("uploadPrescriptionPdfToSupabase: Erro ao fazer upload do PDF:", error);
       throw error;
     }
+    console.log("uploadPrescriptionPdfToSupabase: Upload successful, data:", data);
 
     const { data: publicUrlData } = supabase.storage
-      .from(RECIPES_BUCKET_NAME)
+      .from(PRESCRIPTIONS_BUCKET_NAME)
       .getPublicUrl(filePath);
 
+    console.log("uploadPrescriptionPdfToSupabase: Public URL obtained:", publicUrlData.publicUrl);
     return publicUrlData.publicUrl;
 
   } catch (error) {
-    console.error("uploadRecipePdfToSupabase: Erro no processo de upload do PDF da receita:", error);
+    console.error("uploadPrescriptionPdfToSupabase: Erro no processo de upload do PDF:", error);
     return null;
   }
 };
 
-export const deleteRecipePdfFromSupabase = async (publicUrl: string): Promise<boolean> => {
-  if (!publicUrl) return true;
+export const deletePrescriptionPdfFromSupabase = async (publicUrl: string): Promise<boolean> => {
+  if (!publicUrl) {
+    console.log("deletePrescriptionPdfFromSupabase: No publicUrl provided, nothing to delete.");
+    return true;
+  }
 
   try {
     const url = new URL(publicUrl);
     const pathSegments = url.pathname.split('/');
-    const bucketIndex = pathSegments.indexOf(RECIPES_BUCKET_NAME);
+    const bucketIndex = pathSegments.indexOf(PRESCRIPTIONS_BUCKET_NAME);
     if (bucketIndex === -1 || bucketIndex + 1 >= pathSegments.length) {
-      console.warn("deleteRecipePdfFromSupabase: URL pública inválida para exclusão do PDF da receita:", publicUrl);
+      console.warn("deletePrescriptionPdfFromSupabase: URL pública inválida para exclusão do PDF:", publicUrl);
       return false;
     }
     const filePath = pathSegments.slice(bucketIndex + 1).join('/');
+    console.log(`deletePrescriptionPdfFromSupabase: Attempting to delete filePath: ${filePath} from bucket: ${PRESCRIPTIONS_BUCKET_NAME}`);
 
     const { error } = await supabase.storage
-      .from(RECIPES_BUCKET_NAME)
+      .from(PRESCRIPTIONS_BUCKET_NAME)
       .remove([filePath]);
 
     if (error) {
-      console.error("deleteRecipePdfFromSupabase: Erro ao deletar PDF da receita do storage:", error);
+      console.error("deletePrescriptionPdfFromSupabase: Erro ao deletar PDF do storage:", error);
       return false;
     }
+    console.log("deletePrescriptionPdfFromSupabase: PDF deleted successfully.");
     return true;
   } catch (error) {
-    console.error("deleteRecipePdfFromSupabase: Erro no processo de exclusão do PDF da receita:", error);
+    console.error("deletePrescriptionPdfFromSupabase: Erro no processo de exclusão do PDF:", error);
     return false;
   }
 };

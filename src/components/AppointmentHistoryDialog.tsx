@@ -43,6 +43,7 @@ import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf";
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
 import PdfPreviewDialog from "./PdfPreviewDialog";
 import { useUser } from "@/context/UserContext";
+import { generatePrescriptionPdf } from "@/utils/generatePrescriptionPdf"; // NOVO: Importar generatePrescriptionPdf
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -56,6 +57,7 @@ interface MedicalRecord {
   prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
   created_at: string;
   updated_at: string;
+  recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
 }
 
 interface AppointmentHistoryDialogProps {
@@ -111,11 +113,11 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
 
   // Mutation to fetch the medical record and generate the PDF
   const fetchAndGeneratePdfMutation = useMutation({
-    mutationFn: async ({ appointment }: { appointment: Appointment }) => {
+    mutationFn: async ({ appointment, pdfType }: { appointment: Appointment, pdfType: 'medicalRecord' | 'prescription' }) => {
       // First, fetch the medical record
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
-        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
+        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at, recipe_pdf_url')
         .eq('appointment_id', appointment.id)
         .eq('user_id', appointment.user_id)
         .single();
@@ -131,35 +133,54 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         throw new Error("Prontuário médico não encontrado.");
       }
 
-      // Map medical record data to form values for PDF generation
-      const medicalRecordForPdf: MedicalRecordFormValues = {
-        anamnesis: medicalRecordData.anamnesis || undefined,
-        physicalExam: medicalRecordData.physical_exam || undefined,
-        diagnosis: medicalRecordData.diagnosis || undefined,
-        treatment: medicalRecordData.treatment || undefined,
-        prescriptions: medicalRecordData.prescriptions || [],
+      const clinicDetails = {
+        companyName: appUser?.companyName || 'AsasVet',
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        phone: appUser?.phone || '',
+        email: appUser?.email || '',
+        veterinarianCrmv: appUser?.crmv || '',
+        veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
       };
 
-      // Generate the PDF
-      const blob = await generateMedicalRecordPdf({ 
-        appointment, 
-        medicalRecord: medicalRecordForPdf, 
-        logoUrl: appUser?.logoUrl,
-        clinicDetails: {
-          companyName: appUser?.companyName || 'AsasVet',
-          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
-          phone: appUser?.phone || '',
-          email: appUser?.email || '',
-          veterinarianCrmv: appUser?.crmv || '',
-          veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
-        }
-      });
+      let blob: Blob;
+      let filename: string;
 
-      return { blob, appointment };
+      if (pdfType === 'medicalRecord') {
+        // Map medical record data to form values for PDF generation
+        const medicalRecordForPdf: MedicalRecordFormValues = {
+          anamnesis: medicalRecordData.anamnesis || undefined,
+          physicalExam: medicalRecordData.physical_exam || undefined,
+          diagnosis: medicalRecordData.diagnosis || undefined,
+          treatment: medicalRecordData.treatment || undefined,
+          prescriptions: medicalRecordData.prescriptions || [],
+          recipePdfUrl: medicalRecordData.recipe_pdf_url || null,
+        };
+        blob = await generateMedicalRecordPdf({ 
+          appointment, 
+          medicalRecord: medicalRecordForPdf, 
+          logoUrl: appUser?.logoUrl,
+          clinicDetails,
+        });
+        filename = `Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`;
+      } else { // pdfType === 'prescription'
+        if (!medicalRecordData.prescriptions || medicalRecordData.prescriptions.length === 0) {
+          throw new Error("Nenhuma prescrição encontrada para gerar a receita.");
+        }
+        blob = await generatePrescriptionPdf({
+          petName: appointment.pet_name,
+          ownerName: appointment.client_name,
+          prescriptions: medicalRecordData.prescriptions,
+          logoUrl: appUser?.logoUrl,
+          clinicDetails,
+        });
+        filename = `Receita_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`;
+      }
+
+      return { blob, appointment, filename };
     },
-    onSuccess: ({ blob, appointment }) => {
+    onSuccess: ({ blob, appointment, filename }) => {
       setPdfBlob(blob);
-      setPdfFilename(`Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
+      setPdfFilename(filename);
       setPdfAppointment(appointment);
       setIsPdfPreviewDialogOpen(true);
     },
@@ -197,8 +218,8 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   };
 
   // Handler to open PDF preview dialog
-  const handleOpenPdfPreviewDialog = (appointment: Appointment) => {
-    fetchAndGeneratePdfMutation.mutate({ appointment });
+  const handleOpenPdfPreviewDialog = (appointment: Appointment, pdfType: 'medicalRecord' | 'prescription') => {
+    fetchAndGeneratePdfMutation.mutate({ appointment, pdfType });
   };
 
   // Handler to confirm PDF download
@@ -311,12 +332,13 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                             onClick={(e) => {
                               e.stopPropagation();
                               if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
-                                showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
+                                handleOpenPdfPreviewDialog(appointment, 'prescription');
                               } else {
                                 showError("Nenhuma prescrição encontrada para esta consulta.");
                               }
                             }}
                             className="flex items-center justify-center gap-1"
+                            disabled={fetchAndGeneratePdfMutation.isPending}
                           >
                             <Pill className="h-4 w-4" />
                             <span>{appointment.prescriptions_count || 0}</span>
@@ -329,7 +351,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                               size="sm"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleOpenPdfPreviewDialog(appointment);
+                                handleOpenPdfPreviewDialog(appointment, 'medicalRecord');
                               }}
                               disabled={fetchAndGeneratePdfMutation.isPending}
                             >
