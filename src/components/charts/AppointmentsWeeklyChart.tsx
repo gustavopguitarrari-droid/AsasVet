@@ -30,12 +30,15 @@ const AppointmentsWeeklyChart: React.FC = () => {
 
   // Calcula as últimas 5 semanas para o gráfico
   const today = new Date();
+  // Define explicitamente que a semana começa na segunda-feira (1) para o locale ptBR
+  const weekOptions = { locale: ptBR, weekStartsOn: 1 as 0 | 1 | 2 | 3 | 4 | 5 | 6 }; 
+
   const weeksInterval = eachWeekOfInterval(
     {
-      start: subWeeks(startOfWeek(today, { locale: ptBR }), 4), // Começa 4 semanas atrás para ter 5 semanas no total (semana atual + 4 anteriores)
-      end: endOfWeek(today, { locale: ptBR }),
+      start: subWeeks(startOfWeek(today, weekOptions), 4), // Começa 4 semanas atrás para ter 5 semanas no total (semana atual + 4 anteriores)
+      end: endOfWeek(today, weekOptions),
     },
-    { locale: ptBR }
+    weekOptions // Passa weekOptions para eachWeekOfInterval também
   );
 
   const initialChartData = React.useMemo(() => {
@@ -46,13 +49,17 @@ const AppointmentsWeeklyChart: React.FC = () => {
     }));
   }, [weeksInterval]);
 
+  console.log("Weeks Interval (start dates):", weeksInterval.map(d => format(d, 'yyyy-MM-dd')));
+  console.log("Initial Chart Data (with names):", initialChartData.map(item => item.name));
+
+
   const { data: appointments = [], isLoading, error } = useQuery<Appointment[]>({
     queryKey: ['weeklyAppointmentsChart', userId],
     queryFn: async () => {
       if (!userId) return [];
 
-      const fiveWeeksAgoStart = format(startOfWeek(subWeeks(today, 4), { locale: ptBR }), 'yyyy-MM-dd');
-      const nowFormattedEnd = format(endOfWeek(today, { locale: ptBR }), 'yyyy-MM-dd');
+      const fiveWeeksAgoStart = format(startOfWeek(subWeeks(today, 4), weekOptions), 'yyyy-MM-dd');
+      const nowFormattedEnd = format(endOfWeek(today, weekOptions), 'yyyy-MM-dd');
 
       const { data, error } = await supabase
         .from('appointments')
@@ -76,11 +83,11 @@ const AppointmentsWeeklyChart: React.FC = () => {
 
     appointments.forEach(appointment => {
       const appointmentDate = parseISO(appointment.date);
-      const weekStartOfAppointment = startOfWeek(appointmentDate, { locale: ptBR });
+      const weekStartOfAppointment = startOfWeek(appointmentDate, weekOptions); // Usa weekOptions aqui
       const formattedWeekStart = format(weekStartOfAppointment, 'yyyy-MM-dd');
 
       // Encontra o item correspondente no initialChartData
-      const chartItem = initialChartData.find(item => isSameWeek(item.weekStart, appointmentDate, { locale: ptBR }));
+      const chartItem = initialChartData.find(item => isSameWeek(item.weekStart, appointmentDate, weekOptions)); // Usa weekOptions aqui
 
       if (chartItem) {
         const currentCount = dataMap.get(formattedWeekStart) || 0;
@@ -88,11 +95,13 @@ const AppointmentsWeeklyChart: React.FC = () => {
       }
     });
 
-    return initialChartData.map(item => ({
+    const finalData = initialChartData.map(item => ({
       ...item,
       consultas: dataMap.get(format(item.weekStart, 'yyyy-MM-dd')) || 0,
     }));
-  }, [appointments, initialChartData]);
+    console.log("Final Chart Data for rendering:", finalData.map(item => ({ name: item.name, consultas: item.consultas })));
+    return finalData;
+  }, [appointments, initialChartData, weekOptions]); // Adiciona weekOptions às dependências
 
   const totalConsultas = chartData.reduce((sum, entry) => sum + entry.consultas, 0);
   const averageConsultas = chartData.length > 0 ? totalConsultas / chartData.length : 0;
