@@ -8,7 +8,18 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trash2, CheckCircle } from "lucide-react"; // Importar CheckCircle
+import { Trash2, CheckCircle, CalendarX } from "lucide-react"; // Importar CalendarX para o AlertDialog
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle as AlertDialogTitleComponent,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"; // Importar AlertDialog
 
 export interface CalendarEvent {
   id: string;
@@ -22,8 +33,10 @@ export interface CalendarEvent {
 interface EventCalendarProps {
   events: CalendarEvent[];
   onAddEventClick: (date: Date) => void;
-  onEventClick: (event: CalendarEvent) => void; // Nova prop
-  searchTerm: string; // NOVO: Adicionar searchTerm
+  onEventClick: (event: CalendarEvent) => void;
+  searchTerm: string;
+  onClearAllEvents: () => void; // NOVO: Prop para limpar todos os eventos
+  isClearingEvents: boolean; // NOVO: Prop para indicar se a limpeza está em andamento
 }
 
 const categoryColorMap: Record<CalendarEvent["category"], string> = {
@@ -35,7 +48,7 @@ const categoryColorMap: Record<CalendarEvent["category"], string> = {
   Outros: "bg-event-outros",
 };
 
-const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick, searchTerm }) => {
+const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick, searchTerm, onClearAllEvents, isClearingEvents }) => {
   const [selectedDay, setSelectedDay] = React.useState<Date | undefined>(new Date());
 
   const eventsForSelectedDay = React.useMemo(() => {
@@ -50,7 +63,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
         event.time.includes(lowerCaseSearchTerm)
       )
       .sort((a, b) => a.time.localeCompare(b.time));
-  }, [events, selectedDay, searchTerm]); // Adicionar searchTerm como dependência
+  }, [events, selectedDay, searchTerm]);
 
   const modifiers = {
     events: events.map((event) => event.date),
@@ -63,8 +76,34 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <Card className="flex-1 lg:max-w-[600px]">
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"> {/* Ajustado para flex-row */}
           <CardTitle>Calendário de Agendamentos</CardTitle>
+          {/* NOVO: Botão de Limpar Agenda */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm" disabled={events.length === 0 || isClearingEvents}>
+                <Trash2 className="mr-2 h-4 w-4" />
+                {isClearingEvents ? "Limpando..." : "Limpar Agenda"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitleComponent className="flex items-center">
+                  <Trash2 className="h-5 w-5 mr-2 text-destructive" /> Confirmar Limpeza da Agenda
+                </AlertDialogTitleComponent>
+                <AlertDialogDescription>
+                  Tem certeza que deseja limpar TODOS os agendamentos da sua agenda?
+                  Esta ação não pode ser desfeita e removerá permanentemente todos os seus eventos.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel disabled={isClearingEvents}>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={onClearAllEvents} disabled={isClearingEvents} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                  {isClearingEvents ? "Limpando..." : "Sim, Limpar Tudo"}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardHeader>
         <CardContent className="flex justify-center">
           <Calendar
@@ -75,7 +114,6 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
             className="rounded-md border shadow-md w-full"
             modifiers={modifiers}
             modifiersClassNames={modifiersClassNames}
-            // REMOVIDO: O footer com o botão de adicionar agendamento
           />
         </CardContent>
       </Card>
@@ -100,7 +138,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                     className={cn(
                       "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white",
                       categoryColorMap[event.category],
-                      (isCancelled || isRealizada) && "opacity-70" // Reduz a opacidade se cancelado ou realizado
+                      (isCancelled || isRealizada) && "opacity-70"
                     )}
                   >
                     <span className="font-bold text-lg">{event.time}</span>
@@ -126,7 +164,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                         size="icon"
                         className="h-8 w-8 text-white hover:bg-white/20"
                         onClick={(e) => {
-                          e.stopPropagation(); // Impede que o clique no botão propague para o div pai
+                          e.stopPropagation();
                           onEventClick(event);
                         }}
                       >

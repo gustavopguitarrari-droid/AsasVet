@@ -201,36 +201,18 @@ const AgendamentosMedicos = () => {
               <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsAddEventDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
             </DialogContent>
           </Dialog>
-
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" disabled={events.length === 0 || clearAllEventsMutation.isPending}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                {clearAllEventsMutation.isPending ? "Limpando..." : "Limpar Agenda"}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitleComponent className="flex items-center">
-                  <Trash2 className="h-5 w-5 mr-2 text-destructive" /> Confirmar Limpeza da Agenda
-                </AlertDialogTitleComponent>
-                <AlertDialogDescription>
-                  Tem certeza que deseja limpar TODOS os agendamentos da sua agenda?
-                  Esta ação não pode ser desfeita e removerá permanentemente todos os seus eventos.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel disabled={clearAllEventsMutation.isPending}>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={handleClearAllEvents} disabled={clearAllEventsMutation.isPending} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                  {clearAllEventsMutation.isPending ? "Limpando..." : "Sim, Limpar Tudo"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {/* O botão de Limpar Agenda foi movido para dentro do EventCalendar */}
         </div>
       </div>
 
-      <EventCalendar events={events} onAddEventClick={handleOpenDialogWithDate} onEventClick={handleEventClick} searchTerm={searchTerm} />
+      <EventCalendar
+        events={events}
+        onAddEventClick={handleOpenDialogWithDate}
+        onEventClick={handleEventClick}
+        searchTerm={searchTerm}
+        onClearAllEvents={handleClearAllEvents} // Passa a função de limpeza
+        isClearingEvents={clearAllEventsMutation.isPending} // Passa o estado de carregamento
+      />
 
       {/* Diálogo de Confirmação de Cancelamento */}
       <AlertDialog open={isCancelConfirmDialogOpen} onOpenChange={setIsCancelConfirmDialogOpen}>
