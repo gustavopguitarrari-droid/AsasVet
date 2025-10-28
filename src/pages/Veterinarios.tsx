@@ -297,7 +297,7 @@ const Veterinarios = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline">Filtrar</Button>
+            {/* Botão "Filtrar" removido daqui */}
           </div>
 
           <div className="rounded-md border mt-6">
