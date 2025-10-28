@@ -652,7 +652,11 @@ const Appointments = () => {
                 {activeTab === "finalizadas" && <TableHead>Veterinário</TableHead>}
                 {activeTab === "finalizadas" && <TableHead>Finalização</TableHead>}
                 {activeTab === "finalizadas" && <TableHead>Duração</TableHead>}
-                <TableHead className="text-right">Ações</TableHead>
+                {activeTab === "finalizadas" ? (
+                  <TableHead className="text-right">Prontuário</TableHead>
+                ) : (
+                  <TableHead className="text-right">Ações</TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
