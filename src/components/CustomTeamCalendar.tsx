@@ -13,7 +13,7 @@ import {
   isToday,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Plus, X, Eraser } from "lucide-react"; // Importar Eraser
+import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react"; // Removido Eraser
 
 import { Button } from "@/components/ui/button";
 import {
@@ -140,8 +140,8 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
   return (
     <div className="w-full max-w-full overflow-x-auto">
       <div className="rounded-md border p-4 bg-background shadow-sm relative">
-        <div className="flex justify-center items-center p-2 mb-4"> {/* Centralizado o conteúdo */}
-          <div className="flex items-center space-x-2"> {/* Novo div para agrupar setas e mês/ano */}
+        <div className="flex justify-center items-center p-2 mb-4">
+          <div className="flex items-center space-x-2">
             <Button variant="ghost" size="icon" onClick={goToPreviousMonth}>
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -157,8 +157,8 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
         {/* Botão de Limpar Escala */}
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="destructive" size="sm" className="absolute top-4 right-4 flex items-center">
-              <Eraser className="h-4 w-4" />
+            <Button variant="outline" className="absolute top-4 right-4 flex items-center"> {/* Alterado variant e removido size="sm" */}
+              Limpar Escala
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
