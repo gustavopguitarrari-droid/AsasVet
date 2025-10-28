@@ -7,16 +7,16 @@ import { cn } from "@/lib/utils";
 
 const CadastroLegend: React.FC = () => {
   return (
-    <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200">
-      <CardContent className="p-2 flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-4">
-        <div className="flex items-center space-x-1">
-          <UserPlus className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          <span className="font-medium text-base">1. Adicione um Tutor</span>
+    <Card className="bg-primary text-primary-foreground shadow-lg">
+      <CardContent className="p-4 flex flex-col md:flex-row items-center justify-center space-y-3 md:space-y-0 md:space-x-6">
+        <div className="flex items-center space-x-2">
+          <UserPlus className="h-6 w-6 text-primary-foreground" />
+          <span className="font-semibold text-lg">1. Adicione um Tutor</span>
         </div>
-        <ArrowRight className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-        <div className="flex items-center space-x-1">
-          <PawPrint className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          <span className="font-medium text-base">2. Adicione o(s) Animal(is)</span>
+        <ArrowRight className="h-5 w-5 text-primary-foreground" />
+        <div className="flex items-center space-x-2">
+          <PawPrint className="h-6 w-6 text-primary-foreground" />
+          <span className="font-semibold text-lg">2. Adicione o(s) Animal(is)</span>
         </div>
       </CardContent>
     </Card>
