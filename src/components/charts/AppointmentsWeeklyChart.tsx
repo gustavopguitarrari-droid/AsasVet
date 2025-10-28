@@ -40,9 +40,9 @@ const AppointmentsWeeklyChart: React.FC = () => {
 
   const initialChartData = React.useMemo(() => {
     return weeksInterval.map((weekStart, index) => ({
-      name: `Sem ${index + 1}`, // Ex: "Sem 1", "Sem 2"
+      name: `Sem ${index + 1}`, // Ex: "Sem 1", "Sem 2" para exibição
       consultas: 0,
-      weekStart: weekStart, // Guardar o início da semana para comparação
+      weekKey: format(weekStart, 'yyyy-MM-dd'), // Chave única para a semana para agregação
     }));
   }, [weeksInterval]);
 
@@ -72,25 +72,25 @@ const AppointmentsWeeklyChart: React.FC = () => {
   });
 
   const chartData = React.useMemo(() => {
-    const dataMap = new Map(initialChartData.map(item => [format(item.weekStart, 'yyyy-MM-dd'), item.consultas]));
+    // Cria um mapa mutável para facilitar as atualizações, usando weekKey
+    const dataMap = new Map<string, number>();
+    initialChartData.forEach(item => dataMap.set(item.weekKey, item.consultas));
 
     appointments.forEach(appointment => {
       const appointmentDate = parseISO(appointment.date);
       const weekStartOfAppointment = startOfWeek(appointmentDate, { locale: ptBR });
-      const formattedWeekStart = format(weekStartOfAppointment, 'yyyy-MM-dd');
+      const formattedWeekStartKey = format(weekStartOfAppointment, 'yyyy-MM-dd');
 
-      // Encontra o item correspondente no initialChartData
-      const chartItem = initialChartData.find(item => isSameWeek(item.weekStart, appointmentDate, { locale: ptBR }));
-
-      if (chartItem) {
-        const currentCount = dataMap.get(formattedWeekStart) || 0;
-        dataMap.set(formattedWeekStart, currentCount + 1);
+      // Verifica se esta semana é uma das semanas que estamos rastreando
+      if (dataMap.has(formattedWeekStartKey)) {
+        dataMap.set(formattedWeekStartKey, dataMap.get(formattedWeekStartKey)! + 1);
       }
     });
 
+    // Reconstrói o array final de dados do gráfico, preservando a ordem e os nomes originais
     return initialChartData.map(item => ({
-      ...item,
-      consultas: dataMap.get(format(item.weekStart, 'yyyy-MM-dd')) || 0,
+      name: item.name,
+      consultas: dataMap.get(item.weekKey) || 0,
     }));
   }, [appointments, initialChartData]);
 
