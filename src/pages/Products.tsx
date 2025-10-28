@@ -30,6 +30,14 @@ import {
   AlertDialogTitle as AlertDialogTitleComponent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Dialog, // Importação adicionada
+  DialogContent, // Importação adicionada
+  DialogHeader, // Importação adicionada
+  DialogTitle, // Importação adicionada
+  DialogTrigger, // Importação adicionada
+  DialogFooter, // Importação adicionada
+} from "@/components/ui/dialog"; // Importar Dialog
 import { usePageTitle } from "@/context/PageTitleContext";
 
 const productCategoryOptions: FilterOption[] = [
