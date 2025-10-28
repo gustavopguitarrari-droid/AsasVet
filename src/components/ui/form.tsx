@@ -23,18 +23,18 @@ const FormFieldContext = React.createContext<FormFieldContextValue | undefined>(
   undefined,
 );
 
-export const FormField = <
+export function FormField<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
   props: ControllerProps<TFieldValues, TName>,
-) => {
+) {
   return (
     <FormFieldContext.Provider value={{ name: props.name }}>
       <Controller<TFieldValues, TName> {...props} />
     </FormFieldContext.Provider>
   );
-};
+}
 
 type FormItemContextValue = {
   id: string;
