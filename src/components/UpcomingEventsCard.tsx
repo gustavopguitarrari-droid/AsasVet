@@ -7,20 +7,10 @@ import { format, startOfWeek, endOfWeek, isWithinInterval, isSameDay, parseISO }
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-
-// Mock de eventos (reutilizado de AgendamentosMedicos para demonstração)
-const mockEvents: CalendarEvent[] = [
-  { id: "E001", title: "Consulta Rex", date: new Date(2024, 9, 28), time: "10:00", category: "Consulta" },
-  { id: "E002", title: "Vacina Miau", date: new Date(2024, 9, 28), time: "14:30", category: "Vacina" },
-  { id: "E003", title: "Cirurgia Pingo", date: new Date(2024, 9, 29), time: "09:00", category: "Cirurgia" },
-  { id: "E004", title: "Exame Bob", date: new Date(2024, 10, 5), time: "11:00", category: "Exame" },
-  { id: "E005", title: "Retorno Luna", date: new Date(2024, 10, 5), time: "16:00", category: "Retorno" },
-  { id: "E006", title: "Consulta Thor", date: new Date(2024, 10, 6), time: "10:00", category: "Consulta" },
-  { id: "E007", title: "Vacina Max", date: new Date(2024, 10, 7), time: "11:00", category: "Vacina" },
-  { id: "E008", title: "Exame Dory", date: new Date(2024, 10, 8), time: "14:00", category: "Exame" },
-  { id: "E009", title: "Cirurgia Shadow", date: new Date(2024, 10, 9), time: "08:00", category: "Cirurgia" },
-  { id: "E010", title: "Retorno Rocky", date: new Date(2024, 10, 10), time: "17:00", category: "Retorno" },
-];
+import { useQuery } from "@tanstack/react-query"; // Importar useQuery
+import { supabase } from "@/integrations/supabase/client"; // Importar supabase
+import { useUser } from "@/context/UserContext"; // Importar useUser
+import { CalendarEvent } from "@/components/EventCalendar"; // Importar a interface CalendarEvent
 
 // Mapeamento de cores para as categorias de eventos (já definido em globals.css)
 const categoryColorMap: Record<CalendarEvent["category"], string> = {
@@ -33,19 +23,58 @@ const categoryColorMap: Record<CalendarEvent["category"], string> = {
 };
 
 const UpcomingEventsCard: React.FC = () => {
+  const { user: appUser } = useUser();
+  const userId = appUser?.id;
+
+  // Query para buscar eventos do Supabase
+  const { data: events = [], isLoading, error } = useQuery<CalendarEvent[]>({
+    queryKey: ['upcomingEvents', userId], // Chave de query única
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('status', 'Agendada') // Apenas eventos agendados
+        .gte('date', format(new Date(), 'yyyy-MM-dd')) // Apenas eventos a partir de hoje
+        .order('date', { ascending: true })
+        .order('time', { ascending: true });
+
+      if (error) {
+        console.error("Erro ao buscar eventos para o card 'Próximos Eventos':", error);
+        throw error;
+      }
+      // Mapeia os dados do Supabase para o formato CalendarEvent
+      return data.map(event => ({
+        id: event.id,
+        title: event.title,
+        date: parseISO(event.date), // Converte a string ISO para objeto Date
+        time: event.time,
+        category: event.category as CalendarEvent["category"],
+        status: (event.status || "Agendada") as CalendarEvent["status"],
+      }));
+    },
+    enabled: !!userId, // Só executa a query se o userId estiver disponível
+  });
+
   const today = new Date();
-  const startOfCurrentWeek = startOfWeek(today, { locale: ptBR });
   const endOfCurrentWeek = endOfWeek(today, { locale: ptBR });
 
-  const eventsToday = mockEvents
+  const eventsToday = events
     .filter(event => isSameDay(event.date, today))
     .sort((a, b) => a.time.localeCompare(b.time));
 
-  const eventsThisWeek = mockEvents
+  const eventsThisWeek = events
     .filter(event => isWithinInterval(event.date, { start: today, end: endOfCurrentWeek }) && !isSameDay(event.date, today))
     .sort((a, b) => a.date.getTime() - b.date.getTime() || a.time.localeCompare(b.time));
 
   const renderEventList = (eventsToRender: CalendarEvent[]) => {
+    if (isLoading) {
+      return <p className="text-center text-muted-foreground text-sm">Carregando eventos...</p>;
+    }
+    if (error) {
+      return <p className="text-center text-destructive text-sm">Erro ao carregar eventos.</p>;
+    }
     if (eventsToRender.length === 0) {
       return <p className="text-muted-foreground text-sm">Nenhum evento agendado.</p>;
     }
