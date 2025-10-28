@@ -88,7 +88,7 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
           <ClipboardList className="mr-2 h-5 w-5" /> Prontuário Médico
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-y-auto max-h-[calc(100vh-200px)]"> {/* Adicionado overflow-y-auto e max-h */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -155,8 +155,8 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
               )}
             />
 
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="space-y-4 mt-6"> {/* Adicionado mt-6 para espaçamento */}
+              <div className="flex items-center justify-between mb-4"> {/* Adicionado mb-4 para espaçamento */}
                 <Label className="flex items-center text-lg font-semibold">
                   <Pill className="h-5 w-5 mr-2" /> Prescrições
                 </Label>
@@ -198,11 +198,11 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
                               <FormLabel>Dosagem</FormLabel>
                               <FormControl>
                                 <Input placeholder="Ex: 5mg, 1 comprimido" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                         <FormField
                           control={form.control}
                           name={`prescriptions.${index}.frequency`}
@@ -211,11 +211,11 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
                               <FormLabel>Frequência</FormLabel>
                               <FormControl>
                                 <Input placeholder="Ex: 12/12h, 1x ao dia" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
                       </div>
                       <FormField
                         control={form.control}
