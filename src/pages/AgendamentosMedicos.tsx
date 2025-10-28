@@ -176,9 +176,18 @@ const AgendamentosMedicos = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6"> {/* Novo div para os botões de ação */}
-        {/* Removido: <h2 className="text-3xl font-bold">Agenda Médica</h2> */} {/* Título da página */}
-        <div className="flex space-x-2">
+      {/* Contêiner flexível para o campo de busca e os botões de ação */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+        <div className="relative flex-1 w-full"> {/* Campo de busca */}
+          <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Buscar agendamentos por título ou categoria..."
+            className="pl-9"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <div className="flex space-x-2 shrink-0"> {/* Botões de ação */}
           <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
             <DialogTrigger asChild>
               <Button className="font-bold">
@@ -193,7 +202,6 @@ const AgendamentosMedicos = () => {
             </DialogContent>
           </Dialog>
 
-          {/* NOVO: Botão de Limpar Agenda */}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" disabled={events.length === 0 || clearAllEventsMutation.isPending}>
@@ -222,18 +230,7 @@ const AgendamentosMedicos = () => {
         </div>
       </div>
 
-      {/* NOVO: Campo de busca */}
-      <div className="relative mb-4">
-        <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          placeholder="Buscar agendamentos por título ou categoria..."
-          className="pl-9"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-
-      <EventCalendar events={events} onAddEventClick={handleOpenDialogWithDate} onEventClick={handleEventClick} searchTerm={searchTerm} /> {/* NOVO: Passar searchTerm */}
+      <EventCalendar events={events} onAddEventClick={handleOpenDialogWithDate} onEventClick={handleEventClick} searchTerm={searchTerm} />
 
       {/* Diálogo de Confirmação de Cancelamento */}
       <AlertDialog open={isCancelConfirmDialogOpen} onOpenChange={setIsCancelConfirmDialogOpen}>
