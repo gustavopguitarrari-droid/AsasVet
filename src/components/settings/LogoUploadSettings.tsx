@@ -5,13 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Image as ImageIcon, Upload, XCircle, Building2 } from 'lucide-react';
+import { Image as ImageIcon, Upload, XCircle, Building2, Landmark } from 'lucide-react'; // Adicionado Landmark icon
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadLogoToSupabase, deleteLogoFromSupabase } from "@/utils/supabaseStorage";
+import EditableField from "@/components/EditableField"; // Importar EditableField
 
 const LogoUploadSettings: React.FC = () => {
   const { user, setUser } = useUser();
@@ -78,6 +79,32 @@ const LogoUploadSettings: React.FC = () => {
     },
   });
 
+  // Nova mutação para atualizar o nome da empresa
+  const updateCompanyNameMutation = useMutation({
+    mutationFn: async (newCompanyName: string) => {
+      if (!user?.id) throw new Error("User not authenticated.");
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({ company_name: newCompanyName })
+        .eq('id', user.id)
+        .select()
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      setUser((prevUser) => ({
+        ...prevUser!,
+        companyName: data.company_name || undefined,
+      }));
+      queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] });
+      showSuccess("Nome do empreendimento atualizado com sucesso!");
+    },
+    onError: (error) => {
+      showError(`Erro ao atualizar nome do empreendimento: ${error.message}`);
+    },
+  });
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     console.log("handleFileChange: Selected file:", file);
@@ -94,8 +121,16 @@ const LogoUploadSettings: React.FC = () => {
         setPreviewUrl(user?.logoUrl || null); // Reverte para o logo atual do usuário
         return;
       }
-      setSelectedFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          setPreviewUrl(reader.result);
+        }
+      };
+      reader.onerror = () => {
+        showError("Erro ao ler o arquivo de imagem.");
+      };
+      reader.readAsDataURL(file);
     } else {
       setSelectedFile(null);
       setPreviewUrl(user?.logoUrl || null); // Reverte para o logo atual do usuário
@@ -184,21 +219,37 @@ const LogoUploadSettings: React.FC = () => {
     }
   };
 
-  const isSubmitting = updateProfileLogoMutation.isPending;
+  const handleSaveCompanyName = (newName: string) => {
+    updateCompanyNameMutation.mutate(newName);
+  };
+
+  const isSubmitting = updateProfileLogoMutation.isPending || updateCompanyNameMutation.isPending;
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Building2 className="mr-2 h-5 w-5" /> Logo da Clínica
+          <Building2 className="mr-2 h-5 w-5" /> Personalização da Clínica
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <p className="text-muted-foreground">
-          Faça upload do logo da sua clínica. Ele será usado em documentos como prontuários médicos.
+          Gerencie o nome e o logo da sua clínica.
         </p>
 
+        {/* Campo para Nome do Empreendimento */}
+        <EditableField
+          label="Nome do Empreendimento"
+          value={user?.companyName || ''}
+          onSave={handleSaveCompanyName}
+          icon={Landmark} // Usando o ícone Landmark
+          className="mb-6"
+        />
+
         <div className="flex flex-col items-center space-y-4">
+          <Label className="text-lg font-semibold flex items-center">
+            <ImageIcon className="h-5 w-5 mr-2" /> Logo da Clínica
+          </Label>
           <Avatar className="h-32 w-32 border-4 border-primary shadow-lg">
             {previewUrl ? (
               <AvatarImage src={previewUrl} alt="Logo da Clínica" />
