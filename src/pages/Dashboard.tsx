@@ -112,6 +112,26 @@ const Dashboard = () => {
     enabled: !!userId,
   });
 
+  // NOVO: Query para buscar a contagem de pacientes internados
+  const { data: internedPatientsCount = 0, isLoading: isLoadingInternedPatients } = useQuery<number>({
+    queryKey: ['internedPatientsCount', userId],
+    queryFn: async () => {
+      if (!userId) return 0;
+      const { count, error } = await supabase
+        .from('interned_patients')
+        .select('*', { count: 'exact' })
+        .eq('user_id', userId)
+        .neq('status', 'Alta')
+        .neq('status', 'Óbito');
+      if (error) {
+        console.error("Erro ao buscar contagem de pacientes internados:", error);
+        throw error;
+      }
+      return count || 0;
+    },
+    enabled: !!userId,
+  });
+
   React.useEffect(() => {
     const savedConfigString = localStorage.getItem("dashboardConfig");
     let savedConfig: DashboardItemConfig[] = [];
@@ -267,16 +287,20 @@ const Dashboard = () => {
         );
       case "internmentStatus":
         return (
-          <Card key={item.id} className={cn("bg-purple-600", baseCardClasses)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Status de Internação</CardTitle>
-              <Bed className={iconClasses} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">3 Animais</div>
-              <p className={textMutedClasses}>Atualmente internados</p>
-            </CardContent>
-          </Card>
+          <Link to="/internacao" key={item.id} className="block">
+            <Card className={cn("bg-purple-600", baseCardClasses)}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Status de Internação</CardTitle>
+                <Bed className={iconClasses} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {isLoadingInternedPatients ? "..." : internedPatientsCount.toLocaleString('pt-BR')} Animal{internedPatientsCount !== 1 ? 'is' : ''}
+                </div>
+                <p className={textMutedClasses}>Atualmente internados</p>
+              </CardContent>
+            </Card>
+          </Link>
         );
       case "veterinariansOnDuty":
         return (
