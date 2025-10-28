@@ -11,6 +11,7 @@ export interface SaleItem {
   price: number;
   quantity: number;
   total: number;
+  debitId?: string; // NOVO: ID do débito de animal, se aplicável
 }
 
 export interface Transaction {
