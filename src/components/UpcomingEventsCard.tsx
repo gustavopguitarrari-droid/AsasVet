@@ -7,7 +7,6 @@ import { format, startOfWeek, endOfWeek, isWithinInterval, isSameDay, parseISO }
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"; // Importar Tabs
 
 // Mock de eventos (reutilizado de AgendamentosMedicos para demonstração)
 const mockEvents: CalendarEvent[] = [
@@ -76,18 +75,11 @@ const UpcomingEventsCard: React.FC = () => {
         <CalendarDays className="h-5 w-5 text-muted-foreground" />
       </CardHeader>
       <CardContent className="pt-4">
-        <Tabs defaultValue="today" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="today">Hoje ({eventsToday.length})</TabsTrigger>
-            <TabsTrigger value="this-week">Esta Semana ({eventsThisWeek.length})</TabsTrigger>
-          </TabsList>
-          <TabsContent value="today" className="mt-4">
-            {renderEventList(eventsToday)}
-          </TabsContent>
-          <TabsContent value="this-week" className="mt-4">
-            {renderEventList(eventsThisWeek)}
-          </TabsContent>
-        </Tabs>
+        <h3 className="text-md font-semibold mb-3">Eventos de Hoje ({eventsToday.length})</h3>
+        {renderEventList(eventsToday)}
+        
+        <h3 className="text-md font-semibold mt-6 mb-3">Eventos desta Semana ({eventsThisWeek.length})</h3>
+        {renderEventList(eventsThisWeek)}
       </CardContent>
     </Card>
   );
