@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 const CadastroLegend: React.FC = () => {
   return (
-    <Card className="mb-4 bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200">
+    <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200">
       <CardContent className="p-2 flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-4">
         <div className="flex items-center space-x-1">
           <UserPlus className="h-5 w-5 text-blue-600 dark:text-blue-400" />

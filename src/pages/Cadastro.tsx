@@ -664,8 +664,8 @@ const Cadastro = () => {
         </TabsList>
 
         <TabsContent value="tutores" className="mt-4">
-          <CadastroLegend /> {/* Adicionado o componente de legenda aqui */}
-          <div className="flex items-center justify-end mb-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4"> {/* Novo contêiner flexível */}
+            <CadastroLegend /> {/* Componente de legenda */}
             <div className="flex items-center space-x-2">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -778,9 +778,9 @@ const Cadastro = () => {
                           </Tooltip>
                         </TableCell>
                         <TableCell className="text-center">
-                          {petsOfClient.length > 0 ? (
+                          {pets.filter(pet => pet.ownerId === client.id).length > 0 ? (
                             <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleViewClientPets(client); }}>
-                              {petsOfClient.length} Animal{petsOfClient.length > 1 ? 's' : ''}
+                              {pets.filter(pet => pet.ownerId === client.id).length} Animal{pets.filter(pet => pet.ownerId === client.id).length > 1 ? 's' : ''}
                             </Button>
                           ) : (
                             <span className="text-muted-foreground text-sm">Nenhum</span>
