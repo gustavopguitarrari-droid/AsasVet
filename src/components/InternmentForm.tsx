@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { format, parseISO, isValid } from "date-fns";
+import { CalendarIcon, Search, User, PawPrint } from "lucide-react"; // Adicionado Search, User, PawPrint
 import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
@@ -25,6 +25,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter } from "@/components/ui/dialog";
 import RiskSelector from "./RiskSelector";
+import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
+import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
 
 // Mock de veterinários
 const mockVeterinarians = [
@@ -35,17 +37,25 @@ const mockVeterinarians = [
 
 const formSchema = z.object({
   bayName: z.string().min(1, "O nome da baia é obrigatório."),
+  
+  // Campos para seleção de cliente/pet
+  cpfSearch: z.string().optional(), // Campo para input de CPF
+  selectedClientId: z.string().min(1, "Selecione um tutor."),
+  selectedPetId: z.string().min(1, "Selecione um animal."),
+
+  // Campos que serão preenchidos automaticamente e enviados na mutação
   petName: z.string().min(1, "O nome do animal é obrigatório."),
   ownerName: z.string().min(1, "O nome do tutor é obrigatório."),
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
+    required_error: "A espécie do animal é obrigatória.",
+  }),
+
   reason: z.string().min(1, "O motivo da internação é obrigatório."),
   admissionDate: z.date({
     required_error: "A data de admissão é obrigatória.",
   }),
   expectedDischargeDate: z.date().optional().nullable(),
   veterinarian: z.string().min(1, "O veterinário responsável é obrigatório."),
-  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
-    required_error: "A espécie do animal é obrigatória.",
-  }),
   risk: z.enum(["Sem risco", "Baixo", "Médio", "Alto", "Emergência"], {
     required_error: "O nível de risco é obrigatório.",
   }),
@@ -58,23 +68,136 @@ interface InternmentFormProps {
   onCancel: () => void;
   initialData?: Partial<InternmentFormValues>;
   isSubmittingParent?: boolean;
+  allClients: Client[]; // NOVO: Lista de todos os clientes
+  allPets: Pet[];       // NOVO: Lista de todos os pets
 }
 
-const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, initialData, isSubmittingParent = false }) => {
+const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, initialData, isSubmittingParent = false, allClients, allPets }) => {
+  const safeParseDate = (dateString?: string | null): Date | undefined => {
+    if (!dateString) return undefined;
+    const parsed = parseISO(dateString);
+    return isValid(parsed) ? parsed : undefined;
+  };
+
   const form = useForm<InternmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       bayName: initialData?.bayName || "",
+      
+      cpfSearch: "",
+      selectedClientId: initialData?.selectedClientId || "",
+      selectedPetId: initialData?.selectedPetId || "",
+
       petName: initialData?.petName || "",
       ownerName: initialData?.ownerName || "",
+      species: initialData?.species || "Cachorro",
+
       reason: initialData?.reason || "",
       admissionDate: initialData?.admissionDate || new Date(),
       expectedDischargeDate: initialData?.expectedDischargeDate || null,
       veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
-      species: initialData?.species || "Cachorro",
       risk: initialData?.risk || "Sem risco",
     },
   });
+
+  const [cpfInput, setCpfInput] = useState<string>("");
+  const [selectedClientFromSearch, setSelectedClientFromSearch] = useState<Client | null>(null);
+  const [selectedPetFromDropdown, setSelectedPetFromDropdown] = useState<Pet | null>(null);
+
+  useEffect(() => {
+    form.reset({
+      bayName: initialData?.bayName || "",
+      
+      cpfSearch: "",
+      selectedClientId: initialData?.selectedClientId || "",
+      selectedPetId: initialData?.selectedPetId || "",
+
+      petName: initialData?.petName || "",
+      ownerName: initialData?.ownerName || "",
+      species: initialData?.species || "Cachorro",
+
+      reason: initialData?.reason || "",
+      admissionDate: initialData?.admissionDate || new Date(),
+      expectedDischargeDate: initialData?.expectedDischargeDate || null,
+      veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
+      risk: initialData?.risk || "Sem risco",
+    });
+    setCpfInput("");
+    setSelectedClientFromSearch(null);
+    setSelectedPetFromDropdown(null);
+
+    // If initialData has client/pet IDs, pre-populate search and selection
+    if (initialData?.selectedClientId) {
+      const client = allClients.find(c => c.id === initialData.selectedClientId);
+      if (client) {
+        setSelectedClientFromSearch(client);
+        form.setValue("selectedClientId", client.id);
+        form.setValue("ownerName", client.name);
+        setCpfInput(client.cpf); // Pre-fill CPF input
+      }
+    }
+    if (initialData?.selectedPetId) {
+      const pet = allPets.find(p => p.id === initialData.selectedPetId);
+      if (pet) {
+        setSelectedPetFromDropdown(pet);
+        form.setValue("selectedPetId", pet.id);
+        form.setValue("petName", pet.name);
+        form.setValue("species", pet.species as InternmentFormValues["species"]);
+      }
+    }
+  }, [initialData, form, allClients, allPets]);
+
+  const handleSearchCpf = () => {
+    const cleanCpf = cpfInput.replace(/\D/g, '');
+    if (cleanCpf.length !== 11) {
+      showError("CPF inválido. Digite 11 dígitos.");
+      setSelectedClientFromSearch(null);
+      form.setValue("selectedClientId", "");
+      form.setValue("ownerName", "");
+      setSelectedPetFromDropdown(null);
+      form.setValue("selectedPetId", "");
+      form.setValue("petName", "");
+      form.setValue("species", "Cachorro");
+      return;
+    }
+
+    const foundClient = allClients.find(client => client.cpf.replace(/\D/g, '') === cleanCpf);
+
+    if (foundClient) {
+      setSelectedClientFromSearch(foundClient);
+      form.setValue("selectedClientId", foundClient.id);
+      form.setValue("ownerName", foundClient.name);
+      showSuccess(`Tutor ${foundClient.name} encontrado!`);
+      // Reset pet selection when client changes
+      setSelectedPetFromDropdown(null);
+      form.setValue("selectedPetId", "");
+      form.setValue("petName", "");
+      form.setValue("species", "Cachorro");
+    } else {
+      showError("Tutor não encontrado com este CPF.");
+      setSelectedClientFromSearch(null);
+      form.setValue("selectedClientId", "");
+      form.setValue("ownerName", "");
+      setSelectedPetFromDropdown(null);
+      form.setValue("selectedPetId", "");
+      form.setValue("petName", "");
+      form.setValue("species", "Cachorro");
+    }
+  };
+
+  const handlePetSelection = (petId: string) => {
+    const pet = allPets.find(p => p.id === petId);
+    if (pet) {
+      setSelectedPetFromDropdown(pet);
+      form.setValue("selectedPetId", pet.id);
+      form.setValue("petName", pet.name);
+      form.setValue("species", pet.species as InternmentFormValues["species"]);
+    }
+  };
+
+  const petsOfSelectedClient = selectedClientFromSearch
+    ? allPets.filter(pet => pet.ownerId === selectedClientFromSearch.id)
+    : [];
 
   return (
     <Form {...form}>
@@ -105,56 +228,105 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
             </FormItem>
           )}
         />
+
+        {/* Busca de Tutor por CPF */}
+        <div className="space-y-2 border p-3 rounded-md">
+          <FormLabel className="flex items-center">
+            <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor por CPF
+          </FormLabel>
+          <div className="flex space-x-2">
+            <Input
+              placeholder="Digite o CPF do tutor (somente números)"
+              value={cpfInput}
+              onChange={(e) => setCpfInput(e.target.value)}
+              maxLength={11}
+              className="flex-1"
+              disabled={!!initialData?.selectedClientId} // Desabilita se já houver um cliente inicial
+            />
+            <Button type="button" onClick={handleSearchCpf} size="icon" disabled={!!initialData?.selectedClientId}>
+              <Search className="h-4 w-4" />
+              <span className="sr-only">Buscar Tutor</span>
+            </Button>
+          </div>
+          {selectedClientFromSearch && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Tutor selecionado: <span className="font-semibold">{selectedClientFromSearch.name}</span>
+            </p>
+          )}
+          <FormField
+            control={form.control}
+            name="selectedClientId"
+            render={({ field }) => (
+              <FormItem className="hidden">
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Seleção de Animal */}
+        <div className="space-y-2 border p-3 rounded-md">
+          <FormLabel className="flex items-center">
+            <PawPrint className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Animal
+          </FormLabel>
+          <FormField
+            control={form.control}
+            name="selectedPetId"
+            render={({ field }) => (
+              <FormItem>
+                <Select
+                  onValueChange={handlePetSelection}
+                  value={field.value}
+                  disabled={!selectedClientFromSearch || petsOfSelectedClient.length === 0 || !!initialData?.selectedPetId}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder={selectedClientFromSearch ? "Selecione o animal" : "Busque um tutor primeiro"} />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {petsOfSelectedClient.length > 0 ? (
+                      petsOfSelectedClient.map((pet) => (
+                        <SelectItem key={pet.id} value={pet.id}>
+                          {pet.name} ({pet.species})
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-pets" disabled>
+                        Nenhum animal para este tutor
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {selectedPetFromDropdown && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Animal selecionado: <span className="font-semibold">{selectedPetFromDropdown.name} ({selectedPetFromDropdown.species})</span>
+            </p>
+          )}
+        </div>
+
+        {/* Campos ocultos que serão preenchidos para a mutação */}
         <FormField
           control={form.control}
           name="petName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nome do Animal</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: Rex" {...field} disabled={!!initialData?.petName} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => <Input type="hidden" {...field} />}
         />
         <FormField
           control={form.control}
           name="ownerName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nome do Tutor</FormLabel>
-              <FormControl>
-                <Input placeholder="Ex: João Silva" {...field} disabled={!!initialData?.ownerName} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => <Input type="hidden" {...field} />}
         />
         <FormField
           control={form.control}
           name="species"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Espécie</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!initialData?.species}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a espécie" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Cachorro">Cachorro</SelectItem>
-                  <SelectItem value="Gato">Gato</SelectItem>
-                  <SelectItem value="Pássaro">Pássaro</SelectItem>
-                  <SelectItem value="Roedor">Roedor</SelectItem>
-                  <SelectItem value="Peixe">Peixe</SelectItem>
-                  <SelectItem value="Outros">Outros</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+          render={({ field }) => <Input type="hidden" {...field} />}
         />
         
         <FormField

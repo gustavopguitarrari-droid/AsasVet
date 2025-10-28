@@ -25,12 +25,15 @@ import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { usePageTitle } from "@/context/PageTitleContext";
 import CustomCalendarCaption from "@/components/CustomCalendarCaption";
+import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
 export interface InternedPatient {
   id: string;
   user_id: string;
+  client_id?: string | null; // NOVO: ID do cliente
+  pet_id?: string | null;    // NOVO: ID do pet
   bay_name: string;
   pet_name: string;
   owner_name: string;
@@ -207,24 +210,93 @@ const Internacao = () => {
     enabled: !!userId,
   });
 
+  // Fetch all clients
+  const { data: allClients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
+    queryKey: ['allClientsInternment', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('clients')
+        .select('*')
+        .eq('user_id', userId);
+      if (error) throw error;
+      return data.map(dbClient => ({
+        id: dbClient.id,
+        name: dbClient.name,
+        email: dbClient.email,
+        phone: dbClient.phone,
+        cpf: dbClient.cpf,
+        dateOfBirth: dbClient.date_of_birth,
+        address: {
+          cep: dbClient.address_cep || '',
+          street: dbClient.address_street || '',
+          number: dbClient.address_number || '',
+          complement: dbClient.address_complement || undefined,
+          neighborhood: dbClient.address_neighborhood || '',
+          city: dbClient.address_city || '',
+          state: dbClient.address_state || '',
+        },
+        observations: dbClient.observations || undefined,
+        photoUrl: dbClient.photo_url || undefined,
+      }));
+    },
+    enabled: !!userId,
+  });
+
+  // Fetch all pets
+  const { data: allPets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
+    queryKey: ['allPetsInternment', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('pets')
+        .select('*');
+      if (error) throw error;
+      return data.map(dbPet => ({
+        id: dbPet.id,
+        name: dbPet.name,
+        species: dbPet.species as Pet["species"],
+        breed: dbPet.breed,
+        age: dbPet.age,
+        gender: dbPet.gender as Pet["gender"],
+        color: dbPet.color,
+        weight: dbPet.weight || undefined,
+        observations: dbPet.observations || undefined,
+        photoUrl: dbPet.photo_url || undefined,
+        ownerId: dbPet.owner_id,
+      }));
+    },
+    enabled: !!userId,
+  });
+
   // Mutation for adding a new patient
   const addPatientMutation = useMutation({
     mutationFn: async (newPatientData: InternmentFormValues) => {
       if (!userId) throw new Error("User not authenticated.");
+
+      const client = allClients.find(c => c.id === newPatientData.selectedClientId);
+      const pet = allPets.find(p => p.id === newPatientData.selectedPetId);
+
+      if (!client || !pet) {
+        throw new Error("Tutor ou animal selecionado não encontrado.");
+      }
+
       console.log("Internacao.tsx: Attempting to insert new patient:", newPatientData);
       const { data, error } = await supabase
         .from('interned_patients')
         .insert({
           user_id: userId,
+          client_id: client.id, // NOVO: Adiciona client_id
+          pet_id: pet.id,       // NOVO: Adiciona pet_id
           bay_name: newPatientData.bayName,
-          pet_name: newPatientData.petName,
-          owner_name: newPatientData.ownerName,
+          pet_name: pet.name, // Usa o nome do pet do objeto pet
+          owner_name: client.name, // Usa o nome do cliente do objeto client
           reason: newPatientData.reason,
           admission_date: format(newPatientData.admissionDate, "yyyy-MM-dd"),
           expected_discharge_date: newPatientData.expectedDischargeDate ? format(newPatientData.expectedDischargeDate, "yyyy-MM-dd") : null,
           veterinarian: newPatientData.veterinarian,
           status: "Em Observação",
-          species: newPatientData.species,
+          species: pet.species, // Usa a espécie do pet do objeto pet
           risk: newPatientData.risk,
         })
         .select()
@@ -264,6 +336,7 @@ const Internacao = () => {
           status: updatedPatient.status,
           species: updatedPatient.species,
           risk: updatedPatient.risk,
+          // client_id e pet_id não são atualizáveis via este formulário
         })
         .eq('id', updatedPatient.id)
         .eq('user_id', userId)
@@ -509,7 +582,7 @@ const Internacao = () => {
     updateActionsCompletionMutation.mutate(updatedActions);
   };
 
-  if (isLoadingPatients || isLoadingHistory || isLoadingActions) {
+  if (isLoadingPatients || isLoadingHistory || isLoadingActions || isLoadingClients || isLoadingPets) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando dados de internação...</p>
@@ -517,10 +590,10 @@ const Internacao = () => {
     );
   }
 
-  if (patientsError || historyError || actionsError) {
+  if (patientsError || historyError || actionsError || clientsError || petsError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar dados: {patientsError?.message || historyError?.message || actionsError?.message}</p>
+        <p>Erro ao carregar dados: {patientsError?.message || historyError?.message || actionsError?.message || clientsError?.message || petsError?.message}</p>
       </div>
     );
   }
@@ -578,7 +651,12 @@ const Internacao = () => {
                   <DialogHeader>
                     <DialogTitle>Internar Novo Paciente</DialogTitle>
                   </DialogHeader>
-                  <InternmentForm onSubmit={handleAddInternment} onCancel={() => setIsAddDialogOpen(false)} />
+                  <InternmentForm 
+                    onSubmit={handleAddInternment} 
+                    onCancel={() => setIsAddDialogOpen(false)} 
+                    allClients={allClients} // Passa todos os clientes
+                    allPets={allPets}     // Passa todos os pets
+                  />
                 </DialogContent>
               </Dialog>
             </div>
