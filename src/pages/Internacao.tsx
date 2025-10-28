@@ -43,7 +43,7 @@ export interface InternedPatient {
   expected_discharge_date?: string | null;
   veterinarian: string;
   status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito"; // Tipo de enumeração
-  species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros"; // Tipo de enumeração
+  species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros" | "Equino" | "Bovino"; // Tipo de enumeração
   risk: RiskLevel;
   created_at: string;
 }
