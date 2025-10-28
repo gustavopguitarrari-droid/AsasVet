@@ -195,7 +195,7 @@ const ConsultationPage: React.FC = () => {
   });
 
   // NOVO: Query para buscar todos os produtos/serviços
-  const { data: products = [], isLoading: isLoadingProducts } = useQuery<Product[]>({
+  const { data: products = [], isLoading: isLoadingProducts, error: productsError } = useQuery<Product[]>({
     queryKey: ['productsConsultation', userId],
     queryFn: async () => {
       if (!userId) return [];
@@ -593,7 +593,7 @@ const ConsultationPage: React.FC = () => {
   if (error || medicalRecordError || clientsError || petsError || veterinariansError || productsError || animalDebitsError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar consulta: {error?.message || medicalRecordError?.message || clientsError?.message || petsError?.message || veterinariansError?.message || productsError?.message || animalDebitsError?.message}</p>
+        <p>Erro ao carregar dados: {error?.message || medicalRecordError?.message || clientsError?.message || petsError?.message || veterinariansError?.message || productsError?.message || animalDebitsError?.message}</p>
         <Button onClick={() => navigate('/consultas')} className="ml-4">
           <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
         </Button>
