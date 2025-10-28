@@ -8,9 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { PlusCircle, Trash2, Pill, FileText, ListPlus } from "lucide-react"; // Adicionado ListPlus para o novo botão
+import { PlusCircle, Trash2, Pill, FileText, ListPlus } from "lucide-react";
 import { MedicalRecordFormValues } from "./MedicalRecordForm";
-import { showSuccess } from "@/utils/toast"; // Importar showSuccess
+import { showSuccess } from "@/utils/toast";
 
 const PrescriptionsTabContent: React.FC = () => {
   const { control, getValues } = useFormContext<MedicalRecordFormValues>();
@@ -45,13 +45,7 @@ const PrescriptionsTabContent: React.FC = () => {
         <Label className="flex items-center text-lg font-semibold">
           <Pill className="h-5 w-5 mr-2" /> Prescrições
         </Label>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => append({ medication: "", dosage: "", frequency: "", instructions: "" })}
-        >
-          <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Prescrição
-        </Button>
+        {/* Botão "Adicionar Prescrição" removido */}
       </div>
       {fields.length === 0 && (
         <p className="text-muted-foreground text-sm">Nenhuma prescrição adicionada ainda.</p>
@@ -130,7 +124,7 @@ const PrescriptionsTabContent: React.FC = () => {
         </div>
       </ScrollArea>
 
-      <div className="flex space-x-2 mt-4"> {/* Novo div para agrupar os botões */}
+      <div className="flex space-x-2 mt-4">
         <Button
           type="button"
           onClick={handleAddToExistingPrescription}
