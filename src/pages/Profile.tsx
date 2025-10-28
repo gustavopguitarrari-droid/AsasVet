@@ -96,7 +96,9 @@ const Profile = () => {
   };
 
   const handleSaveRole = (newRole: string) => {
-    updateProfileMutation.mutate({ role: newRole });
+    // Esta função não será chamada se o campo for readOnly, mas é mantida por segurança
+    console.warn("Tentativa de salvar cargo diretamente do perfil. Ação bloqueada.");
+    showError("A alteração de cargo não é permitida diretamente no perfil.");
   };
 
   const handleSaveBirthday = (newBirthday?: string) => {
@@ -183,6 +185,7 @@ const Profile = () => {
               label="Cargo"
               value={user.role || ''} // Fornecer string vazia como fallback
               onSave={handleSaveRole}
+              readOnly={true} // Bloqueia a edição do cargo no perfil
             />
             <EditableBirthdayField
               label="Aniversário"

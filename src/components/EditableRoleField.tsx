@@ -14,6 +14,7 @@ interface EditableRoleFieldProps {
   value: string;
   onSave: (newValue: string) => void;
   className?: string;
+  readOnly?: boolean; // Nova prop
 }
 
 const EditableRoleField: React.FC<EditableRoleFieldProps> = ({
@@ -21,6 +22,7 @@ const EditableRoleField: React.FC<EditableRoleFieldProps> = ({
   value,
   onSave,
   className,
+  readOnly = false, // Valor padrão é false
 }) => {
   const { user: appUser } = useUser(); // Obter o usuário logado
   const isAdmin = appUser?.role === "Administrador"; // Verificar se é administrador
@@ -38,13 +40,16 @@ const EditableRoleField: React.FC<EditableRoleFieldProps> = ({
     setIsEditing(false);
   };
 
+  // O campo é editável se não for readOnly E o usuário for um administrador
+  const canEdit = !readOnly && isAdmin;
+
   return (
     <div className={cn("group flex items-center justify-between p-3 border rounded-md transition-colors", className)}>
       <div className="flex items-center space-x-4">
         <Briefcase className="h-5 w-5 text-primary" />
         <Label className="text-base font-medium text-muted-foreground">{label}:</Label>
       </div>
-      {isEditing && isAdmin ? ( // Apenas permite edição se for administrador
+      {isEditing && canEdit ? ( // Apenas permite edição se canEdit for true
         <div className="flex items-center space-x-2 flex-1 justify-end">
           <RoleSelect value={tempValue} onValueChange={setTempValue} />
           <Tooltip delayDuration={0}>
@@ -69,7 +74,7 @@ const EditableRoleField: React.FC<EditableRoleFieldProps> = ({
       ) : (
         <div className="flex items-center space-x-2">
           <p className="text-base font-semibold">{value}</p>
-          {isAdmin && ( // Apenas mostra o botão de editar se for administrador
+          {canEdit && ( // Apenas mostra o botão de editar se canEdit for true
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)} className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
