@@ -26,6 +26,7 @@ import { showError, showSuccess } from "@/utils/toast";
 import { usePageTitle } from "@/context/PageTitleContext";
 import CustomCalendarCaption from "@/components/CustomCalendarCaption";
 import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
+import { TeamMember } from "@/pages/Veterinarios"; // Importar TeamMember
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -269,6 +270,21 @@ const Internacao = () => {
     enabled: !!userId,
   });
 
+  // Fetch all veterinarians (team members with role 'Veterinário')
+  const { data: allVeterinarians = [], isLoading: isLoadingVeterinarians, error: veterinariansError } = useQuery<TeamMember[]>({
+    queryKey: ['allVeterinariansInternment', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, email, phone, crmv, role')
+        .eq('role', 'Veterinário');
+      if (error) throw error;
+      return data as TeamMember[];
+    },
+    enabled: !!userId,
+  });
+
   // Mutation for adding a new patient
   const addPatientMutation = useMutation({
     mutationFn: async (newPatientData: InternmentFormValues) => {
@@ -276,9 +292,14 @@ const Internacao = () => {
 
       const client = allClients.find(c => c.id === newPatientData.selectedClientId);
       const pet = allPets.find(p => p.id === newPatientData.selectedPetId);
+      const veterinarian = allVeterinarians.find(v => `${v.first_name} ${v.last_name}` === newPatientData.veterinarian);
+
 
       if (!client || !pet) {
         throw new Error("Tutor ou animal selecionado não encontrado.");
+      }
+      if (!veterinarian) {
+        throw new Error("Veterinário responsável não encontrado.");
       }
 
       console.log("Internacao.tsx: Attempting to insert new patient:", newPatientData);
@@ -294,7 +315,7 @@ const Internacao = () => {
           reason: newPatientData.reason,
           admission_date: format(newPatientData.admissionDate, "yyyy-MM-dd"),
           expected_discharge_date: newPatientData.expectedDischargeDate ? format(newPatientData.expectedDischargeDate, "yyyy-MM-dd") : null,
-          veterinarian: newPatientData.veterinarian,
+          veterinarian: `${veterinarian.first_name} ${veterinarian.last_name}`, // Usa o nome completo do veterinário
           status: "Em Observação",
           species: pet.species, // Usa a espécie do pet do objeto pet
           risk: newPatientData.risk,
@@ -323,6 +344,12 @@ const Internacao = () => {
     mutationFn: async (updatedPatient: InternedPatient) => {
       if (!userId) throw new Error("User not authenticated.");
       console.log("Internacao.tsx: Attempting to update patient in DB:", updatedPatient);
+
+      const veterinarian = allVeterinarians.find(v => `${v.first_name} ${v.last_name}` === updatedPatient.veterinarian);
+      if (!veterinarian) {
+        throw new Error("Veterinário responsável não encontrado.");
+      }
+
       const { data, error } = await supabase
         .from('interned_patients')
         .update({
@@ -332,7 +359,7 @@ const Internacao = () => {
           reason: updatedPatient.reason,
           admission_date: updatedPatient.admission_date,
           expected_discharge_date: updatedPatient.expected_discharge_date,
-          veterinarian: updatedPatient.veterinarian,
+          veterinarian: `${veterinarian.first_name} ${veterinarian.last_name}`, // Usa o nome completo do veterinário
           status: updatedPatient.status,
           species: updatedPatient.species,
           risk: updatedPatient.risk,
@@ -377,7 +404,7 @@ const Internacao = () => {
       if (!userId) throw new Error("User not authenticated.");
       console.log("saveAllActionsMutation: actionsToSave received:", actionsToSave);
 
-      const existingActionsForPatient = allActionsForCurrentPatient.filter(a => a.patient_id === actionPatientId);
+      const existingActionsForPatient = patientActions.filter(a => a.patient_id === actionPatientId);
       const newActions = actionsToSave.filter(action => !existingActionsForPatient.some(ea => ea.id === action.id));
       const updatedActions = actionsToSave.filter(action => existingActionsForPatient.some(ea => ea.id === action.id));
       const deletedActions = existingActionsForPatient.filter(ea => !actionsToSave.some(action => action.id === ea.id));
@@ -582,7 +609,7 @@ const Internacao = () => {
     updateActionsCompletionMutation.mutate(updatedActions);
   };
 
-  if (isLoadingPatients || isLoadingHistory || isLoadingActions || isLoadingClients || isLoadingPets) {
+  if (isLoadingPatients || isLoadingHistory || isLoadingActions || isLoadingClients || isLoadingPets || isLoadingVeterinarians) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando dados de internação...</p>
@@ -590,10 +617,10 @@ const Internacao = () => {
     );
   }
 
-  if (patientsError || historyError || actionsError || clientsError || petsError) {
+  if (patientsError || historyError || actionsError || clientsError || petsError || veterinariansError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar dados: {patientsError?.message || historyError?.message || actionsError?.message || clientsError?.message || petsError?.message}</p>
+        <p>Erro ao carregar dados: {patientsError?.message || historyError?.message || actionsError?.message || clientsError?.message || petsError?.message || veterinariansError?.message}</p>
       </div>
     );
   }
@@ -656,6 +683,7 @@ const Internacao = () => {
                     onCancel={() => setIsAddDialogOpen(false)} 
                     allClients={allClients} // Passa todos os clientes
                     allPets={allPets}     // Passa todos os pets
+                    allVeterinarians={allVeterinarians} // Passa todos os veterinários
                   />
                 </DialogContent>
               </Dialog>

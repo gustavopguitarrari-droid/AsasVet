@@ -28,13 +28,7 @@ import RiskSelector from "./RiskSelector";
 import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
 import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
 import { Label } from "@/components/ui/label"; // Importar Label
-
-// Mock de veterinários
-const mockVeterinarians = [
-  { id: "V001", name: "Dr. Ana Paula" },
-  { id: "V002", name: "Dr. Carlos Eduardo" },
-  { id: "V003", name: "Dra. Beatriz Lima" },
-];
+import { TeamMember } from "@/pages/Veterinarios"; // Importar TeamMember
 
 const formSchema = z.object({
   bayName: z.string().min(1, "O nome da baia é obrigatório."),
@@ -69,11 +63,12 @@ interface InternmentFormProps {
   onCancel: () => void;
   initialData?: Partial<InternmentFormValues>;
   isSubmittingParent?: boolean;
-  allClients: Client[]; // NOVO: Lista de todos os clientes
-  allPets: Pet[];       // NOVO: Lista de todos os pets
+  allClients: Client[];
+  allPets: Pet[];
+  allVeterinarians: TeamMember[]; // NOVO: Lista de todos os veterinários
 }
 
-const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, initialData, isSubmittingParent = false, allClients, allPets }) => {
+const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, initialData, isSubmittingParent = false, allClients, allPets, allVeterinarians }) => {
   const safeParseDate = (dateString?: string | null): Date | undefined => {
     if (!dateString) return undefined;
     const parsed = parseISO(dateString);
@@ -96,7 +91,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
       reason: initialData?.reason || "",
       admissionDate: initialData?.admissionDate || new Date(),
       expectedDischargeDate: initialData?.expectedDischargeDate || null,
-      veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
+      veterinarian: initialData?.veterinarian || (allVeterinarians.length > 0 ? `${allVeterinarians[0].first_name} ${allVeterinarians[0].last_name}` : ""),
       risk: initialData?.risk || "Sem risco",
     },
   });
@@ -120,7 +115,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
       reason: initialData?.reason || "",
       admissionDate: initialData?.admissionDate || new Date(),
       expectedDischargeDate: initialData?.expectedDischargeDate || null,
-      veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
+      veterinarian: initialData?.veterinarian || (allVeterinarians.length > 0 ? `${allVeterinarians[0].first_name} ${allVeterinarians[0].last_name}` : ""),
       risk: initialData?.risk || "Sem risco",
     });
     setCpfInput("");
@@ -146,7 +141,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
         form.setValue("species", pet.species as InternmentFormValues["species"]);
       }
     }
-  }, [initialData, form, allClients, allPets]);
+  }, [initialData, form, allClients, allPets, allVeterinarians]);
 
   const handleSearchCpf = () => {
     const cleanCpf = cpfInput.replace(/\D/g, '');
@@ -232,7 +227,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
 
         {/* Busca de Tutor por CPF */}
         <div className="space-y-2 border p-3 rounded-md">
-          <Label className="flex items-center"> {/* Alterado de FormLabel para Label */}
+          <Label className="flex items-center">
             <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor por CPF
           </Label>
           <div className="flex space-x-2">
@@ -270,7 +265,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
 
         {/* Seleção de Animal */}
         <div className="space-y-2 border p-3 rounded-md">
-          <Label className="flex items-center"> {/* Alterado de FormLabel para Label */}
+          <Label className="flex items-center">
             <PawPrint className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Animal
           </Label>
           <FormField
@@ -356,9 +351,9 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {mockVeterinarians.map((vet) => (
-                    <SelectItem key={vet.id} value={vet.name}>
-                      {vet.name}
+                  {allVeterinarians.map((vet) => (
+                    <SelectItem key={vet.id} value={`${vet.first_name} ${vet.last_name}`}>
+                      {vet.first_name} {vet.last_name}
                     </SelectItem>
                   ))}
                 </SelectContent>

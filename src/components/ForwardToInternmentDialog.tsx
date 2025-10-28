@@ -19,6 +19,7 @@ import { useUser } from '@/context/UserContext';
 import { showError, showSuccess } from '@/utils/toast';
 import { format } from 'date-fns';
 import { Client, Pet } from '@/types/cadastro'; // Importar Client e Pet
+import { TeamMember } from '@/pages/Veterinarios'; // Importar TeamMember
 
 interface ForwardToInternmentDialogProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ interface ForwardToInternmentDialogProps {
   appointment: Appointment;
   allClients: Client[]; // NOVO: Passar todos os clientes
   allPets: Pet[];       // NOVO: Passar todos os pets
+  allVeterinarians: TeamMember[]; // NOVO: Passar todos os veterinários
 }
 
 const ForwardToInternmentDialog: React.FC<ForwardToInternmentDialogProps> = ({
@@ -34,6 +36,7 @@ const ForwardToInternmentDialog: React.FC<ForwardToInternmentDialogProps> = ({
   appointment,
   allClients, // NOVO
   allPets,    // NOVO
+  allVeterinarians, // NOVO
 }) => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
@@ -45,9 +48,13 @@ const ForwardToInternmentDialog: React.FC<ForwardToInternmentDialogProps> = ({
 
       const client = allClients.find(c => c.id === newPatientData.selectedClientId);
       const pet = allPets.find(p => p.id === newPatientData.selectedPetId);
+      const veterinarian = allVeterinarians.find(v => `${v.first_name} ${v.last_name}` === newPatientData.veterinarian);
 
       if (!client || !pet) {
         throw new Error("Tutor ou animal selecionado não encontrado.");
+      }
+      if (!veterinarian) {
+        throw new Error("Veterinário responsável não encontrado.");
       }
 
       console.log("ForwardToInternmentDialog: Attempting to insert new patient:", newPatientData);
@@ -63,7 +70,7 @@ const ForwardToInternmentDialog: React.FC<ForwardToInternmentDialogProps> = ({
           reason: newPatientData.reason,
           admission_date: format(newPatientData.admissionDate, "yyyy-MM-dd"),
           expected_discharge_date: newPatientData.expectedDischargeDate ? format(newPatientData.expectedDischargeDate, "yyyy-MM-dd") : null,
-          veterinarian: newPatientData.veterinarian,
+          veterinarian: `${veterinarian.first_name} ${veterinarian.last_name}`, // Usa o nome completo do veterinário
           status: "Em Observação",
           species: pet.species, // Usa a espécie do pet do objeto pet
           risk: newPatientData.risk,
@@ -126,6 +133,7 @@ const ForwardToInternmentDialog: React.FC<ForwardToInternmentDialogProps> = ({
           isSubmittingParent={addPatientMutation.isPending}
           allClients={allClients} // Passa todos os clientes
           allPets={allPets}     // Passa todos os pets
+          allVeterinarians={allVeterinarians} // Passa todos os veterinários
         />
       </DialogContent>
     </Dialog>
