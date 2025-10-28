@@ -761,7 +761,7 @@ const Appointments = () => {
         { id: 'completion', header: 'Finalização', render: (appointment: Appointment) => (
           <TableCell>
             {appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))
-              ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
+              ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })
               : "N/A"}
           </TableCell>
         )},
@@ -857,7 +857,7 @@ const Appointments = () => {
   if (error || clientsError || petsError || historyError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar dados: {error?.message || clientsError?.message || petsError?.message || historyError?.message}</p>
+        <p>Erro ao carregar dados: ${error?.message || clientsError?.message || petsError?.message || historyError?.message}</p>
       </div>
     );
   }
@@ -1010,13 +1010,14 @@ const Appointments = () => {
           pdfBlob={pdfBlob}
           filename={pdfFilename}
           onConfirmDownload={handleConfirmPdfDownload}
+          pdfUrl={pdfAppointment?.id ? `/api/download-medical-record/${pdfAppointment.id}` : undefined}
         />
 
         <PdfPreviewDialog
           isOpen={isRecipePdfPreviewDialogOpen}
           onClose={() => setIsRecipePdfPreviewDialogOpen(false)}
           pdfBlob={recipePdfBlob}
-          pdfUrl={recipePdfUrl} // Passa a URL direta se disponível
+          pdfUrl={recipePdfUrl} // Usa a URL direta para download
           filename={recipePdfFilename}
           onConfirmDownload={handleConfirmRecipePdfDownload}
         />

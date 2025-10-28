@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, ListFilter } from "lucide-react"; // Removido Horse e Cow
+import { Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, ListFilter } from "lucide-react";
 
 interface SpeciesOption {
   name: string;
