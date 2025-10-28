@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, Stethoscope, User, FlaskConical, XCircle, CheckCircle } from "lucide-react";
+import { Edit, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, Stethoscope, User, FlaskConical, XCircle, CheckCircle, Horse, Cow } from "lucide-react"; // Adicionado Horse e Cow
 import InternmentEditForm, { InternmentEditFormValues } from "./InternmentEditForm";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
@@ -33,6 +33,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
+  Equino: Horse, // Adicionado Equino
+  Bovino: Cow,   // Adicionado Bovino
   Outros: MoreHorizontal,
 };
 

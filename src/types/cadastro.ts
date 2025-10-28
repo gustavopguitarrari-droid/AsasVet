@@ -21,7 +21,7 @@ export interface Client {
 export interface Pet {
   id: string;
   name: string;
-  species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros"; // Tipo de enumeração
+  species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros" | "Equino" | "Bovino"; // Tipo de enumeração atualizado
   breed: string;
   age: string; // Novo campo (ex: "2 anos", "6 meses")
   gender: 'Macho' | 'Fêmea' | 'Desconhecido'; // Tipo de enumeração

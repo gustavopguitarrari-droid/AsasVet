@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Syringe, Utensils, Eye, FlaskConical, Check } from "lucide-react";
+import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Syringe, Utensils, Eye, FlaskConical, Check, Horse, Cow } from "lucide-react"; // Adicionado Horse e Cow
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +33,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
+  Equino: Horse, // Adicionado Equino
+  Bovino: Cow,   // Adicionado Bovino
   Outros: MoreHorizontal,
 };
 
@@ -42,6 +44,8 @@ const speciesColorMap: { [key: string]: string } = {
   Pássaro: "text-sidebar-item-bg-3",
   Roedor: "text-sidebar-item-bg-7",
   Peixe: "text-sidebar-item-bg-5",
+  Equino: "text-sidebar-item-bg-2", // Cor para Equino
+  Bovino: "text-sidebar-item-bg-6", // Cor para Bovino
   Outros: "text-sidebar-item-bg-9",
 };
 

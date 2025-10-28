@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format, parseISO, isValid } from "date-fns";
-import { CalendarIcon, Search, User, PawPrint } from "lucide-react"; // Adicionado Search, User, PawPrint
+import { CalendarIcon, Search, User, PawPrint, Horse, Cow } from "lucide-react"; // Adicionado Horse e Cow
 import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
@@ -41,7 +41,7 @@ const formSchema = z.object({
   // Campos que serão preenchidos automaticamente e enviados na mutação
   petName: z.string().min(1, "O nome do animal é obrigatório."),
   ownerName: z.string().min(1, "O nome do tutor é obrigatório."),
-  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros", "Equino", "Bovino"], { // Espécies atualizadas
     required_error: "A espécie do animal é obrigatória.",
   }),
 

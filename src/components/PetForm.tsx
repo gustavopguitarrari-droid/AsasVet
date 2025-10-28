@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, Dog, Camera, XCircle, Upload, Search, User } from "lucide-react";
+import { PlusCircle, Dog, Camera, XCircle, Upload, Search, User, Horse, Cow } from "lucide-react"; // Adicionado Horse e Cow
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +30,7 @@ import { supabase } from "@/integrations/supabase/client";
 // Esquema de validação do formulário com Zod
 const formSchema = z.object({
   name: z.string().min(1, "O nome do animal é obrigatório."),
-  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros", "Equino", "Bovino"], { // Espécies atualizadas
     required_error: "A espécie do animal é obrigatória.",
   }),
   breed: z.string().min(1, "A raça é obrigatória."),
@@ -348,6 +348,8 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
                       <SelectItem value="Pássaro">Pássaro</SelectItem>
                       <SelectItem value="Roedor">Roedor</SelectItem>
                       <SelectItem value="Peixe">Peixe</SelectItem>
+                      <SelectItem value="Equino">Equino</SelectItem> {/* Adicionado Equino */}
+                      <SelectItem value="Bovino">Bovino</SelectItem> {/* Adicionado Bovino */}
                       <SelectItem value="Outros">Outros</SelectItem>
                     </SelectContent>
                   </Select>

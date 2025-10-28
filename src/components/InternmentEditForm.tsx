@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format, parseISO, isValid } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Horse, Cow } from "lucide-react"; // Adicionado Horse e Cow
 import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
@@ -45,7 +45,7 @@ const formSchema = z.object({
   }),
   expectedDischargeDate: z.date().nullable().optional(),
   veterinarian: z.string().min(1, "O veterinário responsável é obrigatório."),
-  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros", "Equino", "Bovino"], { // Espécies atualizadas
     required_error: "A espécie do animal é obrigatória.",
   }),
   risk: z.enum(["Sem risco", "Baixo", "Médio", "Alto", "Emergência"], {
@@ -67,7 +67,7 @@ interface InternmentEditFormProps {
     bayName: string;
     petName: string;
     ownerName: string;
-    species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros";
+    species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros" | "Equino" | "Bovino"; // Espécies atualizadas
     status: "Em Observação" | "Estável" | "Crítico" | "Alta" | "Óbito";
   };
 }
@@ -168,6 +168,8 @@ const InternmentEditForm: React.FC<InternmentEditFormProps> = ({ onSubmit, onCan
                   <SelectItem value="Pássaro">Pássaro</SelectItem>
                   <SelectItem value="Roedor">Roedor</SelectItem>
                   <SelectItem value="Peixe">Peixe</SelectItem>
+                  <SelectItem value="Equino">Equino</SelectItem> {/* Adicionado Equino */}
+                  <SelectItem value="Bovino">Bovino</SelectItem> {/* Adicionado Bovino */}
                   <SelectItem value="Outros">Outros</SelectItem>
                 </SelectContent>
               </Select>
