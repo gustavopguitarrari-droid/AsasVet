@@ -1,7 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
@@ -25,10 +24,10 @@ import { SessionContextProvider } from "./context/SessionContext";
 import ScrollToTop from "./components/ScrollToTop";
 import { PageTitleProvider } from "./context/PageTitleContext";
 
-const queryClient = new QueryClient();
+// Removido: const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  // Removido: <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -146,7 +145,7 @@ const App = () => (
         </SessionContextProvider>
       </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>
+  // Removido: </QueryClientProvider>
 );
 
 export default App;
