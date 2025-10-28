@@ -13,6 +13,7 @@ import Financeiro from "./pages/Financeiro"; // Restaurado
 import Internacao from "./pages/Internacao";
 import Veterinarios from "./pages/Veterinarios";
 import Estoque from "./pages/Estoque";
+import Products from "./pages/Products"; // Import the new Products page
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -95,6 +96,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Veterinarios />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/products" // NEW ROUTE
+                element={
+                  <ProtectedRoute>
+                    <Products />
                   </ProtectedRoute>
                 }
               />

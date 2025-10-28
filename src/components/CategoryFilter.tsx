@@ -4,33 +4,25 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { ListFilter, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, Syringe } from "lucide-react";
+import { ListFilter, Syringe, Pill, SprayCan, Wrench, MoreHorizontal, Package, Tag } from "lucide-react"; // Added Tag for generic product category
 
-interface CategoryOption {
+export interface FilterOption {
   name: string;
   icon: React.ElementType;
   colorClass: string;
   value: string;
 }
 
-const categoryOptions: CategoryOption[] = [
-  { name: "Todos", icon: ListFilter, colorClass: "bg-gray-500", value: "all" },
-  { name: "Insumos", icon: Syringe, colorClass: "bg-sidebar-item-bg-1", value: "Insumos" },
-  { name: "Farmácia", icon: Pill, colorClass: "bg-sidebar-item-bg-4", value: "Farmácia" }, // Alterado para Farmácia
-  { name: "Higiene", icon: SprayCan, colorClass: "bg-sidebar-item-bg-3", value: "Higiene" },
-  { name: "Equipamentos", icon: Wrench, colorClass: "bg-sidebar-item-bg-7", value: "Equipamentos" },
-  { name: "Outros", icon: MoreHorizontal, colorClass: "bg-sidebar-item-bg-9", value: "Outros" },
-];
-
 interface CategoryFilterProps {
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
+  options: FilterOption[]; // Now accepts options as a prop
 }
 
-const CategoryFilter: React.FC<CategoryFilterProps> = ({ selectedCategory, onSelectCategory }) => {
+const CategoryFilter: React.FC<CategoryFilterProps> = ({ selectedCategory, onSelectCategory, options }) => {
   return (
     <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-      {categoryOptions.map((category) => (
+      {options.map((category) => ( // Use options prop
         <Tooltip key={category.value} delayDuration={0}>
           <TooltipTrigger asChild>
             <Button

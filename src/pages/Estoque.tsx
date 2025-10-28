@@ -9,8 +9,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, Syringe } from "lucide-react";
-import CategoryFilter from "@/components/CategoryFilter";
+import { PlusCircle, Search, Package, Wheat, Pill, SprayCan, Wrench, MoreHorizontal, Syringe, ListFilter } from "lucide-react";
+import CategoryFilter, { FilterOption } from "@/components/CategoryFilter"; // Import FilterOption
 import StockItemDetailsDialog from "@/components/StockItemDetailsDialog";
 import { cn } from "@/lib/utils";
 
@@ -42,6 +42,16 @@ const categoryIconMap: { [key: string]: React.ElementType } = {
   Equipamentos: Wrench,
   Outros: MoreHorizontal,
 };
+
+// Define as opções de categoria para o estoque
+const stockCategoryOptions: FilterOption[] = [
+  { name: "Todos", icon: ListFilter, colorClass: "bg-gray-500", value: "all" },
+  { name: "Insumos", icon: Syringe, colorClass: "bg-sidebar-item-bg-1", value: "Insumos" },
+  { name: "Farmácia", icon: Pill, colorClass: "bg-sidebar-item-bg-4", value: "Farmácia" },
+  { name: "Higiene", icon: SprayCan, colorClass: "bg-sidebar-item-bg-3", value: "Higiene" },
+  { name: "Equipamentos", icon: Wrench, colorClass: "bg-sidebar-item-bg-7", value: "Equipamentos" },
+  { name: "Outros", icon: MoreHorizontal, colorClass: "bg-sidebar-item-bg-9", value: "Outros" },
+];
 
 const Estoque = () => {
   const [searchTerm, setSearchTerm] = React.useState<string>("");
@@ -76,7 +86,7 @@ const Estoque = () => {
         </Button>
       </div>
 
-      <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} />
+      <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} options={stockCategoryOptions} />
 
       <div className="flex items-center space-x-2">
         <div className="relative flex-1">

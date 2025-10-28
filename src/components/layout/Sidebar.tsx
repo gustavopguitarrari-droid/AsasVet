@@ -13,6 +13,7 @@ import {
   ArrowRightToLine,
   ReceiptText,
   Package,
+  Tag, // NEW: Import Tag icon for Products
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -54,6 +55,11 @@ const allNavItems: NavItem[] = [
   },
   { name: "Equipe", icon: Stethoscope, path: "/veterinarios" },
   {
+    name: "Produtos", // NEW: Products item
+    icon: Tag, // Using Tag icon
+    path: "/products",
+  },
+  {
     name: "Estoque",
     icon: Package,
     path: "/estoque",
@@ -90,6 +96,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         "/internacao",
         "/cadastro",
         "/medical-records",
+        "/products", // NEW: Allow veterinarians to see Products
       ];
       return allNavItems.filter(item => allowedPaths.includes(item.path));
     }

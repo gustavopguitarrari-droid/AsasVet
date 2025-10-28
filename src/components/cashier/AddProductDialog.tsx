@@ -45,33 +45,40 @@ interface AddProductDialogProps {
   onClose: () => void;
   onSubmit: (data: AddProductFormValues) => void;
   isSubmitting: boolean;
+  initialData?: Product; // NEW: Optional initial data for editing
 }
 
-const AddProductDialog: React.FC<AddProductDialogProps> = ({ isOpen, onClose, onSubmit, isSubmitting }) => {
+const AddProductDialog: React.FC<AddProductDialogProps> = ({ isOpen, onClose, onSubmit, isSubmitting, initialData }) => { // Added initialData
   const form = useForm<AddProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      price: 0,
-      category: "Produto",
+      name: initialData?.name || "", // Use initialData
+      price: initialData?.price || 0, // Use initialData
+      category: (initialData?.category as "Serviço" | "Produto") || "Produto", // Use initialData
     },
   });
 
   React.useEffect(() => {
-    if (!isOpen) {
-      form.reset(); // Reset form when dialog closes
+    if (isOpen) {
+      form.reset({ // Reset form with initialData when dialog opens
+        name: initialData?.name || "",
+        price: initialData?.price || 0,
+        category: (initialData?.category as "Serviço" | "Produto") || "Produto",
+      });
+    } else {
+      form.reset(); // Reset to empty when dialog closes
     }
-  }, [isOpen, form]);
+  }, [isOpen, form, initialData]); // Added initialData to dependencies
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <PlusCircle className="h-5 w-5 mr-2" /> Adicionar Novo Item
+            <PlusCircle className="h-5 w-5 mr-2" /> {initialData ? "Editar Item" : "Adicionar Novo Item"} {/* Dynamic title */}
           </DialogTitle>
           <DialogDescription>
-            Adicione um novo produto ou serviço ao seu catálogo.
+            {initialData ? "Edite os detalhes do produto ou serviço." : "Adicione um novo produto ou serviço ao seu catálogo."} {/* Dynamic description */}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -142,7 +149,7 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({ isOpen, onClose, on
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                {isSubmitting ? "Adicionando..." : "Adicionar Item"}
+                {isSubmitting ? "Salvando..." : (initialData ? "Salvar Alterações" : "Adicionar Item")} {/* Dynamic button text */}
               </Button>
             </DialogFooter>
           </form>

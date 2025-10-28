@@ -38,6 +38,8 @@ const Header = () => {
         return "Internação";
       case "/veterinarios":
         return "Equipe";
+      case "/products": // NEW: Title for Products page
+        return "Produtos e Serviços";
       case "/estoque":
         return "Estoque";
       case "/profile":
