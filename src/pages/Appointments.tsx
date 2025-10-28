@@ -73,7 +73,7 @@ interface MedicalRecord {
   physical_exam?: string | null;
   diagnosis?: string | null;
   treatment?: string | null;
-  prescriptions: { medication: string; dosage: string; frequency: string; instructions?: string }[]; // Alterado para array não nulo
+  prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null; // Alterado para permitir null
   recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
   created_at: string;
   updated_at: string;
@@ -156,6 +156,7 @@ const Appointments = () => {
         `)
         .eq('user_id', userId);
       if (error) throw error;
+      console.log("Appointments.tsx: Raw data from Supabase for appointments query:", data); // ADDED LOG
       return data.map(app => ({
         ...app,
         // Assuming medical_records is an array, take the first one if it exists
@@ -183,6 +184,7 @@ const Appointments = () => {
         .eq('user_id', userId)
         .in('status', ['Realizada', 'Cancelada']);
       if (error) throw error;
+      console.log("Appointments.tsx: Raw data from Supabase for historyAppointments query:", data); // ADDED LOG
       return data.map(app => ({
         ...app,
         prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
