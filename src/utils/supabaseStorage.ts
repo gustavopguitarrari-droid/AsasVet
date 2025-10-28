@@ -24,14 +24,14 @@ const base64ToBlob = (base64: string, contentType: string): Blob => {
 /**
  * Faz upload de uma imagem Base64 para o Supabase Storage.
  * @param base64Image A string Base64 da imagem (ex: "data:image/png;base64,...").
- * @param userId O ID do usuário proprietário da imagem.
+ * @param organizationId O ID da organização/clínica proprietária da imagem.
  * @param entityType O tipo de entidade (ex: 'clients', 'pets').
  * @param entityId O ID da entidade (cliente ou pet).
  * @returns A URL pública da imagem ou null em caso de erro.
  */
 export const uploadImageToSupabase = async (
   base64Image: string,
-  userId: string,
+  organizationId: string, // Alterado de userId para organizationId
   entityType: 'clients' | 'pets',
   entityId: string
 ): Promise<string | null> => {
@@ -44,7 +44,7 @@ export const uploadImageToSupabase = async (
     );
     const fileExtension = contentType.split('/')[1];
     const fileName = `${uuidv4()}.${fileExtension}`; // Nome de arquivo único
-    const filePath = `${userId}/${entityType}/${entityId}/${fileName}`;
+    const filePath = `${organizationId}/${entityType}/${entityId}/${fileName}`; // Caminho: organizationId/entityType/entityId/uuid.ext
 
     const { data, error } = await supabase.storage
       .from(AVATARS_BUCKET_NAME) // Usando o bucket de avatares
@@ -105,7 +105,7 @@ export const deleteImageFromSupabase = async (publicUrl: string): Promise<boolea
 // Funções para upload e exclusão de logos
 export const uploadLogoToSupabase = async (
   base64Image: string,
-  userId: string,
+  organizationId: string, // Alterado de userId para organizationId
 ): Promise<string | null> => {
   if (!base64Image) {
     console.log("uploadLogoToSupabase: No base64Image provided.");
@@ -120,7 +120,7 @@ export const uploadLogoToSupabase = async (
     const fileExtension = contentType.split('/')[1];
     // Usar um nome de arquivo único para o logo do usuário para evitar cache
     const fileName = `${uuidv4()}.${fileExtension}`; 
-    const filePath = `${userId}/${fileName}`; // Caminho: userId/uuid.ext
+    const filePath = `${organizationId}/${fileName}`; // Caminho: organizationId/uuid.ext
     console.log(`uploadLogoToSupabase: Attempting to upload to filePath: ${filePath} with contentType: ${contentType}`);
 
     const { data, error } = await supabase.storage
@@ -166,7 +166,7 @@ export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean
       console.warn("deleteLogoFromSupabase: URL pública inválida para exclusão do logo:", publicUrl);
       return false;
     }
-    const filePath = pathSegments.slice(bucketIndex + 1).join('/'); // user_id/uuid.ext
+    const filePath = pathSegments.slice(bucketIndex + 1).join('/'); // organizationId/uuid.ext
     console.log(`deleteLogoFromSupabase: Attempting to delete filePath: ${filePath} from bucket: ${LOGOS_BUCKET_NAME}`);
 
     const { error } = await supabase.storage
@@ -188,13 +188,13 @@ export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean
 // NOVO: Funções para upload e exclusão de PDFs de receitas
 export const uploadRecipePdfToSupabase = async (
   pdfBlob: Blob,
-  userId: string,
+  organizationId: string, // Alterado de userId para organizationId
   appointmentId: string,
 ): Promise<string | null> => {
   console.log("uploadRecipePdfToSupabase: Iniciando upload do PDF da receita.");
   try {
     const fileName = `receita_${appointmentId}_${uuidv4()}.pdf`;
-    const filePath = `${userId}/${appointmentId}/${fileName}`; // Caminho: userId/appointmentId/uuid.pdf
+    const filePath = `${organizationId}/${appointmentId}/${fileName}`; // Caminho: organizationId/appointmentId/uuid.pdf
     console.log(`uploadRecipePdfToSupabase: Tentando upload para filePath: ${filePath} no bucket: ${PRESCRIPTIONS_BUCKET_NAME}`);
 
     const { data, error } = await supabase.storage

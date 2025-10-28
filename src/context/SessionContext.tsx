@@ -70,6 +70,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         addressState: data?.address_state || userMetadata.address_state?.toString() || undefined,
         colorTheme: data?.color_theme || userMetadata.color_theme?.toString() || undefined,
         registeredTime: data?.registered_time || supabaseUser.created_at,
+        organizationId: data?.organization_id || userMetadata.organization_id?.toString() || undefined, // NOVO: Mapear organization_id
       };
     },
     enabled: !!supabaseUser?.id, // Only run query if supabaseUser ID is available

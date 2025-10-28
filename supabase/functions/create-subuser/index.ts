@@ -38,10 +38,10 @@ serve(async (req) => {
       });
     }
 
-    // Fetch the profile of the authenticated user to check their role
+    // Fetch the profile of the authenticated user to check their role and get their organization_id
     const { data: adminProfile, error: profileError } = await supabaseAdmin
       .from('profiles')
-      .select('role')
+      .select('role, organization_id')
       .eq('id', authUser.id)
       .single();
 
@@ -79,6 +79,7 @@ serve(async (req) => {
         first_name,
         last_name,
         role,
+        organization_id: adminProfile.organization_id, // Pass the admin's organization_id
       },
     });
 

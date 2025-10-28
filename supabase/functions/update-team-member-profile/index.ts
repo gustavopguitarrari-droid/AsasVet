@@ -37,10 +37,10 @@ serve(async (req) => {
       });
     }
 
-    // Fetch the profile of the authenticated user to check their role
+    // Fetch the profile of the authenticated user to check their role and get their organization_id
     const { data: adminProfile, error: profileError } = await supabaseAdmin
       .from('profiles')
-      .select('role')
+      .select('role, organization_id')
       .eq('id', authUser.id)
       .single();
 
@@ -64,6 +64,21 @@ serve(async (req) => {
     // Prevent an admin from changing their own profile via this function (role changes are handled separately)
     if (userIdToUpdate === authUser.id) {
       return new Response(JSON.stringify({ error: 'Forbidden: An administrator cannot change their own profile via this interface.' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Ensure the target user belongs to the same organization as the admin
+    const { data: targetProfile, error: targetProfileError } = await supabaseAdmin
+      .from('profiles')
+      .select('organization_id')
+      .eq('id', userIdToUpdate)
+      .single();
+
+    if (targetProfileError || !targetProfile || targetProfile.organization_id !== adminProfile.organization_id) {
+      console.error('Target user not found or not in the same organization:', targetProfileError?.message);
+      return new Response(JSON.stringify({ error: 'Forbidden: Target user not found or does not belong to your organization.' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
@@ -100,6 +115,7 @@ serve(async (req) => {
           first_name,
           last_name,
           role,
+          organization_id: adminProfile.organization_id, // Ensure organization_id is consistent
         },
       }
     );

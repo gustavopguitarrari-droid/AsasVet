@@ -43,7 +43,7 @@ serve(async (req) => {
 
     const { data: adminProfile, error: profileError } = await supabaseAdmin
       .from('profiles')
-      .select('role')
+      .select('role, organization_id')
       .eq('id', authUser.id)
       .single();
 
@@ -84,20 +84,21 @@ serve(async (req) => {
       });
     }
 
+    // Ensure the target user belongs to the same organization as the admin
     const { data: targetProfile, error: targetProfileError } = await supabaseAdmin
       .from('profiles')
-      .select('id')
+      .select('id, organization_id')
       .eq('id', userIdToUpdate)
       .single();
 
-    if (targetProfileError || !targetProfile) {
-      console.error('Edge Function: Target profile not found or error fetching:', targetProfileError?.message);
-      return new Response(JSON.stringify({ error: 'Target user profile not found.' }), {
-        status: 404,
+    if (targetProfileError || !targetProfile || targetProfile.organization_id !== adminProfile.organization_id) {
+      console.error('Edge Function: Target profile not found or not in the same organization:', targetProfileError?.message);
+      return new Response(JSON.stringify({ error: 'Forbidden: Target user not found or does not belong to your organization.' }), {
+        status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
-    console.log('Edge Function: Target profile found:', userIdToUpdate);
+    console.log('Edge Function: Target profile found and in same organization:', userIdToUpdate);
 
     const { error: updateProfileError } = await supabaseAdmin
       .from('profiles')
@@ -116,7 +117,7 @@ serve(async (req) => {
     // Usando updateUserById conforme a sugestão
     const { error: updateAuthUserError } = await supabaseAdmin.auth.admin.updateUserById(
       userIdToUpdate,
-      { user_metadata: { role: newRole } }
+      { user_metadata: { role: newRole, organization_id: adminProfile.organization_id } } // Ensure organization_id is consistent
     );
 
     if (updateAuthUserError) {

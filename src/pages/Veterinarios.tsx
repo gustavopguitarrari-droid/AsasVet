@@ -43,6 +43,7 @@ export interface TeamMember { // Renomeado de Veterinario para TeamMember para s
   crmv?: string | null;
   role: string;
   avatar_url?: string | null;
+  organization_id?: string; // NOVO: Adicionado organization_id
 }
 
 const roleIconMap: { [key: string]: React.ElementType } = {
@@ -58,7 +59,7 @@ const roleIconMap: { [key: string]: React.ElementType } = {
 const Veterinarios = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
-  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Usar organizationId
   const isAdmin = appUser?.role === "Administrador";
   const location = useLocation(); // Inicializar useLocation
 
@@ -81,21 +82,23 @@ const Veterinarios = () => {
 
   // Query para buscar todos os perfis (membros da equipe)
   const { data: teamMembers = [], isLoading, error } = useQuery<TeamMember[]>({
-    queryKey: ['teamMembers'],
+    queryKey: ['teamMembers', organizationId], // Alterado para usar organizationId
     queryFn: async () => {
+      if (!organizationId) return []; // Usar organizationId
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, phone, crmv, role, avatar_url');
+        .select('id, first_name, last_name, email, phone, crmv, role, avatar_url, organization_id') // Incluído organization_id
+        .eq('organization_id', organizationId); // Filtrar por organization_id
       if (error) throw error;
       return data;
     },
-    enabled: !!userId, // Só busca se o usuário estiver logado
+    enabled: !!organizationId, // Só busca se o organizationId estiver disponível
   });
 
   // Mutação para adicionar um novo membro da equipe
   const addTeamMemberMutation = useMutation({
     mutationFn: async (newMemberData: TeamMemberFormValues) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!appUser?.id || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Usar organizationId
       const session = await supabase.auth.getSession();
       if (!session.data.session) throw new Error("User not authenticated.");
 
@@ -106,6 +109,7 @@ const Veterinarios = () => {
           first_name: newMemberData.firstName,
           last_name: newMemberData.lastName,
           role: newMemberData.role,
+          organization_id: organizationId, // Pass organizationId to the edge function
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -118,11 +122,11 @@ const Veterinarios = () => {
       return responseData;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teamMembers'] });
+      queryClient.invalidateQueries({ queryKey: ['teamMembers', organizationId] }); // Invalida a query com organizationId
       showSuccess("Membro da equipe adicionado com sucesso!");
       setIsAddMemberDialogOpen(false);
     },
-    onError: (err: any) => {
+    onError: (err) => {
       showError(`Erro ao adicionar membro: ${err.message}`);
     },
   });
@@ -130,7 +134,7 @@ const Veterinarios = () => {
   // Mutação para atualizar o perfil de um membro da equipe
   const updateTeamMemberProfileMutation = useMutation({
     mutationFn: async (updatedMemberData: TeamMemberFormValues & { id: string }) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!appUser?.id || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Usar organizationId
       const session = await supabase.auth.getSession();
       if (!session.data.session) throw new Error("User not authenticated.");
 
@@ -143,6 +147,7 @@ const Veterinarios = () => {
           phone: updatedMemberData.phone,
           crmv: updatedMemberData.crmv,
           role: updatedMemberData.role,
+          organization_id: organizationId, // Pass organizationId to the edge function
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -155,7 +160,7 @@ const Veterinarios = () => {
       return responseData;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teamMembers'] });
+      queryClient.invalidateQueries({ queryKey: ['teamMembers', organizationId] }); // Invalida a query com organizationId
       showSuccess("Perfil do membro atualizado com sucesso!");
       setIsEditMemberDialogOpen(false);
       setIsDetailsDialogOpen(false); // Fecha o diálogo de detalhes se estiver aberto
@@ -168,7 +173,7 @@ const Veterinarios = () => {
   // Mutação para deletar um membro da equipe
   const deleteTeamMemberMutation = useMutation({
     mutationFn: async (memberIdToDelete: string) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!appUser?.id || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Usar organizationId
       const session = await supabase.auth.getSession();
       if (!session.data.session) throw new Error("User not authenticated.");
 
@@ -185,7 +190,7 @@ const Veterinarios = () => {
       return responseData;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teamMembers'] });
+      queryClient.invalidateQueries({ queryKey: ['teamMembers', organizationId] }); // Invalida a query com organizationId
       showSuccess("Membro da equipe excluído com sucesso!");
       setIsDetailsDialogOpen(false); // Fecha o diálogo de detalhes
     },
@@ -268,6 +273,7 @@ const Veterinarios = () => {
             email: v.email,
             phone: v.phone || "N/A",
             role: v.role,
+            organization_id: v.organization_id,
           }))} />
         </TabsContent>
 
@@ -351,7 +357,7 @@ const Veterinarios = () => {
         onEdit={handleEditMember}
         onDelete={handleDeleteMember}
         isAdmin={isAdmin}
-        currentUserId={userId}
+        currentUserId={appUser?.id} // Usar appUser?.id
       />
 
       <TeamMemberFormDialog

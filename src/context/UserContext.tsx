@@ -26,6 +26,7 @@ export interface User {
   addressCity?: string;
   addressState?: string;
   colorTheme?: string;
+  organizationId?: string; // NOVO: ID da organização/clínica à qual o usuário pertence
 }
 
 interface UserContextType {

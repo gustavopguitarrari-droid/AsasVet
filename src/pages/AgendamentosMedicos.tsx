@@ -27,7 +27,7 @@ import {
 const AgendamentosMedicos = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
-  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Usar organizationId
 
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = React.useState(false);
   const [defaultDateForNewEvent, setDefaultDateForNewEvent] = React.useState<Date | undefined>(undefined);
@@ -36,13 +36,13 @@ const AgendamentosMedicos = () => {
 
   // Query para buscar eventos do Supabase
   const { data: events = [], isLoading, error } = useQuery<CalendarEvent[]>({
-    queryKey: ['events', userId],
+    queryKey: ['events', organizationId], // Alterado para usar organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!organizationId) return []; // Usar organizationId
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .eq('user_id', userId);
+        .eq('organization_id', organizationId); // Filtrar por organization_id
       if (error) throw error;
       // Mapeia os dados do Supabase para o formato CalendarEvent
       return data.map(event => ({
@@ -54,17 +54,18 @@ const AgendamentosMedicos = () => {
         status: (event.status || "Agendada") as CalendarEvent["status"],
       }));
     },
-    enabled: !!userId,
+    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
   });
 
   // Mutação para adicionar um novo evento
   const addEventMutation = useMutation({
     mutationFn: async (newEventData: EventFormValues) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
       const { data, error } = await supabase
         .from('events')
         .insert({
-          user_id: userId,
+          user_id: appUser?.id, // Manter user_id para referência do criador, mas filtrar por organization_id
+          organization_id: organizationId, // NOVO: Adicionar organization_id
           title: newEventData.title,
           date: format(newEventData.date, "yyyy-MM-dd"),
           time: newEventData.time,
@@ -77,7 +78,7 @@ const AgendamentosMedicos = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events', userId] });
+      queryClient.invalidateQueries({ queryKey: ['events', organizationId] }); // Invalida a query com organizationId
       showSuccess("Agendamento adicionado com sucesso!");
       setIsAddEventDialogOpen(false);
     },
@@ -89,19 +90,19 @@ const AgendamentosMedicos = () => {
   // Mutação para cancelar um evento
   const cancelEventMutation = useMutation({
     mutationFn: async (eventId: string) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
       const { data, error } = await supabase
         .from('events')
         .update({ status: "Cancelada" })
         .eq('id', eventId)
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // Filtrar por organization_id
         .select()
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events', userId] });
+      queryClient.invalidateQueries({ queryKey: ['events', organizationId] }); // Invalida a query com organizationId
       showSuccess("Agendamento cancelado com sucesso!");
       setIsCancelConfirmDialogOpen(false);
       setSelectedEvent(null);
@@ -114,16 +115,16 @@ const AgendamentosMedicos = () => {
   // NOVO: Mutação para limpar todos os eventos
   const clearAllEventsMutation = useMutation({
     mutationFn: async () => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
       const { error } = await supabase
         .from('events')
         .delete()
-        .eq('user_id', userId); // Deleta todos os eventos do usuário logado
+        .eq('organization_id', organizationId); // Deleta todos os eventos da organização logada
       if (error) throw error;
       return true;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events', userId] });
+      queryClient.invalidateQueries({ queryKey: ['events', organizationId] }); // Invalida a query com organizationId
       showSuccess("Todos os agendamentos foram limpos com sucesso!");
     },
     onError: (err) => {

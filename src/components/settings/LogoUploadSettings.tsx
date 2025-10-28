@@ -121,6 +121,7 @@ const LogoUploadSettings: React.FC = () => {
         setPreviewUrl(user?.logoUrl || null); // Reverte para o logo atual do usuário
         return;
       }
+      setSelectedFile(file); // Set the selected file
       const reader = new FileReader();
       reader.onloadend = () => {
         if (typeof reader.result === 'string') {
@@ -139,9 +140,9 @@ const LogoUploadSettings: React.FC = () => {
 
   const handleUploadLogo = async () => {
     console.log("handleUploadLogo: Initiating upload process.");
-    if (!user?.id) {
-      showError("Usuário não autenticado.");
-      console.error("handleUploadLogo: User ID is missing.");
+    if (!user?.id || !user?.organizationId) { // Usar organizationId
+      showError("Usuário não autenticado ou ID da organização não disponível.");
+      console.error("handleUploadLogo: User ID or Organization ID is missing.");
       return;
     }
     if (!selectedFile) {
@@ -166,7 +167,7 @@ const LogoUploadSettings: React.FC = () => {
           }
 
           // 2. Upload the new logo (which will now have a unique filename)
-          const newLogoUrl = await uploadLogoToSupabase(reader.result, user.id);
+          const newLogoUrl = await uploadLogoToSupabase(reader.result, user.organizationId); // Pass organizationId
           
           if (newLogoUrl) {
             console.log("handleUploadLogo: New logo uploaded to storage, URL:", newLogoUrl);
@@ -193,9 +194,9 @@ const LogoUploadSettings: React.FC = () => {
 
   const handleRemoveLogo = async () => {
     console.log("handleRemoveLogo: Initiating remove process.");
-    if (!user?.id) {
-      showError("Usuário não autenticado.");
-      console.error("handleRemoveLogo: User ID is missing.");
+    if (!user?.id || !user?.organizationId) { // Usar organizationId
+      showError("Usuário não autenticado ou ID da organização não disponível.");
+      console.error("handleRemoveLogo: User ID or Organization ID is missing.");
       return;
     }
     if (!user.logoUrl) {

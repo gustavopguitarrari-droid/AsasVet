@@ -40,7 +40,7 @@ interface SubuserProfile {
   last_name: string;
   email: string;
   role: string;
-  // Gênero removido
+  organization_id: string; // NOVO: Adicionado organization_id
 }
 
 const SubusersSettings: React.FC = () => {
@@ -54,17 +54,18 @@ const SubusersSettings: React.FC = () => {
 
   // Fetch subusers
   const { data: subusers, isLoading, error } = useQuery<SubuserProfile[]>({
-    queryKey: ['subusers'],
+    queryKey: ['subusers', user?.organizationId], // Alterado para usar organizationId
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.organizationId) return []; // Usar organizationId
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, role') // Gênero removido da seleção
+        .select('id, first_name, last_name, email, role, organization_id') // Gênero removido da seleção
+        .eq('organization_id', user.organizationId) // Filtrar por organization_id
         .neq('id', user.id); // Exclude the current admin user
       if (error) throw error;
       return data;
     },
-    enabled: user?.role === "Administrador", // Only fetch if current user is admin
+    enabled: user?.role === "Administrador" && !!user?.organizationId, // Only fetch if current user is admin and organizationId is available
   });
 
   // Mutation for deleting a subuser
@@ -86,7 +87,7 @@ const SubusersSettings: React.FC = () => {
       return responseData;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subusers'] });
+      queryClient.invalidateQueries({ queryKey: ['subusers', user?.organizationId] }); // Invalida a query com organizationId
       showSuccess("Subusuário excluído com sucesso!");
     },
     onError: (err: any) => {
@@ -143,7 +144,7 @@ const SubusersSettings: React.FC = () => {
     },
     onSuccess: () => {
       console.log("updateSubuserRoleMutation: onSuccess callback triggered.");
-      queryClient.invalidateQueries({ queryKey: ['subusers'] });
+      queryClient.invalidateQueries({ queryKey: ['subusers', user?.organizationId] }); // Invalida a query com organizationId
       showSuccess("Cargo do subusuário atualizado com sucesso!");
       setEditingUserId(null);
       setTempRole("");
@@ -177,7 +178,7 @@ const SubusersSettings: React.FC = () => {
   };
 
   const handleSubuserCreated = () => {
-    queryClient.invalidateQueries({ queryKey: ['subusers'] }); // Invalida a query para atualizar a lista
+    queryClient.invalidateQueries({ queryKey: ['subusers', user?.organizationId] }); // Invalida a query para atualizar a lista
   };
 
   const filteredSubusers = subusers?.filter(subuser =>
