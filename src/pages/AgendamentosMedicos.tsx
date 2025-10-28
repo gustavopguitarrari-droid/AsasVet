@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, CalendarX, Trash2 } from "lucide-react"; // Adicionado Trash2
+import { PlusCircle, CalendarX, Trash2, Search as SearchIcon } from "lucide-react"; // Adicionado SearchIcon
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import AddEventDialog, { EventFormValues } from "@/components/AddEventDialog";
 import EventCalendar, { CalendarEvent } from "@/components/EventCalendar";
@@ -23,6 +23,7 @@ import {
   AlertDialogTitle as AlertDialogTitleComponent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input"; // Importar Input
 
 const AgendamentosMedicos = () => {
   const queryClient = useQueryClient();
@@ -33,6 +34,7 @@ const AgendamentosMedicos = () => {
   const [defaultDateForNewEvent, setDefaultDateForNewEvent] = React.useState<Date | undefined>(undefined);
   const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null);
   const [isCancelConfirmDialogOpen, setIsCancelConfirmDialogOpen] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState<string>(""); // NOVO: Estado para o termo de busca
 
   // Query para buscar eventos do Supabase
   const { data: events = [], isLoading, error } = useQuery<CalendarEvent[]>({
@@ -220,7 +222,18 @@ const AgendamentosMedicos = () => {
         </div>
       </div>
 
-      <EventCalendar events={events} onAddEventClick={handleOpenDialogWithDate} onEventClick={handleEventClick} />
+      {/* NOVO: Campo de busca */}
+      <div className="relative mb-4">
+        <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          placeholder="Buscar agendamentos por título ou categoria..."
+          className="pl-9"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
+      <EventCalendar events={events} onAddEventClick={handleOpenDialogWithDate} onEventClick={handleEventClick} searchTerm={searchTerm} /> {/* NOVO: Passar searchTerm */}
 
       {/* Diálogo de Confirmação de Cancelamento */}
       <AlertDialog open={isCancelConfirmDialogOpen} onOpenChange={setIsCancelConfirmDialogOpen}>

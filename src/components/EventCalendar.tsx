@@ -23,6 +23,7 @@ interface EventCalendarProps {
   events: CalendarEvent[];
   onAddEventClick: (date: Date) => void;
   onEventClick: (event: CalendarEvent) => void; // Nova prop
+  searchTerm: string; // NOVO: Adicionar searchTerm
 }
 
 const categoryColorMap: Record<CalendarEvent["category"], string> = {
@@ -34,14 +35,22 @@ const categoryColorMap: Record<CalendarEvent["category"], string> = {
   Outros: "bg-event-outros",
 };
 
-const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick }) => {
+const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick, searchTerm }) => {
   const [selectedDay, setSelectedDay] = React.useState<Date | undefined>(new Date());
 
-  const eventsForSelectedDay = selectedDay
-    ? events
-        .filter((event) => isSameDay(event.date, selectedDay))
-        .sort((a, b) => a.time.localeCompare(b.time))
-    : [];
+  const eventsForSelectedDay = React.useMemo(() => {
+    if (!selectedDay) return [];
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+
+    return events
+      .filter((event) => isSameDay(event.date, selectedDay))
+      .filter((event) =>
+        event.title.toLowerCase().includes(lowerCaseSearchTerm) ||
+        event.category.toLowerCase().includes(lowerCaseSearchTerm) ||
+        event.time.includes(lowerCaseSearchTerm)
+      )
+      .sort((a, b) => a.time.localeCompare(b.time));
+  }, [events, selectedDay, searchTerm]); // Adicionar searchTerm como dependência
 
   const modifiers = {
     events: events.map((event) => event.date),
