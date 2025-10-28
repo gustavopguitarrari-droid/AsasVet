@@ -17,20 +17,20 @@ import SpeciesFilter from "@/components/SpeciesFilter";
 import PetDetailsDialog from "@/components/PetDetailsDialog";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import ClientForm, { ClientFormValues } from "@/components/ClientForm";
-import PetForm, { PetFormValues } from "@/components/PetForm"; // Importar PetForm
+import PetForm, { PetFormValues } from "@/components/PetForm";
 import { Client, Pet } from "@/types/cadastro";
 import { format, parseISO, isValid } from "date-fns";
-import { ScrollArea } from "@/components/ui/scroll-area"; // Importar ScrollArea
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { uploadImageToSupabase, deleteImageFromSupabase } from "@/utils/supabaseStorage";
-import ClientDetailsDialog from "@/components/ClientDetailsDialog"; // Importar o novo ClientDetailsDialog
-import { useLocation } from "react-router-dom"; // Importar useLocation
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // NOVO: Importar Tooltip
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
-import ImagePreviewDialog from "@/components/ImagePreviewDialog"; // NOVO: Importar ImagePreviewDialog
+import ClientDetailsDialog from "@/components/ClientDetailsDialog";
+import { useLocation } from "react-router-dom";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ImagePreviewDialog from "@/components/ImagePreviewDialog";
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
@@ -45,44 +45,39 @@ const Cadastro = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id;
-  const location = useLocation(); // Hook para acessar o objeto location
+  const location = useLocation();
 
   const [activeTab, setActiveTab] = useState<string>("tutores");
 
-  // Efeito para verificar o estado da rota e definir a aba ativa
   useEffect(() => {
     if (location.state && (location.state as any).activeTab) {
       setActiveTab((location.state as any).activeTab);
     }
   }, [location.state]);
 
-  // Estados para a aba de Animais
   const [selectedSpecies, setSelectedSpecies] = useState<string>("all");
   const [petSearchTerm, setPetSearchTerm] = useState<string>("");
   const [isPetDetailsDialogOpen, setIsPetDetailsDialogOpen] = useState<boolean>(false);
   const [selectedPet, setSelectedPet] = useState<Pet | null>(null);
-  const [isAddPetDialogOpen, setIsAddPetDialogOpen] = useState<boolean>(false); // Mantido para adicionar pet de forma geral
+  const [isAddPetDialogOpen, setIsAddPetDialogOpen] = useState<boolean>(false);
   const [isEditPetDialogOpen, setIsEditPetDialogOpen] = useState<boolean>(false);
   const [petToEdit, setPetToEdit] = useState<Pet | undefined>(undefined);
   const [defaultOwnerIdForPet, setDefaultOwnerIdForPet] = useState<string | undefined>(undefined);
-  const [defaultOwnerNameForPet, setDefaultOwnerNameForPet] = useState<string | undefined>(undefined); // NOVO: Nome do tutor padrão
+  const [defaultOwnerNameForPet, setDefaultOwnerNameForPet] = useState<string | undefined>(undefined);
 
-  // Estados para a aba de Tutores
   const [clientSearchTerm, setClientSearchTerm] = useState<string>("");
   const [isAddClientDialogOpen, setIsAddClientDialogOpen] = useState<boolean>(false);
   const [isEditClientDialogOpen, setIsEditClientDialogOpen] = useState<boolean>(false);
   const [clientToEdit, setClientToEdit] = useState<Client | undefined>(undefined);
-  const [isClientDetailsDialogOpen, setIsClientDetailsDialogOpen] = useState<boolean>(false); // Novo estado para detalhes do cliente
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null); // Novo estado para cliente selecionado
+  const [isClientDetailsDialogOpen, setIsClientDetailsDialogOpen] = useState<boolean>(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isClientPetsDialogOpen, setIsClientPetsDialogOpen] = useState<boolean>(false);
   const [clientToViewPets, setClientToViewPets] = useState<Client | null>(null);
 
-  // Estados para o ImagePreviewDialog
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imagePreviewAlt, setImagePreviewAlt] = useState("");
 
-  // --- Queries ---
   const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
     queryKey: ['clients', userId],
     queryFn: async () => {
@@ -93,19 +88,18 @@ const Cadastro = () => {
         .eq('user_id', userId);
       if (error) throw error;
 
-      // Transform flat Supabase data into nested Client interface
       return data.map(dbClient => ({
         id: dbClient.id,
         name: dbClient.name,
         email: dbClient.email,
         phone: dbClient.phone,
         cpf: dbClient.cpf,
-        dateOfBirth: dbClient.date_of_birth, // Supabase returns 'date_of_birth'
+        dateOfBirth: dbClient.date_of_birth,
         address: {
-          cep: dbClient.address_cep || '', // Provide default empty string for nullable fields
+          cep: dbClient.address_cep || '',
           street: dbClient.address_street || '',
           number: dbClient.address_number || '',
-          complement: dbClient.address_complement || undefined, // Optional
+          complement: dbClient.address_complement || undefined,
           neighborhood: dbClient.address_neighborhood || '',
           city: dbClient.address_city || '',
           state: dbClient.address_state || '',
@@ -121,12 +115,10 @@ const Cadastro = () => {
     queryKey: ['pets', userId],
     queryFn: async () => {
       if (!userId) return [];
-      // RLS on 'pets' table ensures only pets belonging to the user's clients are returned
       const { data, error } = await supabase
         .from('pets')
         .select('*');
       if (error) throw error;
-      // Mapeia owner_id para ownerId para corresponder à interface Pet
       return data.map(dbPet => ({
         id: dbPet.id,
         name: dbPet.name,
@@ -135,23 +127,21 @@ const Cadastro = () => {
         age: dbPet.age,
         gender: dbPet.gender,
         color: dbPet.color,
-        weight: dbPet.weight || undefined, // Incluindo o campo weight
+        weight: dbPet.weight || undefined,
         observations: dbPet.observations || undefined,
         photoUrl: dbPet.photo_url || undefined,
-        ownerId: dbPet.owner_id, // CORREÇÃO AQUI: Mapeando owner_id para ownerId
+        ownerId: dbPet.owner_id,
       }));
     },
     enabled: !!userId,
   });
 
-  // --- Mutations ---
   const addClientMutation = useMutation({
     mutationFn: async (data: ClientFormValues) => {
       if (!userId) {
         throw new Error("User not authenticated.");
       }
 
-      // 1. Check for duplicate CPF
       const { data: existingCpf, error: cpfCheckError } = await supabase
         .from('clients')
         .select('id')
@@ -159,18 +149,16 @@ const Cadastro = () => {
         .eq('cpf', data.cpf)
         .single();
 
-      if (cpfCheckError && cpfCheckError.code !== 'PGRST116') { // PGRST116 means "no rows found"
+      if (cpfCheckError && cpfCheckError.code !== 'PGRST116') {
         throw new Error("Erro ao verificar CPF existente.");
       }
       if (existingCpf) {
         throw new Error("CPF já cadastrado.");
       }
 
-
       let photoUrl: string | null = null;
       let newClientId: string | undefined;
 
-      // First, insert client without photo_url to get an ID
       const { data: insertedClient, error: insertError } = await supabase
         .from('clients')
         .insert({
@@ -188,7 +176,7 @@ const Cadastro = () => {
           address_city: data.address.city,
           address_state: data.address.state,
           observations: data.observations,
-          photo_url: null, // Set to null initially
+          photo_url: null,
         })
         .select('id')
         .single();
@@ -201,12 +189,10 @@ const Cadastro = () => {
       if (data.photoUrl) {
         photoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'clients', newClientId);
         if (!photoUrl) {
-          // If photo upload fails, delete the temporary client and throw error
           await supabase.from('clients').delete().eq('id', newClientId);
           throw new Error("Failed to upload client photo.");
         }
 
-        // Update the client with the photo URL
         const { data: updatedClient, error: updateError } = await supabase
           .from('clients')
           .update({ photo_url: photoUrl })
@@ -217,11 +203,7 @@ const Cadastro = () => {
           throw updateError;
         }
         return updatedClient;
-
       } else {
-        // No photo, just return the inserted client
-        // The client was already inserted to get an ID, so we just need to return it.
-        // No need to re-insert.
         const { data: finalClient, error: fetchFinalClientError } = await supabase
           .from('clients')
           .select('*')
@@ -248,15 +230,14 @@ const Cadastro = () => {
       if (!userId) throw new Error("User not authenticated.");
 
       const oldClient = clients.find(c => c.id === data.id);
-      let newPhotoUrl: string | null | undefined = data.photoUrl; // Can be Base64, public URL, or undefined (removed)
+      let newPhotoUrl: string | null | undefined = data.photoUrl;
 
-      // 1. Check for duplicate CPF, excluding the current client being updated
       const { data: existingCpf, error: cpfCheckError } = await supabase
         .from('clients')
         .select('id')
         .eq('user_id', userId)
         .eq('cpf', data.cpf)
-        .neq('id', data.id) // Exclude the current client from the check
+        .neq('id', data.id)
         .single();
 
       if (cpfCheckError && cpfCheckError.code !== 'PGRST116') {
@@ -266,22 +247,18 @@ const Cadastro = () => {
         throw new Error("CPF já cadastrado para outro tutor.");
       }
 
-
-      // If photo changed (new Base64 or removed)
       if (data.photoUrl !== oldClient?.photoUrl) {
-        // Delete old image if it existed
         if (oldClient?.photoUrl) {
           await deleteImageFromSupabase(oldClient.photoUrl);
         }
-        // Upload new image if it's a Base64 string
         if (data.photoUrl && data.photoUrl.startsWith('data:image')) {
           newPhotoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'clients', data.id);
           if (!newPhotoUrl) throw new Error("Failed to upload new client photo.");
         } else if (!data.photoUrl) {
-          newPhotoUrl = null; // Photo was explicitly removed
+          newPhotoUrl = null;
         }
       } else {
-        newPhotoUrl = oldClient?.photoUrl; // Photo didn't change, keep existing URL
+        newPhotoUrl = oldClient?.photoUrl;
       }
 
       const { data: updatedClient, error } = await supabase
@@ -315,7 +292,7 @@ const Cadastro = () => {
       queryClient.invalidateQueries({ queryKey: ['clients', userId] });
       showSuccess("Tutor atualizado com sucesso!");
       setIsEditClientDialogOpen(false);
-      setIsClientDetailsDialogOpen(false); // Close details dialog if open
+      setIsClientDetailsDialogOpen(false);
     },
     onError: (error) => {
       showError(`Erro ao atualizar tutor: ${error.message}`);
@@ -326,7 +303,6 @@ const Cadastro = () => {
     mutationFn: async (clientId: string) => {
       if (!userId) throw new Error("User not authenticated.");
 
-      // First, get the client to delete their photo
       const { data: clientToDelete, error: fetchError } = await supabase
         .from('clients')
         .select('photo_url')
@@ -337,12 +313,10 @@ const Cadastro = () => {
         throw fetchError;
       }
 
-      // Delete client's photo from storage if it existed
       if (clientToDelete?.photo_url) {
         await deleteImageFromSupabase(clientToDelete.photo_url);
       }
 
-      // Get all pets associated with this client to delete their photos
       const { data: petsToDelete, error: fetchPetsError } = await supabase
         .from('pets')
         .select('id, photo_url')
@@ -352,14 +326,12 @@ const Cadastro = () => {
         throw fetchPetsError;
       }
 
-      // Delete each pet's photo
       for (const pet of petsToDelete || []) {
         if (pet.photo_url) {
           await deleteImageFromSupabase(pet.photo_url);
         }
       }
 
-      // Deleting the client will cascade delete associated pets due to foreign key ON DELETE CASCADE
       const { error } = await supabase
         .from('clients')
         .delete()
@@ -372,9 +344,9 @@ const Cadastro = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['clients', userId] });
-      queryClient.invalidateQueries({ queryKey: ['pets', userId] }); // Pets also affected
+      queryClient.invalidateQueries({ queryKey: ['pets', userId] });
       showSuccess("Tutor e seus animais excluídos com sucesso!");
-      setIsClientDetailsDialogOpen(false); // Close details dialog
+      setIsClientDetailsDialogOpen(false);
     },
     onError: (error) => {
       showError(`Erro ao excluir tutor: ${error.message}`);
@@ -388,7 +360,6 @@ const Cadastro = () => {
       let photoUrl: string | null = null;
       let newPetId: string | undefined;
 
-      // First, insert pet without photo_url to get an ID
       const { data: insertedPet, error: insertError } = await supabase
         .from('pets')
         .insert({
@@ -399,7 +370,7 @@ const Cadastro = () => {
           age: data.age,
           gender: data.gender,
           color: data.color,
-          weight: data.weight, // Incluindo o campo weight
+          weight: data.weight,
           observations: data.observations,
           photo_url: null,
         })
@@ -414,12 +385,10 @@ const Cadastro = () => {
       if (data.photoUrl) {
         photoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'pets', newPetId);
         if (!photoUrl) {
-          // If photo upload fails, delete the newly created pet and throw error
           await supabase.from('pets').delete().eq('id', newPetId);
           throw new Error("Failed to upload pet photo.");
         }
 
-        // Update the pet with the photo URL
         const { data: updatedPet, error: updateError } = await supabase
           .from('pets')
           .update({ photo_url: photoUrl })
@@ -431,7 +400,6 @@ const Cadastro = () => {
         }
         return updatedPet;
       }
-      // No photo, just return the inserted pet
       const { data: finalPet, error: fetchFinalPetError } = await supabase
         .from('pets')
         .select('*')
@@ -446,7 +414,6 @@ const Cadastro = () => {
       queryClient.invalidateQueries({ queryKey: ['pets', userId] });
       showSuccess("Animal adicionado com sucesso!");
       setIsAddPetDialogOpen(false);
-      // setIsClientPetsDialogOpen(false); // No longer closes parent dialog
     },
     onError: (error) => {
       showError(`Erro ao adicionar animal: ${error.message}`);
@@ -484,7 +451,7 @@ const Cadastro = () => {
           age: data.age,
           gender: data.gender,
           color: data.color,
-          weight: data.weight, // Incluindo o campo weight
+          weight: data.weight,
           observations: data.observations,
           photo_url: newPhotoUrl,
         })
@@ -500,7 +467,7 @@ const Cadastro = () => {
       queryClient.invalidateQueries({ queryKey: ['pets', userId] });
       showSuccess("Animal atualizado com sucesso!");
       setIsEditPetDialogOpen(false);
-      setIsPetDetailsDialogOpen(false); // Close details dialog if open
+      setIsPetDetailsDialogOpen(false);
     },
     onError: (error) => {
       showError(`Erro ao atualizar animal: ${error.message}`);
@@ -537,14 +504,13 @@ const Cadastro = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pets', userId] });
       showSuccess("Animal excluído com sucesso!");
-      setIsPetDetailsDialogOpen(false); // Close details dialog
+      setIsPetDetailsDialogOpen(false);
     },
     onError: (error) => {
       showError(`Erro ao excluir animal: ${error.message}`);
     },
   });
 
-  // --- Handlers ---
   const handleSelectSpecies = (species: string) => {
     setSelectedSpecies(species);
   };
@@ -556,7 +522,7 @@ const Cadastro = () => {
   const handleEditClient = (client: Client) => {
     setClientToEdit(client);
     setIsEditClientDialogOpen(true);
-    setIsClientDetailsDialogOpen(false); // Close details dialog before opening edit
+    setIsClientDetailsDialogOpen(false);
   };
 
   const handleUpdateClient = (data: ClientFormValues) => {
@@ -585,7 +551,7 @@ const Cadastro = () => {
   const handleEditPet = (pet: Pet) => {
     setPetToEdit(pet);
     setIsEditPetDialogOpen(true);
-    setIsPetDetailsDialogOpen(false); // Close details dialog before opening edit
+    setIsPetDetailsDialogOpen(false);
   };
 
   const handleUpdatePet = (data: PetFormValues) => {
@@ -631,14 +597,12 @@ const Cadastro = () => {
     setIsClientPetsDialogOpen(true);
   };
 
-  // NEW: Local state for nested Add Pet dialog
   const [isNestedAddPetDialogOpen, setIsNestedAddPetDialogOpen] = useState(false);
 
   const handleAddPetForClient = (client: Client) => {
     setDefaultOwnerIdForPet(client.id);
     setDefaultOwnerNameForPet(client.name);
-    setIsNestedAddPetDialogOpen(true); // Open nested dialog
-    // setIsClientPetsDialogOpen(false); // No longer close parent dialog
+    setIsNestedAddPetDialogOpen(true);
   };
 
   const handleNestedAddPetClose = () => {
@@ -650,8 +614,7 @@ const Cadastro = () => {
   const handleNestedAddPetSubmit = (data: PetFormValues) => {
     addPetMutation.mutate(data, {
       onSuccess: () => {
-        handleNestedAddPetClose(); // Close nested dialog on success
-        // The parent dialog (isClientPetsDialogOpen) remains open
+        handleNestedAddPetClose();
       },
       onError: (error) => {
         showError(`Erro ao adicionar animal: ${error.message}`);
@@ -659,7 +622,6 @@ const Cadastro = () => {
     });
   };
 
-  // Handler para abrir o ImagePreviewDialog
   const handleImageClick = (imageUrl: string | null, imageAlt: string) => {
     if (imageUrl) {
       setImagePreviewUrl(imageUrl);
@@ -688,50 +650,6 @@ const Cadastro = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">Cadastro de Tutores e Animais</h2>
-        {activeTab === "tutores" && (
-          <Dialog open={isAddClientDialogOpen} onOpenChange={setIsAddClientDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="font-bold">
-                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Adicionar Novo Tutor</DialogTitle>
-              </DialogHeader>
-              <ClientForm
-                key={isAddClientDialogOpen ? "open" : "closed"}
-                onSubmit={handleAddClient}
-                onCancel={() => setIsAddClientDialogOpen(false)}
-                isSubmittingParent={addClientMutation.isPending} // Passa o estado de carregamento da mutação
-              />
-            </DialogContent>
-          </Dialog>
-        )}
-        {activeTab === "animais" && (
-          <Dialog open={isAddPetDialogOpen} onOpenChange={setIsAddPetDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="font-bold" disabled={clients.length === 0}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>
-                  {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
-                </DialogTitle>
-              </DialogHeader>
-              <PetForm
-                key={isAddPetDialogOpen ? "open" : "closed"}
-                onSubmit={handleAddPet}
-                onCancel={() => setIsAddPetDialogOpen(false)}
-                allClients={clients}
-                defaultOwnerId={defaultOwnerIdForPet}
-                defaultOwnerName={defaultOwnerNameForPet} /* Passa o nome do tutor */
-              />
-            </DialogContent>
-          </Dialog>
-        )}
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -745,6 +663,27 @@ const Cadastro = () => {
         </TabsList>
 
         <TabsContent value="tutores" className="mt-4">
+          <div className="flex justify-end mb-4">
+            <Dialog open={isAddClientDialogOpen} onOpenChange={setIsAddClientDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="font-bold">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Adicionar Novo Tutor</DialogTitle>
+                </DialogHeader>
+                <ClientForm
+                  key={isAddClientDialogOpen ? "open" : "closed"}
+                  onSubmit={handleAddClient}
+                  onCancel={() => setIsAddClientDialogOpen(false)}
+                  isSubmittingParent={addClientMutation.isPending}
+                />
+              </DialogContent>
+            </Dialog>
+          </div>
+          
           <div className="flex items-center space-x-2 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -765,7 +704,6 @@ const Cadastro = () => {
                     const petsOfClient = pets.filter(pet => {
                       return pet.ownerId === client.id;
                     });
-                    // Calcular as iniciais de forma mais robusta
                     const firstNameInitial = client.name ? client.name.charAt(0) : '';
                     const lastNameInitial = client.name.split(' ').pop()?.charAt(0) || '';
                     const initials = `${firstNameInitial}${lastNameInitial}`.toUpperCase();
@@ -869,6 +807,28 @@ const Cadastro = () => {
                 onChange={(e) => setPetSearchTerm(e.target.value)}
               />
             </div>
+            <Dialog open={isAddPetDialogOpen} onOpenChange={setIsAddPetDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="font-bold" disabled={clients.length === 0}>
+                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>
+                    {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
+                  </DialogTitle>
+                </DialogHeader>
+                <PetForm
+                  key={isAddPetDialogOpen ? "open" : "closed"}
+                  onSubmit={handleAddPet}
+                  onCancel={() => setIsAddPetDialogOpen(false)}
+                  allClients={clients}
+                  defaultOwnerId={defaultOwnerIdForPet}
+                  defaultOwnerName={defaultOwnerNameForPet}
+                />
+              </DialogContent>
+            </Dialog>
           </div>
 
           <div className="rounded-md border">
@@ -883,7 +843,7 @@ const Cadastro = () => {
                   filteredPets.map((pet) => {
                     const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
                     const owner = clients.find(client => client.id === pet.ownerId);
-                    const initials = pet.name.charAt(0).toUpperCase(); // Apenas a primeira inicial para pets
+                    const initials = pet.name.charAt(0).toUpperCase();
                     return (
                       <TableRow key={pet.id} className="cursor-pointer hover:bg-muted/50">
                         <TableCell className="w-[60px] relative group">
@@ -895,7 +855,7 @@ const Cadastro = () => {
                               <AvatarImage src={pet.photoUrl} alt={pet.name} />
                             ) : (
                               <AvatarFallback className="bg-muted text-muted-foreground text-xs font-bold">
-                                {initials || <Dog className="h-5 w-5" />} {/* Fallback para o ícone Dog se initials for vazio */}
+                                {initials || <Dog className="h-5 w-5" />}
                               </AvatarFallback>
                             )}
                           </Avatar>
@@ -934,7 +894,6 @@ const Cadastro = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Diálogo para ver os animais de um tutor específico */}
       <Dialog open={isClientPetsDialogOpen} onOpenChange={setIsClientPetsDialogOpen}>
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col">
           <DialogHeader>
@@ -1001,7 +960,6 @@ const Cadastro = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Diálogo de Detalhes do Tutor */}
       <ClientDetailsDialog
         client={selectedClient}
         isOpen={isClientDetailsDialogOpen}
@@ -1011,7 +969,6 @@ const Cadastro = () => {
         onViewPets={handleViewClientPets}
       />
 
-      {/* Diálogo de Edição de Tutor */}
       <Dialog open={isEditClientDialogOpen} onOpenChange={setIsEditClientDialogOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -1019,17 +976,16 @@ const Cadastro = () => {
           </DialogHeader>
           {clientToEdit && (
             <ClientForm
-              key={clientToEdit.id} // Key para forçar re-renderização com novos dados
+              key={clientToEdit.id}
               onSubmit={handleUpdateClient}
               onCancel={() => setIsEditClientDialogOpen(false)}
               initialData={clientToEdit}
-              isSubmittingParent={updateClientMutation.isPending} // Passa o estado de carregamento da mutação
+              isSubmittingParent={updateClientMutation.isPending}
             />
           )}
         </DialogContent>
       </Dialog>
 
-      {/* Diálogo de Edição de Animal */}
       <Dialog open={isEditPetDialogOpen} onOpenChange={setIsEditPetDialogOpen}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -1037,7 +993,7 @@ const Cadastro = () => {
           </DialogHeader>
           {petToEdit && (
             <PetForm
-              key={petToEdit.id} // Key para forçar re-renderização com novos dados
+              key={petToEdit.id}
               onSubmit={handleUpdatePet}
               onCancel={() => setIsEditPetDialogOpen(false)}
               initialData={petToEdit}
@@ -1047,7 +1003,6 @@ const Cadastro = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Diálogo Aninhado para Adicionar Animal (MOVIDO PARA CÁ) */}
       <Dialog open={isNestedAddPetDialogOpen} onOpenChange={handleNestedAddPetClose}>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -1066,7 +1021,6 @@ const Cadastro = () => {
         </DialogContent>
       </Dialog>
 
-      {/* NOVO: Image Preview Dialog */}
       <ImagePreviewDialog
         isOpen={isImagePreviewOpen}
         onClose={() => setIsImagePreviewOpen(false)}
