@@ -204,7 +204,7 @@ const Products = () => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold">Produtos e Serviços</h2>
+        {/* Removido: <h2 className="text-3xl font-bold">Produtos e Serviços</h2> */}
         <Dialog open={isAddProductDialogOpen} onOpenChange={setIsAddProductDialogOpen}>
           <DialogTrigger asChild>
             <Button className="font-bold">
