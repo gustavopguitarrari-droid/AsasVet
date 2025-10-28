@@ -735,46 +735,49 @@ const Internacao = () => {
         <TabsContent value="mapa-execucao" className="mt-4">
           <div className="flex flex-col gap-4 mb-4"> {/* Contêiner flexível para os elementos do cabeçalho */}
             <ExecutionMapLegend />
-            <div className="relative w-full"> {/* Barra de pesquisa para o mapa de execução */}
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Buscar pacientes no mapa de execução..."
-                className="pl-9"
-                value={executionMapSearchTerm}
-                onChange={(e) => setExecutionMapSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="flex items-center justify-center space-x-2"> {/* Seletor de data */}
-              <Button variant="default" size="icon" onClick={handlePreviousDay}>
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-[280px] justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={(day) => setSelectedDate(day || new Date())}
-                    initialFocus
-                    locale={ptBR}
-                    components={{ Caption: (props) => <CustomCalendarCaption {...props} /> }}
-                  />
-                </PopoverContent>
-              </Popover>
-              <Button variant="default" size="icon" onClick={handleNextDay}>
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+            {/* NOVO: Contêiner para a pesquisa e o seletor de data na mesma linha */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="relative flex-1 w-full"> {/* Barra de pesquisa para o mapa de execução */}
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar pacientes no mapa de execução..."
+                  className="pl-9"
+                  value={executionMapSearchTerm}
+                  onChange={(e) => setExecutionMapSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="flex items-center justify-center space-x-2 shrink-0"> {/* Seletor de data */}
+                <Button variant="default" size="icon" onClick={handlePreviousDay}>
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-[280px] justify-start text-left font-normal",
+                        !selectedDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? format(selectedDate, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(day) => setSelectedDate(day || new Date())}
+                      initialFocus
+                      locale={ptBR}
+                      components={{ Caption: (props) => <CustomCalendarCaption {...props} /> }}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <Button variant="default" size="icon" onClick={handleNextDay}>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
           <div className="p-4 border rounded-md bg-background space-y-4 mt-4">
