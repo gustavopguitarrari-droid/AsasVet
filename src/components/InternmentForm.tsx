@@ -24,9 +24,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter } from "@/components/ui/dialog";
-import RiskSelector from "./RiskSelector"; // Importar o novo componente RiskSelector
+import RiskSelector from "./RiskSelector";
 
-// Mock de veterinários (reutilizando do AppointmentForm)
+// Mock de veterinários
 const mockVeterinarians = [
   { id: "V001", name: "Dr. Ana Paula" },
   { id: "V002", name: "Dr. Carlos Eduardo" },
@@ -34,19 +34,19 @@ const mockVeterinarians = [
 ];
 
 const formSchema = z.object({
-  bayName: z.string().min(1, "O nome da baia é obrigatório."), // Novo campo
+  bayName: z.string().min(1, "O nome da baia é obrigatório."),
   petName: z.string().min(1, "O nome do animal é obrigatório."),
   ownerName: z.string().min(1, "O nome do tutor é obrigatório."),
   reason: z.string().min(1, "O motivo da internação é obrigatório."),
   admissionDate: z.date({
     required_error: "A data de admissão é obrigatória.",
   }),
-  expectedDischargeDate: z.date().optional(),
+  expectedDischargeDate: z.date().optional().nullable(),
   veterinarian: z.string().min(1, "O veterinário responsável é obrigatório."),
-  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], { // Novo campo de espécie
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
     required_error: "A espécie do animal é obrigatória.",
   }),
-  risk: z.enum(["Sem risco", "Baixo", "Médio", "Alto", "Emergência"], { // Novo campo de risco
+  risk: z.enum(["Sem risco", "Baixo", "Médio", "Alto", "Emergência"], {
     required_error: "O nível de risco é obrigatório.",
   }),
 });
@@ -56,8 +56,8 @@ export type InternmentFormValues = z.infer<typeof formSchema>;
 interface InternmentFormProps {
   onSubmit: (data: InternmentFormValues) => void;
   onCancel: () => void;
-  initialData?: Partial<InternmentFormValues>; // Permitir dados iniciais parciais
-  isSubmittingParent?: boolean; // Nova prop para indicar se a mutação pai está pendente
+  initialData?: Partial<InternmentFormValues>;
+  isSubmittingParent?: boolean;
 }
 
 const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, initialData, isSubmittingParent = false }) => {
@@ -69,7 +69,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
       ownerName: initialData?.ownerName || "",
       reason: initialData?.reason || "",
       admissionDate: initialData?.admissionDate || new Date(),
-      expectedDischargeDate: initialData?.expectedDischargeDate,
+      expectedDischargeDate: initialData?.expectedDischargeDate || null,
       veterinarian: initialData?.veterinarian || mockVeterinarians[0]?.name || "",
       species: initialData?.species || "Cachorro",
       risk: initialData?.risk || "Sem risco",
@@ -112,7 +112,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
             <FormItem>
               <FormLabel>Nome do Animal</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: Rex" {...field} disabled={!!initialData?.petName} /> {/* Desabilita se pré-preenchido */}
+                <Input placeholder="Ex: Rex" {...field} disabled={!!initialData?.petName} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -125,7 +125,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
             <FormItem>
               <FormLabel>Nome do Tutor</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: João Silva" {...field} disabled={!!initialData?.ownerName} /> {/* Desabilita se pré-preenchido */}
+                <Input placeholder="Ex: João Silva" {...field} disabled={!!initialData?.ownerName} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -137,7 +137,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
           render={({ field }) => (
             <FormItem>
               <FormLabel>Espécie</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!initialData?.species}> {/* Desabilita se pré-preenchido */}
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!initialData?.species}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione a espécie" />
@@ -176,7 +176,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
           render={({ field }) => (
             <FormItem>
               <FormLabel>Veterinário Responsável</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!initialData?.veterinarian}> {/* Desabilita se pré-preenchido */}
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!initialData?.veterinarian}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um veterinário" />
@@ -195,6 +195,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
           )}
         />
         <div className="grid grid-cols-2 gap-4">
+          {/* Admission Date Field - Fixed Popover Trigger */}
           <FormField
             control={form.control}
             name="admissionDate"
@@ -222,7 +223,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
                     <Calendar
                       mode="single"
                       selected={field.value}
-                      onSelect={field.onChange}
+                      onSelect={(date) => field.onChange(date)} // Explicitly handle date selection
                       initialFocus
                       locale={ptBR}
                     />
@@ -232,6 +233,8 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
               </FormItem>
             )}
           />
+          
+          {/* Expected Discharge Date Field - Fixed Popover Trigger */}
           <FormField
             control={form.control}
             name="expectedDischargeDate"
@@ -258,17 +261,17 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
+                      selected={field.value || undefined} // Handle null/undefined
+                      onSelect={(date) => field.onChange(date)} // Explicitly handle date selection
                       initialFocus
                       locale={ptBR}
                     />
                   </PopoverContent>
                 </Popover>
                 <FormMessage />
-            </FormItem>
-          )}
-        />
+              </FormItem>
+            )}
+          />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onCancel} type="button" disabled={isSubmittingParent}>
