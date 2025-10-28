@@ -31,13 +31,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
-  Dialog, // Importação adicionada
-  DialogContent, // Importação adicionada
-  DialogHeader, // Importação adicionada
-  DialogTitle, // Importação adicionada
-  DialogTrigger, // Importação adicionada
-  DialogFooter, // Importação adicionada
-} from "@/components/ui/dialog"; // Importar Dialog
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { usePageTitle } from "@/context/PageTitleContext";
 
 const productCategoryOptions: FilterOption[] = [
@@ -49,8 +49,8 @@ const productCategoryOptions: FilterOption[] = [
 const Products = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
-  const userId = appUser?.id; // Use userId for products table
-  const organizationId = appUser?.organizationId; // Keep organizationId for transactions/sale_items if needed
+  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId;
   const { setPageTitle } = usePageTitle();
 
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -64,31 +64,29 @@ const Products = () => {
     return () => setPageTitle("");
   }, [setPageTitle]);
 
-  // Fetch products
   const { data: products = [], isLoading, error } = useQuery<Product[]>({
-    queryKey: ['products', userId], // Changed to use userId
+    queryKey: ['products', userId],
     queryFn: async () => {
-      if (!userId) return []; // Use userId
+      if (!userId) return [];
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('user_id', userId); // Filter by user_id
+        .eq('user_id', userId);
       if (error) throw error;
       return data as Product[];
     },
-    enabled: !!userId, // Enable query only if userId is available
+    enabled: !!userId,
   });
 
-  // Add product mutation (reusing from cashier)
   const addProductMutation = useMutation({
     mutationFn: async (newProductData: AddProductFormValues) => {
-      if (!userId) { // Changed to userId
-        throw new Error("User ID not available."); // Lança erro se userId não estiver disponível
+      if (!userId) {
+        throw new Error("User ID not available.");
       }
       const { data, error } = await supabase
         .from('products')
         .insert({
-          user_id: userId, // Changed to user_id
+          user_id: userId,
           name: newProductData.name,
           price: newProductData.price,
           category: newProductData.category,
@@ -99,7 +97,7 @@ const Products = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', userId] }); // Changed to userId
+      queryClient.invalidateQueries({ queryKey: ['products', userId] });
       showSuccess("Produto/Serviço adicionado com sucesso!");
       setIsAddProductDialogOpen(false);
     },
@@ -108,11 +106,10 @@ const Products = () => {
     },
   });
 
-  // Update product mutation
   const updateProductMutation = useMutation({
     mutationFn: async (updatedProductData: Product) => {
-      if (!userId) { // Changed to userId
-        throw new Error("User ID not available."); // Lança erro se userId não estiver disponível
+      if (!userId) {
+        throw new Error("User ID not available.");
       }
       const { data, error } = await supabase
         .from('products')
@@ -122,14 +119,14 @@ const Products = () => {
           category: updatedProductData.category,
         })
         .eq('id', updatedProductData.id)
-        .eq('user_id', userId) // Filter by user_id
+        .eq('user_id', userId)
         .select()
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', userId] }); // Changed to userId
+      queryClient.invalidateQueries({ queryKey: ['products', userId] });
       showSuccess("Produto/Serviço atualizado com sucesso!");
       setIsEditProductDialogOpen(false);
     },
@@ -138,22 +135,21 @@ const Products = () => {
     },
   });
 
-  // Delete product mutation
   const deleteProductMutation = useMutation({
     mutationFn: async (productId: string) => {
-      if (!userId) { // Changed to userId
-        throw new Error("User ID not available."); // Lança erro se userId não estiver disponível
+      if (!userId) {
+        throw new Error("User ID not available.");
       }
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', productId)
-        .eq('user_id', userId); // Filter by user_id
+        .eq('user_id', userId);
       if (error) throw error;
       return productId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', userId] }); // Changed to userId
+      queryClient.invalidateQueries({ queryKey: ['products', userId] });
       showSuccess("Produto/Serviço excluído com sucesso!");
     },
     onError: (err) => {
@@ -203,36 +199,34 @@ const Products = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        {/* Removido: <h2 className="text-3xl font-bold">Produtos e Serviços</h2> */}
-        <Dialog open={isAddProductDialogOpen} onOpenChange={setIsAddProductDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="font-bold">
-              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Item
-            </Button>
-          </DialogTrigger>
-          <AddProductDialog
-            isOpen={isAddProductDialogOpen}
-            onClose={() => setIsAddProductDialogOpen(false)}
-            onSubmit={addProductMutation.mutate}
-            isSubmitting={addProductMutation.isPending}
-          />
-        </Dialog>
-      </div>
-
-      <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} options={productCategoryOptions} />
-
-      <div className="flex items-center space-x-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar produtos ou serviços..."
-            className="pl-9"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      {/* Novo contêiner flexível para filtros, busca e botão */}
+      <div className="flex flex-col md:flex-row items-center justify-between flex-wrap gap-4">
+        <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} options={productCategoryOptions} />
+        <div className="flex items-center space-x-2 w-full md:w-auto flex-1"> {/* Ajustado para ocupar espaço */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar produtos ou serviços..."
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          {/* O botão "Filtrar" foi removido, pois a filtragem já é reativa */}
+          <Dialog open={isAddProductDialogOpen} onOpenChange={setIsAddProductDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="font-bold shrink-0"> {/* shrink-0 para evitar que o botão encolha */}
+                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Item
+              </Button>
+            </DialogTrigger>
+            <AddProductDialog
+              isOpen={isAddProductDialogOpen}
+              onClose={() => setIsAddProductDialogOpen(false)}
+              onSubmit={addProductMutation.mutate}
+              isSubmitting={addProductMutation.isPending}
+            />
+          </Dialog>
         </div>
-        <Button variant="outline">Filtrar</Button>
       </div>
 
       <div className="rounded-md border">
@@ -303,7 +297,7 @@ const Products = () => {
               onClose={() => setIsEditProductDialogOpen(false)}
               onSubmit={(data) => updateProductMutation.mutate({ ...data, id: productToEdit.id })}
               isSubmitting={updateProductMutation.isPending}
-              initialData={productToEdit} // Pass initial data for editing
+              initialData={productToEdit}
             />
           </DialogContent>
         </Dialog>
