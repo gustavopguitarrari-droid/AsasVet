@@ -2,16 +2,16 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+  Sheet, // Alterado de Dialog para Sheet
+  SheetContent, // Alterado de DialogContent para SheetContent
+  SheetHeader, // Alterado de DialogHeader para SheetHeader
+  SheetTitle, // Alterado de DialogTitle para SheetTitle
+  SheetDescription, // Alterado de DialogDescription para SheetDescription
+  SheetFooter, // Alterado de DialogFooter para SheetFooter
+} from "@/components/ui/sheet"; // Importar Sheet
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { MessageSquareText, Send } from 'lucide-react';
+import { MessageSquareText, Send, X } from 'lucide-react'; // Adicionado X para o botão de fechar
 import { ScrollArea } from "@/components/ui/scroll-area"; // Importar ScrollArea
 
 interface ChatDialogProps {
@@ -65,16 +65,16 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] h-[500px] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent side="right" className="w-full md:w-[450px] flex flex-col"> {/* Ajustado para SheetContent e largura */}
+        <SheetHeader>
+          <SheetTitle className="flex items-center">
             <MessageSquareText className="h-5 w-5 mr-2" /> Atendimento ao Cliente
-          </DialogTitle>
-          <DialogDescription>
+          </SheetTitle>
+          <SheetDescription>
             Converse com nossa equipe de suporte.
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
 
         <ScrollArea className="flex-1 p-4 border rounded-md bg-muted/20 mb-4">
           <div className="flex flex-col space-y-2">
@@ -106,7 +106,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
           </div>
         </ScrollArea>
 
-        <DialogFooter className="flex-row items-center space-x-2">
+        <SheetFooter className="flex-row items-center space-x-2">
           <Input
             placeholder="Digite sua mensagem..."
             value={inputMessage}
@@ -122,9 +122,9 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
             <Send className="h-4 w-4" />
             <span className="sr-only">Enviar</span>
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 };
 
