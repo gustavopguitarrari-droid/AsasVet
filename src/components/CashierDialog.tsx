@@ -11,7 +11,8 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import ProductSelector from "./cashier/ProductSelector";
-import SalePanel from "./cashier/SalePanel";
+import CheckoutCart from "./cashier/CheckoutCart"; // Importar CheckoutCart diretamente
+import PaymentSection from "./cashier/PaymentSection"; // Importar PaymentSection diretamente
 import { Product, SaleItem } from "@/types/cashier";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -180,8 +181,8 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
           </SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-6 p-4 overflow-y-auto">
-          {/* Coluna de Seleção de Produtos */}
+        <div className="flex-1 flex flex-col gap-6 p-4 overflow-y-auto">
+          {/* 1. Produtos e Serviços */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">Produtos e Serviços</h3>
             <ProductSelector
@@ -191,12 +192,18 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
             />
           </div>
 
-          {/* Coluna do Painel de Venda (Carrinho e Pagamento) */}
+          {/* 2. Carrinho */}
           <div className="space-y-4">
-            <SalePanel
+            <CheckoutCart
               items={cartItems}
               onUpdateQuantity={handleUpdateQuantity}
               onRemoveItem={handleRemoveItem}
+            />
+          </div>
+
+          {/* 3. Pagamento */}
+          <div className="space-y-4">
+            <PaymentSection
               totalAmount={totalAmount}
               onFinalizeSale={handleFinalizeSale}
               onCancelSale={handleCancelSale}
