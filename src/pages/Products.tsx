@@ -295,7 +295,7 @@ const Products = () => {
             <AddProductDialog
               isOpen={isEditProductDialogOpen}
               onClose={() => setIsEditProductDialogOpen(false)}
-              onSubmit={(data) => updateProductMutation.mutate({ ...data, id: productToEdit.id })}
+              onSubmit={(data) => updateProductMutation.mutate({ ...data, id: productToEdit.id, user_id: userId! })} // Adicionado user_id
               isSubmitting={updateProductMutation.isPending}
               initialData={productToEdit}
             />
