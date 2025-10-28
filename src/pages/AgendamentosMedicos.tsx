@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, CalendarX, Trash2, Search as SearchIcon } from "lucide-react"; // Adicionado SearchIcon
+import { PlusCircle, CalendarX, Trash2, Search as SearchIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import AddEventDialog, { EventFormValues } from "@/components/AddEventDialog";
 import EventCalendar, { CalendarEvent } from "@/components/EventCalendar";
@@ -23,30 +23,30 @@ import {
   AlertDialogTitle as AlertDialogTitleComponent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Input } from "@/components/ui/input"; // Importar Input
+import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // Importar Tooltip
 
 const AgendamentosMedicos = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
-  const organizationId = appUser?.organizationId; // Usar organizationId
+  const organizationId = appUser?.organizationId;
 
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = React.useState(false);
   const [defaultDateForNewEvent, setDefaultDateForNewEvent] = React.useState<Date | undefined>(undefined);
   const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null);
   const [isCancelConfirmDialogOpen, setIsCancelConfirmDialogOpen] = React.useState(false);
-  const [searchTerm, setSearchTerm] = React.useState<string>(""); // NOVO: Estado para o termo de busca
+  const [searchTerm, setSearchTerm] = React.useState<string>("");
 
   // Query para buscar eventos do Supabase
   const { data: events = [], isLoading, error } = useQuery<CalendarEvent[]>({
-    queryKey: ['events', organizationId], // Alterado para usar organizationId
+    queryKey: ['events', organizationId],
     queryFn: async () => {
-      if (!organizationId) return []; // Usar organizationId
+      if (!organizationId) return [];
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .eq('organization_id', organizationId); // Filtrar por organization_id
+        .eq('organization_id', organizationId);
       if (error) throw error;
-      // Mapeia os dados do Supabase para o formato CalendarEvent
       return data.map(event => ({
         id: event.id,
         title: event.title,
@@ -56,18 +56,18 @@ const AgendamentosMedicos = () => {
         status: (event.status || "Agendada") as CalendarEvent["status"],
       }));
     },
-    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
+    enabled: !!organizationId,
   });
 
   // Mutação para adicionar um novo evento
   const addEventMutation = useMutation({
     mutationFn: async (newEventData: EventFormValues) => {
-      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
+      if (!organizationId) throw new Error("Organization ID not available.");
       const { data, error } = await supabase
         .from('events')
         .insert({
-          user_id: appUser?.id, // Manter user_id para referência do criador, mas filtrar por organization_id
-          organization_id: organizationId, // NOVO: Adicionar organization_id
+          user_id: appUser?.id,
+          organization_id: organizationId,
           title: newEventData.title,
           date: format(newEventData.date, "yyyy-MM-dd"),
           time: newEventData.time,
@@ -80,7 +80,7 @@ const AgendamentosMedicos = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events', organizationId] }); // Invalida a query com organizationId
+      queryClient.invalidateQueries({ queryKey: ['events', organizationId] });
       showSuccess("Agendamento adicionado com sucesso!");
       setIsAddEventDialogOpen(false);
     },
@@ -92,19 +92,19 @@ const AgendamentosMedicos = () => {
   // Mutação para cancelar um evento
   const cancelEventMutation = useMutation({
     mutationFn: async (eventId: string) => {
-      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
+      if (!organizationId) throw new Error("Organization ID not available.");
       const { data, error } = await supabase
         .from('events')
         .update({ status: "Cancelada" })
         .eq('id', eventId)
-        .eq('organization_id', organizationId) // Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .select()
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events', organizationId] }); // Invalida a query com organizationId
+      queryClient.invalidateQueries({ queryKey: ['events', organizationId] });
       showSuccess("Agendamento cancelado com sucesso!");
       setIsCancelConfirmDialogOpen(false);
       setSelectedEvent(null);
@@ -114,19 +114,19 @@ const AgendamentosMedicos = () => {
     },
   });
 
-  // NOVO: Mutação para limpar todos os eventos
+  // Mutação para limpar todos os eventos
   const clearAllEventsMutation = useMutation({
     mutationFn: async () => {
-      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
+      if (!organizationId) throw new Error("Organization ID not available.");
       const { error } = await supabase
         .from('events')
         .delete()
-        .eq('organization_id', organizationId); // Deleta todos os eventos da organização logada
+        .eq('organization_id', organizationId);
       if (error) throw error;
       return true;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['events', organizationId] }); // Invalida a query com organizationId
+      queryClient.invalidateQueries({ queryKey: ['events', organizationId] });
       showSuccess("Todos os agendamentos foram limpos com sucesso!");
     },
     onError: (err) => {
@@ -176,9 +176,8 @@ const AgendamentosMedicos = () => {
 
   return (
     <div className="space-y-6">
-      {/* Contêiner flexível para o campo de busca e os botões de ação */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-        <div className="relative flex-1 w-full"> {/* Campo de busca */}
+        <div className="relative flex-1 w-full">
           <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar agendamentos por título ou categoria..."
@@ -187,20 +186,30 @@ const AgendamentosMedicos = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex space-x-2 shrink-0"> {/* Botões de ação */}
-          <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="font-bold">
-                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
-              </DialogHeader>
-              <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsAddEventDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
-            </DialogContent>
-          </Dialog>
+        <div className="flex space-x-2 shrink-0">
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="font-bold" disabled={!organizationId}>
+                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
+                  </DialogHeader>
+                  <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsAddEventDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
+                </DialogContent>
+              </Dialog>
+            </TooltipTrigger>
+            {!organizationId && (
+              <TooltipContent side="bottom">
+                Carregando informações da organização...
+              </TooltipContent>
+            )}
+          </Tooltip>
+
           {/* O botão de Limpar Agenda foi movido para dentro do EventCalendar */}
         </div>
       </div>
@@ -210,8 +219,8 @@ const AgendamentosMedicos = () => {
         onAddEventClick={handleOpenDialogWithDate}
         onEventClick={handleEventClick}
         searchTerm={searchTerm}
-        onClearAllEvents={handleClearAllEvents} // Passa a função de limpeza
-        isClearingEvents={clearAllEventsMutation.isPending} // Passa o estado de carregamento
+        onClearAllEvents={handleClearAllEvents}
+        isClearingEvents={clearAllEventsMutation.isPending}
       />
 
       {/* Diálogo de Confirmação de Cancelamento */}
