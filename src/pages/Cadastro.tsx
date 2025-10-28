@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -569,29 +569,35 @@ const Cadastro = () => {
     }
   };
 
-  const filteredPets = pets.filter((pet) => {
-    const matchesSpecies = selectedSpecies === "all" || pet.species === selectedSpecies;
-    const owner = clients.find(client => client.id === pet.ownerId);
-    const matchesSearch =
-      pet.name.toLowerCase().includes(petSearchTerm.toLowerCase()) ||
-      pet.breed.toLowerCase().includes(petSearchTerm.toLowerCase()) ||
-      (owner?.name.toLowerCase().includes(petSearchTerm.toLowerCase()));
-    return matchesSpecies && matchesSearch;
-  });
+  // Memoize clientsMap for efficient owner lookup
+  const clientsMap = useMemo(() => {
+    return new Map(clients.map(client => [client.id, client]));
+  }, [clients]);
 
-  const handlePetRowClick = (pet: Pet) => {
-    setSelectedPet(pet);
-    setIsPetDetailsDialogOpen(true);
-  };
+  // Memoize filteredClients
+  const filteredClients = useMemo(() => {
+    return clients.filter((client) =>
+      client.name.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+      client.email.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+      client.phone.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+      client.cpf.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+      client.address.city.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+      client.address.state.toLowerCase().includes(clientSearchTerm.toLowerCase())
+    );
+  }, [clients, clientSearchTerm]);
 
-  const filteredClients = clients.filter((client) =>
-    client.name.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
-    client.phone.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
-    client.cpf.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
-    client.address.city.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
-    client.address.state.toLowerCase().includes(clientSearchTerm.toLowerCase())
-  );
+  // Memoize filteredPets and use clientsMap for owner lookup
+  const filteredPets = useMemo(() => {
+    return pets.filter((pet) => {
+      const matchesSpecies = selectedSpecies === "all" || pet.species === selectedSpecies;
+      const owner = clientsMap.get(pet.ownerId); // Use the map for O(1) lookup
+      const matchesSearch =
+        pet.name.toLowerCase().includes(petSearchTerm.toLowerCase()) ||
+        pet.breed.toLowerCase().includes(petSearchTerm.toLowerCase()) ||
+        (owner?.name.toLowerCase().includes(petSearchTerm.toLowerCase()));
+      return matchesSpecies && matchesSearch;
+    });
+  }, [pets, clientsMap, selectedSpecies, petSearchTerm]);
 
   const handleViewClientPets = (client: Client) => {
     setClientToViewPets(client);
@@ -872,7 +878,7 @@ const Cadastro = () => {
                 {filteredPets.length > 0 ? (
                   filteredPets.map((pet) => {
                     const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
-                    const owner = clients.find(client => client.id === pet.ownerId);
+                    const owner = clientsMap.get(pet.ownerId); // Use clientsMap here
                     const initials = pet.name.charAt(0).toUpperCase();
                     return (
                       <TableRow key={pet.id} className="cursor-pointer hover:bg-muted/50">
@@ -938,7 +944,7 @@ const Cadastro = () => {
           </div>
 
           <PetDetailsDialog
-            pet={selectedPet ? { ...selectedPet, owner: clients.find(c => c.id === selectedPet.ownerId)?.name || "N/A" } : null}
+            pet={selectedPet ? { ...selectedPet, owner: clientsMap.get(selectedPet.ownerId)?.name || "N/A" } : null} // Use clientsMap here
             isOpen={isPetDetailsDialogOpen}
             onClose={() => setIsPetDetailsDialogOpen(false)}
             onEdit={handleEditPet}
