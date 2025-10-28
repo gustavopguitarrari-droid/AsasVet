@@ -31,7 +31,8 @@ import { useLocation } from "react-router-dom";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ImagePreviewDialog from "@/components/ImagePreviewDialog";
-import CadastroLegend from "@/components/CadastroLegend"; // Importar o novo componente
+import CadastroLegend from "@/components/CadastroLegend";
+import { usePageTitle } from "@/context/PageTitleContext"; // Importar usePageTitle
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
@@ -47,6 +48,7 @@ const Cadastro = () => {
   const { user: appUser } = useUser();
   const userId = appUser?.id;
   const location = useLocation();
+  const { setPageTitle } = usePageTitle(); // Obter setPageTitle do contexto
 
   const [activeTab, setActiveTab] = useState<string>("tutores");
 
@@ -55,6 +57,27 @@ const Cadastro = () => {
       setActiveTab((location.state as any).activeTab);
     }
   }, [location.state]);
+
+  // NOVO: Efeito para atualizar o título da página com base na aba ativa
+  useEffect(() => {
+    let tabName = "";
+    switch (activeTab) {
+      case "tutores":
+        tabName = "Tutores";
+        break;
+      case "animais":
+        tabName = "Animais";
+        break;
+      default:
+        tabName = "";
+    }
+    setPageTitle(`Cadastro - ${tabName}`); // Definir o título dinâmico
+
+    // Função de limpeza para redefinir o título quando o componente for desmontado
+    return () => {
+      setPageTitle(""); 
+    };
+  }, [activeTab, setPageTitle]);
 
   const [selectedSpecies, setSelectedSpecies] = useState<string>("all");
   const [petSearchTerm, setPetSearchTerm] = useState<string>("");
