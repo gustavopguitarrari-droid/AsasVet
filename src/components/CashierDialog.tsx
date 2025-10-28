@@ -13,7 +13,14 @@ import {
 } from "@/components/ui/table";
 import { PlusCircle, Search, DollarSign, ShoppingCart, History, Package, X } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import {
+  Sheet, // Alterado de Dialog para Sheet
+  SheetContent, // Alterado de DialogContent para SheetContent
+  SheetHeader, // Alterado de DialogHeader para SheetHeader
+  SheetTitle, // Alterado de DialogTitle para SheetTitle
+  SheetFooter, // Alterado de DialogFooter para SheetFooter
+} from "@/components/ui/sheet"; // Importar Sheet
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter as OriginalDialogFooter } from "@/components/ui/dialog"; // Manter Dialog para o AddProductDialog
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { format, isToday, parseISO } from "date-fns";
 
@@ -250,46 +257,46 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
 
   if (isLoadingProducts || isLoadingTransactions) {
     return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
+      <Sheet open={isOpen} onOpenChange={onClose}>
+        <SheetContent side="right" className="w-full md:w-[700px] lg:w-[900px] flex flex-col">
+          <SheetHeader>
+            <SheetTitle className="flex items-center">
               <ShoppingCart className="h-5 w-5 mr-2" /> Caixa
-            </DialogTitle>
-          </DialogHeader>
+            </SheetTitle>
+          </SheetHeader>
           <div className="flex items-center justify-center h-full">
             <p className="text-muted-foreground">Carregando dados do caixa...</p>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     );
   }
 
   if (productsError || transactionsError) {
     return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="flex items-center">
+      <Sheet open={isOpen} onOpenChange={onClose}>
+        <SheetContent side="right" className="w-full md:w-[700px] lg:w-[900px] flex flex-col">
+          <SheetHeader>
+            <SheetTitle className="flex items-center">
               <ShoppingCart className="h-5 w-5 mr-2" /> Caixa
-            </DialogTitle>
-          </DialogHeader>
+            </SheetTitle>
+          </SheetHeader>
           <div className="flex items-center justify-center h-full text-destructive">
             <p>Erro ao carregar dados: {productsError?.message || transactionsError?.message}</p>
           </div>
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     );
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent side="right" className="w-full md:w-[700px] lg:w-[900px] flex flex-col">
+        <SheetHeader>
+          <SheetTitle className="flex items-center">
             <ShoppingCart className="h-5 w-5 mr-2" /> Caixa
-          </DialogTitle>
-        </DialogHeader>
+          </SheetTitle>
+        </SheetHeader>
         <div className="space-y-6 flex-1 overflow-y-auto p-4"> {/* Adicionado p-4 para padding interno */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             <Card className={cn("text-white shadow-md", totalBalance >= 0 ? "bg-green-700" : "bg-red-700")}>
@@ -436,13 +443,13 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
             </TabsContent>
           </Tabs>
         </div>
-        <DialogFooter className="pt-4">
+        <SheetFooter className="pt-4">
           <Button variant="outline" onClick={onClose}>
             <X className="h-4 w-4 mr-2" /> Fechar
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 };
 
