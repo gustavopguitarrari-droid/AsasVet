@@ -81,6 +81,16 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
     }
   }, [isOpen, form]);
 
+  // Log de depuração para o estado do formulário
+  React.useEffect(() => {
+    if (isOpen) {
+      console.log("AddAnimalDebitDialog: Form is valid:", form.formState.isValid);
+      console.log("AddAnimalDebitDialog: Form errors:", form.formState.errors);
+      console.log("AddAnimalDebitDialog: Current form values:", form.getValues());
+    }
+  }, [isOpen, form.formState.isValid, form.formState.errors, form.getValues]);
+
+
   const handleProductSelect = (productId: string) => {
     setSelectedProductId(productId);
     const product = products.find(p => p.id === productId);
@@ -89,6 +99,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
       form.setValue("amount", product.price);
       form.setValue("productId", product.id);
       setCustomDescription(""); // Clear custom description
+      form.clearErrors(["description", "amount", "productId"]); // Clear errors for these fields
     }
   };
 
@@ -96,6 +107,8 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
     setCustomDescription(e.target.value);
     form.setValue("description", e.target.value);
     form.setValue("productId", undefined); // Clear product selection if custom description is used
+    setSelectedProductId(undefined); // Clear selected product ID state
+    form.clearErrors(["description", "productId"]); // Clear errors for these fields
     // NÃO LIMPAR O CAMPO 'amount' AQUI, permitindo entrada manual
   };
 
