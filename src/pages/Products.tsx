@@ -49,7 +49,7 @@ const productCategoryOptions: FilterOption[] = [
 const Products = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
-  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Usar organizationId
   const { setPageTitle } = usePageTitle();
 
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -65,27 +65,27 @@ const Products = () => {
 
   // Fetch products
   const { data: products = [], isLoading, error } = useQuery<Product[]>({
-    queryKey: ['products', userId],
+    queryKey: ['products', organizationId], // Alterado para usar organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!organizationId) return []; // Usar organizationId
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('user_id', userId);
+        .eq('organization_id', organizationId); // Filtrar por organization_id
       if (error) throw error;
       return data as Product[];
     },
-    enabled: !!userId,
+    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
   });
 
   // Add product mutation (reusing from cashier)
   const addProductMutation = useMutation({
     mutationFn: async (newProductData: AddProductFormValues) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
       const { data, error } = await supabase
         .from('products')
         .insert({
-          user_id: userId,
+          organization_id: organizationId, // NOVO: Adicionar organization_id
           name: newProductData.name,
           price: newProductData.price,
           category: newProductData.category,
@@ -96,7 +96,7 @@ const Products = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', userId] });
+      queryClient.invalidateQueries({ queryKey: ['products', organizationId] }); // Invalida a query com organizationId
       showSuccess("Produto/Serviço adicionado com sucesso!");
       setIsAddProductDialogOpen(false);
     },
@@ -108,7 +108,7 @@ const Products = () => {
   // Update product mutation
   const updateProductMutation = useMutation({
     mutationFn: async (updatedProductData: Product) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
       const { data, error } = await supabase
         .from('products')
         .update({
@@ -117,14 +117,14 @@ const Products = () => {
           category: updatedProductData.category,
         })
         .eq('id', updatedProductData.id)
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // Filtrar por organization_id
         .select()
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', userId] });
+      queryClient.invalidateQueries({ queryKey: ['products', organizationId] }); // Invalida a query com organizationId
       showSuccess("Produto/Serviço atualizado com sucesso!");
       setIsEditProductDialogOpen(false);
     },
@@ -136,17 +136,17 @@ const Products = () => {
   // Delete product mutation
   const deleteProductMutation = useMutation({
     mutationFn: async (productId: string) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!organizationId) throw new Error("Organization ID not available."); // Usar organizationId
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', productId)
-        .eq('user_id', userId);
+        .eq('organization_id', organizationId); // Filtrar por organization_id
       if (error) throw error;
       return productId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', userId] });
+      queryClient.invalidateQueries({ queryKey: ['products', organizationId] }); // Invalida a query com organizationId
       showSuccess("Produto/Serviço excluído com sucesso!");
     },
     onError: (err) => {

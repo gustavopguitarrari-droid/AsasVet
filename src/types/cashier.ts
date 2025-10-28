@@ -3,6 +3,7 @@ export interface Product {
   name: string;
   price: number;
   category: string; // Ex: "Serviço", "Produto"
+  organization_id: string; // NOVO: Adicionado organization_id
 }
 
 export interface SaleItem {
@@ -11,6 +12,7 @@ export interface SaleItem {
   price: number;
   quantity: number;
   total: number;
+  organization_id: string; // NOVO: Adicionado organization_id
 }
 
 export interface Transaction {
@@ -22,4 +24,5 @@ export interface Transaction {
   time: string;
   items?: SaleItem[]; // Opcional, para transações de venda detalhadas
   paymentMethod?: string; // Opcional, para transações de venda
+  organization_id: string; // NOVO: Adicionado organization_id
 }

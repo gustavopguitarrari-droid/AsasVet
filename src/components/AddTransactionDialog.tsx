@@ -98,7 +98,7 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({ onSubmit, o
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Valor (R$)</FormLabel>
+              <FormLabel>Valor (R$)</Label>
               <FormControl>
                 <div className="relative">
                   <DollarSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -157,9 +157,9 @@ const AddTransactionDialog: React.FC<AddTransactionDialogProps> = ({ onSubmit, o
                   <Input type="time" {...field} />
                 </FormControl>
                 <FormMessage />
-              </FormItem>
-            )}
-          />
+            </FormItem>
+          )}
+        />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onCancel}>
