@@ -170,4 +170,12 @@ export const FormMessage = React.forwardRef<
 });
 FormMessage.displayName = "FormMessage";
 
-export { useFormContext, FormProvider };
+// Componente Form que encapsula FormProvider
+const Form = <TFieldValues extends FieldValues = FieldValues>(
+  props: React.ComponentProps<typeof FormProvider<TFieldValues>>
+) => {
+  const { children, ...formProviderProps } = props;
+  return <FormProvider {...formProviderProps}>{children}</FormProvider>;
+};
+
+export { useFormContext, FormProvider, Form };

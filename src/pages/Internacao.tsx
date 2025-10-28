@@ -643,7 +643,7 @@ const Internacao = () => {
                     onSelect={(day) => setSelectedDate(day || new Date())}
                     initialFocus
                     locale={ptBR}
-                    components={{ Caption: CustomCalendarCaption }}
+                    components={{ Caption: (props) => <CustomCalendarCaption {...props} /> }}
                   />
                 </PopoverContent>
               </Popover>
