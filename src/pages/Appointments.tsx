@@ -454,7 +454,7 @@ const Appointments = () => {
       setIsPdfPreviewDialogOpen(true);
     },
     onError: (err: any) => {
-      console.error("Erro ao gerar PDF do histórico:", err);
+      console.error("Appointments: fetchAndGeneratePdfMutation - Erro ao gerar PDF do histórico:", err);
       showError(`Erro ao gerar PDF: ${err.message || "Erro desconhecido"}`);
     },
   });
@@ -462,12 +462,15 @@ const Appointments = () => {
   // NOVO: Mutação para buscar o prontuário médico e gerar o PDF da receita
   const fetchAndGenerateRecipePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url);
       // Se já existe uma URL de PDF de receita, use-a diretamente
       if (appointment.recipe_pdf_url) {
+        console.log("Appointments: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found, using it directly.");
         return { pdfUrl: appointment.recipe_pdf_url, appointment };
       }
 
       // Caso contrário, busque as prescrições e gere o PDF
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - No existing recipe_pdf_url, fetching medical record for prescriptions.");
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
         .select('id, prescriptions')
@@ -504,6 +507,7 @@ const Appointments = () => {
 
       // Upload the newly generated PDF and get its URL
       const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, userId!, appointment.id);
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
       if (!newPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF da receita.");
       }
@@ -514,6 +518,7 @@ const Appointments = () => {
         .update({ recipe_pdf_url: newPdfUrl })
         .eq('id', medicalRecordData.id)
         .eq('user_id', userId);
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Medical record updated with new recipe_pdf_url.");
 
       return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
@@ -526,7 +531,7 @@ const Appointments = () => {
       setIsRecipePdfPreviewDialogOpen(true);
     },
     onError: (err: any) => {
-      console.error("Erro ao gerar PDF da receita do histórico:", err);
+      console.error("Appointments: fetchAndGenerateRecipePdfMutation - Erro ao gerar PDF da receita do histórico:", err);
       showError(`Erro ao gerar receita: ${err.message || "Erro desconhecido"}`);
     },
   });
@@ -946,7 +951,7 @@ const Appointments = () => {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={activeTab === "em-espera" ? 5 : (activeTab === "em-andamento" ? 6 : 8)} className="h-24 text-center"> {/* Ajustado colspan */}
+                  <TableCell colSpan={activeTab === "em-andamento" ? 7 : (activeTab === "finalizadas" ? 10 : 5)} className="h-24 text-center"> {/* Ajustado colspan */}
                     Nenhuma consulta encontrada.
                   </TableCell>
                 </TableRow>

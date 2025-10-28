@@ -173,7 +173,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       setIsPdfPreviewDialogOpen(true);
     },
     onError: (err: any) => {
-      console.error("Erro ao gerar PDF do histórico:", err);
+      console.error("AppointmentHistoryDialog: fetchAndGeneratePdfMutation - Erro ao gerar PDF do histórico:", err);
       showError(`Erro ao gerar PDF: ${err.message || "Erro desconhecido"}`);
     },
   });
@@ -181,12 +181,15 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   // NOVO: Mutação para buscar o prontuário médico e gerar o PDF da receita
   const fetchAndGenerateRecipePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
+      console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url);
       // Se já existe uma URL de PDF de receita, use-a diretamente
       if (appointment.recipe_pdf_url) {
+        console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found, using it directly.");
         return { pdfUrl: appointment.recipe_pdf_url, appointment };
       }
 
       // Caso contrário, busque as prescrições e gere o PDF
+      console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - No existing recipe_pdf_url, fetching medical record for prescriptions.");
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
         .select('id, prescriptions')
@@ -223,6 +226,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
 
       // Upload the newly generated PDF and get its URL
       const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, userId!, appointment.id);
+      console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
       if (!newPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF da receita.");
       }
@@ -233,6 +237,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         .update({ recipe_pdf_url: newPdfUrl })
         .eq('id', medicalRecordData.id)
         .eq('user_id', userId);
+      console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Medical record updated with new recipe_pdf_url.");
 
       return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
@@ -245,7 +250,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       setIsRecipePdfPreviewDialogOpen(true);
     },
     onError: (err: any) => {
-      console.error("Erro ao gerar PDF da receita do histórico:", err);
+      console.error("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Erro ao gerar PDF da receita do histórico:", err);
       showError(`Erro ao gerar receita: ${err.message || "Erro desconhecido"}`);
     },
   });

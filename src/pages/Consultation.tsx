@@ -209,7 +209,7 @@ const ConsultationPage: React.FC = () => {
 
       // If no medical record exists, create a minimal one first
       if (!currentMedicalRecordId) {
-        console.log("No existing medical record found, creating a new one for recipe PDF.");
+        console.log("ConsultationPage: generateAndSaveRecipePdfMutation - No existing medical record found, creating a new one for recipe PDF.");
         const { data: newRecord, error: insertRecordError } = await supabase
           .from('medical_records')
           .insert({
@@ -229,6 +229,7 @@ const ConsultationPage: React.FC = () => {
           throw insertRecordError || new Error("Failed to create a new medical record for recipe PDF.");
         }
         currentMedicalRecordId = newRecord.id;
+        console.log("ConsultationPage: generateAndSaveRecipePdfMutation - New medical record created with ID:", currentMedicalRecordId);
         // Invalidate the medicalRecord query so the next fetch gets the new record
         queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
       }
@@ -241,10 +242,10 @@ const ConsultationPage: React.FC = () => {
         .single();
 
       if (fetchPdfUrlError) {
-        console.warn("Failed to fetch existing recipe_pdf_url for medical record ID:", currentMedicalRecordId, fetchPdfUrlError);
+        console.warn("ConsultationPage: generateAndSaveRecipePdfMutation - Failed to fetch existing recipe_pdf_url for medical record ID:", currentMedicalRecordId, fetchPdfUrlError);
         // Continue without deleting if fetch fails
       } else if (existingRecipePdfUrlData?.recipe_pdf_url) {
-        console.log("Existing recipe PDF found, attempting to delete:", existingRecipePdfUrlData.recipe_pdf_url);
+        console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Existing recipe PDF found, attempting to delete:", existingRecipePdfUrlData.recipe_pdf_url);
         await deleteRecipePdfFromSupabase(existingRecipePdfUrlData.recipe_pdf_url);
       }
 
@@ -256,6 +257,7 @@ const ConsultationPage: React.FC = () => {
       });
 
       const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, userId, appointmentId);
+      console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Uploaded new PDF to URL:", newPdfUrl);
 
       if (!newPdfUrl) throw new Error("Falha ao fazer upload do PDF da receita.");
 
@@ -269,6 +271,7 @@ const ConsultationPage: React.FC = () => {
         .single();
 
       if (error) throw error;
+      console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Medical record updated with new recipe_pdf_url:", data.recipe_pdf_url);
       return { pdfBlob, newPdfUrl };
     },
     onSuccess: ({ pdfBlob, newPdfUrl }) => {
@@ -279,7 +282,7 @@ const ConsultationPage: React.FC = () => {
       setIsRecipePdfPreviewDialogOpen(true);
     },
     onError: (err: any) => {
-      console.error("Erro ao gerar e salvar PDF da receita:", err);
+      console.error("ConsultationPage: generateAndSaveRecipePdfMutation - Erro ao gerar e salvar PDF da receita:", err);
       showError(`Erro ao gerar receita: ${err.message || "Erro desconhecido"}`);
     },
   });
