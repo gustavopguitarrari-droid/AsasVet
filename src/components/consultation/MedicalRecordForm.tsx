@@ -33,7 +33,6 @@ const medicalRecordFormSchema = z.object({
   diagnosis: z.string().min(1, "O diagnóstico é obrigatório."),
   treatment: z.string().min(1, "O tratamento é obrigatório."),
   prescriptions: z.array(prescriptionItemSchema).optional(),
-  recipePdfUrl: z.string().optional().nullable(), // NOVO: URL do PDF da receita
 });
 
 export type MedicalRecordFormValues = z.infer<typeof medicalRecordFormSchema>;
@@ -44,7 +43,6 @@ export interface MedicalRecordFormInstance {
   trigger: UseFormReturn<MedicalRecordFormValues>['trigger'];
   formState: UseFormReturn<MedicalRecordFormValues>['formState'];
   getValues: UseFormReturn<MedicalRecordFormValues>['getValues'];
-  setValue: UseFormReturn<MedicalRecordFormValues>['setValue']; // NOVO: Adicionar setValue
 }
 
 interface MedicalRecordFormProps {
@@ -53,12 +51,10 @@ interface MedicalRecordFormProps {
   isSubmitting: boolean;
   formRef?: React.Ref<MedicalRecordFormInstance>;
   onValidationChange?: (isValid: boolean) => void;
-  appointmentId: string; // NOVO: Passar o ID da consulta
-  petName: string; // NOVO: Passar o nome do pet
-  ownerName: string; // NOVO: Passar o nome do tutor
+  onGenerateRecipePdf: (prescriptions: MedicalRecordFormValues['prescriptions']) => void; // NOVO: Prop para gerar PDF
 }
 
-const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSubmit, isSubmitting, formRef, onValidationChange, appointmentId, petName, ownerName }) => {
+const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSubmit, isSubmitting, formRef, onValidationChange, onGenerateRecipePdf }) => {
   const form = useForm<MedicalRecordFormValues>({
     resolver: zodResolver(medicalRecordFormSchema),
     defaultValues: {
@@ -67,7 +63,6 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
       diagnosis: initialData?.diagnosis || "",
       treatment: initialData?.treatment || "",
       prescriptions: initialData?.prescriptions || [],
-      recipePdfUrl: initialData?.recipePdfUrl || null, // NOVO: Valor inicial para recipePdfUrl
     },
   });
 
@@ -77,7 +72,6 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
     trigger: form.trigger,
     formState: form.formState,
     getValues: form.getValues,
-    setValue: form.setValue, // NOVO: Expor setValue
   }));
 
   // Notificar o componente pai sobre as mudanças na validade do formulário
@@ -95,7 +89,7 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <FormProvider {...form}>
+        <FormProvider {...form}> {/* Envolve o formulário com FormProvider */}
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs defaultValue="anamnesis" className="w-full">
               <TabsList className="grid w-full grid-cols-2 md:grid-cols-5 h-auto p-1">
@@ -130,11 +124,7 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
                   <TreatmentTabContent />
                 </TabsContent>
                 <TabsContent value="prescriptions">
-                  <PrescriptionsTabContent
-                    appointmentId={appointmentId}
-                    petName={petName}
-                    ownerName={ownerName}
-                  />
+                  <PrescriptionsTabContent onGenerateRecipePdf={onGenerateRecipePdf} /> {/* Passa a prop aqui */}
                 </TabsContent>
               </div>
             </Tabs>
