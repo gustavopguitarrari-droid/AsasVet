@@ -251,14 +251,9 @@ const ConsultationPage: React.FC = () => {
         <h2 className="text-3xl font-bold flex items-center">
           <CalendarCheck className="mr-3 h-7 w-7 text-primary" /> Consulta em Andamento
         </h2>
-        <div className="flex space-x-2"> {/* NOVO: Container para os botões */}
-          <Button onClick={() => setIsForwardToInternmentDialogOpen(true)} variant="secondary"> {/* NOVO: Botão de encaminhar */}
-            <Hospital className="mr-2 h-4 w-4" /> Encaminhar para Internação
-          </Button>
-          <Button onClick={() => navigate('/consultas')} variant="outline">
-            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
-          </Button>
-        </div>
+        <Button onClick={() => navigate('/consultas')} variant="outline">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
+        </Button>
       </div>
 
       <Card>
@@ -302,7 +297,10 @@ const ConsultationPage: React.FC = () => {
         onValidationChange={setIsMedicalRecordFormValid}
       />
 
-      <div className="flex justify-end space-x-2">
+      <div className="flex justify-end space-x-2"> {/* Botões de ação agrupados aqui */}
+        <Button onClick={() => setIsForwardToInternmentDialogOpen(true)} variant="secondary" disabled={!appointment}>
+          <Hospital className="mr-2 h-4 w-4" /> Encaminhar para Internação
+        </Button>
         <AlertDialog open={isFinalizeConfirmDialogOpen} onOpenChange={setIsFinalizeConfirmDialogOpen}>
           <AlertDialogTrigger asChild>
             <Button
