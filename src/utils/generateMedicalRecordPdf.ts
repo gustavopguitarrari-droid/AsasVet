@@ -18,41 +18,38 @@ interface MedicalRecordPdfData {
   medicalRecord: MedicalRecordFormValues;
   logoUrl?: string | null;
   filename?: string;
-  clinicDetails: ClinicDetails; // NOVO: Detalhes da clínica
+  clinicDetails: ClinicDetails;
 }
 
-export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, logoUrl, filename, clinicDetails }: MedicalRecordPdfData) => {
+export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, logoUrl, filename, clinicDetails }: MedicalRecordPdfData): Promise<Blob> => {
   const doc = new jsPDF('p', 'mm', 'a4');
   const margin = 15;
   let yPos = margin;
-  const lineHeight = 5; // Linha mais compacta
-  const sectionSpacing = 8; // Espaçamento entre seções
+  const lineHeight = 5;
+  const sectionSpacing = 8;
   const maxWidth = 210 - 2 * margin;
 
-  // Cores e fontes
-  const primaryColor = '#3b82f6'; // Azul
-  const secondaryColor = '#e0e7ff'; // Azul claro para fundos
+  // Colors and fonts
+  const primaryColor = '#3b82f6';
+  const secondaryColor = '#e0e7ff';
   const textColor = '#333333';
   const lightTextColor = '#666666';
   doc.setFont('helvetica');
   doc.setTextColor(textColor);
 
-  // Função para adicionar nova página
+  // Function to add a new page
   const addPageIfNeeded = (requiredSpace = lineHeight * 4) => {
     if (yPos + requiredSpace > 297 - margin) {
       doc.addPage();
       yPos = margin;
-      // O cabeçalho completo será adicionado apenas na primeira página.
-      // Para páginas subsequentes, um cabeçalho simplificado pode ser implementado aqui,
-      // mas por simplicidade, manteremos apenas o conteúdo.
     }
   };
 
-  // --- Cabeçalho Principal ---
+  // --- Main Header ---
   const addMainHeader = async () => {
     const headerStartY = yPos;
 
-    // Logo da Clínica (canto superior esquerdo)
+    // Clinic Logo (top left corner)
     if (logoUrl) {
       try {
         const img = new Image();
@@ -64,15 +61,15 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
         const imgWidth = 25;
         const imgHeight = (img.height * imgWidth) / img.width;
         doc.addImage(img, 'PNG', margin, yPos, imgWidth, imgHeight);
-        yPos += imgHeight > lineHeight * 2 ? imgHeight : lineHeight * 2; // Ajusta yPos para depois do logo
+        yPos += imgHeight > lineHeight * 2 ? imgHeight : lineHeight * 2;
       } catch (e) {
-        console.error("Erro ao carregar ou adicionar logo ao PDF:", e);
+        console.error("Error loading or adding logo to PDF:", e);
       }
     } else {
-      yPos += lineHeight * 2; // Espaço para o logo mesmo que não haja
+      yPos += lineHeight * 2;
     }
 
-    // Nome da Clínica (ao lado do logo ou no topo se não houver logo)
+    // Clinic Name (next to logo or at top if no logo)
     const clinicNameX = logoUrl ? margin + 30 : margin;
     const clinicNameY = headerStartY + lineHeight;
     doc.setFontSize(16);
@@ -80,28 +77,28 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
     doc.setTextColor(primaryColor);
     doc.text(clinicDetails.companyName || 'Nome da Clínica', clinicNameX, clinicNameY);
 
-    // Título do Documento
+    // Document Title
     doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(primaryColor);
     doc.text('PRONTUÁRIO MÉDICO VETERINÁRIO', 210 / 2, clinicNameY + lineHeight * 1.5, { align: 'center' });
 
-    // Data de Emissão (abaixo do título principal)
+    // Issue Date (below main title)
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
     doc.setTextColor(lightTextColor);
     doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, margin, yPos + lineHeight * 0.5);
-    yPos += lineHeight * 2; // Espaço após a data de emissão
+    yPos += lineHeight * 2;
   };
 
   await addMainHeader();
 
-  // Linha separadora após o cabeçalho principal
+  // Separator line after main header
   doc.setDrawColor(primaryColor);
   doc.line(margin, yPos, 210 - margin, yPos);
   yPos += sectionSpacing;
 
-  // --- Detalhes do Paciente e Tutor ---
+  // --- Patient and Owner Details ---
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(primaryColor);
@@ -115,7 +112,7 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
   const patientDetails = [
     { label: 'Nome do Animal', value: appointment.pet_name },
     { label: 'Espécie', value: appointment.species },
-    { label: 'Raça', value: 'N/A' }, // Raça não está na interface Appointment, adicionar se necessário
+    { label: 'Raça', value: 'N/A' },
     { label: 'Nome do Tutor', value: appointment.client_name },
     { label: 'Serviço', value: appointment.service },
     { label: 'Veterinário', value: appointment.veterinarian },
@@ -125,7 +122,7 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
   ];
 
   let currentX = margin;
-  const colWidth = maxWidth / 2; // Duas colunas
+  const colWidth = maxWidth / 2;
   const detailLineHeight = lineHeight * 1.2;
 
   patientDetails.forEach((detail, index) => {
@@ -136,14 +133,14 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
     doc.text(detail.value, currentX + doc.getTextWidth(`${detail.label}: `), yPos);
 
     if (index % 2 === 0 && index < patientDetails.length - 1) {
-      currentX += colWidth; // Move para a segunda coluna
+      currentX += colWidth;
     } else {
-      currentX = margin; // Volta para a primeira coluna
+      currentX = margin;
       yPos += detailLineHeight;
     }
   });
 
-  if (currentX !== margin) { // Se a última linha não foi completa, adiciona espaçamento
+  if (currentX !== margin) {
     yPos += detailLineHeight;
   }
 
@@ -152,20 +149,20 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
   doc.line(margin, yPos, 210 - margin, yPos);
   yPos += sectionSpacing;
 
-  // --- Seções do Prontuário Médico ---
+  // --- Medical Record Sections ---
   const addSection = (title: string, content?: string | null, isPrescription = false) => {
     if (!content && (!isPrescription || !medicalRecord.prescriptions || medicalRecord.prescriptions.length === 0)) {
-      return; // Não adiciona seção se não houver conteúdo
+      return;
     }
 
-    addPageIfNeeded(lineHeight * 3); // Espaço para título e início do conteúdo
+    addPageIfNeeded(lineHeight * 3);
     doc.setFillColor(secondaryColor);
-    doc.rect(margin, yPos, maxWidth, lineHeight * 1.5, 'F'); // Fundo para o título da seção
+    doc.rect(margin, yPos, maxWidth, lineHeight * 1.5, 'F');
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(primaryColor);
-    doc.text(title, margin + 2, yPos + lineHeight); // Título dentro do fundo
-    yPos += lineHeight * 2; // Espaço após o título da seção
+    doc.text(title, margin + 2, yPos + lineHeight);
+    yPos += lineHeight * 2;
 
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(textColor);
@@ -173,7 +170,7 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
 
     if (isPrescription && medicalRecord.prescriptions && medicalRecord.prescriptions.length > 0) {
       medicalRecord.prescriptions.forEach((p, index) => {
-        addPageIfNeeded(lineHeight * 4); // Espaço para cada prescrição
+        addPageIfNeeded(lineHeight * 4);
         doc.setFont('helvetica', 'bold');
         doc.text(`• Medicamento: `, margin + 5, yPos);
         doc.setFont('helvetica', 'normal');
@@ -192,27 +189,27 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
           doc.text(instructionsText, margin + 10 + doc.getTextWidth(`  Instruções: `), yPos);
           yPos += instructionsText.length * lineHeight;
         }
-        yPos += lineHeight; // Espaço entre prescrições
+        yPos += lineHeight;
       });
     } else if (content) {
       const splitText = doc.splitTextToSize(content, maxWidth);
       doc.text(splitText, margin, yPos);
       yPos += splitText.length * lineHeight;
     }
-    yPos += sectionSpacing; // Espaço após a seção
+    yPos += sectionSpacing;
   };
 
   addSection('ANAMNESE', medicalRecord.anamnesis);
   addSection('EXAME FÍSICO', medicalRecord.physicalExam);
   addSection('DIAGNÓSTICO', medicalRecord.diagnosis);
   addSection('TRATAMENTO', medicalRecord.treatment);
-  addSection('PRESCRIÇÕES', null, true); // Passa null para conteúdo, mas indica que é prescrição
+  addSection('PRESCRIÇÕES', null, true);
 
-  // --- Assinatura do Veterinário ---
+  // --- Veterinarian Signature ---
   addPageIfNeeded(lineHeight * 5);
-  yPos = Math.max(yPos, 297 - margin - lineHeight * 5); // Garante que a assinatura fique no final da página
+  yPos = Math.max(yPos, 297 - margin - lineHeight * 5);
   doc.setDrawColor(lightTextColor);
-  doc.line(margin + maxWidth / 4, yPos, margin + maxWidth * 3 / 4, yPos); // Linha para assinatura
+  doc.line(margin + maxWidth / 4, yPos, margin + maxWidth * 3 / 4, yPos);
   yPos += lineHeight;
   doc.setFontSize(10);
   doc.setFont('helvetica', 'normal');
@@ -222,7 +219,7 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
   doc.text(`CRMV: ${clinicDetails.veterinarianCrmv || 'N/A'}`, 210 / 2, yPos, { align: 'center' });
   yPos += sectionSpacing;
 
-  // --- Rodapé ---
+  // --- Footer ---
   const addFooter = () => {
     const pageCount = (doc.internal as any).getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
@@ -231,7 +228,6 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
       doc.setTextColor(lightTextColor);
       doc.text(`Página ${i} de ${pageCount}`, margin, 297 - margin + 5);
       
-      // Informações da clínica no rodapé
       const footerText = [
         clinicDetails.address,
         `Tel: ${clinicDetails.phone} | Email: ${clinicDetails.email}`
@@ -241,5 +237,6 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
   };
   addFooter();
 
-  doc.save(filename || `Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
+  // Return the PDF as a Blob
+  return doc.output('blob');
 };

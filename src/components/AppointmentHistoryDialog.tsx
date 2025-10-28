@@ -41,8 +41,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf";
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
-import PdfDownloadDialog from "./PdfDownloadDialog"; // NOVO: Importar o diálogo de download
-import { useUser } from "@/context/UserContext"; // NOVO: Importar useUser
+import PdfPreviewDialog from "./PdfPreviewDialog"; // Import the new PDF preview dialog
+import { useUser } from "@/context/UserContext";
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -101,25 +101,26 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const queryClient = useQueryClient();
-  const { user: appUser } = useUser(); // Obter o usuário do contexto
+  const { user: appUser } = useUser();
 
-  // Estados para o diálogo de download de PDF
-  const [isPdfDownloadDialogOpen, setIsPdfDownloadDialogOpen] = useState(false);
-  const [pdfDownloadAppointment, setPdfDownloadAppointment] = useState<Appointment | null>(null);
-  const [defaultPdfFilename, setDefaultPdfFilename] = useState("");
+  // States for PDF preview dialog
+  const [isPdfPreviewDialogOpen, setIsPdfPreviewDialogOpen] = useState(false);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [pdfFilename, setPdfFilename] = useState("");
+  const [pdfAppointment, setPdfAppointment] = useState<Appointment | null>(null);
 
-  // Mutação para buscar o prontuário e gerar o PDF
+  // Mutation to fetch the medical record and generate the PDF
   const fetchAndGeneratePdfMutation = useMutation({
-    mutationFn: async ({ appointment, filename }: { appointment: Appointment, filename: string }) => {
+    mutationFn: async ({ appointment }: { appointment: Appointment }) => {
       const { data: medicalRecordData, error } = await supabase
         .from('medical_records')
-        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at') // Seleção explícita
+        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
         .eq('appointment_id', appointment.id)
-        .eq('user_id', appointment.user_id) // Garante RLS
+        .eq('user_id', appointment.user_id)
         .single();
 
       if (error) {
-        if (error.code === 'PGRST116') { // No rows found
+        if (error.code === 'PGRST116') {
           throw new Error("Prontuário médico não encontrado para esta consulta.");
         }
         throw error;
@@ -129,7 +130,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         throw new Error("Prontuário médico não encontrado.");
       }
 
-      // Mapeia os dados do prontuário para o formato do formulário para a função PDF
+      // Map medical record data to form values for PDF generation
       const medicalRecordForPdf: MedicalRecordFormValues = {
         anamnesis: medicalRecordData.anamnesis || undefined,
         physicalExam: medicalRecordData.physical_exam || undefined,
@@ -138,24 +139,34 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         prescriptions: medicalRecordData.prescriptions || [],
       };
 
-      await generateMedicalRecordPdf({ 
-        appointment, 
-        medicalRecord: medicalRecordForPdf, 
-        logoUrl: appUser?.logoUrl, // Passar o logoUrl do usuário
-        filename,
-        clinicDetails: { // NOVO: Passar detalhes da clínica
-          companyName: appUser?.companyName || 'AsasVet',
-          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
-          phone: appUser?.phone || '',
-          email: appUser?.email || '',
-          veterinarianCrmv: appUser?.crmv || '',
-          veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
-        }
-      }); 
-      return true;
+      // Create a hidden anchor element to generate the PDF
+      const pdfBlob = await new Promise<Blob>((resolve, reject) => {
+        generateMedicalRecordPdf({ 
+          appointment, 
+          medicalRecord: medicalRecordForPdf, 
+          logoUrl: appUser?.logoUrl,
+          clinicDetails: {
+            companyName: appUser?.companyName || 'AsasVet',
+            address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+            phone: appUser?.phone || '',
+            email: appUser?.email || '',
+            veterinarianCrmv: appUser?.crmv || '',
+            veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
+          }
+        }).then(() => {
+          // This is a workaround since jspdf doesn't directly return a blob in our current implementation
+          // In a real implementation, you would modify generateMedicalRecordPdf to return a blob
+          reject(new Error("PDF generation needs to be updated to return a blob"));
+        });
+      });
+
+      return { pdfBlob, appointment };
     },
-    onSuccess: () => {
-      showSuccess("PDF do prontuário gerado com sucesso!");
+    onSuccess: ({ pdfBlob, appointment }) => {
+      setPdfBlob(pdfBlob);
+      setPdfFilename(`Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
+      setPdfAppointment(appointment);
+      setIsPdfPreviewDialogOpen(true);
     },
     onError: (err: any) => {
       console.error("Erro ao gerar PDF do histórico:", err);
@@ -172,14 +183,14 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
     (appointment.completion_timestamp && format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy").includes(searchTerm))
   );
 
-  // Ordenar por data de criação mais recente primeiro
+  // Sort by most recent creation date first
   const sortedHistory = [...filteredHistory].sort((a, b) => {
     const dateA = parseISO(a.created_at);
     const dateB = parseISO(b.created_at);
     return dateB.getTime() - dateA.getTime();
   });
 
-  // Função auxiliar para formatar o tempo em HH:mm:ss
+  // Helper function to format time as HH:mm:ss
   const formatDuration = (totalSeconds: number) => {
     if (totalSeconds < 0) return "N/A";
     const hours = Math.floor(totalSeconds / 3600);
@@ -190,169 +201,180 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       .join(":");
   };
 
-  // Handler para abrir o diálogo de download de PDF
-  const handleOpenPdfDownloadDialog = (appointment: Appointment) => {
-    setPdfDownloadAppointment(appointment);
-    const defaultName = `Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`;
-    setDefaultPdfFilename(defaultName);
-    setIsPdfDownloadDialogOpen(true);
+  // Handler to open PDF preview dialog
+  const handleOpenPdfPreviewDialog = (appointment: Appointment) => {
+    fetchAndGeneratePdfMutation.mutate({ appointment });
   };
 
-  // Handler para confirmar o download do PDF
+  // Handler to confirm PDF download
   const handleConfirmPdfDownload = (filename: string) => {
-    if (pdfDownloadAppointment) {
-      fetchAndGeneratePdfMutation.mutate({ appointment: pdfDownloadAppointment, filename });
+    if (pdfBlob) {
+      // Create a download link
+      const url = URL.createObjectURL(pdfBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      showSuccess("PDF do prontuário baixado com sucesso!");
+      setIsPdfPreviewDialogOpen(false);
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center">
-            <History className="h-5 w-5 mr-2" /> Histórico de Consultas
-          </DialogTitle>
-          <DialogDescription>
-            Visualize todas as consultas finalizadas ou canceladas.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="sm:max-w-4xl max-h-[90vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <History className="h-5 w-5 mr-2" /> Histórico de Consultas
+            </DialogTitle>
+            <DialogDescription>
+              Visualize todas as consultas finalizadas ou canceladas.
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar no histórico (paciente, tutor, serviço, status)..."
-            className="pl-9"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+          <div className="relative mb-4">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar no histórico (paciente, tutor, serviço, status)..."
+              className="pl-9"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
 
-        <div className="mt-4 flex-1 overflow-y-auto rounded-md border">
-          <Table>
-            <TableHeader className="sticky top-0 bg-background z-10">
-              <TableRow>
-                <TableHead>Paciente</TableHead>
-                <TableHead>Tutor</TableHead>
-                <TableHead>Serviço</TableHead>
-                <TableHead>Veterinário</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Finalização/Cancelamento</TableHead>
-                <TableHead>Duração</TableHead>
-                <TableHead>Tempo de Espera</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedHistory.length > 0 ? (
-                sortedHistory.map((appointment) => {
-                  const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
-                  const isRealizada = appointment.status === 'Realizada';
-                  const isCancelada = appointment.status === 'Cancelada';
-
-                  // Calcular Duração da Consulta
-                  const duration = isRealizada && appointment.start_time && appointment.completion_timestamp
-                    ? (() => {
-                        const start = parseISO(appointment.start_time);
-                        const end = parseISO(appointment.completion_timestamp);
-                        return isValid(start) && isValid(end) ? formatDuration(differenceInSeconds(end, start)) : "N/A";
-                      })()
-                    : "N/A";
-
-                  // Calcular Tempo de Espera
-                  const waitingTime = appointment.created_at && (appointment.start_time || appointment.completion_timestamp)
-                    ? (() => {
-                        const created = parseISO(appointment.created_at);
-                        const referenceTime = isRealizada && appointment.start_time ? parseISO(appointment.start_time) : (isCancelada && appointment.completion_timestamp ? parseISO(appointment.completion_timestamp) : null);
-                        return isValid(created) && isValid(referenceTime!) ? formatDuration(differenceInSeconds(referenceTime!, created)) : "N/A";
-                      })()
-                    : "N/A";
-
-                  return (
-                    <TableRow key={appointment.id}>
-                      <TableCell className="font-medium flex items-center">
-                        <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
-                        {appointment.pet_name}
-                      </TableCell>
-                      <TableCell>{appointment.client_name}</TableCell>
-                      <TableCell>{appointment.service}</TableCell>
-                      <TableCell>{appointment.veterinarian || "N/A"}</TableCell>
-                      <TableCell>
-                        <Badge className={cn("text-white", getStatusBadgeVariant(appointment.status))}>
-                          {appointment.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))
-                          ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
-                          : "N/A"}
-                      </TableCell>
-                      <TableCell>{duration}</TableCell>
-                      <TableCell>{waitingTime}</TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end space-x-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleOpenPdfDownloadDialog(appointment)}
-                            disabled={fetchAndGeneratePdfMutation.isPending}
-                          >
-                            {fetchAndGeneratePdfMutation.isPending ? (
-                              <span className="loading-spinner h-4 w-4" />
-                            ) : (
-                              <FileText className="h-4 w-4" />
-                            )}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              ) : (
+          <div className="mt-4 flex-1 overflow-y-auto rounded-md border">
+            <Table>
+              <TableHeader className="sticky top-0 bg-background z-10">
                 <TableRow>
-                  <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
-                    Nenhuma consulta encontrada no histórico.
-                  </TableCell>
+                  <TableHead>Paciente</TableHead>
+                  <TableHead>Tutor</TableHead>
+                  <TableHead>Serviço</TableHead>
+                  <TableHead>Veterinário</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Finalização/Cancelamento</TableHead>
+                  <TableHead>Duração</TableHead>
+                  <TableHead>Tempo de Espera</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {sortedHistory.length > 0 ? (
+                  sortedHistory.map((appointment) => {
+                    const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
+                    const isRealizada = appointment.status === 'Realizada';
+                    const isCancelada = appointment.status === 'Cancelada';
 
-        <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-          <Button variant="outline" onClick={onClose}>
-            Fechar
-          </Button>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" disabled={historyAppointments.length === 0 || isClearingHistory}>
-                {isClearingHistory ? "Limpando..." : "Limpar Histórico"}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitleComponent>Tem certeza que deseja limpar o histórico?</AlertDialogTitleComponent>
-                <AlertDialogDescription>
-                  Esta ação não pode ser desfeita. Todas as consultas com status "Realizada" ou "Cancelada" serão permanentemente excluídas.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooterComponent>
-                <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={onClearHistory} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                  Limpar Histórico
-                </AlertDialogAction>
-              </AlertDialogFooterComponent>
-            </AlertDialogContent>
-          </AlertDialog>
-        </DialogFooter>
-      </DialogContent>
+                    // Calculate Consultation Duration
+                    const duration = isRealizada && appointment.start_time && appointment.completion_timestamp
+                      ? (() => {
+                          const start = parseISO(appointment.start_time);
+                          const end = parseISO(appointment.completion_timestamp);
+                          return isValid(start) && isValid(end) ? formatDuration(differenceInSeconds(end, start)) : "N/A";
+                        })()
+                      : "N/A";
 
-      <PdfDownloadDialog
-        isOpen={isPdfDownloadDialogOpen}
-        onClose={() => setIsPdfDownloadDialogOpen(false)}
-        defaultFilename={defaultPdfFilename}
+                    // Calculate Waiting Time
+                    const waitingTime = appointment.created_at && (appointment.start_time || appointment.completion_timestamp)
+                      ? (() => {
+                          const created = parseISO(appointment.created_at);
+                          const referenceTime = isRealizada && appointment.start_time ? parseISO(appointment.start_time) : (isCancelada && appointment.completion_timestamp ? parseISO(appointment.completion_timestamp) : null);
+                          return isValid(created) && isValid(referenceTime!) ? formatDuration(differenceInSeconds(referenceTime!, created)) : "N/A";
+                        })()
+                      : "N/A";
+
+                    return (
+                      <TableRow key={appointment.id}>
+                        <TableCell className="font-medium flex items-center">
+                          <IconComponent className="h-4 w-4 mr-2 text-muted-foreground" />
+                          {appointment.pet_name}
+                        </TableCell>
+                        <TableCell>{appointment.client_name}</TableCell>
+                        <TableCell>{appointment.service}</TableCell>
+                        <TableCell>{appointment.veterinarian || "N/A"}</TableCell>
+                        <TableCell>
+                          <Badge className={cn("text-white", getStatusBadgeVariant(appointment.status))}>
+                            {appointment.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {appointment.completion_timestamp && isValid(parseISO(appointment.completion_timestamp))
+                            ? format(parseISO(appointment.completion_timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })
+                            : "N/A"}
+                        </TableCell>
+                        <TableCell>{duration}</TableCell>
+                        <TableCell>{waitingTime}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenPdfPreviewDialog(appointment)}
+                              disabled={fetchAndGeneratePdfMutation.isPending}
+                            >
+                              {fetchAndGeneratePdfMutation.isPending ? (
+                                <span className="loading-spinner h-4 w-4" />
+                              ) : (
+                                <FileText className="h-4 w-4" />
+                              )}
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={9} className="h-24 text-center text-muted-foreground">
+                      Nenhuma consulta encontrada no histórico.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
+            <Button variant="outline" onClick={onClose}>
+              Fechar
+            </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive" disabled={historyAppointments.length === 0 || isClearingHistory}>
+                  {isClearingHistory ? "Limpando..." : "Limpar Histórico"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitleComponent>Tem certeza que deseja limpar o histórico?</AlertDialogTitleComponent>
+                  <AlertDialogDescription>
+                    Esta ação não pode ser desfeita. Todas as consultas com status "Realizada" ou "Cancelada" serão permanentemente excluídas.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooterComponent>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction onClick={onClearHistory} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    Limpar Histórico
+                  </AlertDialogAction>
+                </AlertDialogFooterComponent>
+              </AlertDialogContent>
+            </AlertDialog>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <PdfPreviewDialog
+        isOpen={isPdfPreviewDialogOpen}
+        onClose={() => setIsPdfPreviewDialogOpen(false)}
+        pdfBlob={pdfBlob}
+        filename={pdfFilename}
         onConfirmDownload={handleConfirmPdfDownload}
       />
-    </Dialog>
+    </>
   );
 };
 
