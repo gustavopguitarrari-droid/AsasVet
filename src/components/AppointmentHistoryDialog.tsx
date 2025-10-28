@@ -41,7 +41,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf";
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
-import PdfPreviewDialog from "./PdfPreviewDialog"; // Import the new PDF preview dialog
+import PdfPreviewDialog from "./PdfPreviewDialog";
 import { useUser } from "@/context/UserContext";
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
@@ -112,18 +112,19 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   // Mutation to fetch the medical record and generate the PDF
   const fetchAndGeneratePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
-      const { data: medicalRecordData, error } = await supabase
+      // First, fetch the medical record
+      const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
         .eq('appointment_id', appointment.id)
         .eq('user_id', appointment.user_id)
         .single();
 
-      if (error) {
-        if (error.code === 'PGRST116') {
+      if (fetchError) {
+        if (fetchError.code === 'PGRST116') {
           throw new Error("Prontuário médico não encontrado para esta consulta.");
         }
-        throw error;
+        throw fetchError;
       }
 
       if (!medicalRecordData) {
@@ -139,38 +140,32 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         prescriptions: medicalRecordData.prescriptions || [],
       };
 
-      // Create a hidden anchor element to generate the PDF
-      const pdfBlob = await new Promise<Blob>((resolve, reject) => {
-        generateMedicalRecordPdf({ 
-          appointment, 
-          medicalRecord: medicalRecordForPdf, 
-          logoUrl: appUser?.logoUrl,
-          clinicDetails: {
-            companyName: appUser?.companyName || 'AsasVet',
-            address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
-            phone: appUser?.phone || '',
-            email: appUser?.email || '',
-            veterinarianCrmv: appUser?.crmv || '',
-            veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
-          }
-        }).then(() => {
-          // This is a workaround since jspdf doesn't directly return a blob in our current implementation
-          // In a real implementation, you would modify generateMedicalRecordPdf to return a blob
-          reject(new Error("PDF generation needs to be updated to return a blob"));
-        });
+      // Generate the PDF
+      const blob = await generateMedicalRecordPdf({ 
+        appointment, 
+        medicalRecord: medicalRecordForPdf, 
+        logoUrl: appUser?.logoUrl,
+        clinicDetails: {
+          companyName: appUser?.companyName || 'AsasVet',
+          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+          phone: appUser?.phone || '',
+          email: appUser?.email || '',
+          veterinarianCrmv: appUser?.crmv || '',
+          veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
+        }
       });
 
-      return { pdfBlob, appointment };
+      return { blob, appointment };
     },
-    onSuccess: ({ pdfBlob, appointment }) => {
-      setPdfBlob(pdfBlob);
+    onSuccess: ({ blob, appointment }) => {
+      setPdfBlob(blob);
       setPdfFilename(`Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
       setPdfAppointment(appointment);
       setIsPdfPreviewDialogOpen(true);
     },
     onError: (err: any) => {
       console.error("Erro ao gerar PDF do histórico:", err);
-      showError(`Erro ao gerar PDF: ${err.message}`);
+      showError(`Erro ao gerar PDF: ${err.message || "Erro desconhecido"}`);
     },
   });
 
