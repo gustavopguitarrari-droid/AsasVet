@@ -83,7 +83,6 @@ const Veterinarios = () => {
   const { data: teamMembers = [], isLoading, error } = useQuery<TeamMember[]>({
     queryKey: ['teamMembers'],
     queryFn: async () => {
-      if (!userId) return [];
       const { data, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email, phone, crmv, role, avatar_url');
@@ -135,7 +134,6 @@ const Veterinarios = () => {
       const session = await supabase.auth.getSession();
       if (!session.data.session) throw new Error("User not authenticated.");
 
-      console.log("Attempting to invoke update-team-member-profile Edge Function...");
       const { data: responseData, error } = await supabase.functions.invoke('update-team-member-profile', {
         body: JSON.stringify({
           userIdToUpdate: updatedMemberData.id,
@@ -152,47 +150,18 @@ const Veterinarios = () => {
         },
       });
 
-      console.log("Supabase Functions Invoke Raw Response:");
-      console.log("  data:", responseData);
-      console.log("  error:", error);
-
-      if (error) {
-        let errorMessage = error.message;
-        console.error("Raw error object from invoke:", error); // Added log
-        if (error.context && error.context.data) {
-          console.error("error.context.data:", error.context.data); // Added log
-          try {
-            const errorData = JSON.parse(error.context.data);
-            if (errorData.error) {
-              errorMessage = errorData.error;
-            }
-          } catch (parseError) {
-            console.error("Failed to parse Edge Function error response context data:", parseError);
-          }
-        }
-        console.error("Error from supabase.functions.invoke:", errorMessage);
-        throw new Error(errorMessage);
-      }
-      
-      // If no error from invoke, check if the Edge Function itself returned an error in its body (status 200 with error payload)
-      if (responseData && responseData.error) {
-        console.error("Error reported by Edge Function in 200 response:", responseData.error);
-        throw new Error(responseData.error);
-      }
-
-      console.log("Edge Function invocation successful. Returning data:", responseData);
+      if (error) throw new Error(error.message);
+      if (responseData.error) throw new Error(responseData.error);
       return responseData;
     },
     onSuccess: () => {
-      console.log("updateSubuserRoleMutation: onSuccess callback triggered.");
       queryClient.invalidateQueries({ queryKey: ['teamMembers'] });
       showSuccess("Perfil do membro atualizado com sucesso!");
       setIsEditMemberDialogOpen(false);
       setIsDetailsDialogOpen(false); // Fecha o diálogo de detalhes se estiver aberto
     },
     onError: (err: any) => {
-      console.error("updateSubuserRoleMutation: onError callback triggered. Full error object:", err);
-      showError(`Erro ao atualizar cargo: ${err.message || "Erro desconhecido."}`);
+      showError(`Erro ao atualizar perfil: ${err.message}`);
     },
   });
 
@@ -305,12 +274,21 @@ const Veterinarios = () => {
         </TabsContent>
 
         <TabsContent value="equipe" className="mt-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4"> {/* Ajustado para flex-col em mobile e flex-row em md+ */}
             <RoleFilter selectedRole={selectedRole} onSelectRole={handleSelectRole} />
+            {isAdmin ? (
+              <Button onClick={() => setIsAddMemberDialogOpen(true)}>
+                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
+              </Button>
+            ) : (
+              <p className="text-destructive font-semibold flex items-center">
+                <AlertCircle className="h-5 w-5 mr-2" /> Apenas administradores podem adicionar membros.
+              </p>
+            )}
           </div>
 
-          <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2 mb-4">
-            <div className="relative flex-1 w-full">
+          <div className="flex items-center space-x-2 mt-4">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Buscar membros da equipe..."
@@ -319,16 +297,7 @@ const Veterinarios = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            {isAdmin ? (
-              <Button onClick={() => setIsAddMemberDialogOpen(true)} className="w-full md:w-auto">
-                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
-              </Button>
-            ) : (
-              <p className="text-destructive font-semibold flex items-center w-full md:w-auto">
-                <AlertCircle className="h-5 w-5 mr-2" /> Apenas administradores podem adicionar membros.
-              </p>
-            )}
-            <Button variant="outline" className="w-full md:w-auto">Filtrar</Button>
+            <Button variant="outline">Filtrar</Button>
           </div>
 
           <div className="rounded-md border mt-6">
