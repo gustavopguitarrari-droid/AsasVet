@@ -31,6 +31,9 @@ const AgendamentosMedicos = () => {
   const { user: appUser } = useUser();
   const organizationId = appUser?.organizationId;
 
+  // Adicionado console.log para depuração
+  console.log("AgendamentosMedicos: Current organizationId:", organizationId);
+
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = React.useState(false);
   const [defaultDateForNewEvent, setDefaultDateForNewEvent] = React.useState<Date | undefined>(undefined);
   const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null);
@@ -187,22 +190,19 @@ const AgendamentosMedicos = () => {
           />
         </div>
         <div className="flex space-x-2 shrink-0">
-          <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                {/* DialogTrigger é o filho direto de TooltipTrigger */}
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
                 <DialogTrigger asChild>
                   <Button className="font-bold" disabled={!organizationId}>
                     <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
                   </Button>
                 </DialogTrigger>
-              </TooltipTrigger>
-              {!organizationId && (
-                <TooltipContent side="bottom">
-                  Carregando informações da organização...
-                </TooltipContent>
-              )}
-            </Tooltip>
+            </TooltipTrigger>
+            {!organizationId && (
+              <TooltipContent side="bottom">
+                Carregando informações da organização...
+              </TooltipContent>
+            )}
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
