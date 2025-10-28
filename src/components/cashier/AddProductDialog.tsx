@@ -30,8 +30,8 @@ import { Product } from "@/types/cashier";
 const formSchema = z.object({
   name: z.string().min(1, "O nome é obrigatório."),
   price: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)), // Converte string vazia para undefined, depois para número
-    z.number().min(0.01, "O preço deve ser maior que zero.").optional() // Torna opcional para permitir campo vazio temporariamente
+    (val) => (val === "" ? undefined : Number(val)),
+    z.number().min(0.01, "O preço deve ser maior que zero.") // Changed to required
   ),
   category: z.enum(["Serviço", "Produto"], {
     required_error: "A categoria é obrigatória.",
@@ -45,40 +45,40 @@ interface AddProductDialogProps {
   onClose: () => void;
   onSubmit: (data: AddProductFormValues) => void;
   isSubmitting: boolean;
-  initialData?: Product; // NEW: Optional initial data for editing
+  initialData?: Product;
 }
 
-const AddProductDialog: React.FC<AddProductDialogProps> = ({ isOpen, onClose, onSubmit, isSubmitting, initialData }) => { // Added initialData
+const AddProductDialog: React.FC<AddProductDialogProps> = ({ isOpen, onClose, onSubmit, isSubmitting, initialData }) => {
   const form = useForm<AddProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: initialData?.name || "", // Use initialData
-      price: initialData?.price || undefined, // Use initialData, ou undefined para campo vazio
-      category: (initialData?.category as "Serviço" | "Produto") || "Produto", // Use initialData
+      name: initialData?.name || "",
+      price: initialData?.price || undefined,
+      category: (initialData?.category as "Serviço" | "Produto") || "Produto",
     },
   });
 
   React.useEffect(() => {
     if (isOpen) {
-      form.reset({ // Reset form with initialData when dialog opens
+      form.reset({
         name: initialData?.name || "",
         price: initialData?.price || undefined,
         category: (initialData?.category as "Serviço" | "Produto") || "Produto",
       });
     } else {
-      form.reset(); // Reset to empty when dialog closes
+      form.reset();
     }
-  }, [isOpen, form, initialData]); // Added initialData to dependencies
+  }, [isOpen, form, initialData]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <PlusCircle className="h-5 w-5 mr-2" /> {initialData ? "Editar Item" : "Adicionar Novo Item"} {/* Dynamic title */}
+            <PlusCircle className="h-5 w-5 mr-2" /> {initialData ? "Editar Item" : "Adicionar Novo Item"}
           </DialogTitle>
           <DialogDescription>
-            {initialData ? "Edite os detalhes do produto ou serviço." : "Adicione um novo produto ou serviço ao seu catálogo."} {/* Dynamic description */}
+            {initialData ? "Edite os detalhes do produto ou serviço." : "Adicione um novo produto ou serviço ao seu catálogo."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -113,7 +113,7 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({ isOpen, onClose, on
                       min="0.01"
                       placeholder="0.00"
                       {...field}
-                      value={field.value === undefined ? "" : field.value} // Garante que o valor seja string ou vazio
+                      value={field.value === undefined ? "" : String(field.value)}
                       onChange={(e) => {
                         const value = e.target.value;
                         field.onChange(value === "" ? undefined : parseFloat(value));
@@ -153,7 +153,7 @@ const AddProductDialog: React.FC<AddProductDialogProps> = ({ isOpen, onClose, on
               </Button>
               <Button type="submit" disabled={isSubmitting}>
                 <PlusCircle className="mr-2 h-4 w-4" />
-                {isSubmitting ? "Salvando..." : (initialData ? "Salvar Alterações" : "Adicionar Item")} {/* Dynamic button text */}
+                {isSubmitting ? "Salvando..." : (initialData ? "Salvar Alterações" : "Adicionar Item")}
               </Button>
             </DialogFooter>
           </form>

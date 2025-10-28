@@ -202,7 +202,7 @@ const Products = () => {
       {/* Novo contêiner flexível para filtros, busca e botão */}
       <div className="flex flex-col md:flex-row items-center justify-between flex-wrap gap-4">
         <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} options={productCategoryOptions} />
-        <div className="flex items-center space-x-2 w-full md:w-auto flex-1"> {/* Ajustado para ocupar espaço */}
+        <div className="flex items-center space-x-2 w-full md:w-auto flex-1">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -212,10 +212,9 @@ const Products = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          {/* O botão "Filtrar" foi removido, pois a filtragem já é reativa */}
           <Dialog open={isAddProductDialogOpen} onOpenChange={setIsAddProductDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="font-bold shrink-0"> {/* shrink-0 para evitar que o botão encolha */}
+              <Button className="font-bold shrink-0">
                 <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Item
               </Button>
             </DialogTrigger>
@@ -295,7 +294,7 @@ const Products = () => {
             <AddProductDialog
               isOpen={isEditProductDialogOpen}
               onClose={() => setIsEditProductDialogOpen(false)}
-              onSubmit={(data) => updateProductMutation.mutate({ ...data, id: productToEdit.id, user_id: userId! })} // Adicionado user_id
+              onSubmit={(data) => updateProductMutation.mutate({ ...data, id: productToEdit.id, user_id: userId!, name: data.name, price: data.price, category: data.category })}
               isSubmitting={updateProductMutation.isPending}
               initialData={productToEdit}
             />

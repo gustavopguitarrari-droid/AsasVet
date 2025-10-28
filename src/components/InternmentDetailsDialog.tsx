@@ -12,11 +12,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, Stethoscope, User, FlaskConical, XCircle, CheckCircle, Horse, Cow } from "lucide-react"; // Adicionado Horse e Cow
+import { Edit, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, Stethoscope, User, FlaskConical, XCircle, CheckCircle } from "lucide-react"; // Replaced Horse and Cow with MoreHorizontal
 import InternmentEditForm, { InternmentEditFormValues } from "./InternmentEditForm";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { InternedPatient } from "@/pages/Internacao"; // Importar a interface atualizada
+import { InternedPatient } from "@/pages/Internacao";
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -33,8 +33,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
-  Equino: Horse, // Adicionado Equino
-  Bovino: Cow,   // Adicionado Bovino
+  Equino: MoreHorizontal, // Adicionado Equino
+  Bovino: MoreHorizontal,   // Adicionado Bovino
   Outros: MoreHorizontal,
 };
 
@@ -93,7 +93,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
       species: data.species,
       risk: data.risk,
     };
-    console.log("InternmentDetailsDialog: Submitting form, updatedPatient:", updatedPatient); // Log para verificar
+    console.log("InternmentDetailsDialog: Submitting form, updatedPatient:", updatedPatient);
     onUpdate(updatedPatient);
     setIsEditing(false);
     onClose();
@@ -106,7 +106,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
         status: "Alta",
         expected_discharge_date: format(new Date(), "yyyy-MM-dd"),
       };
-      console.log("InternmentDetailsDialog: Registering discharge, updatedPatient:", updatedPatient); // Log para verificar
+      console.log("InternmentDetailsDialog: Registering discharge, updatedPatient:", updatedPatient);
       onUpdate(updatedPatient);
       onClose();
     }
@@ -119,7 +119,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
         status: "Óbito",
         expected_discharge_date: format(new Date(), "yyyy-MM-dd"),
       };
-      console.log("InternmentDetailsDialog: Registering obito, updatedPatient:", updatedPatient); // Log para verificar
+      console.log("InternmentDetailsDialog: Registering obito, updatedPatient:", updatedPatient);
       onUpdate(updatedPatient);
       onClose();
     }
@@ -235,7 +235,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Risco:</p>
-              <div className="col-span-2 text-sm"> {/* Alterado de <p> para <div> */}
+              <div className="col-span-2 text-sm">
                 <Badge className={cn(riskColorMap[patient.risk as RiskLevel], "text-white")}>
                   {patient.risk}
                 </Badge>

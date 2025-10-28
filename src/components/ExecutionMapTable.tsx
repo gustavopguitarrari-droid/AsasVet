@@ -10,12 +10,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Syringe, Utensils, Eye, FlaskConical, Check, Horse, Cow } from "lucide-react"; // Adicionado Horse e Cow
+import { Plus, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Syringe, Utensils, Eye, FlaskConical, Check } from "lucide-react"; // Replaced Horse and Cow with MoreHorizontal
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { InternedPatient, PatientAction } from "@/pages/Internacao"; // Importar as interfaces atualizadas
+import { InternedPatient, PatientAction } from "@/pages/Internacao";
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -33,8 +33,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
-  Equino: Horse, // Adicionado Equino
-  Bovino: Cow,   // Adicionado Bovino
+  Equino: MoreHorizontal, // Adicionado Equino
+  Bovino: MoreHorizontal,   // Adicionado Bovino
   Outros: MoreHorizontal,
 };
 
@@ -44,8 +44,8 @@ const speciesColorMap: { [key: string]: string } = {
   Pássaro: "text-sidebar-item-bg-3",
   Roedor: "text-sidebar-item-bg-7",
   Peixe: "text-sidebar-item-bg-5",
-  Equino: "text-sidebar-item-bg-2", // Cor para Equino
-  Bovino: "text-sidebar-item-bg-6", // Cor para Bovino
+  Equino: "text-sidebar-item-bg-2",
+  Bovino: "text-sidebar-item-bg-6",
   Outros: "text-sidebar-item-bg-9",
 };
 

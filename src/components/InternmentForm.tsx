@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import *s z from "zod";
+import * as z from "zod";
 import { format, parseISO, isValid } from "date-fns";
-import { CalendarIcon, Search, User, PawPrint, MoreHorizontal } from "lucide-react"; // Removido Horse e Cow, adicionado MoreHorizontal
+import { CalendarIcon, Search, User, PawPrint, MoreHorizontal } from "lucide-react";
 import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
@@ -25,23 +25,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { DialogFooter } from "@/components/ui/dialog";
 import RiskSelector from "./RiskSelector";
-import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
-import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
-import { Label } from "@/components/ui/label"; // Importar Label
-import { TeamMember } from "@/pages/Veterinarios"; // Importar TeamMember
+import { Client, Pet } from "@/types/cadastro";
+import { showError, showSuccess } from "@/utils/toast";
+import { Label } from "@/components/ui/label";
+import { TeamMember } from "@/pages/Veterinarios";
 
 const formSchema = z.object({
   bayName: z.string().min(1, "O nome da baia é obrigatório."),
   
   // Campos para seleção de cliente/pet
-  cpfSearch: z.string().optional(), // Campo para input de CPF
+  cpfSearch: z.string().optional(),
   selectedClientId: z.string().min(1, "Selecione um tutor."),
   selectedPetId: z.string().min(1, "Selecione um animal."),
 
   // Campos que serão preenchidos automaticamente e enviados na mutação
   petName: z.string().min(1, "O nome do animal é obrigatório."),
   ownerName: z.string().min(1, "O nome do tutor é obrigatório."),
-  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros", "Equino", "Bovino"], { // Espécies atualizadas
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros", "Equino", "Bovino"], {
     required_error: "A espécie do animal é obrigatória.",
   }),
 
@@ -65,7 +65,7 @@ interface InternmentFormProps {
   isSubmittingParent?: boolean;
   allClients: Client[];
   allPets: Pet[];
-  allVeterinarians: TeamMember[]; // NOVO: Lista de todos os veterinários
+  allVeterinarians: TeamMember[];
 }
 
 const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, initialData, isSubmittingParent = false, allClients, allPets, allVeterinarians }) => {
@@ -237,7 +237,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
               onChange={(e) => setCpfInput(e.target.value)}
               maxLength={11}
               className="flex-1"
-              disabled={!!initialData?.selectedClientId} // Desabilita se já houver um cliente inicial
+              disabled={!!initialData?.selectedClientId}
             />
             <Button type="button" onClick={handleSearchCpf} size="icon" disabled={!!initialData?.selectedClientId}>
               <Search className="h-4 w-4" />
@@ -391,7 +391,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
                     <Calendar
                       mode="single"
                       selected={field.value}
-                      onSelect={(date) => field.onChange(date)} // Explicitly handle date selection
+                      onSelect={(date) => field.onChange(date)}
                       initialFocus
                       locale={ptBR}
                     />
@@ -429,17 +429,17 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={field.value || undefined} // Handle null/undefined
-                      onSelect={(date) => field.onChange(date)} // Explicitly handle date selection
+                      selected={field.value || undefined}
+                      onSelect={(date) => field.onChange(date)}
                       initialFocus
                       locale={ptBR}
                     />
                   </PopoverContent>
                 </Popover>
                 <FormMessage />
-              </FormItem>
-            )}
-          />
+            </FormItem>
+          )}
+        />
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onCancel} type="button" disabled={isSubmittingParent}>

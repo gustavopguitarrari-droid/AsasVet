@@ -23,9 +23,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { DialogFooter } from "@/components/ui/dialog";
 import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
-import { Label } from "@/components/ui/label"; // Importar o componente Label
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"; // Importar Popover
-import { CalendarIcon, Search, User, PawPrint } from "lucide-react"; // Adicionado User e Search aqui
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon, Search, User, PawPrint } from "lucide-react";
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -44,50 +44,50 @@ const formSchema = z.object({
   time: z.string().min(1, "A hora da consulta é obrigatória."),
   
   // Campos para seleção de cliente/pet
-  cpfSearch: z.string().optional(), // Campo para input de CPF
+  cpfSearch: z.string().optional(),
   selectedClientId: z.string().min(1, "Selecione um tutor."),
   selectedPetId: z.string().min(1, "Selecione um animal."),
 
   // Campos que serão preenchidos automaticamente e enviados na mutação
   client: z.string().min(1, "O nome do cliente é obrigatório."),
   pet: z.string().min(1, "O nome do animal é obrigatório."),
-  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros"], {
+  species: z.enum(["Cachorro", "Gato", "Pássaro", "Roedor", "Peixe", "Outros", "Equino", "Bovino"], {
     required_error: "A espécie do animal é obrigatória.",
   }),
   service: z.enum(serviceOptions, {
     required_error: "O serviço é obrigatório.",
   }),
-  dateOption: z.enum(["today", "specific"]).default("today"), // NOVO: Adicionado dateOption
+  dateOption: z.enum(["today", "specific"]).default("today"),
 });
 
 export type AppointmentFormValues = z.infer<typeof formSchema>;
 
 interface AppointmentFormProps {
   onSubmit: (data: AppointmentFormValues) => void;
-  onCancel: () => void; // Adicionado prop onCancel
+  onCancel: () => void;
   initialData?: {
     time?: string;
     client?: string;
     pet?: string;
-    species?: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros";
+    species?: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros" | "Equino" | "Bovino";
     service?: typeof serviceOptions[number];
     veterinarian?: string;
     date?: string;
     status?: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
-    selectedClientId?: string; // Adicionado para initialData
-    selectedPetId?: string;   // Adicionado para initialData
-    dateOption?: "today" | "specific"; // NOVO: Adicionado dateOption
+    selectedClientId?: string;
+    selectedPetId?: string;
+    dateOption?: "today" | "specific";
   };
-  allClients: Client[]; // Lista de todos os clientes
-  allPets: Pet[];       // Lista de todos os pets
+  allClients: Client[];
+  allPets: Pet[];
 }
 
 const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, initialData, allClients, allPets }) => {
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      date: initialData?.date ? parseISO(initialData.date) : new Date(), // Data padrão para hoje
-      time: initialData?.time || format(new Date(), "HH:mm"), // Define o horário atual como padrão
+      date: initialData?.date ? parseISO(initialData.date) : new Date(),
+      time: initialData?.time || format(new Date(), "HH:mm"),
       
       cpfSearch: "",
       selectedClientId: initialData?.selectedClientId || "",
@@ -97,7 +97,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
       pet: initialData?.pet || "",
       species: initialData?.species || "Cachorro",
       service: initialData?.service || serviceOptions[0],
-      dateOption: initialData?.dateOption || "today", // NOVO: Valor padrão para dateOption
+      dateOption: initialData?.dateOption || "today",
     },
   });
 
@@ -108,8 +108,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
   // Reset form and states when initialData changes (e.g., dialog opens for new appointment)
   useEffect(() => {
     form.reset({
-      date: initialData?.date ? parseISO(initialData.date) : new Date(), // Resetar data para hoje
-      time: initialData?.time || format(new Date(), "HH:mm"), // Garante que o horário seja atualizado ao reabrir
+      date: initialData?.date ? parseISO(initialData.date) : new Date(),
+      time: initialData?.time || format(new Date(), "HH:mm"),
       
       cpfSearch: "",
       selectedClientId: initialData?.selectedClientId || "",
@@ -119,7 +119,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
       pet: initialData?.pet || "",
       species: initialData?.species || "Cachorro",
       service: initialData?.service || serviceOptions[0],
-      dateOption: initialData?.dateOption || "today", // NOVO: Resetar dateOption
+      dateOption: initialData?.dateOption || "today",
     });
     setCpfInput("");
     setSelectedClientFromSearch(null);
@@ -132,7 +132,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
         setSelectedClientFromSearch(client);
         form.setValue("selectedClientId", client.id);
         form.setValue("client", client.name);
-        setCpfInput(client.cpf); // Pre-fill CPF input
+        setCpfInput(client.cpf);
       }
     }
     if (initialData?.selectedPetId) {
