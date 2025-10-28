@@ -545,6 +545,11 @@ const Cadastro = () => {
     setIsClientDetailsDialogOpen(true);
   };
 
+  const handlePetRowClick = (pet: Pet) => {
+    setSelectedPet(pet);
+    setIsPetDetailsDialogOpen(true);
+  };
+
   const handleAddPet = (data: PetFormValues) => {
     addPetMutation.mutate(data);
   };
