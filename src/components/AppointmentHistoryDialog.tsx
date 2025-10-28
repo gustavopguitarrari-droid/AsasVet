@@ -44,6 +44,7 @@ import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecord
 import PdfPreviewDialog from "./PdfPreviewDialog";
 import { useUser } from "@/context/UserContext";
 import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf'; // NOVO: Importar função de PDF de receita
+import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase } from '@/utils/supabaseStorage'; // NOVO: Funções de storage para receita
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -114,6 +115,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   // Estados para o diálogo de pré-visualização de PDF de receita
   const [isRecipePdfPreviewDialogOpen, setIsRecipePdfPreviewDialogOpen] = useState(false);
   const [recipePdfBlob, setRecipePdfBlob] = useState<Blob | null>(null);
+  const [recipePdfUrl, setRecipePdfUrl] = useState<string | null>(null); // NOVO: Para URL direta
   const [recipePdfFilename, setRecipePdfFilename] = useState("");
 
   // Mutation to fetch the medical record and generate the PDF
@@ -179,7 +181,12 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   // NOVO: Mutação para buscar o prontuário médico e gerar o PDF da receita
   const fetchAndGenerateRecipePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
-      // First, fetch the medical record to get prescriptions
+      // Se já existe uma URL de PDF de receita, use-a diretamente
+      if (appointment.recipe_pdf_url) {
+        return { pdfUrl: appointment.recipe_pdf_url, appointment };
+      }
+
+      // Caso contrário, busque as prescrições e gere o PDF
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
         .select('id, prescriptions')
@@ -214,10 +221,26 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         clinicDetails,
       });
 
-      return { pdfBlob, appointment };
+      // Upload the newly generated PDF and get its URL
+      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, userId!, appointment.id);
+      if (!newPdfUrl) {
+        throw new Error("Falha ao fazer upload do PDF da receita.");
+      }
+
+      // Update the medical record with the new PDF URL
+      await supabase
+        .from('medical_records')
+        .update({ recipe_pdf_url: newPdfUrl })
+        .eq('id', medicalRecordData.id)
+        .eq('user_id', userId);
+
+      return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
-    onSuccess: ({ pdfBlob, appointment }) => {
-      setRecipePdfBlob(pdfBlob);
+    onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalida para atualizar recipe_pdf_url
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      setRecipePdfBlob(pdfBlob || null); // Pode ser null se a URL existente foi usada
+      setRecipePdfUrl(pdfUrl || null); // Define a URL direta
       setRecipePdfFilename(`Receita_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
       setIsRecipePdfPreviewDialogOpen(true);
     },
@@ -265,36 +288,28 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   };
 
   // Handler to confirm PDF download
-  const handleConfirmPdfDownload = (filename: string) => {
-    if (pdfBlob) {
-      // Create a download link
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      showSuccess("PDF do prontuário baixado com sucesso!");
-      setIsPdfPreviewDialogOpen(false);
-    }
+  const handleConfirmPdfDownload = (filename: string, downloadUrl: string) => {
+    // Create a download link
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    showSuccess("PDF do prontuário baixado com sucesso!");
+    setIsPdfPreviewDialogOpen(false);
   };
 
-  const handleConfirmRecipePdfDownload = (filename: string) => {
-    if (recipePdfBlob) {
-      const url = URL.createObjectURL(recipePdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showSuccess("PDF da receita baixado com sucesso!");
-      setIsRecipePdfPreviewDialogOpen(false);
-    }
+  const handleConfirmRecipePdfDownload = (filename: string, downloadUrl: string) => {
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showSuccess("PDF da receita baixado com sucesso!");
+    setIsRecipePdfPreviewDialogOpen(false);
   };
 
   return (
@@ -492,6 +507,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         isOpen={isRecipePdfPreviewDialogOpen}
         onClose={() => setIsRecipePdfPreviewDialogOpen(false)}
         pdfBlob={recipePdfBlob}
+        pdfUrl={recipePdfUrl} // Passa a URL direta
         filename={recipePdfFilename}
         onConfirmDownload={handleConfirmRecipePdfDownload}
       />

@@ -16,35 +16,42 @@ import { showError } from '@/utils/toast';
 interface PdfPreviewDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  pdfBlob: Blob | null;
+  pdfBlob: Blob | null; // Pode ser null se pdfUrl for fornecido
+  pdfUrl?: string | null; // Nova prop para URL direta
   filename: string;
-  onConfirmDownload: (filename: string) => void;
+  onConfirmDownload: (filename: string, downloadUrl: string) => void; // onConfirmDownload agora recebe a URL para download
 }
 
 const PdfPreviewDialog: React.FC<PdfPreviewDialogProps> = ({
   isOpen,
   onClose,
   pdfBlob,
+  pdfUrl, // Usar a nova prop
   filename,
   onConfirmDownload,
 }) => {
-  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [internalPdfUrl, setInternalPdfUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (pdfBlob) {
-      const url = URL.createObjectURL(pdfBlob);
-      setPdfUrl(url);
-      
-      // Clean up the object URL when the component unmounts or blob changes
-      return () => URL.revokeObjectURL(url);
+    if (isOpen) {
+      if (pdfUrl) {
+        setInternalPdfUrl(pdfUrl); // Prioriza a URL direta
+      } else if (pdfBlob) {
+        const url = URL.createObjectURL(pdfBlob);
+        setInternalPdfUrl(url);
+        // Clean up the object URL when the component unmounts or blob changes
+        return () => URL.revokeObjectURL(url);
+      } else {
+        setInternalPdfUrl(null);
+      }
     } else {
-      setPdfUrl(null);
+      setInternalPdfUrl(null); // Limpa a URL interna ao fechar o diálogo
     }
-  }, [pdfBlob]);
+  }, [isOpen, pdfBlob, pdfUrl]); // Adicionado pdfUrl como dependência
 
   const handleDownload = () => {
-    if (pdfBlob) {
-      onConfirmDownload(filename);
+    if (internalPdfUrl) {
+      onConfirmDownload(filename, internalPdfUrl); // Passa a URL interna para download
     } else {
       showError("Não foi possível baixar o PDF.");
     }
@@ -63,9 +70,9 @@ const PdfPreviewDialog: React.FC<PdfPreviewDialogProps> = ({
         </DialogHeader>
         
         <div className="flex-1 overflow-hidden rounded-lg border bg-muted">
-          {pdfUrl ? (
+          {internalPdfUrl ? (
             <iframe
-              src={pdfUrl}
+              src={internalPdfUrl}
               className="w-full h-full min-h-[500px]"
               title="PDF Preview"
               style={{ border: 'none' }}

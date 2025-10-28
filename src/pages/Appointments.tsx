@@ -113,6 +113,7 @@ const Appointments = () => {
   // Estados para o diálogo de pré-visualização de PDF de receita
   const [isRecipePdfPreviewDialogOpen, setIsRecipePdfPreviewDialogOpen] = useState(false);
   const [recipePdfBlob, setRecipePdfBlob] = useState<Blob | null>(null);
+  const [recipePdfUrl, setRecipePdfUrl] = useState<string | null>(null); // NOVO: Para URL direta
   const [recipePdfFilename, setRecipePdfFilename] = useState("");
 
   // NOVO: Efeito para atualizar o título da página com base na aba ativa
@@ -461,7 +462,12 @@ const Appointments = () => {
   // NOVO: Mutação para buscar o prontuário médico e gerar o PDF da receita
   const fetchAndGenerateRecipePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
-      // First, fetch the medical record to get prescriptions
+      // Se já existe uma URL de PDF de receita, use-a diretamente
+      if (appointment.recipe_pdf_url) {
+        return { pdfUrl: appointment.recipe_pdf_url, appointment };
+      }
+
+      // Caso contrário, busque as prescrições e gere o PDF
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
         .select('id, prescriptions')
@@ -496,10 +502,26 @@ const Appointments = () => {
         clinicDetails,
       });
 
-      return { pdfBlob, appointment };
+      // Upload the newly generated PDF and get its URL
+      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, userId!, appointment.id);
+      if (!newPdfUrl) {
+        throw new Error("Falha ao fazer upload do PDF da receita.");
+      }
+
+      // Update the medical record with the new PDF URL
+      await supabase
+        .from('medical_records')
+        .update({ recipe_pdf_url: newPdfUrl })
+        .eq('id', medicalRecordData.id)
+        .eq('user_id', userId);
+
+      return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
-    onSuccess: ({ pdfBlob, appointment }) => {
-      setRecipePdfBlob(pdfBlob);
+    onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalida para atualizar recipe_pdf_url
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      setRecipePdfBlob(pdfBlob || null); // Pode ser null se a URL existente foi usada
+      setRecipePdfUrl(pdfUrl || null); // Define a URL direta
       setRecipePdfFilename(`Receita_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
       setIsRecipePdfPreviewDialogOpen(true);
     },
@@ -603,36 +625,28 @@ const Appointments = () => {
   };
 
   // Handler to confirm PDF download
-  const handleConfirmPdfDownload = (filename: string) => {
-    if (pdfBlob) {
-      // Create a download link
-      const url = URL.createObjectURL(pdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      showSuccess("PDF do prontuário baixado com sucesso!");
-      setIsPdfPreviewDialogOpen(false);
-    }
+  const handleConfirmPdfDownload = (filename: string, downloadUrl: string) => {
+    // Create a download link
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    
+    showSuccess("PDF do prontuário baixado com sucesso!");
+    setIsPdfPreviewDialogOpen(false);
   };
 
-  const handleConfirmRecipePdfDownload = (filename: string) => {
-    if (recipePdfBlob) {
-      const url = URL.createObjectURL(recipePdfBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      showSuccess("PDF da receita baixado com sucesso!");
-      setIsRecipePdfPreviewDialogOpen(false);
-    }
+  const handleConfirmRecipePdfDownload = (filename: string, downloadUrl: string) => {
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showSuccess("PDF da receita baixado com sucesso!");
+    setIsRecipePdfPreviewDialogOpen(false);
   };
 
   if (isLoading || isLoadingClients || isLoadingPets || isLoadingHistory) {
@@ -975,6 +989,7 @@ const Appointments = () => {
         isOpen={isRecipePdfPreviewDialogOpen}
         onClose={() => setIsRecipePdfPreviewDialogOpen(false)}
         pdfBlob={recipePdfBlob}
+        pdfUrl={recipePdfUrl} // Passa a URL direta
         filename={recipePdfFilename}
         onConfirmDownload={handleConfirmRecipePdfDownload}
       />
