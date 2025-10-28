@@ -43,8 +43,8 @@ import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf";
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
 import PdfPreviewDialog from "./PdfPreviewDialog";
 import { useUser } from "@/context/UserContext";
-import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf'; // NOVO: Importar função de PDF de receita
-import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase } from '@/utils/supabaseStorage'; // NOVO: Funções de storage para receita
+import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf';
+import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase } from '@/utils/supabaseStorage';
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -56,7 +56,7 @@ interface MedicalRecord {
   diagnosis?: string | null;
   treatment?: string | null;
   prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
-  recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
+  recipe_pdf_url?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -105,6 +105,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>("");
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
+  const userId = appUser?.id;
 
   // States for PDF preview dialog
   const [isPdfPreviewDialogOpen, setIsPdfPreviewDialogOpen] = useState(false);
@@ -121,12 +122,15 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   // Mutation to fetch the medical record and generate the PDF
   const fetchAndGeneratePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
+      if (!userId) throw new Error("User not authenticated.");
+      const currentUserId: string = userId; // Captura userId como string não nula
+
       // First, fetch the medical record
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
         .eq('appointment_id', appointment.id)
-        .eq('user_id', appointment.user_id)
+        .eq('user_id', currentUserId) // Usa currentUserId
         .single();
 
       if (fetchError) {
@@ -167,6 +171,8 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       return { blob, appointment };
     },
     onSuccess: ({ blob, appointment }) => {
+      if (!userId) return; // Guard clause
+      const currentUserId: string = userId; // Captura userId como string não nula
       setPdfBlob(blob);
       setPdfFilename(`Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
       setPdfAppointment(appointment);
@@ -181,6 +187,9 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   // NOVO: Mutação para buscar o prontuário médico e gerar o PDF da receita
   const fetchAndGenerateRecipePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
+      if (!userId) throw new Error("User not authenticated.");
+      const currentUserId: string = userId; // Captura userId como string não nula
+
       console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url);
       // Se já existe uma URL de PDF de receita, use-a diretamente
       if (appointment.recipe_pdf_url) {
@@ -194,7 +203,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         .from('medical_records')
         .select('id, prescriptions')
         .eq('appointment_id', appointment.id)
-        .eq('user_id', appointment.user_id)
+        .eq('user_id', currentUserId) // Usa currentUserId
         .single();
 
       if (fetchError) {
@@ -225,7 +234,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       });
 
       // Upload the newly generated PDF and get its URL
-      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, userId!, appointment.id);
+      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, currentUserId, appointment.id); // Usa currentUserId
       console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
       if (!newPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF da receita.");
@@ -236,14 +245,16 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         .from('medical_records')
         .update({ recipe_pdf_url: newPdfUrl })
         .eq('id', medicalRecordData.id)
-        .eq('user_id', userId);
+        .eq('user_id', currentUserId); // Usa currentUserId
       console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Medical record updated with new recipe_pdf_url.");
 
       return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
     onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalida para atualizar recipe_pdf_url
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      if (!userId) return; // Guard clause
+      const currentUserId: string = userId; // Captura userId como string não nula
+      queryClient.invalidateQueries({ queryKey: ['appointments', currentUserId] }); // Usa currentUserId
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', currentUserId] }); // Usa currentUserId
       setRecipePdfBlob(pdfBlob || null); // Pode ser null se a URL existente foi usada
       setRecipePdfUrl(pdfUrl || null); // Define a URL direta
       setRecipePdfFilename(`Receita_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
@@ -352,8 +363,8 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                   <TableHead>Finalização/Cancelamento</TableHead>
                   <TableHead>Duração</TableHead>
                   <TableHead>Tempo de Espera</TableHead>
-                  <TableHead>Receitas</TableHead> {/* NOVO: Coluna Receitas */}
-                  <TableHead className="text-right">Prontuário / Receita</TableHead> {/* Alterado de 'Ações' para 'Prontuário' */}
+                  <TableHead>Receitas</TableHead>
+                  <TableHead className="text-right">Prontuário / Receita</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -419,7 +430,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                             <Pill className="h-4 w-4" />
                             <span>{appointment.prescriptions_count || 0}</span>
                           </Button>
-                        </TableCell> {/* NOVO: Exibe a contagem de prescrições */}
+                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end space-x-2">
                             <Button
@@ -512,7 +523,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         isOpen={isRecipePdfPreviewDialogOpen}
         onClose={() => setIsRecipePdfPreviewDialogOpen(false)}
         pdfBlob={recipePdfBlob}
-        pdfUrl={recipePdfUrl} // Passa a URL direta
+        pdfUrl={recipePdfUrl}
         filename={recipePdfFilename}
         onConfirmDownload={handleConfirmRecipePdfDownload}
       />
