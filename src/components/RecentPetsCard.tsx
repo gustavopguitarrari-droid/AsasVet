@@ -66,13 +66,13 @@ const RecentPetsCard: React.FC = () => {
 
   if (isLoadingPets || isLoadingClients) {
     return (
-      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md")}> {/* Adicionada cor de fundo */}
+      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md flex flex-col h-full")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Últimos Animais Cadastrados</CardTitle>
-          <PawPrint className="h-4 w-4 text-white" /> {/* Ícone branco */}
+          <PawPrint className="h-4 w-4 text-white" />
         </CardHeader>
-        <CardContent>
-          <p className="text-white/80">Carregando...</p> {/* Texto branco */}
+        <CardContent className="flex-1">
+          <p className="text-white/80">Carregando...</p>
         </CardContent>
       </Card>
     );
@@ -80,26 +80,26 @@ const RecentPetsCard: React.FC = () => {
 
   if (petsError || clientsError) {
     return (
-      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md")}> {/* Adicionada cor de fundo */}
+      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md flex flex-col h-full")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Últimos Animais Cadastrados</CardTitle>
-          <PawPrint className="h-4 w-4 text-white" /> {/* Ícone branco */}
+          <PawPrint className="h-4 w-4 text-white" />
         </CardHeader>
-        <CardContent>
-          <p className="text-white/80">Erro ao carregar dados.</p> {/* Texto branco */}
+        <CardContent className="flex-1">
+          <p className="text-white/80">Erro ao carregar dados.</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Link to="/cadastro" state={{ activeTab: "animais" }} className="block"> {/* O card inteiro é um link */}
-      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer")}> {/* Adicionada cor de fundo e estilos de hover */}
+    <Link to="/cadastro" state={{ activeTab: "animais" }} className="block">
+      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full")}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Últimos Animais Cadastrados</CardTitle>
           <PawPrint className="h-4 w-4 text-white" />
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1">
           {recentPets.length === 0 ? (
             <p className="text-white/80 text-sm">Nenhum animal cadastrado recentemente.</p>
           ) : (
@@ -109,17 +109,16 @@ const RecentPetsCard: React.FC = () => {
                 const ownerName = clientMap.get(pet.ownerId) || "Tutor Desconhecido";
                 return (
                   <li key={pet.id} className="flex items-center space-x-2">
-                    <IconComponent className="h-4 w-4 text-white/80" /> {/* Ícone branco */}
+                    <IconComponent className="h-4 w-4 text-white/80" />
                     <div className="flex-1">
                       <p className="text-sm font-medium">{pet.name}</p>
-                      <p className="text-xs text-white/80">Tutor: {ownerName}</p> {/* Texto branco */}
+                      <p className="text-xs text-white/80">Tutor: {ownerName}</p>
                     </div>
                   </li>
                 );
               })}
             </ul>
           )}
-          {/* Removido o link "Ver Todos" */}
         </CardContent>
       </Card>
     </Link>
