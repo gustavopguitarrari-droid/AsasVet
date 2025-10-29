@@ -299,11 +299,16 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {isLoadingInternedPatients ? "..." : internedPatientsCount.toLocaleString('pt-BR')}
+                  {isLoadingInternedPatients ? (
+                    "..."
+                  ) : (
+                    <>
+                      {internedPatientsCount.toLocaleString('pt-BR')}{" "}
+                      {internedPatientsCount === 1 ? "Animal" : "Animais"}
+                    </>
+                  )}
                 </div>
-                <p className={textMutedClasses}>
-                  {isLoadingInternedPatients ? "" : `${internedPatientsCount === 1 ? "Animal" : "Animais"} atualmente internados`}
-                </p>
+                <p className={textMutedClasses}>atualmente internados</p>
               </CardContent>
             </Card>
           </Link>
