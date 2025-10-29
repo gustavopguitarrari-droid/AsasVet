@@ -6,20 +6,20 @@ import DashboardConfigurator from "@/components/DashboardConfigurator";
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Link } from "react-router-dom"; // Importar Link
-import { useQuery } from "@tanstack/react-query"; // Importar useQuery
-import { supabase } from "@/integrations/supabase/client"; // Importar supabase
-import { format } from "date-fns"; // Importar format
+import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
 import AppointmentsWeeklyChart from "@/components/charts/AppointmentsWeeklyChart";
 import RevenueMonthlyChart from "@/components/charts/RevenueMonthlyChart";
 import PetsBySpeciesChart from "@/components/charts/PetsBySpeciesChart";
-import AverageWaitingTimeCard from "@/components/AverageWaitingTimeCard"; // Importar o card de tempo de espera
-import AverageConsultationTimeCard from "@/components/AverageConsultationTimeCard"; // Importar o novo card de tempo de consulta
-import UpcomingEventsCard from "@/components/UpcomingEventsCard"; // Importar o novo componente de Próximos Eventos
-import RecentPetsCard from "@/components/RecentPetsCard"; // NOVO: Importar o RecentPetsCard
+import AverageWaitingTimeCard from "@/components/AverageWaitingTimeCard";
+import AverageConsultationTimeCard from "@/components/AverageConsultationTimeCard";
+import UpcomingEventsCard from "@/components/UpcomingEventsCard";
+import RecentPetsCard from "@/components/RecentPetsCard";
 
 interface DashboardItemConfig {
   id: string;
@@ -29,18 +29,18 @@ interface DashboardItemConfig {
 }
 
 const initialDashboardConfig: DashboardItemConfig[] = [
-  { id: "totalClients", name: "Total de Tutores", isVisible: true, category: "overview" }, // Renomeado de 'Total de Clientes' para 'Total de Tutores'
+  { id: "totalClients", name: "Total de Tutores", isVisible: true, category: "overview" },
   { id: "totalPets", name: "Total de Animais", isVisible: true, category: "overview" },
   { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview" },
   { id: "averageWaitingTime", name: "Média de Tempo de Espera", isVisible: true, category: "overview" },
-  { id: "averageConsultationTime", name: "Média de Tempo da Consulta", isVisible: true, category: "overview" }, // Novo item
-  { id: "recentPets", name: "Últimos Animais Cadastrados", isVisible: true, category: "overview" }, // NOVO: Adicionado o card de últimos animais
-  { id: "upcomingEvents", name: "Próximos Eventos", isVisible: true, category: "recentActivity" }, // Renomeado e ajustado
+  { id: "averageConsultationTime", name: "Média de Tempo da Consulta", isVisible: true, category: "overview" },
+  { id: "recentPets", name: "Últimos Animais Cadastrados", isVisible: true, category: "overview" },
+  { id: "upcomingEvents", name: "Próximos Eventos", isVisible: true, category: "recentActivity" },
   { id: "financialSummary", name: "Resumo Financeiro", isVisible: true, category: "financial" },
   { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial" },
   { id: "internmentStatus", name: "Status de Internação", isVisible: true, category: "animalHealth" },
   { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true, category: "animalHealth" },
-  { id: "medicalRecordsSummary", name: "Resumo da Agenda", isVisible: true, category: "animalHealth" }, // Nome atualizado
+  { id: "medicalRecordsSummary", name: "Resumo da Agenda", isVisible: true, category: "animalHealth" },
   // Novos itens de gráfico
   { id: "appointmentsMonthlyChart", name: "Consultas por Mês (Gráfico)", isVisible: true, category: "animalHealth" },
   { id: "appointmentsWeeklyChart", name: "Consultas por Semana (Gráfico)", isVisible: true, category: "animalHealth" },
@@ -54,7 +54,7 @@ const Dashboard = () => {
     initialDashboardConfig
   );
   const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "animalHealth" | "recentActivity">("recentActivity");
-  const [vetsOnDutyToday, setVetsOnDutyToday] = React.useState<number>(0); // Novo estado para veterinários de plantão
+  const [vetsOnDutyToday, setVetsOnDutyToday] = React.useState<number>(0);
 
   const { user } = useUser();
   const userId = user?.id;
@@ -84,7 +84,7 @@ const Dashboard = () => {
       if (!userId) return 0;
       const { count, error } = await supabase
         .from('pets')
-        .select('*', { count: 'exact' }); // RLS deve garantir que apenas pets do usuário sejam contados
+        .select('*', { count: 'exact' });
       if (error) {
         console.error("Erro ao buscar contagem de pets:", error);
         throw error;
@@ -100,15 +100,15 @@ const Dashboard = () => {
     queryFn: async () => {
       if (!userId) return 0;
       const { count, error } = await supabase
-        .from('events') // Alterado de 'appointments' para 'events'
+        .from('events')
         .select('*', { count: 'exact' })
         .eq('user_id', userId)
-        .eq('status', 'Agendada'); // Filtra por status "Agendada"
+        .eq('status', 'Agendada');
       if (error) {
         console.error("Erro ao buscar contagem de consultas agendadas (events):", error);
         throw error;
       }
-      console.log("Contagem de consultas agendadas (events) do Supabase:", count); // Log para depuração
+      console.log("Contagem de consultas agendadas (events) do Supabase:", count);
       return count || 0;
     },
     enabled: !!userId,
@@ -185,7 +185,7 @@ const Dashboard = () => {
         setVetsOnDutyToday(0);
       }
     }
-  }, []); // Executa apenas uma vez no carregamento do componente
+  }, []);
 
   const handleSaveConfig = (newConfig: DashboardItemConfig[]) => {
     setDashboardConfig(newConfig);
@@ -217,7 +217,7 @@ const Dashboard = () => {
         );
       case "totalPets":
         return (
-          <Link to="/cadastro" state={{ activeTab: "animais" }} key={item.id} className="block"> {/* Adicionado Link com state aqui */}
+          <Link to="/cadastro" state={{ activeTab: "animais" }} key={item.id} className="block">
             <Card className={cn("bg-indigo-600", baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total de Animais</CardTitle>
@@ -257,11 +257,11 @@ const Dashboard = () => {
         );
       case "averageWaitingTime":
         return <AverageWaitingTimeCard key={item.id} />;
-      case "averageConsultationTime": // Novo case para o card de média de tempo da consulta
+      case "averageConsultationTime":
         return <AverageConsultationTimeCard key={item.id} />;
-      case "recentPets": // NOVO: Renderiza o RecentPetsCard
+      case "recentPets":
         return <RecentPetsCard key={item.id} />;
-      case "upcomingEvents": // Novo case para o card de Próximos Eventos
+      case "upcomingEvents":
         return <UpcomingEventsCard key={item.id} />;
       case "financialSummary":
         return (
@@ -299,9 +299,11 @@ const Dashboard = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {isLoadingInternedPatients ? "..." : internedPatientsCount.toLocaleString('pt-BR')} Animal{internedPatientsCount !== 1 ? 'is' : ''}
+                  {isLoadingInternedPatients ? "..." : internedPatientsCount.toLocaleString('pt-BR')}
                 </div>
-                <p className={textMutedClasses}>Atualmente internados</p>
+                <p className={textMutedClasses}>
+                  {internedPatientsCount === 1 ? "Animal" : "Animais"} atualmente internados
+                </p>
               </CardContent>
             </Card>
           </Link>
@@ -351,19 +353,19 @@ const Dashboard = () => {
     if (!user) {
       return "Bem-vindo(a) ao AsasVet!";
     }
-    const prefix = user.gender === "Feminino" ? "Dra." : "Dr."; // Ajustado para "Feminino"
+    const prefix = user.gender === "Feminino" ? "Dra." : "Dr.";
     return `Bem-vindo(a) ${prefix} ${user.name}!`;
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4"> {/* Adicionado flex container para logo e texto */}
+        <div className="flex items-center space-x-4">
           {user?.logoUrl && (
             <img
               src={user.logoUrl}
               alt="Logo da Clínica"
-              className="h-24 w-auto max-w-[150px] object-contain" // Removido rounded-md e shadow-sm
+              className="h-24 w-auto max-w-[150px] object-contain"
             />
           )}
           <div>
