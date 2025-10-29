@@ -302,7 +302,7 @@ const Dashboard = () => {
                   {isLoadingInternedPatients ? "..." : internedPatientsCount.toLocaleString('pt-BR')}
                 </div>
                 <p className={textMutedClasses}>
-                  {internedPatientsCount === 1 ? "Animal" : "Animais"} atualmente internados
+                  {isLoadingInternedPatients ? "" : `${internedPatientsCount === 1 ? "Animal" : "Animais"} atualmente internados`}
                 </p>
               </CardContent>
             </Card>
