@@ -66,13 +66,13 @@ const RecentPetsCard: React.FC = () => {
 
   if (isLoadingPets || isLoadingClients) {
     return (
-      <Card className="col-span-1">
+      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md")}> {/* Adicionada cor de fundo */}
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Últimos Animais Cadastrados</CardTitle>
-          <PawPrint className="h-4 w-4 text-muted-foreground" />
+          <PawPrint className="h-4 w-4 text-white" /> {/* Ícone branco */}
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Carregando...</p>
+          <p className="text-white/80">Carregando...</p> {/* Texto branco */}
         </CardContent>
       </Card>
     );
@@ -80,51 +80,49 @@ const RecentPetsCard: React.FC = () => {
 
   if (petsError || clientsError) {
     return (
-      <Card className="col-span-1">
+      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md")}> {/* Adicionada cor de fundo */}
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Últimos Animais Cadastrados</CardTitle>
-          <PawPrint className="h-4 w-4 text-destructive" />
+          <PawPrint className="h-4 w-4 text-white" /> {/* Ícone branco */}
         </CardHeader>
         <CardContent>
-          <p className="text-destructive">Erro ao carregar dados.</p>
+          <p className="text-white/80">Erro ao carregar dados.</p> {/* Texto branco */}
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="col-span-1">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Últimos Animais Cadastrados</CardTitle>
-        <PawPrint className="h-4 w-4 text-muted-foreground" />
-      </CardHeader>
-      <CardContent>
-        {recentPets.length === 0 ? (
-          <p className="text-muted-foreground text-sm">Nenhum animal cadastrado recentemente.</p>
-        ) : (
-          <ul className="space-y-2">
-            {recentPets.map((pet) => {
-              const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
-              const ownerName = clientMap.get(pet.ownerId) || "Tutor Desconhecido";
-              return (
-                <li key={pet.id} className="flex items-center space-x-2">
-                  <IconComponent className="h-4 w-4 text-muted-foreground" />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{pet.name}</p>
-                    <p className="text-xs text-muted-foreground">Tutor: {ownerName}</p>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-        <Link to="/cadastro" state={{ activeTab: "animais" }} className="mt-4 block text-right text-sm text-primary hover:underline">
-          <span className="flex items-center justify-end">
-            Ver Todos <ArrowRight className="ml-1 h-3 w-3" />
-          </span>
-        </Link>
-      </CardContent>
-    </Card>
+    <Link to="/cadastro" state={{ activeTab: "animais" }} className="block"> {/* O card inteiro é um link */}
+      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer")}> {/* Adicionada cor de fundo e estilos de hover */}
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Últimos Animais Cadastrados</CardTitle>
+          <PawPrint className="h-4 w-4 text-white" />
+        </CardHeader>
+        <CardContent>
+          {recentPets.length === 0 ? (
+            <p className="text-white/80 text-sm">Nenhum animal cadastrado recentemente.</p>
+          ) : (
+            <ul className="space-y-2">
+              {recentPets.map((pet) => {
+                const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
+                const ownerName = clientMap.get(pet.ownerId) || "Tutor Desconhecido";
+                return (
+                  <li key={pet.id} className="flex items-center space-x-2">
+                    <IconComponent className="h-4 w-4 text-white/80" /> {/* Ícone branco */}
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{pet.name}</p>
+                      <p className="text-xs text-white/80">Tutor: {ownerName}</p> {/* Texto branco */}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          {/* Removido o link "Ver Todos" */}
+        </CardContent>
+      </Card>
+    </Link>
   );
 };
 
