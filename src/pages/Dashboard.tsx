@@ -19,6 +19,7 @@ import PetsBySpeciesChart from "@/components/charts/PetsBySpeciesChart";
 import AverageWaitingTimeCard from "@/components/AverageWaitingTimeCard"; // Importar o card de tempo de espera
 import AverageConsultationTimeCard from "@/components/AverageConsultationTimeCard"; // Importar o novo card de tempo de consulta
 import UpcomingEventsCard from "@/components/UpcomingEventsCard"; // Importar o novo componente de Próximos Eventos
+import RecentPetsCard from "@/components/RecentPetsCard"; // NOVO: Importar o RecentPetsCard
 
 interface DashboardItemConfig {
   id: string;
@@ -33,6 +34,7 @@ const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview" },
   { id: "averageWaitingTime", name: "Média de Tempo de Espera", isVisible: true, category: "overview" },
   { id: "averageConsultationTime", name: "Média de Tempo da Consulta", isVisible: true, category: "overview" }, // Novo item
+  { id: "recentPets", name: "Últimos Animais Cadastrados", isVisible: true, category: "overview" }, // NOVO: Adicionado o card de últimos animais
   { id: "upcomingEvents", name: "Próximos Eventos", isVisible: true, category: "recentActivity" }, // Renomeado e ajustado
   { id: "financialSummary", name: "Resumo Financeiro", isVisible: true, category: "financial" },
   { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial" },
@@ -257,6 +259,8 @@ const Dashboard = () => {
         return <AverageWaitingTimeCard key={item.id} />;
       case "averageConsultationTime": // Novo case para o card de média de tempo da consulta
         return <AverageConsultationTimeCard key={item.id} />;
+      case "recentPets": // NOVO: Renderiza o RecentPetsCard
+        return <RecentPetsCard key={item.id} />;
       case "upcomingEvents": // Novo case para o card de Próximos Eventos
         return <UpcomingEventsCard key={item.id} />;
       case "financialSummary":
