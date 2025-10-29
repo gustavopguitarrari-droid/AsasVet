@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, CalendarX, Trash2, Search as SearchIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -31,6 +31,10 @@ const AgendamentosMedicos = () => {
   const { user: appUser } = useUser();
   const organizationId = appUser?.organizationId;
 
+  // Adicionando logs para depuração
+  console.log("AgendamentosMedicos: appUser", appUser);
+  console.log("AgendamentosMedicos: organizationId", organizationId);
+
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = React.useState(false);
   const [defaultDateForNewEvent, setDefaultDateForNewEvent] = React.useState<Date | undefined>(undefined);
   const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null);
@@ -41,7 +45,10 @@ const AgendamentosMedicos = () => {
   const { data: events = [], isLoading, error } = useQuery<CalendarEvent[]>({
     queryKey: ['events', organizationId],
     queryFn: async () => {
-      if (!organizationId) return [];
+      if (!organizationId) {
+        console.log("AgendamentosMedicos: Query for events skipped, organizationId is null/undefined.");
+        return [];
+      }
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -190,12 +197,18 @@ const AgendamentosMedicos = () => {
           <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
-                {/* DialogTrigger é o filho direto de TooltipTrigger */}
-                <DialogTrigger asChild>
-                  <Button className="font-bold" disabled={!organizationId}>
+                {/* Conditionally render DialogTrigger or just a disabled button */}
+                {organizationId ? (
+                  <DialogTrigger asChild>
+                    <Button className="font-bold">
+                      <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
+                    </Button>
+                  </DialogTrigger>
+                ) : (
+                  <Button className="font-bold" disabled>
                     <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
                   </Button>
-                </DialogTrigger>
+                )}
               </TooltipTrigger>
               {!organizationId && (
                 <TooltipContent side="bottom">
