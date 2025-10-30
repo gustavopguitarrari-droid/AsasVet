@@ -25,15 +25,19 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useSession } from "@/context/SessionContext"; // Importar useSession
 
 const AgendamentosMedicos = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
+  const { isLoading: isLoadingSessionContext } = useSession(); // Obter o estado de carregamento da sessão
   const organizationId = appUser?.organizationId;
 
   // Adicionando logs para depuração
   console.log("AgendamentosMedicos: appUser", appUser);
   console.log("AgendamentosMedicos: organizationId", organizationId);
+  console.log("AgendamentosMedicos: isLoadingSessionContext", isLoadingSessionContext);
+
 
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = React.useState(false);
   const [defaultDateForNewEvent, setDefaultDateForNewEvent] = React.useState<Date | undefined>(undefined);
@@ -42,7 +46,7 @@ const AgendamentosMedicos = () => {
   const [searchTerm, setSearchTerm] = React.useState<string>("");
 
   // Query para buscar eventos do Supabase
-  const { data: events = [], isLoading, error } = useQuery<CalendarEvent[]>({
+  const { data: events = [], isLoading: isLoadingEvents, error } = useQuery<CalendarEvent[]>({
     queryKey: ['events', organizationId],
     queryFn: async () => {
       if (!organizationId) {
@@ -165,7 +169,8 @@ const AgendamentosMedicos = () => {
     clearAllEventsMutation.mutate();
   };
 
-  if (isLoading) {
+  // Usar o estado de carregamento combinado
+  if (isLoadingEvents || isLoadingSessionContext) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando agenda...</p>
@@ -180,6 +185,8 @@ const AgendamentosMedicos = () => {
       </div>
     );
   }
+
+  const isAddButtonDisabled = !organizationId || addEventMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -197,22 +204,13 @@ const AgendamentosMedicos = () => {
           <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
-                {/* Conditionally render DialogTrigger or just a disabled button */}
-                {organizationId ? (
-                  <DialogTrigger asChild>
-                    <Button className="font-bold">
-                      <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
-                    </Button>
-                  </DialogTrigger>
-                ) : (
-                  <Button className="font-bold" disabled>
-                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
-                  </Button>
-                )}
+                <Button className="font-bold" disabled={isAddButtonDisabled}>
+                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
+                </Button>
               </TooltipTrigger>
-              {!organizationId && (
+              {isAddButtonDisabled && (
                 <TooltipContent side="bottom">
-                  Carregando informações da organização...
+                  {!organizationId ? "Informações da organização não disponíveis." : "Adicionando agendamento..."}
                 </TooltipContent>
               )}
             </Tooltip>
