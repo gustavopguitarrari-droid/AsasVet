@@ -203,6 +203,7 @@ const AgendamentosMedicos = () => {
           />
         </div>
         <div className="flex space-x-2 shrink-0">
+          {/* O Dialog e seu conteúdo devem estar sempre presentes no DOM para que o shadcn/ui funcione corretamente */}
           <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
@@ -215,7 +216,7 @@ const AgendamentosMedicos = () => {
                   {!organizationId ? "Informações da organização não disponíveis. Por favor, aguarde ou verifique seu perfil." : "Adicionando agendamento..."}
                 </TooltipContent>
               )}
-            </Tooltip>
+            </TooltipTrigger> {/* Fechamento do TooltipTrigger */}
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
