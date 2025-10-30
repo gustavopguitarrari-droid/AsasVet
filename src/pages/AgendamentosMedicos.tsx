@@ -33,12 +33,6 @@ const AgendamentosMedicos = () => {
   const { isLoading: isLoadingSessionContext } = useSession(); // Obter o estado de carregamento da sessão
   const organizationId = appUser?.organizationId;
 
-  // Adicionando logs para depuração
-  console.log("AgendamentosMedicos: appUser", appUser);
-  console.log("AgendamentosMedicos: organizationId", organizationId);
-  console.log("AgendamentosMedicos: isLoadingSessionContext", isLoadingSessionContext);
-
-
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = React.useState(false);
   const [defaultDateForNewEvent, setDefaultDateForNewEvent] = React.useState<Date | undefined>(undefined);
   const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null);
@@ -169,6 +163,16 @@ const AgendamentosMedicos = () => {
     clearAllEventsMutation.mutate();
   };
 
+  // Determine if the add button should be disabled
+  const isAddButtonDisabled = !organizationId || addEventMutation.isPending;
+
+  // Log the state of organizationId and loading for debugging
+  console.log("AgendamentosMedicos: Current organizationId:", organizationId);
+  console.log("AgendamentosMedicos: isLoadingEvents:", isLoadingEvents);
+  console.log("AgendamentosMedicos: isLoadingSessionContext:", isLoadingSessionContext);
+  console.log("AgendamentosMedicos: isAddButtonDisabled:", isAddButtonDisabled);
+
+
   // Usar o estado de carregamento combinado
   if (isLoadingEvents || isLoadingSessionContext) {
     return (
@@ -185,8 +189,6 @@ const AgendamentosMedicos = () => {
       </div>
     );
   }
-
-  const isAddButtonDisabled = !organizationId || addEventMutation.isPending;
 
   return (
     <div className="space-y-6">
@@ -210,7 +212,7 @@ const AgendamentosMedicos = () => {
               </TooltipTrigger>
               {isAddButtonDisabled && (
                 <TooltipContent side="bottom">
-                  {!organizationId ? "Informações da organização não disponíveis." : "Adicionando agendamento..."}
+                  {!organizationId ? "Informações da organização não disponíveis. Por favor, aguarde ou verifique seu perfil." : "Adicionando agendamento..."}
                 </TooltipContent>
               )}
             </Tooltip>
