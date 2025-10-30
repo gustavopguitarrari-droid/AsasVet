@@ -21,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DialogFooter } from "@/components/ui/dialog";
+import { DialogFooter, DialogDescription } from "@/components/ui/dialog"; // Importar DialogDescription
 
 const formSchema = z.object({
   title: z.string().min(1, "O título do agendamento é obrigatório."),
@@ -56,6 +56,9 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onSubmit, onCancel, def
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <DialogDescription>
+          Preencha os detalhes para adicionar um novo agendamento.
+        </DialogDescription>
         <FormField
           control={form.control}
           name="title"
