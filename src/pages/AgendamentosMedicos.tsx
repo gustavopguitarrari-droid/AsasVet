@@ -68,6 +68,7 @@ const AgendamentosMedicos = () => {
   const addEventMutation = useMutation({
     mutationFn: async (newEventData: EventFormValues) => {
       if (!organizationId) throw new Error("Organization ID not available.");
+      console.log("AgendamentosMedicos: addEventMutation - Inserting event with organization_id:", organizationId); // ADDED LOG
       const { data, error } = await supabase
         .from('events')
         .insert({
