@@ -47,13 +47,17 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
 
       // Map Supabase data to UserProfile interface
       const userMetadata = supabaseUser.user_metadata;
+      
+      // Ensure organization_id is always a string if present, otherwise provide a fallback
+      const organizationId = data?.organization_id?.toString() || userMetadata.organization_id?.toString() || supabaseUser.id; // Fallback to user.id if not found
+
       return {
         id: supabaseUser.id,
         name: data?.first_name || userMetadata.first_name?.toString() || undefined,
         lastName: data?.last_name || userMetadata.last_name?.toString() || undefined,
         email: supabaseUser.email || undefined,
         avatarUrl: data?.avatar_url || userMetadata.avatar_url?.toString() || undefined,
-        logoUrl: data?.logo_url || userMetadata.logo_url?.toString() || undefined, // Ensure logoUrl is mapped
+        logoUrl: data?.logo_url || userMetadata.logo_url?.toString() || undefined,
         role: data?.role || userMetadata.role?.toString() || 'Usuário',
         birthday: data?.birthday || userMetadata.birthday?.toString() || undefined,
         gender: data?.gender || userMetadata.gender?.toString() || undefined,
@@ -70,15 +74,14 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         addressState: data?.address_state || userMetadata.address_state?.toString() || undefined,
         colorTheme: data?.color_theme || userMetadata.color_theme?.toString() || undefined,
         registeredTime: data?.registered_time || supabaseUser.created_at,
-        organizationId: data?.organization_id || userMetadata.organization_id?.toString() || undefined, // NOVO: Mapear organization_id
+        organizationId: organizationId, // Usar o valor garantido
       };
     },
-    enabled: !!supabaseUser?.id, // Only run query if supabaseUser ID is available
-    staleTime: 5 * 60 * 1000, // 5 minutes stale time for profile data
-    refetchOnWindowFocus: false, // Don't refetch on window focus unless explicitly invalidated
+    enabled: !!supabaseUser?.id,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   });
 
-  // Effect to handle Supabase auth state changes
   useEffect(() => {
     let isMounted = true;
 
@@ -87,7 +90,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       if (!isMounted) return;
 
       setSession(currentSession);
-      setSupabaseUserState(currentSession?.user || null); // Update supabaseUser state
+      setSupabaseUserState(currentSession?.user || null);
 
       if (isMounted) {
         setIsLoadingSession(false);
@@ -105,7 +108,6 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
     };
   }, []);
 
-  // Effect to update UserContext when profileData changes from useQuery
   useEffect(() => {
     console.log('SessionContext: [PROFILE_DATA_CHANGE] profileData:', profileData, 'isLoadingProfile:', isLoadingProfile, 'profileError:', profileError);
     if (!isLoadingProfile && !profileError) {
