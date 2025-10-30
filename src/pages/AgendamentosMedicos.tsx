@@ -146,6 +146,7 @@ const AgendamentosMedicos = () => {
   const handleOpenDialogWithDate = (date: Date) => {
     setDefaultDateForNewEvent(date);
     setIsAddEventDialogOpen(true);
+    console.log("AgendamentosMedicos: handleOpenDialogWithDate - Setting isAddEventDialogOpen to true.");
   };
 
   const handleEventClick = (event: CalendarEvent) => {
@@ -171,7 +172,7 @@ const AgendamentosMedicos = () => {
   console.log("AgendamentosMedicos: isLoadingEvents:", isLoadingEvents);
   console.log("AgendamentosMedicos: isLoadingSessionContext:", isLoadingSessionContext);
   console.log("AgendamentosMedicos: isAddButtonDisabled:", isAddButtonDisabled);
-
+  console.log("AgendamentosMedicos: isAddEventDialogOpen state:", isAddEventDialogOpen); // NOVO LOG
 
   // Usar o estado de carregamento combinado
   if (isLoadingEvents || isLoadingSessionContext) {
@@ -203,7 +204,10 @@ const AgendamentosMedicos = () => {
           />
         </div>
         <div className="flex space-x-2 shrink-0">
-          <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
+          <Dialog open={isAddEventDialogOpen} onOpenChange={(open) => {
+            setIsAddEventDialogOpen(open);
+            console.log("AgendamentosMedicos: Dialog onOpenChange - Setting isAddEventDialogOpen to", open); // NOVO LOG
+          }}>
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                 <Button className="font-bold" disabled={isAddButtonDisabled}>
@@ -220,7 +224,10 @@ const AgendamentosMedicos = () => {
               <DialogHeader>
                 <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
               </DialogHeader>
-              <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsAddEventDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
+              <AddEventDialog onSubmit={handleAddEvent} onCancel={() => {
+                setIsAddEventDialogOpen(false);
+                console.log("AgendamentosMedicos: AddEventDialog onCancel - Setting isAddEventDialogOpen to false."); // NOVO LOG
+              }} defaultDate={defaultDateForNewEvent} />
             </DialogContent>
           </Dialog>
         </div>
