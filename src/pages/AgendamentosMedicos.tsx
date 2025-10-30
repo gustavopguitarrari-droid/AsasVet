@@ -204,13 +204,17 @@ const AgendamentosMedicos = () => {
           />
         </div>
         <div className="flex space-x-2 shrink-0">
-          <Dialog open={isAddEventDialogOpen} onOpenChange={(open) => {
-            setIsAddEventDialogOpen(open);
-            console.log("AgendamentosMedicos: Dialog onOpenChange - Setting isAddEventDialogOpen to", open); // NOVO LOG
-          }}>
+          <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}> {/* Removido o console.log do onOpenChange */}
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
-                <Button className="font-bold" disabled={isAddButtonDisabled}>
+                <Button 
+                  className="font-bold" 
+                  disabled={isAddButtonDisabled}
+                  onClick={() => { // Adicionado onClick para definir o estado
+                    setIsAddEventDialogOpen(true);
+                    console.log("AgendamentosMedicos: Button onClick - Setting isAddEventDialogOpen to true.");
+                  }}
+                >
                   <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
                 </Button>
               </TooltipTrigger>
@@ -226,7 +230,7 @@ const AgendamentosMedicos = () => {
               </DialogHeader>
               <AddEventDialog onSubmit={handleAddEvent} onCancel={() => {
                 setIsAddEventDialogOpen(false);
-                console.log("AgendamentosMedicos: AddEventDialog onCancel - Setting isAddEventDialogOpen to false."); // NOVO LOG
+                console.log("AgendamentosMedicos: AddEventDialog onCancel - Setting isAddEventDialogOpen to false.");
               }} defaultDate={defaultDateForNewEvent} />
             </DialogContent>
           </Dialog>
