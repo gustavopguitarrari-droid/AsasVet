@@ -27,16 +27,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf';
-import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase, uploadMedicalRecordPdfToSupabase, deleteMedicalRecordPdfFromSupabase } from '@/utils/supabaseStorage'; // NOVO: Importar funções de storage para prontuário
+import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase, uploadMedicalRecordPdfToSupabase, deleteMedicalRecordPdfFromSupabase } from '@/utils/supabaseStorage';
 import PdfPreviewDialog from '@/components/PdfPreviewDialog';
-import { Client, Pet } from '@/types/cadastro'; // Importar Client e Pet
-import { TeamMember } from '@/pages/Veterinarios'; // Importar TeamMember
-import AddAnimalDebitDialog, { AddAnimalDebitFormValues } from '@/components/consultation/AddAnimalDebitDialog'; // NOVO: Importar o diálogo de débito
-import { AnimalDebit, Product } from '@/types/cashier'; // NOVO: Importar AnimalDebit e Product
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'; // NOVO: Importar componentes de tabela
-import { Badge } from '@/components/ui/badge'; // NOVO: Importar Badge
-import { cn } from '@/lib/utils'; // NOVO: Importar cn
-import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf'; // Importar a função de geração de PDF
+import { Client, Pet } from '@/types/cadastro';
+import { TeamMember } from '@/pages/Veterinarios';
+import AddAnimalDebitDialog, { AddAnimalDebitFormValues } from '@/components/consultation/AddAnimalDebitDialog';
+import { AnimalDebit, Product } from '@/types/cashier';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf';
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -47,9 +47,9 @@ interface MedicalRecord {
   physical_exam?: string | null;
   diagnosis?: string | null;
   treatment?: string | null;
-  prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null; // Alterado para permitir null
+  prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
   recipe_pdf_url?: string | null;
-  medical_record_pdf_url?: string | null; // NOVO: URL do PDF do prontuário
+  medical_record_pdf_url?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -71,16 +71,14 @@ const ConsultationPage: React.FC = () => {
 
   const [isRecipePdfPreviewDialogOpen, setIsRecipePdfPreviewDialogOpen] = useState(false);
   const [recipePdfBlob, setRecipePdfBlob] = useState<Blob | null>(null);
-  const [recipePdfUrl, setRecipePdfUrl] = useState<string | null>(null); // NOVO: Estado para a URL da receita
+  const [recipePdfUrl, setRecipePdfUrl] = useState<string | null>(null);
   const [recipePdfFilename, setRecipePdfFilename] = useState("");
 
-  // NOVO: Estados para o diálogo de pré-visualização de PDF do prontuário
   const [isMedicalRecordPdfPreviewDialogOpen, setIsMedicalRecordPdfPreviewDialogOpen] = useState(false);
   const [medicalRecordPdfBlob, setMedicalRecordPdfBlob] = useState<Blob | null>(null);
-  const [medicalRecordPdfUrl, setMedicalRecordPdfUrl] = useState<string | null>(null); // NOVO: Estado para a URL do prontuário
+  const [medicalRecordPdfUrl, setMedicalRecordPdfUrl] = useState<string | null>(null);
   const [medicalRecordPdfFilename, setMedicalRecordPdfFilename] = useState("");
 
-  // NOVO: Estados para o diálogo de adicionar débito
   const [isAddAnimalDebitDialogOpen, setIsAddAnimalDebitDialogOpen] = useState(false);
 
   // Query para buscar os detalhes da consulta
@@ -107,7 +105,7 @@ const ConsultationPage: React.FC = () => {
       if (!userId || !appointmentId) throw new Error("User or Appointment ID not available.");
       const { data, error } = await supabase
         .from('medical_records')
-        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, recipe_pdf_url, medical_record_pdf_url, created_at, updated_at') // NOVO: Selecionar medical_record_pdf_url
+        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, recipe_pdf_url, medical_record_pdf_url, created_at, updated_at')
         .eq('appointment_id', appointmentId)
         .eq('user_id', userId)
         .maybeSingle();
@@ -152,8 +150,8 @@ const ConsultationPage: React.FC = () => {
           number: dbClient.address_number || '',
           complement: dbClient.address_complement || undefined,
           neighborhood: dbClient.address_neighborhood || '',
-          city: dbClient.localidade || '', // Corrected from dbClient.address_city
-          state: dbClient.uf || '', // Corrected from dbClient.address_state
+          city: dbClient.localidade || '',
+          state: dbClient.uf || '',
         },
         observations: dbClient.observations || undefined,
         photoUrl: dbClient.photo_url || undefined,
@@ -234,117 +232,6 @@ const ConsultationPage: React.FC = () => {
     enabled: !!userId && !!appointmentId,
   });
 
-  // Mutação para salvar/atualizar o prontuário médico
-  const saveMedicalRecordMutation = useMutation({
-    mutationFn: async (recordData: MedicalRecordFormValues) => { // Removido recipe_pdf_url do tipo aqui
-      if (!userId || !appointmentId || !appointment) throw new Error("User, Appointment, or Appointment ID not available.");
-
-      const clinicDetails = {
-        companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
-        phone: appUser?.phone || '',
-        email: appUser?.email || '',
-        veterinarianCrmv: appUser?.crmv || '',
-        veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
-      };
-
-      let currentMedicalRecordId = medicalRecord?.id;
-      let existingMedicalRecordPdfUrl = medicalRecord?.medical_record_pdf_url;
-
-      // 1. Se não houver prontuário, crie um para obter um ID
-      if (!currentMedicalRecordId) {
-        console.log("ConsultationPage: saveMedicalRecordMutation - No existing medical record, creating a new one.");
-        const { data: newRecord, error: insertRecordError } = await supabase
-          .from('medical_records')
-          .insert({
-            user_id: userId,
-            appointment_id: appointmentId,
-            anamnesis: recordData.anamnesis || null,
-            physical_exam: recordData.physicalExam || null,
-            diagnosis: recordData.diagnosis || null,
-            treatment: recordData.treatment || null,
-            prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : [],
-            recipe_pdf_url: null, // Não geramos a receita aqui
-            medical_record_pdf_url: null,
-          })
-          .select('id')
-          .single();
-
-        if (insertRecordError || !newRecord) {
-          console.error("saveMedicalRecordMutation: Erro ao criar novo prontuário:", insertRecordError);
-          throw insertRecordError || new Error("Failed to create a new medical record.");
-        }
-        currentMedicalRecordId = newRecord.id;
-        console.log("ConsultationPage: saveMedicalRecordMutation - New medical record created with ID:", currentMedicalRecordId);
-      } else {
-        // Se existe, e tem um PDF antigo, delete-o antes de gerar um novo
-        if (existingMedicalRecordPdfUrl) {
-          console.log("saveMedicalRecordMutation: Existing medical record PDF found, attempting to delete:", existingMedicalRecordPdfUrl);
-          await deleteMedicalRecordPdfFromSupabase(existingMedicalRecordPdfUrl);
-        }
-      }
-
-      // 2. Gerar o PDF do prontuário
-      console.log("saveMedicalRecordMutation: Gerando PDF do prontuário...");
-      const medicalRecordPdfBlob = await generateMedicalRecordPdf({
-        appointment,
-        medicalRecord: recordData,
-        logoUrl: appUser?.logoUrl,
-        clinicDetails,
-      });
-      console.log("saveMedicalRecordMutation: PDF do prontuário Blob gerado.");
-
-      // 3. Fazer upload do PDF do prontuário para o Supabase Storage
-      console.log("saveMedicalRecordMutation: Fazendo upload do PDF do prontuário para o Supabase Storage...");
-      const newMedicalRecordPdfUrl = await uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId!, currentMedicalRecordId);
-      if (!newMedicalRecordPdfUrl) {
-        throw new Error("Falha ao fazer upload do PDF do prontuário.");
-      }
-      console.log("saveMedicalRecordMutation: Novo PDF do prontuário uploaded, URL:", newMedicalRecordPdfUrl);
-
-      // 4. Atualizar o prontuário médico com a nova URL do PDF e os dados do formulário
-      const payload = {
-        anamnesis: recordData.anamnesis || null,
-        physical_exam: recordData.physicalExam || null,
-        diagnosis: recordData.diagnosis || null,
-        treatment: recordData.treatment || null,
-        prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : [],
-        medical_record_pdf_url: newMedicalRecordPdfUrl, // Salvar a nova URL
-      };
-
-      console.log("ConsultationPage: Payload being sent to medical_records (update):", JSON.stringify(payload, null, 2));
-      const { data, error } = await supabase
-        .from('medical_records')
-        .update(payload)
-        .eq('id', currentMedicalRecordId)
-        .eq('user_id', userId)
-        .select()
-        .single();
-
-      if (error) {
-        console.error("saveMedicalRecordMutation: Erro ao atualizar medical_records:", error);
-        throw error;
-      }
-      console.log("saveMedicalRecordMutation: Medical record updated successfully with PDF URL:", data.medical_record_pdf_url);
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalida para atualizar o status do PDF na lista
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] }); // Invalida para atualizar o status do PDF no histórico
-      showSuccess("Prontuário salvo com sucesso!");
-      if (isAttemptingFinalize) {
-        finalizeAppointmentMutation.mutate(appointmentId!);
-      }
-      setIsAttemptingFinalize(false);
-    },
-    onError: (err) => {
-      console.error("Error saving medical record:", err);
-      showError(`Erro ao salvar prontuário: ${err.message}`);
-      setIsAttemptingFinalize(false);
-    },
-  });
-
   // Mutação para finalizar a consulta
   const finalizeAppointmentMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -376,7 +263,7 @@ const ConsultationPage: React.FC = () => {
 
   // NOVO: Mutação para gerar e salvar o PDF da receita
   const generateAndSaveRecipePdfMutation = useMutation({
-    mutationFn: async (prescriptions: MedicalRecordFormValues['prescriptions']) => {
+    mutationFn: async ({ prescriptions, shouldOpenPreview = false }: { prescriptions: MedicalRecordFormValues['prescriptions']; shouldOpenPreview?: boolean }) => {
       console.log("generateAndSaveRecipePdfMutation: Iniciando...");
       if (!userId || !appointmentId || !appointment) {
         console.error("generateAndSaveRecipePdfMutation: Dados da consulta ou usuário não disponíveis.");
@@ -411,7 +298,7 @@ const ConsultationPage: React.FC = () => {
             diagnosis: null,
             treatment: null,
             prescriptions: [],
-            medical_record_pdf_url: null, // NOVO: Adicionado aqui
+            medical_record_pdf_url: null,
           })
           .select('id')
           .single();
@@ -470,23 +357,151 @@ const ConsultationPage: React.FC = () => {
         throw error;
       }
       console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Medical record updated with new recipe_pdf_url:", data.recipe_pdf_url);
-      return { pdfBlob, newPdfUrl };
+      return { pdfBlob, newPdfUrl, shouldOpenPreview };
     },
-    onSuccess: ({ pdfBlob, newPdfUrl }) => {
+    onSuccess: ({ pdfBlob, newPdfUrl, shouldOpenPreview }) => {
       console.log("generateAndSaveRecipePdfMutation: onSuccess - Invalidando queries e mostrando sucesso.");
       queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
-      // NOVO: Invalidar as queries de agendamentos e histórico
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       showSuccess("Receita PDF gerada e salva com sucesso!");
-      setRecipePdfBlob(pdfBlob);
-      setRecipePdfUrl(newPdfUrl); // Set the direct URL
-      setRecipePdfFilename(`Receita_${appointment?.pet_name}_${format(parseISO(appointment?.date || new Date().toISOString()), 'yyyyMMdd')}.pdf`);
-      setIsRecipePdfPreviewDialogOpen(true);
+      if (shouldOpenPreview) {
+        setRecipePdfBlob(pdfBlob);
+        setRecipePdfUrl(newPdfUrl);
+        setRecipePdfFilename(`Receita_${appointment?.pet_name}_${format(parseISO(appointment?.date || new Date().toISOString()), 'yyyyMMdd')}.pdf`);
+        setIsRecipePdfPreviewDialogOpen(true);
+      }
     },
     onError: (err: any) => {
       console.error("ConsultationPage: generateAndSaveRecipePdfMutation - Erro ao gerar e salvar PDF da receita:", err);
       showError(`Erro ao gerar receita: ${err.message || "Erro desconhecido"}`);
+    },
+  });
+
+  // Mutação para salvar/atualizar o prontuário médico
+  const saveMedicalRecordMutation = useMutation({
+    mutationFn: async (recordData: MedicalRecordFormValues) => {
+      if (!userId || !appointmentId || !appointment) throw new Error("User, Appointment, or Appointment ID not available.");
+
+      const clinicDetails = {
+        companyName: appUser?.companyName || 'AsasVet',
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        phone: appUser?.phone || '',
+        email: appUser?.email || '',
+        veterinarianCrmv: appUser?.crmv || '',
+        veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
+      };
+
+      let currentMedicalRecordId = medicalRecord?.id;
+      let existingMedicalRecordPdfUrl = medicalRecord?.medical_record_pdf_url;
+
+      // 1. Se não houver prontuário, crie um para obter um ID
+      if (!currentMedicalRecordId) {
+        console.log("ConsultationPage: saveMedicalRecordMutation - No existing medical record, creating a new one.");
+        const { data: newRecord, error: insertRecordError } = await supabase
+          .from('medical_records')
+          .insert({
+            user_id: userId,
+            appointment_id: appointmentId,
+            anamnesis: recordData.anamnesis || null,
+            physical_exam: recordData.physicalExam || null,
+            diagnosis: recordData.diagnosis || null,
+            treatment: recordData.treatment || null,
+            prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : [],
+            recipe_pdf_url: null,
+            medical_record_pdf_url: null,
+          })
+          .select('id')
+          .single();
+
+        if (insertRecordError || !newRecord) {
+          console.error("saveMedicalRecordMutation: Erro ao criar novo prontuário:", insertRecordError);
+          throw insertRecordError || new Error("Failed to create a new medical record.");
+        }
+        currentMedicalRecordId = newRecord.id;
+        console.log("ConsultationPage: saveMedicalRecordMutation - New medical record created with ID:", currentMedicalRecordId);
+      } else {
+        // Se existe, e tem um PDF antigo, delete-o antes de gerar um novo
+        if (existingMedicalRecordPdfUrl) {
+          console.log("saveMedicalRecordMutation: Existing medical record PDF found, attempting to delete:", existingMedicalRecordPdfUrl);
+          await deleteMedicalRecordPdfFromSupabase(existingMedicalRecordPdfUrl);
+        }
+      }
+
+      // 2. Gerar o PDF do prontuário
+      console.log("saveMedicalRecordMutation: Gerando PDF do prontuário...");
+      const medicalRecordPdfBlob = await generateMedicalRecordPdf({
+        appointment,
+        medicalRecord: recordData,
+        logoUrl: appUser?.logoUrl,
+        clinicDetails,
+      });
+      console.log("saveMedicalRecordMutation: PDF do prontuário Blob gerado.");
+
+      // 3. Fazer upload do PDF do prontuário para o Supabase Storage
+      console.log("saveMedicalRecordMutation: Fazendo upload do PDF do prontuário para o Supabase Storage...");
+      const newMedicalRecordPdfUrl = await uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId!, currentMedicalRecordId);
+      if (!newMedicalRecordPdfUrl) {
+        throw new Error("Falha ao fazer upload do PDF do prontuário.");
+      }
+      console.log("saveMedicalRecordMutation: Novo PDF do prontuário uploaded, URL:", newMedicalRecordPdfUrl);
+
+      // 4. Atualizar o prontuário médico com a nova URL do PDF e os dados do formulário
+      const payload = {
+        anamnesis: recordData.anamnesis || null,
+        physical_exam: recordData.physicalExam || null,
+        diagnosis: recordData.diagnosis || null,
+        treatment: recordData.treatment || null,
+        prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : [],
+        medical_record_pdf_url: newMedicalRecordPdfUrl,
+      };
+
+      console.log("ConsultationPage: Payload being sent to medical_records (update):", JSON.stringify(payload, null, 2));
+      const { data, error } = await supabase
+        .from('medical_records')
+        .update(payload)
+        .eq('id', currentMedicalRecordId)
+        .eq('user_id', userId)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("saveMedicalRecordMutation: Erro ao atualizar medical_records:", error);
+        throw error;
+      }
+      console.log("saveMedicalRecordMutation: Medical record updated successfully with PDF URL:", data.medical_record_pdf_url);
+      return data;
+    },
+    onSuccess: async (data) => { // 'data' here is the updated medical record from Supabase
+      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      showSuccess("Prontuário salvo com sucesso!");
+
+      if (isAttemptingFinalize) {
+        // Check if there are prescriptions to generate a PDF for
+        if (data.prescriptions && data.prescriptions.length > 0) {
+          console.log("ConsultationPage: Finalizing with prescriptions, generating recipe PDF...");
+          try {
+            await generateAndSaveRecipePdfMutation.mutateAsync({ prescriptions: data.prescriptions, shouldOpenPreview: false });
+            console.log("ConsultationPage: Recipe PDF generated and saved. Now finalizing appointment.");
+            finalizeAppointmentMutation.mutate(appointmentId!);
+          } catch (recipeError: any) {
+            console.error("ConsultationPage: Error generating recipe PDF during finalization:", recipeError);
+            showError(`Erro ao gerar receita durante a finalização: ${recipeError.message}`);
+            setIsAttemptingFinalize(false); // Stop the finalization process
+          }
+        } else {
+          console.log("ConsultationPage: Finalizing without prescriptions. Directly finalizing appointment.");
+          finalizeAppointmentMutation.mutate(appointmentId!);
+        }
+      }
+      setIsAttemptingFinalize(false); // Reset flag after processing
+    },
+    onError: (err) => {
+      console.error("Error saving medical record:", err);
+      showError(`Erro ao salvar prontuário: ${err.message}`);
+      setIsAttemptingFinalize(false);
     },
   });
 
@@ -593,7 +608,7 @@ const ConsultationPage: React.FC = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId] });
-      queryClient.invalidateQueries({ queryKey: ['transactions', userId] }); // Invalida transações para atualizar o financeiro
+      queryClient.invalidateQueries({ queryKey: ['transactions', userId] });
       showSuccess("Débito marcado como pago e transação registrada!");
     },
     onError: (err: any) => {
@@ -623,7 +638,7 @@ const ConsultationPage: React.FC = () => {
   };
 
   const handleGenerateRecipePdf = (prescriptions: MedicalRecordFormValues['prescriptions']) => {
-    generateAndSaveRecipePdfMutation.mutate(prescriptions);
+    generateAndSaveRecipePdfMutation.mutate({ prescriptions, shouldOpenPreview: true });
   };
 
   const handleConfirmRecipePdfDownload = (filename: string, downloadUrl: string) => {
@@ -639,7 +654,6 @@ const ConsultationPage: React.FC = () => {
     }
   };
 
-  // NOVO: Handler para abrir o diálogo de pré-visualização do PDF do prontuário
   const handleOpenMedicalRecordPdfPreviewDialog = () => {
     if (medicalRecord?.medical_record_pdf_url) {
       setMedicalRecordPdfUrl(medicalRecord.medical_record_pdf_url);
@@ -650,7 +664,6 @@ const ConsultationPage: React.FC = () => {
     }
   };
 
-  // NOVO: Handler para confirmar o download do PDF do prontuário
   const handleConfirmMedicalRecordPdfDownload = (filename: string, downloadUrl: string) => {
     const a = document.createElement('a');
     a.href = downloadUrl;
@@ -662,12 +675,10 @@ const ConsultationPage: React.FC = () => {
     setIsMedicalRecordPdfPreviewDialogOpen(false);
   };
 
-  // NOVO: Handler para adicionar débito
   const handleAddAnimalDebit = (data: AddAnimalDebitFormValues) => {
     addAnimalDebitMutation.mutate(data);
   };
 
-  // NOVO: Handler para marcar débito como pago
   const handleMarkDebitAsPaid = (debitId: string) => {
     markDebitAsPaidMutation.mutate(debitId);
   };
@@ -870,9 +881,9 @@ const ConsultationPage: React.FC = () => {
           isOpen={isForwardToInternmentDialogOpen}
           onClose={() => setIsForwardToInternmentDialogOpen(false)}
           appointment={appointment}
-          allClients={allClients} // Passando allClients
-          allPets={allPets}     // Passando allPets
-          allVeterinarians={allVeterinarians} // Passando allVeterinarians
+          allClients={allClients}
+          allPets={allPets}
+          allVeterinarians={allVeterinarians}
         />
       )}
 
@@ -893,7 +904,6 @@ const ConsultationPage: React.FC = () => {
         onConfirmDownload={handleConfirmRecipePdfDownload}
       />
 
-      {/* NOVO: Diálogo de Pré-visualização de PDF do Prontuário */}
       <PdfPreviewDialog
         isOpen={isMedicalRecordPdfPreviewDialogOpen}
         onClose={() => setIsMedicalRecordPdfPreviewDialogOpen(false)}
