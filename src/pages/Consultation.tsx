@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, Hospital, AlertTriangle, PlusCircle, DollarSign, ReceiptText, XCircle } from 'lucide-react';
+import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, Hospital, AlertTriangle, PlusCircle, DollarSign, ReceiptText, XCircle, FileText } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser } from '@/context/UserContext';
@@ -71,12 +71,13 @@ const ConsultationPage: React.FC = () => {
 
   const [isRecipePdfPreviewDialogOpen, setIsRecipePdfPreviewDialogOpen] = useState(false);
   const [recipePdfBlob, setRecipePdfBlob] = useState<Blob | null>(null);
+  const [recipePdfUrl, setRecipePdfUrl] = useState<string | null>(null); // NOVO: Estado para a URL da receita
   const [recipePdfFilename, setRecipePdfFilename] = useState("");
 
   // NOVO: Estados para o diálogo de pré-visualização de PDF do prontuário
   const [isMedicalRecordPdfPreviewDialogOpen, setIsMedicalRecordPdfPreviewDialogOpen] = useState(false);
   const [medicalRecordPdfBlob, setMedicalRecordPdfBlob] = useState<Blob | null>(null);
-  const [medicalRecordPdfUrl, setMedicalRecordPdfUrl] = useState<string | null>(null);
+  const [medicalRecordPdfUrl, setMedicalRecordPdfUrl] = useState<string | null>(null); // NOVO: Estado para a URL do prontuário
   const [medicalRecordPdfFilename, setMedicalRecordPdfFilename] = useState("");
 
   // NOVO: Estados para o diálogo de adicionar débito
@@ -479,6 +480,7 @@ const ConsultationPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       showSuccess("Receita PDF gerada e salva com sucesso!");
       setRecipePdfBlob(pdfBlob);
+      setRecipePdfUrl(newPdfUrl); // Set the direct URL
       setRecipePdfFilename(`Receita_${appointment?.pet_name}_${format(parseISO(appointment?.date || new Date().toISOString()), 'yyyyMMdd')}.pdf`);
       setIsRecipePdfPreviewDialogOpen(true);
     },
@@ -624,16 +626,14 @@ const ConsultationPage: React.FC = () => {
     generateAndSaveRecipePdfMutation.mutate(prescriptions);
   };
 
-  const handleConfirmRecipePdfDownload = (filename: string) => {
-    if (recipePdfBlob) {
-      const url = URL.createObjectURL(recipePdfBlob);
+  const handleConfirmRecipePdfDownload = (filename: string, downloadUrl: string) => {
+    if (downloadUrl) {
       const a = document.createElement('a');
-      a.href = url;
+      a.href = downloadUrl;
       a.download = filename;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-      URL.revokeObjectURL(url);
       showSuccess("PDF da receita baixado com sucesso!");
       setIsRecipePdfPreviewDialogOpen(false);
     }

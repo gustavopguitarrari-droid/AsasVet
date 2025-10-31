@@ -34,7 +34,7 @@ import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf"; // 
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm"; // Importar tipo de formulário
 import PdfPreviewDialog from "@/components/PdfPreviewDialog"; // Importar diálogo de pré-visualização
 import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf'; // NOVO: Importar função de PDF de receita
-import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase } from '@/utils/supabaseStorage'; // NOVO: Funções de storage para receita
+import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase, uploadMedicalRecordPdfToSupabase } from '@/utils/supabaseStorage'; // NOVO: Funções de storage para receita e prontuário
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -479,19 +479,21 @@ const Appointments = () => {
       });
 
       // Upload the newly generated PDF and get its URL
-      const newPdfUrl = await supabase
+      const newPdfUrl = await uploadMedicalRecordPdfToSupabase(pdfBlob, currentUserId, medicalRecordData.id);
+
+      if (!newPdfUrl) {
+        throw new Error("Falha ao fazer upload do PDF do prontuário.");
+      }
+
+      await supabase
         .from('medical_records')
-        .update({ medical_record_pdf_url: await uploadMedicalRecordPdfToSupabase(pdfBlob, currentUserId, medicalRecordData.id) })
+        .update({ medical_record_pdf_url: newPdfUrl })
         .eq('id', medicalRecordData.id)
         .eq('user_id', currentUserId)
         .select('medical_record_pdf_url')
         .single();
 
-      if (newPdfUrl.error) {
-        throw newPdfUrl.error;
-      }
-
-      return { pdfBlob, pdfUrl: newPdfUrl.data.medical_record_pdf_url, appointment };
+      return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
     onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalida para atualizar medical_record_pdf_url
@@ -941,7 +943,7 @@ const Appointments = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          {/* Botões movidos para cá, alinhados à direita */}
+          {/* Botões movidos para acá, alinhados à direita */}
           <div className="flex space-x-2 mt-4 md:mt-0"> {/* Adicionado margem superior para mobile */}
             <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
               <History className="mr-2 h-4 w-4" /> Ver Histórico
@@ -1028,7 +1030,7 @@ const Appointments = () => {
           pdfBlob={pdfBlob}
           filename={pdfFilename}
           onConfirmDownload={handleConfirmPdfDownload}
-          pdfUrl={pdfAppointment?.medical_record_pdf_url || null} {/* NOVO: Usar medical_record_pdf_url */}
+          pdfUrl={pdfAppointment?.medical_record_pdf_url || null}
         />
 
         <PdfPreviewDialog
