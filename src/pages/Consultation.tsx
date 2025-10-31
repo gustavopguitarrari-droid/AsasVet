@@ -102,7 +102,7 @@ const ConsultationPage: React.FC = () => {
   const { data: medicalRecord, isLoading: isLoadingMedicalRecord, error: medicalRecordError } = useQuery<MedicalRecord | null>({
     queryKey: ['medicalRecord', appointmentId, userId],
     queryFn: async () => {
-      if (!userId || !appointmentId) throw new Error("User or Appointment ID not available.");
+      if (!userId || !appointmentId) return null; // Return null if IDs are not available
       const { data, error } = await supabase
         .from('medical_records')
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, recipe_pdf_url, medical_record_pdf_url, created_at, updated_at')
@@ -261,11 +261,11 @@ const ConsultationPage: React.FC = () => {
     },
   });
 
-  // NOVO: Mutação para gerar e salvar o PDF da receita
+  // Mutação para gerar e salvar o PDF da receita
   const generateAndSaveRecipePdfMutation = useMutation({
     mutationFn: async ({ prescriptions, shouldOpenPreview = false }: { prescriptions: MedicalRecordFormValues['prescriptions']; shouldOpenPreview?: boolean }) => {
       console.log("generateAndSaveRecipePdfMutation: Iniciando...");
-      if (!userId || !appointmentId || !appointment || !organizationId) { // Added organizationId check
+      if (!userId || !appointmentId || !appointment || !organizationId) {
         console.error("generateAndSaveRecipePdfMutation: Dados da consulta, usuário ou organização não disponíveis.");
         throw new Error("Dados da consulta, usuário ou organização não disponíveis.");
       }
@@ -273,7 +273,15 @@ const ConsultationPage: React.FC = () => {
         console.error("generateAndSaveRecipePdfMutation: Nenhuma prescrição para gerar a receita.");
         throw new Error("Nenhuma prescrição para gerar a receita.");
       }
-      console.log("generateAndSaveRecipePdfMutation: Prescriptions to save:", prescriptions); // ADDED LOG
+
+      // Ensure a medical record exists before proceeding.
+      // This mutation relies on saveMedicalRecordMutation having been called first.
+      if (!medicalRecord?.id) {
+        console.error("generateAndSaveRecipePdfMutation: Medical record ID not available. Save medical record first.");
+        throw new Error("Prontuário médico não salvo. Por favor, salve o prontuário antes de gerar a receita.");
+      }
+      const currentMedicalRecordId = medicalRecord.id;
+
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
         address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
@@ -283,46 +291,25 @@ const ConsultationPage: React.FC = () => {
         veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
       };
 
-      let currentMedicalRecordId = medicalRecord?.id;
-      console.log("generateAndSaveRecipePdfMutation: medicalRecord?.id inicial:", currentMedicalRecordId);
-
-      if (!currentMedicalRecordId) {
-        console.log("ConsultationPage: generateAndSaveRecipePdfMutation - No existing medical record found, creating a new one for recipe PDF.");
-        const { data: newRecord, error: insertRecordError } = await supabase
-          .from('medical_records')
-          .insert({
-            user_id: userId,
-            appointment_id: appointmentId,
-            anamnesis: null,
-            physical_exam: null,
-            diagnosis: null,
-            treatment: null,
-            prescriptions: [],
-            medical_record_pdf_url: null,
-          })
-          .select('id')
-          .single();
-
-        if (insertRecordError || !newRecord) {
-          console.error("generateAndSaveRecipePdfMutation: Erro ao criar novo prontuário:", insertRecordError);
-          throw insertRecordError || new Error("Failed to create a new medical record for recipe PDF.");
-        }
-        currentMedicalRecordId = newRecord.id;
-        console.log("ConsultationPage: generateAndSaveRecipePdfMutation - New medical record created with ID:", currentMedicalRecordId);
-        queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
-      }
-
-      const { data: existingRecipePdfUrlData, error: fetchPdfUrlError } = await supabase
+      // Fetch the current medical record to get its existing recipe PDF URL for deletion
+      const { data: currentMedicalRecordInDb, error: fetchCurrentRecordError } = await supabase
         .from('medical_records')
         .select('recipe_pdf_url')
         .eq('id', currentMedicalRecordId)
-        .maybeSingle();
+        .eq('user_id', userId)
+        .single();
 
-      if (fetchPdfUrlError) {
-        console.warn("ConsultationPage: generateAndSaveRecipePdfMutation - Failed to fetch existing recipe_pdf_url for medical record ID:", currentMedicalRecordId, fetchPdfUrlError);
-      } else if (existingRecipePdfUrlData?.recipe_pdf_url) {
-        console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Existing recipe PDF found, attempting to delete:", existingRecipePdfUrlData.recipe_pdf_url);
-        await deleteRecipePdfFromSupabase(existingRecipePdfUrlData.recipe_pdf_url);
+      if (fetchCurrentRecordError) {
+        console.error("generateAndSaveRecipePdfMutation: Error fetching current medical record for recipe PDF deletion:", fetchCurrentRecordError);
+        throw fetchCurrentRecordError;
+      }
+
+      const existingRecipePdfUrl = currentMedicalRecordInDb?.recipe_pdf_url;
+
+      // If an existing recipe PDF URL is found, delete the old PDF from storage
+      if (existingRecipePdfUrl) {
+        console.log("generateAndSaveRecipePdfMutation: Existing recipe PDF found, attempting to delete:", existingRecipePdfUrl);
+        await deleteRecipePdfFromSupabase(existingRecipePdfUrl);
       }
 
       console.log("generateAndSaveRecipePdfMutation: Gerando PDF da receita...");
@@ -332,28 +319,28 @@ const ConsultationPage: React.FC = () => {
         logoUrl: appUser?.logoUrl,
         clinicDetails,
       });
-      console.log("generateAndSaveRecipePdfMutation: PDF Blob gerado:", pdfBlob);
+      console.log("generateAndSaveRecipePdfMutation: PDF Blob da receita gerado:", pdfBlob);
 
-      console.log("generateAndSaveRecipePdfMutation: Fazendo upload do PDF para o Supabase Storage...");
-      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, organizationId, appointmentId); // CORRECTED HERE: using organizationId
-      console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Uploaded new PDF to URL:", newPdfUrl);
+      console.log("generateAndSaveRecipePdfMutation: Fazendo upload do PDF da receita para o Supabase Storage...");
+      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, organizationId, appointmentId);
+      console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
 
       if (!newPdfUrl) {
         console.error("generateAndSaveRecipePdfMutation: Falha ao fazer upload do PDF da receita.");
         throw new Error("Falha ao fazer upload do PDF da receita.");
       }
 
-      console.log("generateAndSaveRecipePdfMutation: Atualizando medical_records com a nova URL...");
+      console.log("generateAndSaveRecipePdfMutation: Atualizando medical_records com a nova URL da receita...");
       const { data, error } = await supabase
         .from('medical_records')
-        .update({ recipe_pdf_url: newPdfUrl }) // APENAS ATUALIZA A URL DO PDF DA RECEITA
+        .update({ recipe_pdf_url: newPdfUrl })
         .eq('id', currentMedicalRecordId)
         .eq('user_id', userId)
         .select()
         .single();
 
       if (error) {
-        console.error("generateAndSaveRecipePdfMutation: Erro ao atualizar medical_records:", error);
+        console.error("generateAndSaveRecipePdfMutation: Erro ao atualizar medical_records com recipe_pdf_url:", error);
         throw error;
       }
       console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Medical record updated with new recipe_pdf_url:", data.recipe_pdf_url);
@@ -361,7 +348,7 @@ const ConsultationPage: React.FC = () => {
     },
     onSuccess: ({ pdfBlob, newPdfUrl, shouldOpenPreview }) => {
       console.log("generateAndSaveRecipePdfMutation: onSuccess - Invalidating queries and showing success.");
-      console.log("generateAndSaveRecipePdfMutation: Prescriptions after save:", medicalRecordFormRef.current?.getValues().prescriptions); // ADDED LOG
+      console.log("generateAndSaveRecipePdfMutation: Prescriptions after save:", medicalRecordFormRef.current?.getValues().prescriptions);
       queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
@@ -393,42 +380,30 @@ const ConsultationPage: React.FC = () => {
         veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
       };
 
-      let currentMedicalRecordId = medicalRecord?.id;
-      let existingMedicalRecordPdfUrl = medicalRecord?.medical_record_pdf_url;
+      // Fetch the current medical record to get its ID and existing PDF URL
+      // This ensures we have the most up-to-date ID for upsert and old PDF URL for deletion
+      const { data: currentMedicalRecordInDb, error: fetchCurrentRecordError } = await supabase
+        .from('medical_records')
+        .select('id, medical_record_pdf_url')
+        .eq('appointment_id', appointmentId)
+        .eq('user_id', userId)
+        .maybeSingle();
 
-      // 1. Se não houver prontuário, crie um para obter um ID
-      if (!currentMedicalRecordId) {
-        console.log("ConsultationPage: saveMedicalRecordMutation - No existing medical record, creating a new one.");
-        const { data: newRecord, error: insertRecordError } = await supabase
-          .from('medical_records')
-          .insert({
-            user_id: userId,
-            appointment_id: appointmentId,
-            anamnesis: recordData.anamnesis || null,
-            physical_exam: recordData.physicalExam || null,
-            diagnosis: recordData.diagnosis || null,
-            treatment: recordData.treatment || null,
-            prescriptions: [],
-            medical_record_pdf_url: null,
-          })
-          .select('id')
-          .single();
-
-        if (insertRecordError || !newRecord) {
-          console.error("saveMedicalRecordMutation: Erro ao criar novo prontuário:", insertRecordError);
-          throw insertRecordError || new Error("Failed to create a new medical record.");
-        }
-        currentMedicalRecordId = newRecord.id;
-        console.log("ConsultationPage: saveMedicalRecordMutation - New medical record created with ID:", currentMedicalRecordId);
-      } else {
-        // Se existe, e tem um PDF antigo, delete-o antes de gerar um novo
-        if (existingMedicalRecordPdfUrl) {
-          console.log("saveMedicalRecordMutation: Existing medical record PDF found, attempting to delete:", existingMedicalRecordPdfUrl);
-          await deleteMedicalRecordPdfFromSupabase(existingMedicalRecordPdfUrl);
-        }
+      if (fetchCurrentRecordError && fetchCurrentRecordError.code !== 'PGRST116') { // PGRST116 means no rows found
+        console.error("saveMedicalRecordMutation: Error fetching current medical record for PDF deletion:", fetchCurrentRecordError);
+        throw fetchCurrentRecordError;
       }
 
-      // 2. Gerar o PDF do prontuário
+      const existingMedicalRecordId = currentMedicalRecordInDb?.id;
+      const existingMedicalRecordPdfUrl = currentMedicalRecordInDb?.medical_record_pdf_url;
+
+      // If there's an existing medical record PDF, delete it before generating a new one
+      if (existingMedicalRecordPdfUrl) {
+        console.log("saveMedicalRecordMutation: Existing medical record PDF found, attempting to delete:", existingMedicalRecordPdfUrl);
+        await deleteMedicalRecordPdfFromSupabase(existingMedicalRecordPdfUrl);
+      }
+
+      // Generate the new PDF for the medical record
       console.log("ConsultationPage: saveMedicalRecordMutation - Gerando PDF do prontuário...");
       const medicalRecordPdfBlob = await generateMedicalRecordPdf({
         appointment,
@@ -438,39 +413,58 @@ const ConsultationPage: React.FC = () => {
       });
       console.log("ConsultationPage: saveMedicalRecordMutation - PDF do prontuário Blob gerado.");
 
-      // 3. Fazer upload do PDF do prontuário para o Supabase Storage
-      console.log("ConsultationPage: saveMedicalRecordMutation - Fazendo upload do PDF do prontuário para o Supabase Storage...");
-      const newMedicalRecordPdfUrl = await uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId, currentMedicalRecordId); // CORRECTED HERE: using organizationId
-      if (!newMedicalRecordPdfUrl) {
-        throw new Error("Falha ao fazer upload do PDF do prontuário.");
-      }
-      console.log("ConsultationPage: saveMedicalRecordMutation - Novo PDF do prontuário uploaded, URL:", newMedicalRecordPdfUrl);
-
-      // 4. Atualizar o prontuário médico com a nova URL do PDF e os dados do formulário
-      const payload = {
+      // Prepare the payload for upsert.
+      // We include the ID if it exists, so upsert knows to update.
+      // If it doesn't exist, Supabase will generate a new one (due to default value).
+      const upsertPayload = {
+        id: existingMedicalRecordId, // Pass existing ID if available
+        user_id: userId,
+        appointment_id: appointmentId,
         anamnesis: recordData.anamnesis || null,
         physical_exam: recordData.physicalExam || null,
         diagnosis: recordData.diagnosis || null,
         treatment: recordData.treatment || null,
         prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : [],
-        medical_record_pdf_url: newMedicalRecordPdfUrl,
+        // medical_record_pdf_url will be updated in a separate step after upload
+        recipe_pdf_url: medicalRecord?.recipe_pdf_url || null, // Preserve existing recipe_pdf_url
       };
 
-      console.log("ConsultationPage: Payload being sent to medical_records (update):", JSON.stringify(payload, null, 2));
-      const { data, error } = await supabase
+      console.log("ConsultationPage: Upserting medical_records with payload:", JSON.stringify(upsertPayload, null, 2));
+      const { data: upsertedRecord, error: upsertError } = await supabase
         .from('medical_records')
-        .update(payload)
-        .eq('id', currentMedicalRecordId)
+        .upsert(upsertPayload, { onConflict: 'appointment_id,user_id' }) // Assuming unique constraint on these two
+        .select('id') // Select only the ID for the next step
+        .single();
+
+      if (upsertError) {
+        console.error("saveMedicalRecordMutation: Erro ao upsert medical_records:", upsertError);
+        throw upsertError;
+      }
+      console.log("saveMedicalRecordMutation: Medical record upserted successfully, ID:", upsertedRecord.id);
+
+      // Now that we have the medical record ID (either new or existing), upload the PDF
+      const medicalRecordIdForPdf = upsertedRecord.id;
+      const newMedicalRecordPdfUrl = await uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId, medicalRecordIdForPdf);
+      if (!newMedicalRecordPdfUrl) {
+        throw new Error("Falha ao fazer upload do PDF do prontuário.");
+      }
+      console.log("ConsultationPage: saveMedicalRecordMutation - Novo PDF do prontuário uploaded, URL:", newMedicalRecordPdfUrl);
+
+      // Update the medical record with the new PDF URL
+      const { data: finalRecord, error: updatePdfUrlError } = await supabase
+        .from('medical_records')
+        .update({ medical_record_pdf_url: newMedicalRecordPdfUrl })
+        .eq('id', medicalRecordIdForPdf)
         .eq('user_id', userId)
         .select()
         .single();
 
-      if (error) {
-        console.error("saveMedicalRecordMutation: Erro ao atualizar medical_records:", error);
-        throw error;
+      if (updatePdfUrlError) {
+        console.error("saveMedicalRecordMutation: Erro ao atualizar medical_records com PDF URL:", updatePdfUrlError);
+        throw updatePdfUrlError;
       }
-      console.log("saveMedicalRecordMutation: Medical record updated successfully with PDF URL:", data.medical_record_pdf_url);
-      return data;
+      console.log("saveMedicalRecordMutation: Medical record updated successfully with PDF URL:", finalRecord.medical_record_pdf_url);
+      return finalRecord;
     },
     onSuccess: async (data) => { // 'data' here is the updated medical record from Supabase
       queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
