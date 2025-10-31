@@ -353,7 +353,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                   <TableHead>Duração</TableHead>
                   <TableHead>Tempo de Espera</TableHead>
                   <TableHead>Receitas</TableHead>
-                  <TableHead className="text-right">Prontuário / Receita</TableHead>
+                  <TableHead className="text-right">Prontuário</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

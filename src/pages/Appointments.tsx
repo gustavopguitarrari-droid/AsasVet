@@ -824,7 +824,7 @@ const Appointments = () => {
             <span>{appointment.prescriptions_count || 0}</span>
           </Button>
         )},
-        { id: 'pdfActions', header: 'Prontuário / Receita', className: 'text-right', render: (appointment: Appointment) => (
+        { id: 'pdfActions', header: 'Prontuário', className: 'text-right', render: (appointment: Appointment) => (
           <div className="flex justify-end space-x-2">
             <Button
               variant="outline"
