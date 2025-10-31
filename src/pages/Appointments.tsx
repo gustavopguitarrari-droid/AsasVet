@@ -60,11 +60,12 @@ export interface Appointment {
   completion_timestamp?: string | null;
   created_at: string;
   start_time?: string | null;
+  pet_id: string | null;
+  client_id: string | null; // Adicionado client_id
+  // NOVO: Adicionado para refletir os dados do prontuário aninhado
   prescriptions_count?: number;
   recipe_pdf_url?: string | null;
   medical_record_pdf_url?: string | null;
-  pet_id: string | null;
-  client_id: string | null; // Adicionado client_id
 }
 
 interface MedicalRecord {
@@ -75,7 +76,7 @@ interface MedicalRecord {
   physical_exam?: string | null;
   diagnosis?: string | null;
   treatment?: string | null;
-  prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
+  prescriptions: { medication: string; dosage: string; frequency: string; instructions?: string }[]; // Alterado para array não nulo
   recipe_pdf_url?: string | null;
   medical_record_pdf_url?: string | null; // NOVO: URL do PDF do prontuário
   created_at: string;

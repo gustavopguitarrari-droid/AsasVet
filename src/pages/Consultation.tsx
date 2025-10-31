@@ -47,7 +47,7 @@ interface MedicalRecord {
   physical_exam?: string | null;
   diagnosis?: string | null;
   treatment?: string | null;
-  prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
+  prescriptions: { medication: string; dosage: string; frequency: string; instructions?: string }[]; // Alterado para array não nulo
   recipe_pdf_url?: string | null;
   medical_record_pdf_url?: string | null;
   created_at: string;
