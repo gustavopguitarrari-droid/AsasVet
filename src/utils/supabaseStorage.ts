@@ -169,7 +169,7 @@ export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean
       return false;
     }
     const filePath = pathSegments.slice(bucketIndex + 1).join('/'); // organizationId/uuid.ext
-    console.log(`deleteLogoFromSupabase: Attempting to delete filePath: ${filePath} from bucket: ${LOGOS_BUCKET_NAME}`);
+    console.log(`deleteLogoFromSupabase: Tentando deletar filePath: ${filePath} do bucket: ${LOGOS_BUCKET_NAME}`);
 
     const { error } = await supabase.storage
       .from(LOGOS_BUCKET_NAME)
