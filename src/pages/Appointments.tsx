@@ -517,28 +517,30 @@ const Appointments = () => {
       }
       const currentUserId: string = userId;
 
-      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url);
-      if (appointment.recipe_pdf_url) {
-        console.log("Appointments: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found, using it directly.");
-        return { pdfUrl: appointment.recipe_pdf_url, appointment };
-      }
-
-      console.log("Appointments: fetchAndGenerateRecipePdfMutation - No existing recipe_pdf_url, fetching medical record for prescriptions.");
+      // Sempre buscar o prontuário médico diretamente para garantir os dados mais recentes
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
-        .select('id, prescriptions')
+        .select('id, prescriptions, recipe_pdf_url') // Incluir recipe_pdf_url na busca direta
         .eq('appointment_id', appointment.id)
         .eq('user_id', currentUserId)
         .maybeSingle();
 
-      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Fetched medicalRecordData:", medicalRecordData); // Add this log
-      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Fetched medicalRecordData.prescriptions:", medicalRecordData?.prescriptions); // Add this log
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Fetched medicalRecordData directly:", medicalRecordData);
 
       if (fetchError) {
+        console.error("Appointments: fetchAndGenerateRecipePdfMutation - Erro ao buscar prontuário médico:", fetchError);
         throw fetchError;
       }
 
+      // Se o prontuário médico existe e já tem uma URL de PDF de receita, use-a diretamente
+      if (medicalRecordData?.recipe_pdf_url) {
+        console.log("Appointments: fetchAndGenerateRecipePdfMutation - URL de PDF de receita existente encontrada no prontuário, usando-a diretamente.");
+        return { pdfUrl: medicalRecordData.recipe_pdf_url, appointment, pdfBlob: null }; // Retorna pdfBlob como null, pois estamos usando a URL existente
+      }
+
+      // Se não há URL de PDF de receita existente ou não há prescrições, lance o erro
       if (!medicalRecordData || !medicalRecordData.prescriptions || medicalRecordData.prescriptions.length === 0) {
+        console.error("Appointments: fetchAndGenerateRecipePdfMutation - Nenhuma prescrição encontrada no prontuário para gerar a receita.");
         throw new Error("Nenhuma prescrição encontrada no prontuário para gerar a receita.");
       }
 
