@@ -76,7 +76,7 @@ interface MedicalRecord {
   treatment?: string | null;
   prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null;
   recipe_pdf_url?: string | null;
-  medical_record_pdf_url?: string | null;
+  medical_record_pdf_url?: string | null; // NOVO: URL do PDF do prontuário
   created_at: string;
   updated_at: string;
 }
@@ -229,8 +229,8 @@ const Appointments = () => {
           number: dbClient.address_number || '',
           complement: dbClient.address_complement || undefined,
           neighborhood: dbClient.address_neighborhood || '',
-          city: dbClient.address_city || '',
-          state: dbClient.address_state || '',
+          city: dbClient.localidade || '', // Corrected from dbClient.address_city
+          state: dbClient.uf || '', // Corrected from dbClient.address_state
         },
         observations: dbClient.observations || undefined,
         photoUrl: dbClient.photo_url || undefined,

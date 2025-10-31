@@ -152,8 +152,8 @@ const ConsultationPage: React.FC = () => {
           number: dbClient.address_number || '',
           complement: dbClient.address_complement || undefined,
           neighborhood: dbClient.address_neighborhood || '',
-          city: dbClient.address_city || '',
-          state: dbClient.address_state || '',
+          city: dbClient.localidade || '', // Corrected from dbClient.address_city
+          state: dbClient.uf || '', // Corrected from dbClient.address_state
         },
         observations: dbClient.observations || undefined,
         photoUrl: dbClient.photo_url || undefined,
