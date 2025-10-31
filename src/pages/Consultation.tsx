@@ -263,7 +263,7 @@ const ConsultationPage: React.FC = () => {
 
   // Mutação para gerar e salvar o PDF da receita
   const generateAndSaveRecipePdfMutation = useMutation({
-    mutationFn: async ({ prescriptions, shouldOpenPreview = false }: { prescriptions: MedicalRecordFormValues['prescriptions']; shouldOpenPreview?: boolean }) => {
+    mutationFn: async ({ prescriptions, medicalRecordId, shouldOpenPreview = false }: { prescriptions: MedicalRecordFormValues['prescriptions']; medicalRecordId: string; shouldOpenPreview?: boolean }) => {
       console.log("generateAndSaveRecipePdfMutation: Iniciando...");
       if (!userId || !appointmentId || !appointment || !organizationId) {
         console.error("generateAndSaveRecipePdfMutation: Dados da consulta, usuário ou organização não disponíveis.");
@@ -276,11 +276,11 @@ const ConsultationPage: React.FC = () => {
 
       // Ensure a medical record exists before proceeding.
       // This mutation relies on saveMedicalRecordMutation having been called first.
-      if (!medicalRecord?.id) {
+      if (!medicalRecordId) {
         console.error("generateAndSaveRecipePdfMutation: Medical record ID not available. Save medical record first.");
         throw new Error("Prontuário médico não salvo. Por favor, salve o prontuário antes de gerar a receita.");
       }
-      const currentMedicalRecordId = medicalRecord.id;
+      const currentMedicalRecordId = medicalRecordId;
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
@@ -479,7 +479,11 @@ const ConsultationPage: React.FC = () => {
           try {
             // Call the mutation to generate and save the recipe PDF
             // Pass shouldOpenPreview: false because we don't want to open the dialog during finalization flow
-            await generateAndSaveRecipePdfMutation.mutateAsync({ prescriptions: data.prescriptions, shouldOpenPreview: false });
+            await generateAndSaveRecipePdfMutation.mutateAsync({
+              prescriptions: data.prescriptions,
+              medicalRecordId: data.id, // Pass the ID from the saved medical record
+              shouldOpenPreview: false
+            });
             console.log("ConsultationPage: Recipe PDF generated and saved. Now finalizing appointment.");
             finalizeAppointmentMutation.mutate(appointmentId!);
           } catch (recipeError: any) {
@@ -649,11 +653,15 @@ const ConsultationPage: React.FC = () => {
 
     try {
       // Chame a mutação de salvar o prontuário. Use mutateAsync para esperar a conclusão.
-      await saveMedicalRecordMutation.mutateAsync(medicalRecordFormRef.current.getValues());
+      const savedMedicalRecord = await saveMedicalRecordMutation.mutateAsync(medicalRecordFormRef.current.getValues());
       showSuccess("Prontuário salvo. Gerando receita...");
 
-      // Em seguida, gere e salve o PDF da receita
-      await generateAndSaveRecipePdfMutation.mutateAsync({ prescriptions, shouldOpenPreview: true });
+      // Em seguida, gere e salve o PDF da receita, passando o ID do prontuário salvo
+      await generateAndSaveRecipePdfMutation.mutateAsync({
+        prescriptions,
+        medicalRecordId: savedMedicalRecord.id, // Pass the ID here
+        shouldOpenPreview: true
+      });
     } catch (err: any) {
       console.error("Erro ao salvar prontuário e gerar receita:", err);
       showError(`Erro ao gerar receita: ${err.message || "Erro desconhecido"}`);
