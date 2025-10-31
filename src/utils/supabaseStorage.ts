@@ -190,15 +190,17 @@ export const deleteLogoFromSupabase = async (publicUrl: string): Promise<boolean
 // NOVO: Funções para upload e exclusão de PDFs de receitas
 export const uploadRecipePdfToSupabase = async (
   pdfBlob: Blob,
-  organizationId: string, // Alterado de userId para organizationId
+  organizationId: string,
+  userId: string, // NOVO: Adicionado userId
   appointmentId: string,
 ): Promise<string | null> => {
   console.log("uploadRecipePdfToSupabase: Iniciando upload do PDF da receita.");
   try {
     const fileName = `receita_${appointmentId}_${uuidv4()}.pdf`;
-    const filePath = `${organizationId}/${appointmentId}/${fileName}`; // Caminho: organizationId/appointmentId/uuid.pdf
+    // Caminho: organizationId/userId/appointmentId/uuid.pdf
+    const filePath = `${organizationId}/${userId}/${appointmentId}/${fileName}`; 
     console.log(`uploadRecipePdfToSupabase: Tentando upload para filePath: ${filePath} no bucket: ${PRESCRIPTIONS_BUCKET_NAME}`);
-    console.log(`uploadRecipePdfToSupabase: Using organizationId: ${organizationId}, filePath: ${filePath}`); // ADDED LOG
+    console.log(`uploadRecipePdfToSupabase: Using organizationId: ${organizationId}, userId: ${userId}, filePath: ${filePath}`); // ADDED LOG
 
     const { data, error } = await supabase.storage
       .from(PRESCRIPTIONS_BUCKET_NAME)
@@ -264,15 +266,16 @@ export const deleteRecipePdfFromSupabase = async (publicUrl: string): Promise<bo
 export const uploadMedicalRecordPdfToSupabase = async (
   pdfBlob: Blob,
   organizationId: string,
+  userId: string, // NOVO: Adicionado userId
   medicalRecordId: string,
 ): Promise<string | null> => {
   console.log("uploadMedicalRecordPdfToSupabase: Iniciando upload do PDF do prontuário.");
   try {
     const fileName = `prontuario_${medicalRecordId}_${uuidv4()}.pdf`;
-    // CORREÇÃO AQUI: O filePath deve ser organizationId/medicalRecordId/fileName para corresponder à política RLS
-    const filePath = `${organizationId}/${medicalRecordId}/${fileName}`; 
+    // Caminho: organizationId/userId/medicalRecordId/uuid.pdf
+    const filePath = `${organizationId}/${userId}/${medicalRecordId}/${fileName}`; 
     console.log(`uploadMedicalRecordPdfToSupabase: Tentando upload para filePath: ${filePath} no bucket: ${MEDICAL_RECORDS_BUCKET_NAME}`);
-    console.log(`uploadMedicalRecordPdfToSupabase: Using organizationId: ${organizationId}, filePath: ${filePath}`); // ADDED LOG
+    console.log(`uploadMedicalRecordPdfToSupabase: Using organizationId: ${organizationId}, userId: ${userId}, filePath: ${filePath}`); // ADDED LOG
 
     const { data, error } = await supabase.storage
       .from(MEDICAL_RECORDS_BUCKET_NAME)
@@ -301,9 +304,9 @@ export const uploadMedicalRecordPdfToSupabase = async (
 };
 
 export const deleteMedicalRecordPdfFromSupabase = async (publicUrl: string): Promise<boolean> => {
-  console.log("deleteMedicalRecordPdfFromSupabase: Iniciando exclusão do PDF do prontuário para URL:", publicUrl);
+  console.log("deleteMedicalRecordPdfToSupabase: Iniciando exclusão do PDF do prontuário para URL:", publicUrl);
   if (!publicUrl) {
-    console.log("deleteMedicalRecordPdfFromSupabase: Nenhuma publicUrl fornecida, nada para deletar.");
+    console.log("deleteMedicalRecordPdfToSupabase: Nenhuma publicUrl fornecida, nada para deletar.");
     return true;
   }
 
@@ -312,11 +315,11 @@ export const deleteMedicalRecordPdfFromSupabase = async (publicUrl: string): Pro
     const pathSegments = url.pathname.split('/');
     const bucketIndex = pathSegments.indexOf(MEDICAL_RECORDS_BUCKET_NAME);
     if (bucketIndex === -1 || bucketIndex + 1 >= pathSegments.length) {
-      console.warn("deleteMedicalRecordPdfFromSupabase: URL pública inválida para exclusão do PDF do prontuário:", publicUrl);
+      console.warn("deleteMedicalRecordPdfToSupabase: URL pública inválida para exclusão do PDF do prontuário:", publicUrl);
       return false;
     }
     const filePath = pathSegments.slice(bucketIndex + 1).join('/');
-    console.log(`deleteMedicalRecordPdfFromSupabase: Tentando deletar filePath: ${filePath} do bucket: ${MEDICAL_RECORDS_BUCKET_NAME}`);
+    console.log(`deleteMedicalRecordPdfToSupabase: Tentando deletar filePath: ${filePath} do bucket: ${MEDICAL_RECORDS_BUCKET_NAME}`);
 
     const { error } = await supabase.storage
       .from(MEDICAL_RECORDS_BUCKET_NAME)
@@ -326,7 +329,7 @@ export const deleteMedicalRecordPdfFromSupabase = async (publicUrl: string): Pro
       console.error("deleteMedicalRecordPdfToSupabase: Erro ao deletar PDF do prontuário do storage:", error);
       return false;
     }
-    console.log("deleteMedicalRecordPdfFromSupabase: PDF do prontuário deletado com sucesso.");
+    console.log("deleteMedicalRecordPdfToSupabase: PDF do prontuário deletado com sucesso.");
     return true;
   } catch (error) {
     console.error("deleteMedicalRecordPdfToSupabase: Erro no processo de exclusão do PDF do prontuário:", error);

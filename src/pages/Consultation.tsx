@@ -322,7 +322,7 @@ const ConsultationPage: React.FC = () => {
       console.log("generateAndSaveRecipePdfMutation: PDF Blob da receita gerado:", pdfBlob);
 
       console.log("generateAndSaveRecipePdfMutation: Fazendo upload do PDF da receita para o Supabase Storage...");
-      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, organizationId, appointmentId);
+      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, organizationId, userId, appointmentId); // NOVO: Passando userId
       console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
 
       if (!newPdfUrl) {
@@ -444,7 +444,7 @@ const ConsultationPage: React.FC = () => {
 
       // Now that we have the medical record ID (either new or existing), upload the PDF
       const medicalRecordIdForPdf = upsertedRecord.id;
-      const newMedicalRecordPdfUrl = await uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId, medicalRecordIdForPdf);
+      const newMedicalRecordPdfUrl = await uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId, userId, medicalRecordIdForPdf); // NOVO: Passando userId
       if (!newMedicalRecordPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF do prontuário.");
       }
