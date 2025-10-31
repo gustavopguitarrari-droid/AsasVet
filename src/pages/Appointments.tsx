@@ -165,14 +165,18 @@ const Appointments = () => {
         .eq('user_id', userId);
       if (error) throw error;
       console.log("Appointments.tsx: Raw data from Supabase for appointments query:", data);
-      return data.map(app => ({
-        ...app,
-        // Access medical_records as an array and get the first element if it exists
-        prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
-        recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
-        medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null,
-        pet_id: app.pet_id || null,
-      })) as Appointment[];
+      return data.map(app => {
+        const mappedApp = {
+          ...app,
+          // Access medical_records as an array and get the first element if it exists
+          prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
+          recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
+          medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null,
+          pet_id: app.pet_id || null,
+        };
+        console.log(`Appointments.tsx: Mapped appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}`);
+        return mappedApp;
+      }) as Appointment[];
     },
     enabled: !!userId,
   });
@@ -195,14 +199,18 @@ const Appointments = () => {
         .in('status', ['Realizada', 'Cancelada']);
       if (error) throw error;
       console.log("Appointments.tsx: Raw data from Supabase for historyAppointments query:", data);
-      return data.map(app => ({
-        ...app,
-        // Access medical_records as an array and get the first element if it exists
-        prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
-        recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
-        medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null,
-        pet_id: app.pet_id || null,
-      })) as Appointment[];
+      return data.map(app => {
+        const mappedApp = {
+          ...app,
+          // Access medical_records as an array and get the first element if it exists
+          prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
+          recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
+          medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null,
+          pet_id: app.pet_id || null,
+        };
+        console.log(`Appointments.tsx: Mapped history appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}`);
+        return mappedApp;
+      }) as Appointment[];
     },
     enabled: !!userId,
   });
@@ -518,6 +526,9 @@ const Appointments = () => {
         .eq('appointment_id', appointment.id)
         .eq('user_id', currentUserId)
         .maybeSingle();
+
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Fetched medicalRecordData:", medicalRecordData); // Add this log
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Fetched medicalRecordData.prescriptions:", medicalRecordData?.prescriptions); // Add this log
 
       if (fetchError) {
         throw fetchError;
