@@ -30,11 +30,11 @@ import { showError, showSuccess } from "@/utils/toast";
 import { Client, Pet } from "@/types/cadastro";
 import { useNavigate } from "react-router-dom";
 import { usePageTitle } from "@/context/PageTitleContext";
-import { generateMedicalRecordPdf } from "@/components/consultation/MedicalRecordForm";
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
 import PdfPreviewDialog from "@/components/PdfPreviewDialog";
 import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf';
 import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase, uploadMedicalRecordPdfToSupabase } from '@/utils/supabaseStorage';
+import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf'; // CORREÇÃO AQUI: Importação correta
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
