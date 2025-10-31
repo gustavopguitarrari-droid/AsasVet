@@ -323,7 +323,7 @@ export const deleteMedicalRecordPdfFromSupabase = async (publicUrl: string): Pro
       .remove([filePath]);
 
     if (error) {
-      console.error("deleteMedicalRecordPdfFromSupabase: Erro ao deletar PDF do prontuário do storage:", error);
+      console.error("deleteMedicalRecordPdfToSupabase: Erro ao deletar PDF do prontuário do storage:", error);
       return false;
     }
     console.log("deleteMedicalRecordPdfFromSupabase: PDF do prontuário deletado com sucesso.");
