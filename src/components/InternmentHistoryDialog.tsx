@@ -26,6 +26,7 @@ import {
   AlertDialogTitle as AlertDialogTitleComponent, // Renomear para evitar conflito
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar Tabs
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -71,6 +72,7 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
   isClearingHistory,
 }) => {
   const [searchTerm, setSearchTerm] = React.useState<string>("");
+  const [activeTab, setActiveTab] = React.useState<"alta" | "obito">("alta");
 
   const filteredHistoryPatients = historyPatients.filter(patient =>
     patient.pet_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -80,6 +82,52 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
     patient.species.toLowerCase().includes(searchTerm.toLowerCase()) ||
     patient.bay_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const dischargedPatients = filteredHistoryPatients.filter(patient => patient.status === "Alta");
+  const deceasedPatients = filteredHistoryPatients.filter(patient => patient.status === "Óbito");
+
+  const renderPatientList = (patientsToRender: InternedPatient[]) => {
+    if (patientsToRender.length === 0) {
+      return (
+        <p className="text-muted-foreground text-center py-8 flex-1">
+          Nenhum paciente no histórico de {activeTab === "alta" ? "altas" : "óbitos"} que corresponda à sua busca.
+        </p>
+      );
+    }
+    return (
+      <ul className="space-y-4 flex-1 overflow-y-auto pr-2">
+        {patientsToRender.map((patient) => {
+          const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
+          const statusColorClass = statusBadgeColorMap[patient.status] || "bg-gray-500";
+          const finalDate = patient.expected_discharge_date || patient.admission_date;
+
+          return (
+            <li key={patient.id} className="flex items-center p-4 border rounded-md shadow-sm bg-card text-card-foreground">
+              <IconComponent className={cn("h-6 w-6 mr-4", speciesColorMap[patient.species])} />
+              <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
+                <p className="font-bold text-lg">{patient.pet_name}</p>
+                <p className="text-muted-foreground flex items-center">
+                  <User className="h-4 w-4 mr-2" /> {patient.owner_name}
+                </p>
+                <p className="text-muted-foreground flex items-center">
+                  <Stethoscope className="h-4 w-4 mr-2" /> {patient.veterinarian}
+                </p>
+              </div>
+              <div className="flex flex-col items-end ml-4">
+                <Badge className={cn("text-white mb-1", statusColorClass)}>
+                  {patient.status}
+                </Badge>
+                <span className="text-sm text-muted-foreground flex items-center">
+                  <CalendarDays className="h-4 w-4 mr-1" /> {finalDate}
+                </span>
+                <span className="text-xs text-muted-foreground mt-1">Baia: {patient.bay_name}</span>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -99,41 +147,21 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        {filteredHistoryPatients.length > 0 ? (
-          <ul className="space-y-4 flex-1 overflow-y-auto pr-2">
-            {filteredHistoryPatients.map((patient) => {
-              const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
-              const statusColorClass = statusBadgeColorMap[patient.status] || "bg-gray-500";
-              const finalDate = patient.expected_discharge_date || patient.admission_date;
 
-              return (
-                <li key={patient.id} className="flex items-center p-4 border rounded-md shadow-sm bg-card text-card-foreground">
-                  <IconComponent className={cn("h-6 w-6 mr-4", speciesColorMap[patient.species])} />
-                  <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
-                    <p className="font-bold text-lg">{patient.pet_name}</p>
-                    <p className="text-muted-foreground flex items-center">
-                      <User className="h-4 w-4 mr-2" /> {patient.owner_name}
-                    </p>
-                    <p className="text-muted-foreground flex items-center">
-                      <Stethoscope className="h-4 w-4 mr-2" /> {patient.veterinarian}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end ml-4">
-                    <Badge className={cn("text-white mb-1", statusColorClass)}>
-                      {patient.status}
-                    </Badge>
-                    <span className="text-sm text-muted-foreground flex items-center">
-                      <CalendarDays className="h-4 w-4 mr-1" /> {finalDate}
-                    </span>
-                    <span className="text-xs text-muted-foreground mt-1">Baia: {patient.bay_name}</span>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <p className="text-muted-foreground text-center py-8 flex-1">Nenhum paciente no histórico de internações que corresponda à sua busca.</p>
-        )}
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "alta" | "obito")} className="w-full flex-1 flex flex-col">
+          <TabsList className="grid w-full grid-cols-2 h-auto p-1 mb-4">
+            <TabsTrigger value="alta" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Altas ({dischargedPatients.length})</TabsTrigger>
+            <TabsTrigger value="obito" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Óbitos ({deceasedPatients.length})</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="alta" className="flex-1 flex flex-col">
+            {renderPatientList(dischargedPatients)}
+          </TabsContent>
+          <TabsContent value="obito" className="flex-1 flex flex-col">
+            {renderPatientList(deceasedPatients)}
+          </TabsContent>
+        </Tabs>
+
         <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
           <Button variant="outline" onClick={onClose}>Fechar</Button>
           <AlertDialog>
