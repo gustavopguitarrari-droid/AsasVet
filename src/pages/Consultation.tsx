@@ -117,7 +117,7 @@ const ConsultationPage: React.FC = () => {
         console.log("ConsultationPage: No medical record found for appointment", appointmentId, ". Returning null.");
         return null;
       }
-      console.log("ConsultationPage: Raw medical record data from Supabase:", data);
+      console.log("ConsultationPage: Raw medical record data from Supabase:", data); // ADDED LOG
       // Garante que prescriptions seja sempre um array
       return {
         ...data,
@@ -273,7 +273,7 @@ const ConsultationPage: React.FC = () => {
         console.error("generateAndSaveRecipePdfMutation: Nenhuma prescrição para gerar a receita.");
         throw new Error("Nenhuma prescrição para gerar a receita.");
       }
-
+      console.log("generateAndSaveRecipePdfMutation: Prescriptions to save:", prescriptions); // ADDED LOG
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
         address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
@@ -407,8 +407,7 @@ const ConsultationPage: React.FC = () => {
             physical_exam: recordData.physicalExam || null,
             diagnosis: recordData.diagnosis || null,
             treatment: recordData.treatment || null,
-            prescriptions: recordData.prescriptions && recordData.prescriptions.length > 0 ? recordData.prescriptions : [],
-            recipe_pdf_url: null,
+            prescriptions: [],
             medical_record_pdf_url: null,
           })
           .select('id')

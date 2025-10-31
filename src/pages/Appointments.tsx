@@ -176,7 +176,7 @@ const Appointments = () => {
           pet_id: app.pet_id || null,
           client_id: app.client_id || null, // Mapear client_id
         };
-        console.log(`Appointments.tsx: Mapped appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}`);
+        console.log(`Appointments.tsx: Mapped appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}, medical_records_array:`, app.medical_records); // ADDED LOG
         return mappedApp;
       }) as Appointment[];
     },
@@ -211,7 +211,7 @@ const Appointments = () => {
           pet_id: app.pet_id || null,
           client_id: app.client_id || null, // Mapear client_id
         };
-        console.log(`Appointments.tsx: Mapped history appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}`);
+        console.log(`Appointments.tsx: Mapped history appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}, medical_records_array:`, app.medical_records); // ADDED LOG
         return mappedApp;
       }) as Appointment[];
     },
