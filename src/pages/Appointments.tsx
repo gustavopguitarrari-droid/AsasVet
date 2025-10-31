@@ -64,6 +64,7 @@ export interface Appointment {
   recipe_pdf_url?: string | null;
   medical_record_pdf_url?: string | null;
   pet_id: string | null;
+  client_id: string | null; // Adicionado client_id
 }
 
 interface MedicalRecord {
@@ -173,6 +174,7 @@ const Appointments = () => {
           recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
           medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null,
           pet_id: app.pet_id || null,
+          client_id: app.client_id || null, // Mapear client_id
         };
         console.log(`Appointments.tsx: Mapped appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}`);
         return mappedApp;
@@ -207,6 +209,7 @@ const Appointments = () => {
           recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
           medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null,
           pet_id: app.pet_id || null,
+          client_id: app.client_id || null, // Mapear client_id
         };
         console.log(`Appointments.tsx: Mapped history appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}`);
         return mappedApp;
