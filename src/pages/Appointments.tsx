@@ -30,7 +30,7 @@ import { showError, showSuccess } from "@/utils/toast";
 import { Client, Pet } from "@/types/cadastro";
 import { useNavigate } from "react-router-dom";
 import { usePageTitle } from "@/context/PageTitleContext";
-import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf";
+import { generateMedicalRecordPdf } from "@/components/consultation/MedicalRecordForm";
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
 import PdfPreviewDialog from "@/components/PdfPreviewDialog";
 import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf';
@@ -497,7 +497,7 @@ const Appointments = () => {
       return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
     onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
-      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
+      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointment.id, userId] }); // CORRIGIDO: Usando appointment.id
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       setPdfBlob(pdfBlob || null);
@@ -577,6 +577,7 @@ const Appointments = () => {
       return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
     onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
+      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointment.id, userId] }); // CORRIGIDO: Usando appointment.id
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       // Force a refetch immediately after invalidation
