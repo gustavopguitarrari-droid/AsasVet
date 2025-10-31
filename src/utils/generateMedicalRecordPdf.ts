@@ -157,8 +157,8 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
         yPos += sectionSpacing;
 
         // --- Medical Record Sections ---
-        const addSection = (title: string, content?: string | null, isPrescription = false) => {
-          if (!content && (!isPrescription || !medicalRecord.prescriptions || medicalRecord.prescriptions.length === 0)) {
+        const addSection = (title: string, content?: string | null) => { // Removed isPrescription parameter
+          if (!content) {
             return;
           }
 
@@ -175,34 +175,10 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
           doc.setTextColor(textColor);
           doc.setFontSize(10);
 
-          if (isPrescription && medicalRecord.prescriptions && medicalRecord.prescriptions.length > 0) {
-            medicalRecord.prescriptions.forEach((p, index) => {
-              addPageIfNeeded(lineHeight * 4);
-              doc.setFont('helvetica', 'bold');
-              doc.text(`• Medicamento: `, margin + 5, yPos);
-              doc.setFont('helvetica', 'normal');
-              doc.text(p.medication, margin + 5 + doc.getTextWidth(`• Medicamento: `), yPos);
-              yPos += lineHeight;
-
-              doc.text(`  Dosagem: ${p.dosage}`, margin + 10, yPos);
-              yPos += lineHeight;
-
-              doc.text(`  Frequência: ${p.frequency}`, margin + 10, yPos);
-              yPos += lineHeight;
-
-              if (p.instructions && p.instructions.trim() !== '') {
-                doc.text(`  Instruções: `, margin + 10, yPos);
-                const instructionsText = doc.splitTextToSize(p.instructions, maxWidth - 20);
-                doc.text(instructionsText, margin + 10 + doc.getTextWidth(`  Instruções: `), yPos);
-                yPos += instructionsText.length * lineHeight;
-              }
-              yPos += lineHeight;
-            });
-          } else if (content) {
-            const splitText = doc.splitTextToSize(content, maxWidth);
-            doc.text(splitText, margin, yPos);
-            yPos += splitText.length * lineHeight;
-          }
+          const splitText = doc.splitTextToSize(content, maxWidth);
+          doc.text(splitText, margin, yPos);
+          yPos += splitText.length * lineHeight;
+          
           yPos += sectionSpacing;
         };
 
@@ -210,7 +186,8 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
         addSection('EXAME FÍSICO', medicalRecord.physicalExam);
         addSection('DIAGNÓSTICO', medicalRecord.diagnosis);
         addSection('TRATAMENTO', medicalRecord.treatment);
-        addSection('PRESCRIÇÕES', null, true);
+        // REMOVIDO: A seção de prescrições não será mais incluída no prontuário médico.
+        // addSection('PRESCRIÇÕES', null, true);
 
         // --- Veterinarian Signature ---
         addPageIfNeeded(lineHeight * 5);
