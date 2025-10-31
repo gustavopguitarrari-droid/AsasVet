@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText, Pill } from "lucide-react"; // Importar ArrowRight, FileText e Pill
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText, Pill, ArrowLeft } from "lucide-react"; // Importar ArrowLeft, FileText e Pill
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -76,7 +76,7 @@ interface MedicalRecord {
   diagnosis?: string | null;
   treatment?: string | null;
   prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null; // Alterado para permitir null
-  recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
+  recipe_pdf_url?: string | null;
   medical_record_pdf_url?: string | null; // NOVO: URL do PDF do prontuário
   created_at: string;
   updated_at: string;
@@ -154,7 +154,7 @@ const Appointments = () => {
   }, [activeTab, setPageTitle]);
 
   // --- Queries ---
-  const { data: appointments = [], isLoading, error } = useQuery<Appointment[]>({
+  const { data: appointments = [], isLoading, error } = useQuery<Appointment>({
     queryKey: ['appointments', userId],
     queryFn: async () => {
       if (!userId) return [];
@@ -184,7 +184,7 @@ const Appointments = () => {
     enabled: !!userId,
   });
 
-  const { data: historyAppointments = [], isLoading: isLoadingHistory, error: historyError } = useQuery<Appointment[]>({
+  const { data: historyAppointments = [], isLoading: isLoadingHistory, error: historyError } = useQuery<Appointment>({
     queryKey: ['historyAppointments', userId],
     queryFn: async () => {
       if (!userId) return [];
