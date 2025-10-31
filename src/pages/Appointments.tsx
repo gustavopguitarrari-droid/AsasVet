@@ -545,8 +545,11 @@ const Appointments = () => {
         return { pdfUrl: medicalRecordData.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
       }
 
+      // Ensure prescriptions is an array, even if null from DB
+      const prescriptionsFromDb = medicalRecordData?.prescriptions || [];
+
       // Se não há URL de PDF de receita existente ou não há prescrições, lance o erro
-      if (!medicalRecordData || !medicalRecordData.prescriptions || medicalRecordData.prescriptions.length === 0) {
+      if (prescriptionsFromDb.length === 0) { // Changed condition here
         console.error("Appointments: fetchAndGenerateRecipePdfMutation - Nenhuma prescrição encontrada no prontuário para gerar a receita.");
         throw new Error("Nenhuma prescrição encontrada no prontuário para gerar a receita.");
       }
@@ -562,7 +565,7 @@ const Appointments = () => {
 
       const pdfBlob = await generatePrescriptionPdf({
         appointment,
-        prescriptions: medicalRecordData.prescriptions,
+        prescriptions: prescriptionsFromDb,
         logoUrl: appUser?.logoUrl,
         clinicDetails,
       });
@@ -597,7 +600,7 @@ const Appointments = () => {
       setIsRecipePdfPreviewDialogOpen(true);
     },
     onError: (err: any) => {
-      console.error("Appointments: fetchAndGenerateRecipePdfMutation - Erro ao gerar PDF da receita do histórico:", err);
+      console.error("Appointments: fetchAndGenerateRecipePdfMutation - Erro ao gerar e salvar PDF da receita:", err);
       showError(`Erro ao gerar receita: ${err.message || "Erro desconhecido"}`);
     },
   });

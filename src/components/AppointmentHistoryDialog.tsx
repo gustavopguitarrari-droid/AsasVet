@@ -209,8 +209,12 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         throw new Error("Prontuário médico não encontrado para esta consulta.");
       }
       console.log("AppointmentHistoryDialog: Raw medical record data for Recipe PDF generation:", medicalRecordData); // Add log
-      console.log("AppointmentHistoryDialog: Fetched medicalRecordData.prescriptions:", medicalRecordData.prescriptions);
-      if (!medicalRecordData.prescriptions || medicalRecordData.prescriptions.length === 0) {
+      
+      // Ensure prescriptions is an array, even if null from DB
+      const prescriptionsFromDb = medicalRecordData.prescriptions || [];
+
+      console.log("AppointmentHistoryDialog: Fetched medicalRecordData.prescriptions:", prescriptionsFromDb);
+      if (prescriptionsFromDb.length === 0) { // Changed condition here
         throw new Error("Nenhuma prescrição encontrada no prontuário para gerar a receita.");
       }
 
@@ -225,7 +229,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
 
       const pdfBlob = await generatePrescriptionPdf({
         appointment,
-        prescriptions: medicalRecordData.prescriptions,
+        prescriptions: prescriptionsFromDb,
         logoUrl: appUser?.logoUrl,
         clinicDetails,
       });
