@@ -46,6 +46,7 @@ export const uploadImageToSupabase = async (
     const fileExtension = contentType.split('/')[1];
     const fileName = `${uuidv4()}.${fileExtension}`; // Nome de arquivo único
     const filePath = `${organizationId}/${entityType}/${entityId}/${fileName}`; // Caminho: organizationId/entityType/entityId/uuid.ext
+    console.log(`uploadImageToSupabase: Using organizationId: ${organizationId}, filePath: ${filePath}`); // ADDED LOG
 
     const { data, error } = await supabase.storage
       .from(AVATARS_BUCKET_NAME) // Usando o bucket de avatares
@@ -122,7 +123,7 @@ export const uploadLogoToSupabase = async (
     // Usar um nome de arquivo único para o logo do usuário para evitar cache
     const fileName = `${uuidv4()}.${fileExtension}`; 
     const filePath = `${organizationId}/${fileName}`; // Caminho: organizationId/uuid.ext
-    console.log(`uploadLogoToSupabase: Attempting to upload to filePath: ${filePath} with contentType: ${contentType}`);
+    console.log(`uploadLogoToSupabase: Using organizationId: ${organizationId}, filePath: ${filePath}`); // ADDED LOG
 
     const { data, error } = await supabase.storage
       .from(LOGOS_BUCKET_NAME)
@@ -197,6 +198,7 @@ export const uploadRecipePdfToSupabase = async (
     const fileName = `receita_${appointmentId}_${uuidv4()}.pdf`;
     const filePath = `${organizationId}/${appointmentId}/${fileName}`; // Caminho: organizationId/appointmentId/uuid.pdf
     console.log(`uploadRecipePdfToSupabase: Tentando upload para filePath: ${filePath} no bucket: ${PRESCRIPTIONS_BUCKET_NAME}`);
+    console.log(`uploadRecipePdfToSupabase: Using organizationId: ${organizationId}, filePath: ${filePath}`); // ADDED LOG
 
     const { data, error } = await supabase.storage
       .from(PRESCRIPTIONS_BUCKET_NAME)
@@ -269,6 +271,7 @@ export const uploadMedicalRecordPdfToSupabase = async (
     const fileName = `prontuario_${medicalRecordId}_${uuidv4()}.pdf`;
     const filePath = `${organizationId}/${medicalRecordId}/${fileName}`; // Caminho: organizationId/medicalRecordId/uuid.pdf
     console.log(`uploadMedicalRecordPdfToSupabase: Tentando upload para filePath: ${filePath} no bucket: ${MEDICAL_RECORDS_BUCKET_NAME}`);
+    console.log(`uploadMedicalRecordPdfToSupabase: Using organizationId: ${organizationId}, filePath: ${filePath}`); // ADDED LOG
 
     const { data, error } = await supabase.storage
       .from(MEDICAL_RECORDS_BUCKET_NAME)

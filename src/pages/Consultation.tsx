@@ -265,9 +265,9 @@ const ConsultationPage: React.FC = () => {
   const generateAndSaveRecipePdfMutation = useMutation({
     mutationFn: async ({ prescriptions, shouldOpenPreview = false }: { prescriptions: MedicalRecordFormValues['prescriptions']; shouldOpenPreview?: boolean }) => {
       console.log("generateAndSaveRecipePdfMutation: Iniciando...");
-      if (!userId || !appointmentId || !appointment) {
-        console.error("generateAndSaveRecipePdfMutation: Dados da consulta ou usuário não disponíveis.");
-        throw new Error("Dados da consulta ou usuário não disponíveis.");
+      if (!userId || !appointmentId || !appointment || !organizationId) { // Added organizationId check
+        console.error("generateAndSaveRecipePdfMutation: Dados da consulta, usuário ou organização não disponíveis.");
+        throw new Error("Dados da consulta, usuário ou organização não disponíveis.");
       }
       if (!prescriptions || prescriptions.length === 0) {
         console.error("generateAndSaveRecipePdfMutation: Nenhuma prescrição para gerar a receita.");
@@ -335,7 +335,7 @@ const ConsultationPage: React.FC = () => {
       console.log("generateAndSaveRecipePdfMutation: PDF Blob gerado:", pdfBlob);
 
       console.log("generateAndSaveRecipePdfMutation: Fazendo upload do PDF para o Supabase Storage...");
-      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, userId, appointmentId);
+      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, organizationId, appointmentId); // CORRECTED HERE: using organizationId
       console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Uploaded new PDF to URL:", newPdfUrl);
 
       if (!newPdfUrl) {
@@ -381,7 +381,7 @@ const ConsultationPage: React.FC = () => {
   // Mutação para salvar/atualizar o prontuário médico
   const saveMedicalRecordMutation = useMutation({
     mutationFn: async (recordData: MedicalRecordFormValues) => {
-      if (!userId || !appointmentId || !appointment) throw new Error("User, Appointment, or Appointment ID not available.");
+      if (!userId || !appointmentId || !appointment || !organizationId) throw new Error("User, Appointment, or Appointment ID not available.");
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
@@ -429,22 +429,22 @@ const ConsultationPage: React.FC = () => {
       }
 
       // 2. Gerar o PDF do prontuário
-      console.log("saveMedicalRecordMutation: Gerando PDF do prontuário...");
+      console.log("ConsultationPage: saveMedicalRecordMutation - Gerando PDF do prontuário...");
       const medicalRecordPdfBlob = await generateMedicalRecordPdf({
         appointment,
         medicalRecord: recordData,
         logoUrl: appUser?.logoUrl,
         clinicDetails,
       });
-      console.log("saveMedicalRecordMutation: PDF do prontuário Blob gerado.");
+      console.log("ConsultationPage: saveMedicalRecordMutation - PDF do prontuário Blob gerado.");
 
       // 3. Fazer upload do PDF do prontuário para o Supabase Storage
-      console.log("saveMedicalRecordMutation: Fazendo upload do PDF do prontuário para o Supabase Storage...");
-      const newMedicalRecordPdfUrl = await uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId!, currentMedicalRecordId);
+      console.log("ConsultationPage: saveMedicalRecordMutation - Fazendo upload do PDF do prontuário para o Supabase Storage...");
+      const newMedicalRecordPdfUrl = await uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId, currentMedicalRecordId); // CORRECTED HERE: using organizationId
       if (!newMedicalRecordPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF do prontuário.");
       }
-      console.log("saveMedicalRecordMutation: Novo PDF do prontuário uploaded, URL:", newMedicalRecordPdfUrl);
+      console.log("ConsultationPage: saveMedicalRecordMutation - Novo PDF do prontuário uploaded, URL:", newMedicalRecordPdfUrl);
 
       // 4. Atualizar o prontuário médico com a nova URL do PDF e os dados do formulário
       const payload = {
