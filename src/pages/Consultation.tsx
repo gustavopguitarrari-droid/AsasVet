@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Clock, User, PawPrint, Stethoscope, CalendarCheck, CheckCircle, ClipboardList, Hospital, AlertTriangle, PlusCircle, DollarSign, ReceiptText, XCircle, FileText } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@//integrations/supabase/client';
 import { useUser } from '@/context/UserContext';
 import { showError, showSuccess } from '@/utils/toast';
 import { format, parseISO, differenceInSeconds, isValid } from 'date-fns';
@@ -483,6 +483,8 @@ const ConsultationPage: React.FC = () => {
         if (data.prescriptions && data.prescriptions.length > 0) {
           console.log("ConsultationPage: Finalizing with prescriptions, generating recipe PDF...");
           try {
+            // Call the mutation to generate and save the recipe PDF
+            // Pass shouldOpenPreview: false because we don't want to open the dialog during finalization flow
             await generateAndSaveRecipePdfMutation.mutateAsync({ prescriptions: data.prescriptions, shouldOpenPreview: false });
             console.log("ConsultationPage: Recipe PDF generated and saved. Now finalizing appointment.");
             finalizeAppointmentMutation.mutate(appointmentId!);

@@ -260,7 +260,7 @@ export const deleteRecipePdfFromSupabase = async (publicUrl: string): Promise<bo
   }
 };
 
-// NOVO: Funções para upload e exclusão de PDFs de prontuários médicos
+-- NOVO: Funções para upload e exclusão de PDFs de prontuários médicos
 export const uploadMedicalRecordPdfToSupabase = async (
   pdfBlob: Blob,
   organizationId: string,
