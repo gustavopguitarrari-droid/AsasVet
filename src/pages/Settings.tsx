@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar Tabs
-import SubusersSettings from "@/components/settings/SubusersSettings"; // Importar novo componente
-import MyPlanSettings from "@/components/settings/MyPlanSettings"; // Importar novo componente
-import LogoUploadSettings from "@/components/settings/LogoUploadSettings"; // NOVO: Importar o componente de logo
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import SubusersSettings from "@/components/settings/SubusersSettings";
+import MyPlanSettings from "@/components/settings/MyPlanSettings";
+import LogoUploadSettings from "@/components/settings/LogoUploadSettings";
+import ImportDataSettings from "@/components/settings/ImportDataSettings"; // NOVO: Importar o componente de importação
 
 const Settings = () => {
   return (
@@ -17,11 +18,11 @@ const Settings = () => {
       <p className="text-muted-foreground">Gerencie as preferências da sua conta e do aplicativo.</p>
 
       <Tabs defaultValue="security" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-auto p-1"> {/* Aumentado para 4 colunas */}
+        <TabsList className="grid w-full grid-cols-4 h-auto p-1">
           <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Geral</TabsTrigger>
           <TabsTrigger value="subusers" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Subusuários</TabsTrigger>
           <TabsTrigger value="my-plan" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Meu Plano</TabsTrigger>
-          <TabsTrigger value="personalization" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Personalização</TabsTrigger> {/* NOVO */}
+          <TabsTrigger value="personalization" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Personalização</TabsTrigger>
         </TabsList>
 
         <TabsContent value="security" className="mt-4 space-y-6">
@@ -59,6 +60,8 @@ const Settings = () => {
               </div>
             </CardContent>
           </Card>
+
+          <ImportDataSettings /> {/* NOVO: Adicionado o componente de importação de dados aqui */}
         </TabsContent>
 
         <TabsContent value="subusers" className="mt-4">
@@ -69,7 +72,7 @@ const Settings = () => {
           <MyPlanSettings />
         </TabsContent>
 
-        <TabsContent value="personalization" className="mt-4"> {/* NOVO */}
+        <TabsContent value="personalization" className="mt-4">
           <LogoUploadSettings />
         </TabsContent>
       </Tabs>
