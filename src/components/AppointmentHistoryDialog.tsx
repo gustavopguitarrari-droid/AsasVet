@@ -186,7 +186,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       if (!userId) throw new Error("User not authenticated.");
       const currentUserId: string = userId;
 
-      console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url);
+      console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url); // ADDED LOG
       if (appointment.recipe_pdf_url) {
         console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found, using it directly.");
         return { pdfUrl: appointment.recipe_pdf_url, appointment };

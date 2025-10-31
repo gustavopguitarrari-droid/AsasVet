@@ -466,7 +466,7 @@ const Appointments = () => {
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',
@@ -517,6 +517,12 @@ const Appointments = () => {
         throw new Error("User not authenticated.");
       }
       const currentUserId: string = userId;
+
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url); // ADDED LOG
+      if (appointment.recipe_pdf_url) {
+        console.log("Appointments: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found, using it directly.");
+        return { pdfUrl: appointment.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
+      }
 
       // Sempre buscar o prontuário médico diretamente para garantir os dados mais recentes
       const { data: medicalRecordData, error: fetchError } = await supabase
@@ -577,6 +583,8 @@ const Appointments = () => {
       return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
     onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
+      if (!userId) return;
+      const currentUserId: string = userId;
       queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointment.id, userId] }); // CORRIGIDO: Usando appointment.id
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
@@ -681,7 +689,7 @@ const Appointments = () => {
   };
 
   const handleOpenRecipePdfPreviewDialog = (appointment: Appointment) => {
-    console.log(`Appointments.tsx: handleOpenRecipePdfPreviewDialog called for appointment ${appointment.id}. recipe_pdf_url: ${appointment.recipe_pdf_url}, prescriptions_count: ${appointment.prescriptions_count}`); // ADDED LOG
+    console.log(`Appointments.tsx: Clicking recipe PDF button for appointment ${appointment.id}. recipe_pdf_url: ${appointment.recipe_pdf_url}, prescriptions_count: ${appointment.prescriptions_count}`); // ADDED LOG
     fetchAndGenerateRecipePdfMutation.mutate({ appointment });
   };
 
