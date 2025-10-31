@@ -156,7 +156,7 @@ const Appointments = () => {
         .from('appointments')
         .select(`
           *,
-          medical_records!left (
+          medical_records (
             prescriptions,
             recipe_pdf_url,
             medical_record_pdf_url
@@ -167,6 +167,7 @@ const Appointments = () => {
       console.log("Appointments.tsx: Raw data from Supabase for appointments query:", data);
       return data.map(app => ({
         ...app,
+        // Access medical_records as an array and get the first element if it exists
         prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
         recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
         medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null,
@@ -184,7 +185,7 @@ const Appointments = () => {
         .from('appointments')
         .select(`
           *,
-          medical_records!left (
+          medical_records (
             prescriptions,
             recipe_pdf_url,
             medical_record_pdf_url
@@ -196,6 +197,7 @@ const Appointments = () => {
       console.log("Appointments.tsx: Raw data from Supabase for historyAppointments query:", data);
       return data.map(app => ({
         ...app,
+        // Access medical_records as an array and get the first element if it exists
         prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
         recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
         medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null,
@@ -280,6 +282,7 @@ const Appointments = () => {
           service: newAppointmentData.service,
           veterinarian: veterinarianName,
           status: "Agendada",
+          client_id: newAppointmentData.selectedClientId, // Ensure client_id is passed
           pet_id: newAppointmentData.selectedPetId,
         })
         .select()
@@ -313,6 +316,7 @@ const Appointments = () => {
           status: updatedAppointment.status,
           completion_timestamp: updatedAppointment.completion_timestamp,
           start_time: updatedAppointment.start_time,
+          client_id: updatedAppointment.client_id, // Ensure client_id is passed
           pet_id: updatedAppointment.pet_id,
         })
         .eq('id', updatedAppointment.id)
