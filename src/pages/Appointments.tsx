@@ -497,6 +497,7 @@ const Appointments = () => {
       return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
     onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
+      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       setPdfBlob(pdfBlob || null);
