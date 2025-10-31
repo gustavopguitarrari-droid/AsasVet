@@ -269,7 +269,8 @@ export const uploadMedicalRecordPdfToSupabase = async (
   console.log("uploadMedicalRecordPdfToSupabase: Iniciando upload do PDF do prontuário.");
   try {
     const fileName = `prontuario_${medicalRecordId}_${uuidv4()}.pdf`;
-    const filePath = `${organizationId}/${medicalRecordId}/${fileName}`; // Caminho: organizationId/medicalRecordId/uuid.pdf
+    // CORREÇÃO AQUI: O filePath deve ser organizationId/medicalRecordId/fileName para corresponder à política RLS
+    const filePath = `${organizationId}/${medicalRecordId}/${fileName}`; 
     console.log(`uploadMedicalRecordPdfToSupabase: Tentando upload para filePath: ${filePath} no bucket: ${MEDICAL_RECORDS_BUCKET_NAME}`);
     console.log(`uploadMedicalRecordPdfToSupabase: Using organizationId: ${organizationId}, filePath: ${filePath}`); // ADDED LOG
 
@@ -328,7 +329,7 @@ export const deleteMedicalRecordPdfFromSupabase = async (publicUrl: string): Pro
     console.log("deleteMedicalRecordPdfFromSupabase: PDF do prontuário deletado com sucesso.");
     return true;
   } catch (error) {
-    console.error("deleteMedicalRecordPdfFromSupabase: Erro no processo de exclusão do PDF do prontuário:", error);
+    console.error("deleteMedicalRecordPdfToSupabase: Erro no processo de exclusão do PDF do prontuário:", error);
     return false;
   }
 };
