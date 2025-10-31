@@ -343,10 +343,10 @@ const ConsultationPage: React.FC = () => {
         throw new Error("Falha ao fazer upload do PDF da receita.");
       }
 
-      console.log("generateAndSaveRecipePdfMutation: Atualizando medical_records com a nova URL e prescrições...");
+      console.log("generateAndSaveRecipePdfMutation: Atualizando medical_records com a nova URL...");
       const { data, error } = await supabase
         .from('medical_records')
-        .update({ recipe_pdf_url: newPdfUrl, prescriptions: prescriptions })
+        .update({ recipe_pdf_url: newPdfUrl }) // APENAS ATUALIZA A URL DO PDF DA RECEITA
         .eq('id', currentMedicalRecordId)
         .eq('user_id', userId)
         .select()
