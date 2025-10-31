@@ -535,7 +535,7 @@ const Appointments = () => {
       // Se o prontuário médico existe e já tem uma URL de PDF de receita, use-a diretamente
       if (medicalRecordData?.recipe_pdf_url) {
         console.log("Appointments: fetchAndGenerateRecipePdfMutation - URL de PDF de receita existente encontrada no prontuário, usando-a diretamente.");
-        return { pdfUrl: medicalRecordData.recipe_pdf_url, appointment, pdfBlob: null }; // Retorna pdfBlob como null, pois estamos usando a URL existente
+        return { pdfUrl: medicalRecordData.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
       }
 
       // Se não há URL de PDF de receita existente ou não há prescrições, lance o erro
@@ -578,6 +578,9 @@ const Appointments = () => {
     onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      // Force a refetch immediately after invalidation
+      queryClient.refetchQueries({ queryKey: ['appointments', userId] }); // ADDED THIS
+      queryClient.refetchQueries({ queryKey: ['historyAppointments', userId] }); // ADDED THIS
       setRecipePdfBlob(pdfBlob || null);
       setRecipePdfUrl(pdfUrl || null);
       setRecipePdfFilename(`Receita_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
@@ -676,6 +679,7 @@ const Appointments = () => {
   };
 
   const handleOpenRecipePdfPreviewDialog = (appointment: Appointment) => {
+    console.log(`Appointments.tsx: handleOpenRecipePdfPreviewDialog called for appointment ${appointment.id}. recipe_pdf_url: ${appointment.recipe_pdf_url}, prescriptions_count: ${appointment.prescriptions_count}`); // ADDED LOG
     fetchAndGenerateRecipePdfMutation.mutate({ appointment });
   };
 
@@ -805,6 +809,7 @@ const Appointments = () => {
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
+              console.log(`Appointments.tsx: Clicking prescriptions count button for appointment ${appointment.id}. prescriptions_count: ${appointment.prescriptions_count}`); // ADDED LOG
               if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
                 showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
               } else {

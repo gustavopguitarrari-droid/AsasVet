@@ -360,7 +360,8 @@ const ConsultationPage: React.FC = () => {
       return { pdfBlob, newPdfUrl, shouldOpenPreview };
     },
     onSuccess: ({ pdfBlob, newPdfUrl, shouldOpenPreview }) => {
-      console.log("generateAndSaveRecipePdfMutation: onSuccess - Invalidando queries e mostrando sucesso.");
+      console.log("generateAndSaveRecipePdfMutation: onSuccess - Invalidating queries and showing success.");
+      console.log("generateAndSaveRecipePdfMutation: Prescriptions after save:", medicalRecordFormRef.current?.getValues().prescriptions); // ADDED LOG
       queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
