@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 const AVATARS_BUCKET_NAME = 'avatars';
 const LOGOS_BUCKET_NAME = 'logos';
 const PRESCRIPTIONS_BUCKET_NAME = 'prescriptions'; // NOVO: Nome do bucket para prescrições
+const MEDICAL_RECORDS_BUCKET_NAME = 'medical_records_pdfs'; // NOVO: Nome do bucket para prontuários médicos
 
 /**
  * Converte uma string Base64 em um Blob.
@@ -253,6 +254,78 @@ export const deleteRecipePdfFromSupabase = async (publicUrl: string): Promise<bo
     return true;
   } catch (error) {
     console.error("deleteRecipePdfFromSupabase: Erro no processo de exclusão do PDF da receita:", error);
+    return false;
+  }
+};
+
+// NOVO: Funções para upload e exclusão de PDFs de prontuários médicos
+export const uploadMedicalRecordPdfToSupabase = async (
+  pdfBlob: Blob,
+  organizationId: string,
+  medicalRecordId: string,
+): Promise<string | null> => {
+  console.log("uploadMedicalRecordPdfToSupabase: Iniciando upload do PDF do prontuário.");
+  try {
+    const fileName = `prontuario_${medicalRecordId}_${uuidv4()}.pdf`;
+    const filePath = `${organizationId}/${medicalRecordId}/${fileName}`; // Caminho: organizationId/medicalRecordId/uuid.pdf
+    console.log(`uploadMedicalRecordPdfToSupabase: Tentando upload para filePath: ${filePath} no bucket: ${MEDICAL_RECORDS_BUCKET_NAME}`);
+
+    const { data, error } = await supabase.storage
+      .from(MEDICAL_RECORDS_BUCKET_NAME)
+      .upload(filePath, pdfBlob, {
+        contentType: 'application/pdf',
+        upsert: false,
+      });
+
+    if (error) {
+      console.error("uploadMedicalRecordPdfToSupabase: Erro ao fazer upload do PDF do prontuário:", error);
+      throw error;
+    }
+    console.log("uploadMedicalRecordPdfToSupabase: Upload bem-sucedido, data:", data);
+
+    const { data: publicUrlData } = supabase.storage
+      .from(MEDICAL_RECORDS_BUCKET_NAME)
+      .getPublicUrl(filePath);
+
+    console.log("uploadMedicalRecordPdfToSupabase: URL pública obtida:", publicUrlData.publicUrl);
+    return publicUrlData.publicUrl;
+
+  } catch (error) {
+    console.error("uploadMedicalRecordPdfToSupabase: Erro no processo de upload do PDF do prontuário:", error);
+    return null;
+  }
+};
+
+export const deleteMedicalRecordPdfFromSupabase = async (publicUrl: string): Promise<boolean> => {
+  console.log("deleteMedicalRecordPdfFromSupabase: Iniciando exclusão do PDF do prontuário para URL:", publicUrl);
+  if (!publicUrl) {
+    console.log("deleteMedicalRecordPdfFromSupabase: Nenhuma publicUrl fornecida, nada para deletar.");
+    return true;
+  }
+
+  try {
+    const url = new URL(publicUrl);
+    const pathSegments = url.pathname.split('/');
+    const bucketIndex = pathSegments.indexOf(MEDICAL_RECORDS_BUCKET_NAME);
+    if (bucketIndex === -1 || bucketIndex + 1 >= pathSegments.length) {
+      console.warn("deleteMedicalRecordPdfFromSupabase: URL pública inválida para exclusão do PDF do prontuário:", publicUrl);
+      return false;
+    }
+    const filePath = pathSegments.slice(bucketIndex + 1).join('/');
+    console.log(`deleteMedicalRecordPdfFromSupabase: Tentando deletar filePath: ${filePath} do bucket: ${MEDICAL_RECORDS_BUCKET_NAME}`);
+
+    const { error } = await supabase.storage
+      .from(MEDICAL_RECORDS_BUCKET_NAME)
+      .remove([filePath]);
+
+    if (error) {
+      console.error("deleteMedicalRecordPdfFromSupabase: Erro ao deletar PDF do prontuário do storage:", error);
+      return false;
+    }
+    console.log("deleteMedicalRecordPdfFromSupabase: PDF do prontuário deletado com sucesso.");
+    return true;
+  } catch (error) {
+    console.error("deleteMedicalRecordPdfFromSupabase: Erro no processo de exclusão do PDF do prontuário:", error);
     return false;
   }
 };

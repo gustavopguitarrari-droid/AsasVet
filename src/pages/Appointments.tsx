@@ -62,6 +62,7 @@ export interface Appointment {
   start_time?: string | null;
   prescriptions_count?: number; // NOVO: Contagem de prescrições
   recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
+  medical_record_pdf_url?: string | null; // NOVO: URL do PDF do prontuário
   pet_id: string | null; // NOVO: Adicionado pet_id e tornado obrigatório (ou null)
 }
 
@@ -76,6 +77,7 @@ interface MedicalRecord {
   treatment?: string | null;
   prescriptions?: { medication: string; dosage: string; frequency: string; instructions?: string }[] | null; // Alterado para permitir null
   recipe_pdf_url?: string | null; // NOVO: URL do PDF da receita
+  medical_record_pdf_url?: string | null; // NOVO: URL do PDF do prontuário
   created_at: string;
   updated_at: string;
 }
@@ -162,7 +164,8 @@ const Appointments = () => {
           *,
           medical_records (
             prescriptions,
-            recipe_pdf_url
+            recipe_pdf_url,
+            medical_record_pdf_url
           )
         `)
         .eq('user_id', userId);
@@ -174,6 +177,7 @@ const Appointments = () => {
         // and extract prescriptions. Handle null/undefined cases.
         prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
         recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
+        medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null, // NOVO: Mapear medical_record_pdf_url
         pet_id: app.pet_id || null, // Ensure pet_id is always present, even if null
       })) as Appointment[];
     },
@@ -190,7 +194,8 @@ const Appointments = () => {
           *,
           medical_records (
             prescriptions,
-            recipe_pdf_url
+            recipe_pdf_url,
+            medical_record_pdf_url
           )
         `)
         .eq('user_id', userId)
@@ -201,6 +206,7 @@ const Appointments = () => {
         ...app,
         prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
         recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
+        medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null, // NOVO: Mapear medical_record_pdf_url
         pet_id: app.pet_id || null, // Ensure pet_id is always present, even if null
       })) as Appointment[];
     },
@@ -424,13 +430,19 @@ const Appointments = () => {
       }
       const currentUserId: string = userId;
 
+      // Se já existe uma URL de PDF de prontuário, use-a diretamente
+      if (appointment.medical_record_pdf_url) {
+        console.log("Appointments: fetchAndGeneratePdfMutation - Existing medical_record_pdf_url found, using it directly.");
+        return { pdfUrl: appointment.medical_record_pdf_url, appointment };
+      }
+
       // First, fetch the medical record
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
         .eq('appointment_id', appointment.id)
         .eq('user_id', currentUserId)
-        .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
+        .maybeSingle();
 
       if (fetchError) {
         throw fetchError;
@@ -449,25 +461,42 @@ const Appointments = () => {
         prescriptions: medicalRecordData.prescriptions || [],
       };
 
+      const clinicDetails = {
+        companyName: appUser?.companyName || 'AsasVet',
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        phone: appUser?.phone || '',
+        email: appUser?.email || '',
+        veterinarianCrmv: appUser?.crmv || '',
+        veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
+      };
+
       // Generate the PDF
-      const blob = await generateMedicalRecordPdf({ 
+      const pdfBlob = await generateMedicalRecordPdf({ 
         appointment, 
         medicalRecord: medicalRecordForPdf, 
         logoUrl: appUser?.logoUrl,
-        clinicDetails: {
-          companyName: appUser?.companyName || 'AsasVet',
-          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
-          phone: appUser?.phone || '',
-          email: appUser?.email || '',
-          veterinarianCrmv: appUser?.crmv || '',
-          veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
-        }
+        clinicDetails,
       });
 
-      return { blob, appointment };
+      // Upload the newly generated PDF and get its URL
+      const newPdfUrl = await supabase
+        .from('medical_records')
+        .update({ medical_record_pdf_url: await uploadMedicalRecordPdfToSupabase(pdfBlob, currentUserId, medicalRecordData.id) })
+        .eq('id', medicalRecordData.id)
+        .eq('user_id', currentUserId)
+        .select('medical_record_pdf_url')
+        .single();
+
+      if (newPdfUrl.error) {
+        throw newPdfUrl.error;
+      }
+
+      return { pdfBlob, pdfUrl: newPdfUrl.data.medical_record_pdf_url, appointment };
     },
-    onSuccess: ({ blob, appointment }) => {
-      setPdfBlob(blob);
+    onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalida para atualizar medical_record_pdf_url
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      setPdfBlob(pdfBlob || null); // Pode ser null se a URL existente foi usada
       setPdfFilename(`Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
       setPdfAppointment(appointment);
       setIsPdfPreviewDialogOpen(true);
@@ -500,7 +529,7 @@ const Appointments = () => {
         .select('id, prescriptions')
         .eq('appointment_id', appointment.id)
         .eq('user_id', currentUserId)
-        .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
+        .maybeSingle();
 
       if (fetchError) {
         throw fetchError;
@@ -999,7 +1028,7 @@ const Appointments = () => {
           pdfBlob={pdfBlob}
           filename={pdfFilename}
           onConfirmDownload={handleConfirmPdfDownload}
-          pdfUrl={pdfAppointment?.id ? `/api/download-medical-record/${pdfAppointment.id}` : undefined}
+          pdfUrl={pdfAppointment?.medical_record_pdf_url || null} {/* NOVO: Usar medical_record_pdf_url */}
         />
 
         <PdfPreviewDialog
