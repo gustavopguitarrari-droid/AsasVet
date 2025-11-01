@@ -1037,8 +1037,8 @@ const Appointments = () => {
           onViewDetails={handleViewHistoryDetails}
           onClearHistory={clearHistoryAppointmentsMutation.mutate}
           isClearingHistory={clearHistoryAppointmentsMutation.isPending}
-          onViewMedicalRecordPdf={handleOpenMedicalRecordPdfPreviewDialog} {/* NOVO */}
-          onViewRecipePdf={handleOpenRecipePdfPreviewDialog} {/* NOVO */}
+          onViewMedicalRecordPdf={handleOpenMedicalRecordPdfPreviewDialog}
+          onViewRecipePdf={handleOpenRecipePdfPreviewDialog}
         />
 
         <PdfPreviewDialog
