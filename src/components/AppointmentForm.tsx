@@ -216,7 +216,8 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
                         )}
                         disabled
                       >
-                        <span> {/* Wrapped children in a single span */}
+                        {/* Wrapped children in a single span */}
+                        <span> 
                           {field.value ? (
                             format(field.value, "PPP", { locale: ptBR })
                           ) : (
