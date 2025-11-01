@@ -28,7 +28,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { Client, Pet } from "@/types/cadastro";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Importar useLocation
 import { usePageTitle } from "@/context/PageTitleContext";
 import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
 import PdfPreviewDialog from "@/components/PdfPreviewDialog";
@@ -109,6 +109,7 @@ const Appointments = () => {
   const userId = appUser?.id;
   const veterinarianName = appUser?.name || "Veterinário Desconhecido";
   const navigate = useNavigate();
+  const location = useLocation(); // Inicializar useLocation
   const { setPageTitle } = usePageTitle();
 
   const [activeTab, setActiveTab] = React.useState<string>("em-espera");
@@ -128,6 +129,15 @@ const Appointments = () => {
   const [recipePdfBlob, setRecipePdfBlob] = useState<Blob | null>(null);
   const [recipePdfUrl, setRecipePdfUrl] = useState<string | null>(null);
   const [recipePdfFilename, setRecipePdfFilename] = useState("");
+
+  React.useEffect(() => {
+    // Verifica se há um estado de navegação para definir a aba ativa
+    if (location.state && (location.state as any).activeTab) {
+      setActiveTab((location.state as any).activeTab);
+      // Limpa o estado para que a aba não seja redefinida em futuras navegações
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate]);
 
   React.useEffect(() => {
     let tabName = "";
