@@ -346,11 +346,12 @@ const ConsultationPage: React.FC = () => {
       console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Medical record updated with new recipe_pdf_url:", data.recipe_pdf_url);
       return { pdfBlob, newPdfUrl, shouldOpenPreview };
     },
-    onSuccess: ({ pdfBlob, newPdfUrl, shouldOpenPreview }) => {
+    onSuccess: async ({ pdfBlob, newPdfUrl, shouldOpenPreview }) => { // Adicionado 'async' aqui
       console.log("generateAndSaveRecipePdfMutation: onSuccess - Invalidating queries and showing success.");
       console.log("generateAndSaveRecipePdfMutation: Prescriptions after save:", medicalRecordFormRef.current?.getValues().prescriptions);
       queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      await queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalidate
+      await queryClient.refetchQueries({ queryKey: ['appointments', userId] }); // Force refetch
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       showSuccess("Receita PDF gerada e salva com sucesso!");
       if (shouldOpenPreview) {
@@ -433,7 +434,7 @@ const ConsultationPage: React.FC = () => {
       const { data: upsertedRecord, error: upsertError } = await supabase
         .from('medical_records')
         .upsert(upsertPayload, { onConflict: 'appointment_id,user_id' }) // Assuming unique constraint on these two
-        .select('id') // Select only the ID for the next step
+        .select('id, prescriptions') // Select ID and prescriptions for the next step
         .single();
 
       if (upsertError) {
@@ -468,7 +469,8 @@ const ConsultationPage: React.FC = () => {
     },
     onSuccess: async (data) => { // 'data' here is the updated medical record from Supabase
       queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      await queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalidate
+      await queryClient.refetchQueries({ queryKey: ['appointments', userId] }); // Force refetch
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       showSuccess("Prontuário salvo com sucesso!");
 

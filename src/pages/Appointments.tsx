@@ -466,7 +466,7 @@ const Appointments = () => {
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',
@@ -518,12 +518,16 @@ const Appointments = () => {
       }
       const currentUserId: string = userId;
 
+      console.log(`Appointments.tsx: fetchAndGenerateRecipePdfMutation called for appointment ${appointment.id}. Current appointment object:`, appointment); // ADDED LOG
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation.mutationFn - Received appointment:", appointment); // ADDED LOG
+
       console.log("Appointments: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url); // ADDED LOG
       if (appointment.recipe_pdf_url) {
-        console.log("Appointments: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found, using it directly.");
+        console.log("Appointments: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found on passed appointment, using it directly:", appointment.recipe_pdf_url); // ADDED LOG
         return { pdfUrl: appointment.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
       }
 
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - No recipe_pdf_url on passed appointment, fetching medical record directly from DB."); // ADDED LOG
       // Sempre buscar o prontuário médico diretamente para garantir os dados mais recentes
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
@@ -547,10 +551,11 @@ const Appointments = () => {
 
       // Ensure prescriptions is an array, even if null from DB
       const prescriptionsFromDb = medicalRecordData?.prescriptions || [];
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Prescriptions from direct DB fetch:", prescriptionsFromDb); // ADDED LOG
 
       // Se não há URL de PDF de receita existente ou não há prescrições, lance o erro
       if (prescriptionsFromDb.length === 0) { // Changed condition here
-        console.error("Appointments: fetchAndGenerateRecipePdfMutation - Nenhuma prescrição encontrada no prontuário para gerar a receita.");
+        console.error("Appointments: fetchAndGenerateRecipePdfMutation - Prescriptions array is empty after direct DB fetch."); // ADDED LOG
         throw new Error("Nenhuma prescrição encontrada no prontuário para gerar a receita.");
       }
 
@@ -849,7 +854,7 @@ const Appointments = () => {
                 <FileText className="h-4 w-4" />
               )}
             </Button>
-            {appointment.recipe_pdf_url && (
+            {appointment.recipe_pdf_url || (appointment.prescriptions_count && appointment.prescriptions_count > 0) ? ( // Show button if URL exists OR if prescriptions exist
               <Button
                 variant="outline"
                 size="sm"
@@ -862,7 +867,7 @@ const Appointments = () => {
                   <Pill className="h-4 w-4" />
                 )}
               </Button>
-            )}
+            ) : null}
           </div>
         )},
       ];
