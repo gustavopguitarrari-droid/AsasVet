@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format, parseISO, isValid } from "date-fns";
+import { format, parseISO, isValid, isSameDay } from "date-fns"; // Importar isSameDay
 import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
@@ -25,7 +25,7 @@ import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Search, User, PawPrint, Check, ChevronsUpDown } from "lucide-react"; // Adicionado Check e ChevronsUpDown
+import { CalendarIcon, Search, User, PawPrint, Check, ChevronsUpDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import {
@@ -35,7 +35,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command"; // Importar Command components
+} from "@/components/ui/command";
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -229,6 +229,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
                       onSelect={field.onChange}
                       initialFocus
                       locale={ptBR}
+                      disabled={(date) => !isSameDay(date, new Date())} // Desabilita todos os dias, exceto o atual
                     />
                   </PopoverContent>
                 </Popover>
