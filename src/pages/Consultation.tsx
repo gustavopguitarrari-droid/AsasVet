@@ -768,6 +768,14 @@ const ConsultationPage: React.FC = () => {
           <div className="flex items-center space-x-2">
             <Clock className="h-5 w-5 mr-2 text-muted-foreground" />
             {appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
+            <Button
+              onClick={() => setIsAddAnimalDebitDialogOpen(true)}
+              size="sm"
+              variant="secondary"
+              className="ml-4"
+            >
+              <ReceiptText className="mr-2 h-4 w-4" /> Débitos do Animal
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="grid gap-4 py-4">
@@ -794,62 +802,6 @@ const ConsultationPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Seção de Débitos do Animal */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center">
-            <ReceiptText className="mr-2 h-5 w-5" /> Débitos do Animal
-          </CardTitle>
-          <Button onClick={() => setIsAddAnimalDebitDialogOpen(true)} size="sm">
-            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Débito
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {animalDebits.length === 0 ? (
-            <p className="text-muted-foreground text-center py-4">Nenhum débito registrado para este animal nesta consulta.</p>
-          ) : (
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Descrição</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {animalDebits.map((debit) => (
-                    <TableRow key={debit.id} className={cn(debit.is_paid && "bg-green-50/50 dark:bg-green-900/20")}>
-                      <TableCell className="font-medium">{debit.description}</TableCell>
-                      <TableCell>R$ {debit.amount.toFixed(2).replace('.', ',')}</TableCell>
-                      <TableCell>
-                        <Badge variant={debit.is_paid ? "default" : "destructive"} className={cn(debit.is_paid ? "bg-green-500" : "bg-orange-500")}>
-                          {debit.is_paid ? "Pago" : "Pendente"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {!debit.is_paid && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleMarkDebitAsPaid(debit.id)}
-                            disabled={markDebitAsPaidMutation.isPending}
-                          >
-                            <DollarSign className="mr-2 h-4 w-4" /> Marcar como Pago
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Formulário de Prontuário Médico */}
       <MedicalRecordForm
         initialData={initialMedicalRecordData}
         onSubmit={handleSaveMedicalRecord}
@@ -923,6 +875,8 @@ const ConsultationPage: React.FC = () => {
         onSubmit={handleAddAnimalDebit}
         isSubmitting={addAnimalDebitMutation.isPending}
         products={products}
+        animalDebits={animalDebits}
+        onMarkDebitAsPaid={handleMarkDebitAsPaid}
       />
 
       <PdfPreviewDialog
