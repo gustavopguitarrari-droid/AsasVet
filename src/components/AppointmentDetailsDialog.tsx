@@ -68,7 +68,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
   const getStatusBadgeVariant = (status: Appointment["status"]) => {
     switch (status) {
       case "Agendada":
-        return "bg-sidebar-item-bg-1 text-white";
+        return "bg-sidebar-item-bg-1 text-white"; // Mantém a cor, mas o texto será "Em espera"
       case "Em Andamento":
         return "bg-orange-500 text-white";
       case "Realizada":
@@ -203,7 +203,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
               <p className="text-sm font-medium text-muted-foreground">Status:</p>
               <div className="col-span-2 text-sm">
                 <Badge className={cn("text-white", getStatusBadgeVariant(appointment.status))}>
-                  {appointment.status}
+                  {appointment.status === "Agendada" ? "Em espera" : appointment.status}
                 </Badge>
               </div>
             </div>
