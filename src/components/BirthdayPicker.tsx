@@ -26,8 +26,11 @@ const BirthdayPicker: React.FC<BirthdayPickerProps> = ({ value, onChange }) => {
             !value && "text-muted-foreground"
           )}
         >
-          <CalendarIcon className="mr-2 h-4 w-4" />
-          {value ? format(value, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
+          {/* Conteúdo do botão envolvido em uma única div */}
+          <div className="flex items-center">
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {value ? format(value, "PPP", { locale: ptBR }) : <span>Selecione uma data</span>}
+          </div>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">

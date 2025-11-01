@@ -207,16 +207,15 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
                 <FormLabel>Data da Consulta</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <FormControl> {/* Adicionado FormControl aqui */}
+                    <FormControl>
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-full pl-3 text-left font-normal h-10", // Adicionado h-10
+                          "w-full px-3 text-left font-normal h-10", // Alterado de pl-3 para px-3
                           !field.value && "text-muted-foreground"
                         )}
                         disabled
                       >
-                        {/* Wrapped children in a single div */}
                         <div className="flex items-center justify-between w-full"> 
                           <span>
                             {field.value ? (
@@ -249,10 +248,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
             control={form.control}
             name="time"
             render={({ field }) => (
-              <FormItem className="flex flex-col"> {/* Adicionado flex flex-col para consistência */}
+              <FormItem className="flex flex-col">
                 <FormLabel>Hora da Consulta</FormLabel>
                 <FormControl>
-                  <Input type="time" {...field} disabled className="h-10" /> {/* Adicionado h-10 */}
+                  <Input type="time" {...field} disabled className="h-10" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
