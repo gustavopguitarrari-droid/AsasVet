@@ -100,7 +100,7 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
                   <HeartPulse className="h-4 w-4 mr-1" /> Exame Físico
                 </TabsTrigger>
                 <TabsTrigger value="diagnosis" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm py-2 font-bold flex items-center">
-                  <FlaskConical className="h-4 w-4 mr-1" /> Diagnóstico
+                  <FlaskConical className="h-4 w-4 mr-1" /> Suspeita
                 </TabsTrigger>
                 <TabsTrigger value="treatment" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-sm py-2 font-bold flex items-center">
                   <Pill className="h-4 w-4 mr-1" /> Tratamento
