@@ -228,11 +228,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
                 <Play className="mr-2 h-4 w-4" /> Iniciar Consulta
               </Button>
             )}
-            {!isFinalized && (
-              <Button variant="outline" onClick={() => setIsEditing(true)} className="w-full sm:w-auto mb-2 sm:mb-0">
-                <Edit className="mr-2 h-4 w-4" /> Editar
-              </Button>
-            )}
+            {/* Botão de Editar removido */}
             {!isFinalized && (
               <Button variant="destructive" onClick={handleCancelClick} className="w-full sm:w-auto">
                 <Trash2 className="mr-2 h-4 w-4" /> Cancelar Consulta
