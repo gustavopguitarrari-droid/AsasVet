@@ -64,6 +64,8 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
       const session = await supabase.auth.getSession();
       if (!session.data.session) throw new Error("User not authenticated.");
 
+      console.log("AddSubuserDialog: Sending data to create-subuser edge function:", newUserData); // ADDED LOG
+
       const { data: responseData, error } = await supabase.functions.invoke('create-subuser', {
         body: JSON.stringify({
           email: newUserData.email,

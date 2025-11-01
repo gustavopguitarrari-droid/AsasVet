@@ -52,17 +52,28 @@ const SubusersSettings: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isAddSubuserDialogOpen, setIsAddSubuserDialogOpen] = useState(false); // Estado para o diálogo
 
+  console.log("SubusersSettings: Current user organizationId:", user?.organizationId); // ADDED LOG
+  console.log("SubusersSettings: Current user role:", user?.role); // ADDED LOG
+
   // Fetch subusers
   const { data: subusers, isLoading, error } = useQuery<SubuserProfile[]>({
     queryKey: ['subusers', user?.organizationId], // Alterado para usar organizationId
     queryFn: async () => {
-      if (!user?.organizationId) return []; // Usar organizationId
+      if (!user?.organizationId) {
+        console.log("SubusersSettings: Skipping subusers query, organizationId is null/undefined."); // ADDED LOG
+        return []; // Usar organizationId
+      }
+      console.log("SubusersSettings: Fetching subusers for organizationId:", user.organizationId); // ADDED LOG
       const { data, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email, role, organization_id') // Gênero removido da seleção
         .eq('organization_id', user.organizationId) // Filtrar por organization_id
         .neq('id', user.id); // Exclude the current admin user
-      if (error) throw error;
+      if (error) {
+        console.error("SubusersSettings: Error fetching subusers:", error); // ADDED LOG
+        throw error;
+      }
+      console.log("SubusersSettings: Fetched subusers data:", data); // ADDED LOG
       return data;
     },
     enabled: user?.role === "Administrador" && !!user?.organizationId, // Only fetch if current user is admin and organizationId is available
