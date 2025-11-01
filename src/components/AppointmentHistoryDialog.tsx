@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock, FileText, Pill, User, Stethoscope, CalendarDays } from "lucide-react"; // Adicionado CalendarDays
+import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock, FileText, Pill, User, Stethoscope, CalendarDays } from "lucide-react"; // Adicionado FileText e Pill
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Appointment } from "@/pages/Appointments"; // Importar a interface Appointment
@@ -39,6 +39,8 @@ interface AppointmentHistoryDialogProps { // Renomeado para AppointmentHistoryDi
   onViewDetails: (appointment: Appointment) => void; // Nova prop para ver detalhes
   onClearHistory: () => void; // Nova prop para limpar o histórico
   isClearingHistory: boolean; // Nova prop para indicar se a limpeza está em andamento
+  onViewMedicalRecordPdf: (appointment: Appointment) => void; // NOVO: Prop para visualizar PDF do prontuário
+  onViewRecipePdf: (appointment: Appointment) => void; // NOVO: Prop para visualizar PDF da receita
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -66,6 +68,8 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   onViewDetails,
   onClearHistory,
   isClearingHistory,
+  onViewMedicalRecordPdf, // NOVO
+  onViewRecipePdf, // NOVO
 }) => {
   const [searchTerm, setSearchTerm] = React.useState<string>("");
   const [activeTab, setActiveTab] = React.useState<"realizadas" | "canceladas">("realizadas"); // Tabs para realizadas e canceladas
@@ -116,9 +120,21 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                   <CalendarDays className="h-4 w-4 mr-1" /> {finalDate ? format(parseISO(finalDate), "dd/MM/yyyy", { locale: ptBR }) : "N/A"}
                 </span>
                 <span className="text-xs text-muted-foreground mt-1">Serviço: {appointment.service}</span>
-                <Button variant="ghost" size="sm" onClick={() => onViewDetails(appointment)} className="mt-2">
-                  <Eye className="h-4 w-4 mr-1" /> Ver Detalhes
-                </Button>
+                <div className="flex space-x-2 mt-2">
+                  {appointment.medical_record_pdf_url && (
+                    <Button variant="outline" size="sm" onClick={() => onViewMedicalRecordPdf(appointment)}>
+                      <FileText className="h-4 w-4 mr-1" /> Prontuário
+                    </Button>
+                  )}
+                  {(appointment.recipe_pdf_url || (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0)) && (
+                    <Button variant="outline" size="sm" onClick={() => onViewRecipePdf(appointment)}>
+                      <Pill className="h-4 w-4 mr-1" /> Receita
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="sm" onClick={() => onViewDetails(appointment)}>
+                    <Eye className="h-4 w-4 mr-1" /> Detalhes
+                  </Button>
+                </div>
               </div>
             </li>
           );
