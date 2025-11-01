@@ -20,7 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 import AppointmentChronometer from "@/components/AppointmentChronometer";
-import AppointmentHistoryDialog from "@/components/AppointmentHistoryDialog";
+import AppointmentHistoryDialog from "@/components/AppointmentHistoryDialog"; // Importação atualizada
 import { format, parseISO, differenceInSeconds, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";

@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock, FileText, Pill } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { InternedPatient } from "@/pages/Internacao"; // Importar a interface atualizada
+import { Appointment } from "@/pages/Appointments"; // Importar a interface Appointment
 import { Button } from "@/components/ui/button"; // Importar Button
 import {
   AlertDialog,
@@ -27,13 +27,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar Tabs
+import { format, parseISO, isValid } from "date-fns"; // Importar format, parseISO, isValid
+import { ptBR } from "date-fns/locale"; // Importar ptBR
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
-interface InternmentHistoryDialogProps {
+interface AppointmentHistoryDialogProps { // Renomeado para AppointmentHistoryDialogProps
   isOpen: boolean;
   onClose: () => void;
-  historyPatients: InternedPatient[];
+  historyAppointments: Appointment[]; // Alterado para Appointment[]
+  onViewDetails: (appointment: Appointment) => void; // Nova prop para ver detalhes
   onClearHistory: () => void; // Nova prop para limpar o histórico
   isClearingHistory: boolean; // Nova prop para indicar se a limpeza está em andamento
 }
@@ -44,83 +47,78 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
+  Equino: MoreHorizontal, // Adicionado Equino
+  Bovino: MoreHorizontal,   // Adicionado Bovino
   Outros: MoreHorizontal,
 };
 
-const speciesColorMap: { [key: string]: string } = {
-  Cachorro: "text-sidebar-item-bg-1",
-  Gato: "text-sidebar-item-bg-4",
-  Pássaro: "text-sidebar-item-bg-3",
-  Roedor: "text-sidebar-item-bg-7",
-  Peixe: "text-sidebar-item-bg-5",
-  Outros: "text-sidebar-item-bg-9",
+const statusBadgeColorMap: Record<Appointment["status"], string> = { // Alterado para Appointment["status"]
+  "Agendada": "bg-blue-500",
+  "Em Andamento": "bg-orange-500",
+  "Realizada": "bg-green-500",
+  "Cancelada": "bg-red-500",
 };
 
-const statusBadgeColorMap: Record<InternedPatient["status"], string> = {
-  "Em Observação": "bg-blue-500",
-  "Estável": "bg-green-500",
-  "Crítico": "bg-red-500",
-  "Alta": "bg-green-500",
-  "Óbito": "bg-red-500",
-};
-
-const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
+const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   isOpen,
   onClose,
-  historyPatients,
+  historyAppointments = [], // Adicionado valor padrão para evitar undefined
+  onViewDetails,
   onClearHistory,
   isClearingHistory,
 }) => {
   const [searchTerm, setSearchTerm] = React.useState<string>("");
-  const [activeTab, setActiveTab] = React.useState<"alta" | "obito">("alta");
+  const [activeTab, setActiveTab] = React.useState<"realizadas" | "canceladas">("realizadas"); // Tabs para realizadas e canceladas
 
-  const filteredHistoryPatients = historyPatients.filter(patient =>
-    patient.pet_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.owner_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.status.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.species.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    patient.bay_name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredHistoryAppointments = historyAppointments.filter(appointment =>
+    appointment.pet_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    appointment.client_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    appointment.veterinarian.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    appointment.service.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    appointment.species.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const dischargedPatients = filteredHistoryPatients.filter(patient => patient.status === "Alta");
-  const deceasedPatients = filteredHistoryPatients.filter(patient => patient.status === "Óbito");
+  const completedAppointments = filteredHistoryAppointments.filter(appointment => appointment.status === "Realizada");
+  const cancelledAppointments = filteredHistoryAppointments.filter(appointment => appointment.status === "Cancelada");
 
-  const renderPatientList = (patientsToRender: InternedPatient[]) => {
-    if (patientsToRender.length === 0) {
+  const renderAppointmentList = (appointmentsToRender: Appointment[]) => {
+    if (appointmentsToRender.length === 0) {
       return (
         <p className="text-muted-foreground text-center py-8 flex-1">
-          Nenhum paciente no histórico de {activeTab === "alta" ? "altas" : "óbitos"} que corresponda à sua busca.
+          Nenhuma consulta no histórico de {activeTab === "realizadas" ? "realizadas" : "canceladas"} que corresponda à sua busca.
         </p>
       );
     }
     return (
       <ul className="space-y-4 flex-1 overflow-y-auto pr-2">
-        {patientsToRender.map((patient) => {
-          const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
-          const statusColorClass = statusBadgeColorMap[patient.status] || "bg-gray-500";
-          const finalDate = patient.expected_discharge_date || patient.admission_date;
+        {appointmentsToRender.map((appointment) => {
+          const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
+          const statusColorClass = statusBadgeColorMap[appointment.status] || "bg-gray-500";
+          const finalDate = appointment.completion_timestamp || appointment.date;
 
           return (
-            <li key={patient.id} className="flex items-center p-4 border rounded-md shadow-sm bg-card text-card-foreground">
-              <IconComponent className={cn("h-6 w-6 mr-4", speciesColorMap[patient.species])} />
+            <li key={appointment.id} className="flex items-center p-4 border rounded-md shadow-sm bg-card text-card-foreground">
+              <IconComponent className={cn("h-6 w-6 mr-4 text-muted-foreground")} />
               <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2 items-center">
-                <p className="font-bold text-lg">{patient.pet_name}</p>
+                <p className="font-bold text-lg">{appointment.pet_name}</p>
                 <p className="text-muted-foreground flex items-center">
-                  <User className="h-4 w-4 mr-2" /> {patient.owner_name}
+                  <User className="h-4 w-4 mr-2" /> {appointment.client_name}
                 </p>
                 <p className="text-muted-foreground flex items-center">
-                  <Stethoscope className="h-4 w-4 mr-2" /> {patient.veterinarian}
+                  <Stethoscope className="h-4 w-4 mr-2" /> {appointment.veterinarian}
                 </p>
               </div>
               <div className="flex flex-col items-end ml-4">
                 <Badge className={cn("text-white mb-1", statusColorClass)}>
-                  {patient.status}
+                  {appointment.status === "Realizada" ? "Concluída" : "Cancelada"}
                 </Badge>
                 <span className="text-sm text-muted-foreground flex items-center">
-                  <CalendarDays className="h-4 w-4 mr-1" /> {finalDate}
+                  <CalendarDays className="h-4 w-4 mr-1" /> {finalDate ? format(parseISO(finalDate), "dd/MM/yyyy", { locale: ptBR }) : "N/A"}
                 </span>
-                <span className="text-xs text-muted-foreground mt-1">Baia: {patient.bay_name}</span>
+                <span className="text-xs text-muted-foreground mt-1">Serviço: {appointment.service}</span>
+                <Button variant="ghost" size="sm" onClick={() => onViewDetails(appointment)} className="mt-2">
+                  <Eye className="h-4 w-4 mr-1" /> Ver Detalhes
+                </Button>
               </div>
             </li>
           );
@@ -133,9 +131,9 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-4xl max-h-[90vh] overflow-y-auto flex flex-col">
         <DialogHeader>
-          <DialogTitle>Histórico de Pacientes Internados</DialogTitle>
+          <DialogTitle>Histórico de Consultas</DialogTitle>
           <DialogDescription>
-            Visualize e busque por pacientes que já tiveram alta ou óbito.
+            Visualize e busque por consultas realizadas ou canceladas.
           </DialogDescription>
         </DialogHeader>
         <div className="relative mb-4">
@@ -148,17 +146,17 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
           />
         </div>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "alta" | "obito")} className="w-full flex-1 flex flex-col">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "realizadas" | "canceladas")} className="w-full flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-2 h-auto p-1 mb-4">
-            <TabsTrigger value="alta" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Altas ({dischargedPatients.length})</TabsTrigger>
-            <TabsTrigger value="obito" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Óbitos ({deceasedPatients.length})</TabsTrigger>
+            <TabsTrigger value="realizadas" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Realizadas ({completedAppointments.length})</TabsTrigger>
+            <TabsTrigger value="canceladas" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Canceladas ({cancelledAppointments.length})</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="alta" className="flex-1 flex flex-col">
-            {renderPatientList(dischargedPatients)}
+          <TabsContent value="realizadas" className="flex-1 flex flex-col">
+            {renderAppointmentList(completedAppointments)}
           </TabsContent>
-          <TabsContent value="obito" className="flex-1 flex flex-col">
-            {renderPatientList(deceasedPatients)}
+          <TabsContent value="canceladas" className="flex-1 flex flex-col">
+            {renderAppointmentList(cancelledAppointments)}
           </TabsContent>
         </Tabs>
 
@@ -166,7 +164,7 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
           <Button variant="outline" onClick={onClose}>Fechar</Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" disabled={historyPatients.length === 0 || isClearingHistory}>
+              <Button variant="destructive" disabled={historyAppointments.length === 0 || isClearingHistory}>
                 {isClearingHistory ? "Limpando..." : "Limpar Histórico"}
               </Button>
             </AlertDialogTrigger>
@@ -174,7 +172,7 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
               <AlertDialogHeader>
                 <AlertDialogTitleComponent>Tem certeza que deseja limpar o histórico?</AlertDialogTitleComponent>
                 <AlertDialogDescription>
-                  Esta ação não pode ser desfeita. Todos os registros de pacientes com status "Alta" ou "Óbito" serão permanentemente excluídos.
+                  Esta ação não pode ser desfeita. Todos os registros de consultas com status "Realizada" ou "Cancelada" serão permanentemente excluídos.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooterComponent>
@@ -191,4 +189,4 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
   );
 };
 
-export default InternmentHistoryDialog;
+export default AppointmentHistoryDialog;
