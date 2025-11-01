@@ -26,6 +26,8 @@ import { showError, showSuccess } from "@/utils/toast";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, Search, User, PawPrint } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client"; // Importar supabase
+import { useUser } from "@/context/UserContext"; // Importar useUser
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -44,7 +46,7 @@ const formSchema = z.object({
   time: z.string().min(1, "A hora da consulta é obrigatória."),
   
   // Campos para seleção de cliente/pet
-  cpfSearch: z.string().optional(),
+  // cpfSearch: z.string().optional(), // Removido, pois a busca será feita por um estado local
   selectedClientId: z.string().min(1, "Selecione um tutor."),
   selectedPetId: z.string().min(1, "Selecione um animal."),
 
@@ -83,13 +85,16 @@ interface AppointmentFormProps {
 }
 
 const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, initialData, allClients, allPets }) => {
+  const { user: appUser } = useUser();
+  const userId = appUser?.id;
+
   const form = useForm<AppointmentFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       date: initialData?.date ? parseISO(initialData.date) : new Date(),
       time: initialData?.time || format(new Date(), "HH:mm"),
       
-      cpfSearch: "",
+      // cpfSearch: "", // Removido
       selectedClientId: initialData?.selectedClientId || "",
       selectedPetId: initialData?.selectedPetId || "",
 
@@ -101,7 +106,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
     },
   });
 
-  const [cpfInput, setCpfInput] = useState<string>("");
+  const [clientSearchInput, setClientSearchInput] = useState<string>(""); // Alterado de cpfInput para clientSearchInput
   const [selectedClientFromSearch, setSelectedClientFromSearch] = useState<Client | null>(null);
   const [selectedPetFromDropdown, setSelectedPetFromDropdown] = useState<Pet | null>(null);
 
@@ -111,7 +116,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
       date: initialData?.date ? parseISO(initialData.date) : new Date(),
       time: initialData?.time || format(new Date(), "HH:mm"),
       
-      cpfSearch: "",
+      // cpfSearch: "", // Removido
       selectedClientId: initialData?.selectedClientId || "",
       selectedPetId: initialData?.selectedPetId || "",
 
@@ -121,7 +126,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
       service: initialData?.service || serviceOptions[0],
       dateOption: initialData?.dateOption || "today",
     });
-    setCpfInput("");
+    setClientSearchInput(""); // Resetar o campo de busca
     setSelectedClientFromSearch(null);
     setSelectedPetFromDropdown(null);
 
@@ -132,7 +137,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
         setSelectedClientFromSearch(client);
         form.setValue("selectedClientId", client.id);
         form.setValue("client", client.name);
-        setCpfInput(client.cpf);
+        setClientSearchInput(client.name); // Pre-fill with client name
       }
     }
     if (initialData?.selectedPetId) {
@@ -146,10 +151,14 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
     }
   }, [initialData, form, allClients, allPets]);
 
-  const handleSearchCpf = () => {
-    const cleanCpf = cpfInput.replace(/\D/g, '');
-    if (cleanCpf.length !== 11) {
-      showError("CPF inválido. Digite 11 dígitos.");
+  const handleSearchClient = async () => { // Alterado de handleSearchCpf para handleSearchClient
+    if (!userId) {
+      showError("Usuário não autenticado.");
+      return;
+    }
+    const searchTerm = clientSearchInput.trim();
+    if (searchTerm.length < 3) { // Mínimo de 3 caracteres para busca por nome
+      showError("Digite pelo menos 3 caracteres para buscar por nome ou o CPF completo.");
       setSelectedClientFromSearch(null);
       form.setValue("selectedClientId", "");
       form.setValue("client", "");
@@ -160,20 +169,67 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
       return;
     }
 
-    const foundClient = allClients.find(client => client.cpf.replace(/\D/g, '') === cleanCpf);
+    try {
+      let query = supabase
+        .from('clients')
+        .select('*')
+        .eq('user_id', userId);
 
-    if (foundClient) {
-      setSelectedClientFromSearch(foundClient);
-      form.setValue("selectedClientId", foundClient.id);
-      form.setValue("client", foundClient.name);
-      showSuccess(`Tutor ${foundClient.name} encontrado!`);
-      // Reset pet selection when client changes
-      setSelectedPetFromDropdown(null);
-      form.setValue("selectedPetId", "");
-      form.setValue("pet", "");
-      form.setValue("species", "Cachorro");
-    } else {
-      showError("Tutor não encontrado com este CPF.");
+      // Verifica se o termo de busca é um CPF (apenas números e 11 dígitos)
+      const isCpf = /^\d{11}$/.test(searchTerm.replace(/\D/g, ''));
+
+      if (isCpf) {
+        query = query.eq('cpf', searchTerm.replace(/\D/g, ''));
+      } else {
+        // Busca por nome (case-insensitive)
+        query = query.ilike('name', `%${searchTerm}%`);
+      }
+
+      const { data: foundClients, error } = await query;
+
+      if (error) {
+        throw error;
+      }
+
+      if (foundClients && foundClients.length > 0) {
+        if (foundClients.length === 1) {
+          const foundClient = foundClients[0];
+          setSelectedClientFromSearch(foundClient);
+          form.setValue("selectedClientId", foundClient.id);
+          form.setValue("client", foundClient.name);
+          showSuccess(`Tutor ${foundClient.name} encontrado!`);
+          // Reset pet selection when client changes
+          setSelectedPetFromDropdown(null);
+          form.setValue("selectedPetId", "");
+          form.setValue("pet", "");
+          form.setValue("species", "Cachorro");
+        } else {
+          // Se múltiplos clientes forem encontrados, o usuário precisará selecionar
+          // Por simplicidade, para este exemplo, vamos pegar o primeiro.
+          // Em uma aplicação real, você apresentaria uma lista para o usuário escolher.
+          const foundClient = foundClients[0];
+          setSelectedClientFromSearch(foundClient);
+          form.setValue("selectedClientId", foundClient.id);
+          form.setValue("client", foundClient.name);
+          showSuccess(`Múltiplos tutores encontrados. Selecionado o primeiro: ${foundClient.name}.`);
+          setSelectedPetFromDropdown(null);
+          form.setValue("selectedPetId", "");
+          form.setValue("pet", "");
+          form.setValue("species", "Cachorro");
+        }
+      } else {
+        showError("Tutor não encontrado com este CPF ou nome.");
+        setSelectedClientFromSearch(null);
+        form.setValue("selectedClientId", "");
+        form.setValue("client", "");
+        setSelectedPetFromDropdown(null);
+        form.setValue("selectedPetId", "");
+        form.setValue("pet", "");
+        form.setValue("species", "Cachorro");
+      }
+    } catch (err: any) {
+      console.error("Erro ao buscar cliente:", err.message);
+      showError(`Erro ao buscar tutor: ${err.message}`);
       setSelectedClientFromSearch(null);
       form.setValue("selectedClientId", "");
       form.setValue("client", "");
@@ -254,20 +310,19 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
           />
         </div>
 
-        {/* Busca de Tutor por CPF */}
+        {/* Busca de Tutor por CPF ou Nome */}
         <div className="space-y-2 border p-3 rounded-md">
           <Label className="flex items-center">
-            <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor por CPF
+            <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor (CPF ou Nome)
           </Label>
           <div className="flex space-x-2">
             <Input
-              placeholder="Digite o CPF do tutor (somente números)"
-              value={cpfInput}
-              onChange={(e) => setCpfInput(e.target.value)}
-              maxLength={11}
+              placeholder="Digite o CPF ou nome do tutor"
+              value={clientSearchInput}
+              onChange={(e) => setClientSearchInput(e.target.value)}
               className="flex-1"
             />
-            <Button type="button" onClick={handleSearchCpf} size="icon">
+            <Button type="button" onClick={handleSearchClient} size="icon">
               <Search className="h-4 w-4" />
               <span className="sr-only">Buscar Tutor</span>
             </Button>
