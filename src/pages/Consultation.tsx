@@ -640,7 +640,7 @@ const ConsultationPage: React.FC = () => {
   };
 
   // NOVO: Função para gerar PDF da receita, garantindo que o prontuário seja salvo primeiro
-  const handleGenerateRecipePdf = async (prescriptions: MedicalRecordFormValues['prescriptions']) => {
+  const handleGenerateRecipePdf = async (prescriptions: MedicalRecordFormValues['prescriptions'], shouldOpenPreview: boolean) => { // Adicionado shouldOpenPreview
     if (!medicalRecordFormRef.current) {
       showError("Erro: Formulário de prontuário não disponível.");
       return;
@@ -663,7 +663,7 @@ const ConsultationPage: React.FC = () => {
       await generateAndSaveRecipePdfMutation.mutateAsync({
         prescriptions,
         medicalRecordId: savedMedicalRecord.id, // Pass the ID here
-        shouldOpenPreview: true
+        shouldOpenPreview: shouldOpenPreview // Passa shouldOpenPreview para a mutação
       });
     } catch (err: any) {
       console.error("Erro ao salvar prontuário e gerar receita:", err);

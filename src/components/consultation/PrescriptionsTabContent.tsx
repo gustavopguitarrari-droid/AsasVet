@@ -20,7 +20,7 @@ interface SinglePrescriptionInput {
 }
 
 interface PrescriptionsTabContentProps {
-  onGenerateRecipePdf: (prescriptions: MedicalRecordFormValues['prescriptions']) => void;
+  onGenerateRecipePdf: (prescriptions: MedicalRecordFormValues['prescriptions'], shouldOpenPreview: boolean) => void; // Adicionado shouldOpenPreview
 }
 
 const PrescriptionsTabContent: React.FC<PrescriptionsTabContentProps> = ({ onGenerateRecipePdf }) => {
@@ -75,12 +75,12 @@ const PrescriptionsTabContent: React.FC<PrescriptionsTabContentProps> = ({ onGen
     trigger("prescriptions"); // Trigger validation
   };
 
-  const handleGenerateRecipe = () => {
+  const handleSaveRecipe = () => { // Renomeado para handleSaveRecipe
     if (!fields || fields.length === 0) {
-      showError("Adicione prescrições à lista antes de gerar a receita.");
+      showError("Adicione prescrições à lista antes de salvar a receita.");
       return;
     }
-    onGenerateRecipePdf(fields); // Call the prop to generate PDF
+    onGenerateRecipePdf(fields, false); // Passa false para shouldOpenPreview
   };
 
   return (
@@ -183,11 +183,11 @@ const PrescriptionsTabContent: React.FC<PrescriptionsTabContentProps> = ({ onGen
       <div className="flex space-x-2 mt-4">
         <Button
           type="button"
-          onClick={handleGenerateRecipe}
+          onClick={handleSaveRecipe} // Alterado para handleSaveRecipe
           className="flex-1"
           disabled={fields.length === 0}
         >
-          <FileText className="mr-2 h-4 w-4" /> Gerar Receita
+          <FileText className="mr-2 h-4 w-4" /> Salvar Receita {/* Alterado o texto do botão */}
         </Button>
       </div>
     </div>

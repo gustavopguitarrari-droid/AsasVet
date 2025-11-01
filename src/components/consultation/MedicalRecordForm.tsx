@@ -51,7 +51,7 @@ interface MedicalRecordFormProps {
   isSubmitting: boolean;
   formRef?: React.Ref<MedicalRecordFormInstance>;
   onValidationChange?: (isValid: boolean) => void;
-  onGenerateRecipePdf: (prescriptions: MedicalRecordFormValues['prescriptions']) => void; // NOVO: Prop para gerar PDF
+  onGenerateRecipePdf: (prescriptions: MedicalRecordFormValues['prescriptions'], shouldOpenPreview: boolean) => void; // NOVO: Prop para gerar PDF
 }
 
 const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSubmit, isSubmitting, formRef, onValidationChange, onGenerateRecipePdf }) => {
