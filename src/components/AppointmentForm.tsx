@@ -216,15 +216,17 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
                         )}
                         disabled
                       >
-                        {/* Wrapped children in a single span */}
-                        <span> 
-                          {field.value ? (
-                            format(field.value, "PPP", { locale: ptBR })
-                          ) : (
-                            <span>Selecione uma data</span>
-                          )}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </span>
+                        {/* Wrapped children in a single div */}
+                        <div className="flex items-center justify-between w-full"> 
+                          <span>
+                            {field.value ? (
+                              format(field.value, "PPP", { locale: ptBR })
+                            ) : (
+                              <span>Selecione uma data</span>
+                            )}
+                          </span>
+                          <CalendarIcon className="h-4 w-4 opacity-50" />
+                        </div>
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
