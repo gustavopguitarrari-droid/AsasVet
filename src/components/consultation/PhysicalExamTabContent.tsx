@@ -21,7 +21,6 @@ const PhysicalExamTabContent: React.FC = () => {
           </FormLabel>
           <FormControl>
             <Textarea 
-              placeholder={`Estado geral:\nTemperatura:\nFrequência cardíaca:\nFrequência respiratória:\nMucosas:\nLinfonodos:\nPalpação abdominal:\nSistema locomotor:\nSistema nervoso:\nPele e anexos:`} 
               rows={8} 
               {...field} 
             />

@@ -21,7 +21,6 @@ const AnamnesisTabContent: React.FC = () => {
           </FormLabel>
           <FormControl>
             <Textarea 
-              placeholder={`Queixa principal:\nHistórico da doença atual:\nHistórico médico pregresso:\nVacinação:\nAlimentação:\nAmbiente:\nComportamento:`} 
               rows={8} 
               {...field} 
             />

@@ -13,7 +13,7 @@ import { ClipboardList, Stethoscope, HeartPulse, FlaskConical, Pill } from "luci
 
 // Importar os novos componentes de conteúdo das abas
 import AnamnesisTabContent from "./AnamnesisTabContent";
-import PhysicalExamTabContent from "./PhysicalExamTabContent";
+import PhysicalExamTabContent from "./AnamnesisTabContent"; // Reutilizando para o exemplo
 import DiagnosisTabContent from "./DiagnosisTabContent";
 import TreatmentTabContent from "./TreatmentTabContent";
 import PrescriptionsTabContent from "./PrescriptionsTabContent";
@@ -58,10 +58,10 @@ const MedicalRecordForm: React.FC<MedicalRecordFormProps> = ({ initialData, onSu
   const form = useForm<MedicalRecordFormValues>({
     resolver: zodResolver(medicalRecordFormSchema),
     defaultValues: {
-      anamnesis: initialData?.anamnesis || "",
-      physicalExam: initialData?.physicalExam || "",
-      diagnosis: initialData?.diagnosis || "",
-      treatment: initialData?.treatment || "",
+      anamnesis: initialData?.anamnesis || `Queixa principal:\nHistórico da doença atual:\nHistórico médico pregresso:\nVacinação:\nAlimentação:\nAmbiente:\nComportamento:`,
+      physicalExam: initialData?.physicalExam || `Estado geral:\nTemperatura:\nFrequência cardíaca:\nFrequência respiratória:\nMucosas:\nLinfonodos:\nPalpação abdominal:\nSistema locomotor:\nSistema nervoso:\nPele e anexos:`,
+      diagnosis: initialData?.diagnosis || `Diagnóstico diferencial:\nHipótese diagnóstica principal:\nExames complementares solicitados:`,
+      treatment: initialData?.treatment || `Plano terapêutico:\nMedicações (se não for usar a aba de prescrições):\nOrientações ao tutor:\nPróximo retorno:`,
       prescriptions: initialData?.prescriptions || [],
     },
   });

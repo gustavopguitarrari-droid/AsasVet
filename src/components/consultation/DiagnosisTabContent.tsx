@@ -21,7 +21,6 @@ const DiagnosisTabContent: React.FC = () => {
           </FormLabel>
           <FormControl>
             <Textarea 
-              placeholder={`Diagnóstico diferencial:\nHipótese diagnóstica principal:\nExames complementares solicitados:`} 
               rows={8} 
               {...field} 
             />
