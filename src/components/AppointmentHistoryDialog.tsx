@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock, FileText, Pill, User, Stethoscope } from "lucide-react"; // Adicionado User e Stethoscope
+import { Search, History, CalendarCheck, CalendarX, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Eye, CalendarClock, FileText, Pill, User, Stethoscope, CalendarDays } from "lucide-react"; // Adicionado CalendarDays
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Appointment } from "@/pages/Appointments"; // Importar a interface Appointment
