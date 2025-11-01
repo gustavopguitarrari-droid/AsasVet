@@ -46,6 +46,22 @@ const serviceOptions = [
   "Consulta de Retorno",
 ] as const;
 
+// Interface para o prontuário médico (deve corresponder à tabela medical_records)
+interface MedicalRecord {
+  id: string;
+  appointment_id: string;
+  user_id: string;
+  anamnesis?: string | null;
+  physical_exam?: string | null;
+  diagnosis?: string | null;
+  treatment?: string | null;
+  prescriptions: { medication: string; dosage: string; frequency: string; instructions?: string }[]; // Alterado para array não nulo
+  recipe_pdf_url?: string | null;
+  medical_record_pdf_url?: string | null; // NOVO: URL do PDF do prontuário
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Appointment {
   id: string;
   user_id: string;
@@ -63,24 +79,10 @@ export interface Appointment {
   pet_id: string | null;
   client_id: string | null; // Adicionado client_id
   // NOVO: Adicionado para refletir os dados do prontuário aninhado
+  medical_records?: MedicalRecord | null; // Alterado para ser um objeto único ou null
   prescriptions_count?: number;
   recipe_pdf_url?: string | null;
   medical_record_pdf_url?: string | null;
-}
-
-interface MedicalRecord {
-  id: string;
-  appointment_id: string;
-  user_id: string;
-  anamnesis?: string | null;
-  physical_exam?: string | null;
-  diagnosis?: string | null;
-  treatment?: string | null;
-  prescriptions: { medication: string; dosage: string; frequency: string; instructions?: string }[]; // Alterado para array não nulo
-  recipe_pdf_url?: string | null;
-  medical_record_pdf_url?: string | null; // NOVO: URL do PDF do prontuário
-  created_at: string;
-  updated_at: string;
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -168,16 +170,17 @@ const Appointments = () => {
       if (error) throw error;
       console.log("Appointments.tsx: Raw data from Supabase for appointments query:", data);
       return data.map(app => {
+        // Access medical_records directly as a single object or null
+        const medicalRecordData = app.medical_records;
         const mappedApp = {
           ...app,
-          // Access medical_records as an array and get the first element if it exists
-          prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
-          recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
-          medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null,
+          prescriptions_count: medicalRecordData?.prescriptions?.length || 0,
+          recipe_pdf_url: medicalRecordData?.recipe_pdf_url || null,
+          medical_record_pdf_url: medicalRecordData?.medical_record_pdf_url || null,
           pet_id: app.pet_id || null,
           client_id: app.client_id || null, // Mapear client_id
         };
-        console.log(`Appointments.tsx: Mapped appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}, medical_records_array:`, app.medical_records); // ADDED LOG
+        console.log(`Appointments.tsx: Mapped appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}, medical_records_data:`, medicalRecordData); // ADDED LOG
         return mappedApp;
       }) as Appointment[];
     },
@@ -203,16 +206,17 @@ const Appointments = () => {
       if (error) throw error;
       console.log("Appointments.tsx: Raw data from Supabase for historyAppointments query:", data);
       return data.map(app => {
+        // Access medical_records directly as a single object or null
+        const medicalRecordData = app.medical_records;
         const mappedApp = {
           ...app,
-          // Access medical_records as an array and get the first element if it exists
-          prescriptions_count: app.medical_records?.[0]?.prescriptions?.length || 0,
-          recipe_pdf_url: app.medical_records?.[0]?.recipe_pdf_url || null,
-          medical_record_pdf_url: app.medical_records?.[0]?.medical_record_pdf_url || null,
+          prescriptions_count: medicalRecordData?.prescriptions?.length || 0,
+          recipe_pdf_url: medicalRecordData?.recipe_pdf_url || null,
+          medical_record_pdf_url: medicalRecordData?.medical_record_pdf_url || null,
           pet_id: app.pet_id || null,
           client_id: app.client_id || null, // Mapear client_id
         };
-        console.log(`Appointments.tsx: Mapped history appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}, medical_records_array:`, app.medical_records); // ADDED LOG
+        console.log(`Appointments.tsx: Mapped history appointment ${mappedApp.id} - recipe_pdf_url: ${mappedApp.recipe_pdf_url}, prescriptions_count: ${mappedApp.prescriptions_count}, medical_records_data:`, medicalRecordData); // ADDED LOG
         return mappedApp;
       }) as Appointment[];
     },
@@ -436,9 +440,9 @@ const Appointments = () => {
       }
       const currentUserId: string = userId;
 
-      if (appointment.medical_record_pdf_url) {
+      if (appointment.medical_records?.medical_record_pdf_url) {
         console.log("Appointments: fetchAndGeneratePdfMutation - Existing medical_record_pdf_url found, using it directly.");
-        return { pdfUrl: appointment.medical_record_pdf_url, appointment };
+        return { pdfUrl: appointment.medical_records.medical_record_pdf_url, appointment };
       }
 
       const { data: medicalRecordData, error: fetchError } = await supabase
@@ -466,7 +470,7 @@ const Appointments = () => {
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',
@@ -480,7 +484,7 @@ const Appointments = () => {
         clinicDetails,
       });
 
-      const newPdfUrl = await uploadMedicalRecordPdfToSupabase(pdfBlob, currentUserId, medicalRecordData.id);
+      const newPdfUrl = await uploadMedicalRecordPdfToSupabase(pdfBlob, appUser?.organizationId || userId, currentUserId, medicalRecordData.id);
 
       if (!newPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF do prontuário.");
@@ -521,10 +525,10 @@ const Appointments = () => {
       console.log(`Appointments.tsx: fetchAndGenerateRecipePdfMutation called for appointment ${appointment.id}. Current appointment object:`, appointment); // ADDED LOG
       console.log("Appointments: fetchAndGenerateRecipePdfMutation.mutationFn - Received appointment:", appointment); // ADDED LOG
 
-      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url); // ADDED LOG
-      if (appointment.recipe_pdf_url) {
-        console.log("Appointments: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found on passed appointment, using it directly:", appointment.recipe_pdf_url); // ADDED LOG
-        return { pdfUrl: appointment.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.medical_records?.recipe_pdf_url); // ADDED LOG
+      if (appointment.medical_records?.recipe_pdf_url) {
+        console.log("Appointments: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found on passed appointment, using it directly:", appointment.medical_records.recipe_pdf_url); // ADDED LOG
+        return { pdfUrl: appointment.medical_records.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
       }
 
       console.log("Appointments: fetchAndGenerateRecipePdfMutation - No recipe_pdf_url on passed appointment, fetching medical record directly from DB."); // ADDED LOG
@@ -561,7 +565,7 @@ const Appointments = () => {
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',
@@ -575,7 +579,7 @@ const Appointments = () => {
         clinicDetails,
       });
 
-      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, currentUserId, appointment.id);
+      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, appUser?.organizationId || userId, currentUserId, appointment.id);
       console.log("Appointments: fetchAndGenerateRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
       if (!newPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF da receita.");
@@ -697,7 +701,7 @@ const Appointments = () => {
   };
 
   const handleOpenRecipePdfPreviewDialog = (appointment: Appointment) => {
-    console.log(`Appointments.tsx: Clicking recipe PDF button for appointment ${appointment.id}. recipe_pdf_url: ${appointment.recipe_pdf_url}, prescriptions_count: ${appointment.prescriptions_count}`); // ADDED LOG
+    console.log(`Appointments.tsx: Clicking recipe PDF button for appointment ${appointment.id}. recipe_pdf_url: ${appointment.medical_records?.recipe_pdf_url}, prescriptions_count: ${appointment.medical_records?.prescriptions?.length}`); // ADDED LOG
     fetchAndGenerateRecipePdfMutation.mutate({ appointment });
   };
 
@@ -827,9 +831,9 @@ const Appointments = () => {
             size="sm"
             onClick={(e) => {
               e.stopPropagation();
-              console.log(`Appointments.tsx: Clicking prescriptions count button for appointment ${appointment.id}. prescriptions_count: ${appointment.prescriptions_count}`); // ADDED LOG
-              if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
-                showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
+              console.log(`Appointments.tsx: Clicking prescriptions count button for appointment ${appointment.id}. prescriptions_count: ${appointment.medical_records?.prescriptions?.length}`); // ADDED LOG
+              if (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0) {
+                showSuccess(`${appointment.medical_records.prescriptions.length} prescrição(ões) no prontuário.`);
               } else {
                 showError("Nenhuma prescrição encontrada para esta consulta.");
               }
@@ -837,7 +841,7 @@ const Appointments = () => {
             className="flex items-center justify-center gap-1"
           >
             <Pill className="h-4 w-4" />
-            <span>{appointment.prescriptions_count || 0}</span>
+            <span>{appointment.medical_records?.prescriptions?.length || 0}</span>
           </Button>
         )},
         { id: 'pdfActions', header: 'Prontuário', className: 'text-right', render: (appointment: Appointment) => (
@@ -854,7 +858,7 @@ const Appointments = () => {
                 <FileText className="h-4 w-4" />
               )}
             </Button>
-            {appointment.recipe_pdf_url || (appointment.prescriptions_count && appointment.prescriptions_count > 0) ? ( // Show button if URL exists OR if prescriptions exist
+            {appointment.medical_records?.recipe_pdf_url || (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0) ? ( // Show button if URL exists OR if prescriptions exist
               <Button
                 variant="outline"
                 size="sm"
@@ -1047,7 +1051,7 @@ const Appointments = () => {
           pdfBlob={pdfBlob}
           filename={pdfFilename}
           onConfirmDownload={handleConfirmPdfDownload}
-          pdfUrl={pdfAppointment?.medical_record_pdf_url || null}
+          pdfUrl={pdfAppointment?.medical_records?.medical_record_pdf_url || null}
         />
 
         <PdfPreviewDialog

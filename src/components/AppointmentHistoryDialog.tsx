@@ -125,6 +125,11 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       if (!userId) throw new Error("User not authenticated.");
       const currentUserId: string = userId;
 
+      if (appointment.medical_records?.medical_record_pdf_url) {
+        console.log("AppointmentHistoryDialog: fetchAndGeneratePdfMutation - Existing medical_record_pdf_url found, using it directly.");
+        return { pdfUrl: appointment.medical_records.medical_record_pdf_url, appointment };
+      }
+
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
@@ -152,7 +157,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',
@@ -165,7 +170,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         logoUrl: appUser?.logoUrl,
         clinicDetails: {
           companyName: appUser?.companyName || 'AsasVet',
-          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
           phone: appUser?.phone || '',
           email: appUser?.email || '',
           veterinarianCrmv: appUser?.crmv || '',
@@ -195,10 +200,10 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       if (!userId) throw new Error("User not authenticated.");
       const currentUserId: string = userId;
 
-      console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url); // ADDED LOG
-      if (appointment.recipe_pdf_url) {
+      console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.medical_records?.recipe_pdf_url); // ADDED LOG
+      if (appointment.medical_records?.recipe_pdf_url) {
         console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found, using it directly.");
-        return { pdfUrl: appointment.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
+        return { pdfUrl: appointment.medical_records.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
       }
 
       console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - No existing recipe_pdf_url, fetching medical record for prescriptions.");
@@ -235,7 +240,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',
@@ -317,7 +322,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
 
   const handleOpenRecipePdfPreviewDialog = (appointment: Appointment) => {
     console.log("handleOpenRecipePdfPreviewDialog: Clicked for appointment:", appointment.id);
-    console.log("handleOpenRecipePdfPreviewDialog: appointment.recipe_pdf_url:", appointment.recipe_pdf_url);
+    console.log("handleOpenRecipePdfPreviewDialog: appointment.medical_records?.recipe_pdf_url:", appointment.medical_records?.recipe_pdf_url);
     fetchAndGenerateRecipePdfMutation.mutate({ appointment });
   };
 
@@ -433,9 +438,9 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log(`AppointmentHistoryDialog: Prescriptions count button clicked for appointment ${appointment.id}. Prescriptions count: ${appointment.prescriptions_count}`); // ADDED LOG
-                              if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
-                                showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
+                              console.log(`AppointmentHistoryDialog: Prescriptions count button clicked for appointment ${appointment.id}. Prescriptions count: ${appointment.medical_records?.prescriptions?.length}`); // ADDED LOG
+                              if (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0) {
+                                showSuccess(`${appointment.medical_records.prescriptions.length} prescrição(ões) no prontuário.`);
                               } else {
                                 showError("Nenhuma prescrição encontrada para esta consulta.");
                               }
@@ -443,7 +448,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                             className="flex items-center justify-center gap-1"
                           >
                             <Pill className="h-4 w-4" />
-                            <span>{appointment.prescriptions_count || 0}</span>
+                            <span>{appointment.medical_records?.prescriptions?.length || 0}</span>
                           </Button>
                         </TableCell>
                         <TableCell className="text-right">
@@ -463,7 +468,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                                 <FileText className="h-4 w-4" />
                               )}
                             </Button>
-                            {appointment.recipe_pdf_url || (appointment.prescriptions_count && appointment.prescriptions_count > 0) ? ( // Show button if URL exists OR if prescriptions exist
+                            {appointment.medical_records?.recipe_pdf_url || (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0) ? ( // Show button if URL exists OR if prescriptions exist
                               <Button
                                 variant="outline"
                                 size="sm"
