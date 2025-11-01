@@ -25,7 +25,7 @@ import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Search, User, PawPrint, Check, ChevronsUpDown } from "lucide-react";
+import { CalendarIcon, Search, User, PawPrint, Check, ChevronsUpDown } from "lucide-react"; // Adicionado Check e ChevronsUpDown
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import {
@@ -35,7 +35,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
+} from "@/components/ui/command"; // Importar Command components
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -229,7 +229,6 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
                       onSelect={field.onChange}
                       initialFocus
                       locale={ptBR}
-                      fromDate={new Date()} // Impede a seleção de datas passadas
                     />
                   </PopoverContent>
                 </Popover>
