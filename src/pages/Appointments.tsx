@@ -71,8 +71,7 @@ export interface Appointment {
   pet_name: string;
   species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros" | "Equino" | "Bovino";
   service: typeof serviceOptions[number];
-  veterinarian: string;
-  status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
+  status: "Em espera" | "Realizada" | "Cancelada" | "Em Andamento"; // Alterado de 'Agendada' para 'Em espera'
   completion_timestamp?: string | null;
   created_at: string;
   start_time?: string | null;
@@ -297,7 +296,7 @@ const Appointments = () => {
           species: newAppointmentData.species,
           service: newAppointmentData.service,
           veterinarian: veterinarianName,
-          status: "Agendada",
+          status: "Em espera", // Alterado de 'Agendada' para 'Em espera'
           client_id: newAppointmentData.selectedClientId, // Ensure client_id is passed
           pet_id: newAppointmentData.selectedPetId,
         })
@@ -643,7 +642,7 @@ const Appointments = () => {
 
   const getStatusBadgeVariant = (status: Appointment["status"]) => {
     switch (status) {
-      case "Agendada":
+      case "Em espera": // Alterado de 'Agendada' para 'Em espera'
         return "bg-primary text-primary-foreground";
       case "Em Andamento":
         return "bg-orange-500 text-white";
@@ -660,7 +659,7 @@ const Appointments = () => {
     let matchesTab = false;
     switch (activeTab) {
       case "em-espera":
-        matchesTab = appointment.status === "Agendada";
+        matchesTab = appointment.status === "Em espera"; // Alterado de 'Agendada' para 'Em espera'
         break;
       case "em-andamento":
         matchesTab = appointment.status === "Em Andamento";
@@ -681,7 +680,7 @@ const Appointments = () => {
     return matchesTab && matchesSearch;
   });
 
-  const totalAgendadas = appointments.filter(a => a.status === "Agendada").length;
+  const totalEmEspera = appointments.filter(a => a.status === "Em espera").length; // Alterado de 'Agendadas' para 'Em espera'
   const totalRealizadas = appointments.filter(a => a.status === "Realizada").length;
   const totalCanceladas = appointments.filter(a => a.status === "Cancelada").length;
   const totalEmAndamento = appointments.filter(a => a.status === "Em Andamento").length;
@@ -895,7 +894,7 @@ const Appointments = () => {
               <CalendarClock className="h-4 w-4 text-white" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalAgendadas}</div>
+              <div className="text-2xl font-bold">{totalEmEspera}</div>
               <p className="text-gray-200 text-xs">Consultas aguardando</p>
             </CardContent>
           </Card>

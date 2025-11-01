@@ -58,7 +58,7 @@ const AgendamentosMedicos = () => {
         date: parseISO(event.date),
         time: event.time,
         category: event.category as CalendarEvent["category"],
-        status: (event.status || "Agendada") as CalendarEvent["status"],
+        status: (event.status || "Em espera") as CalendarEvent["status"], // Alterado de 'Agendada' para 'Em espera'
       }));
     },
     enabled: !!organizationId,
@@ -78,7 +78,7 @@ const AgendamentosMedicos = () => {
           date: format(newEventData.date, "yyyy-MM-dd"),
           time: newEventData.time,
           category: newEventData.category,
-          status: "Agendada",
+          status: "Em espera", // Alterado de 'Agendada' para 'Em espera'
         })
         .select()
         .single();

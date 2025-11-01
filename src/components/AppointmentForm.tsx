@@ -80,7 +80,7 @@ interface AppointmentFormProps {
     service?: typeof serviceOptions[number];
     veterinarian?: string;
     date?: string;
-    status?: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
+    status?: "Em espera" | "Realizada" | "Cancelada" | "Em Andamento"; // Alterado de 'Agendada' para 'Em espera'
     selectedClientId?: string;
     selectedPetId?: string;
     dateOption?: "today" | "specific";
