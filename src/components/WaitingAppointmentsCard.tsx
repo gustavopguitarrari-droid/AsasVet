@@ -21,7 +21,7 @@ const WaitingAppointmentsCard: React.FC = () => {
         .from('appointments')
         .select('*', { count: 'exact' })
         .eq('user_id', userId)
-        .eq('status', 'Em espera'); // Contar apenas consultas com status 'Em espera'
+        .eq('status', 'Agendada'); // Contar apenas consultas com status 'Agendada'
       if (error) {
         console.error("Erro ao buscar contagem de consultas em espera:", error);
         throw error;

@@ -67,7 +67,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
 
   const getStatusBadgeVariant = (status: Appointment["status"]) => {
     switch (status) {
-      case "Em espera": // Alterado de 'Agendada' para 'Em espera'
+      case "Agendada":
         return "bg-sidebar-item-bg-1 text-white";
       case "Em Andamento":
         return "bg-orange-500 text-white";
@@ -116,7 +116,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
   const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
 
   const isFinalized = appointment.status === "Realizada" || appointment.status === "Cancelada";
-  const isEmEspera = appointment.status === "Em espera"; // Alterado de 'isAgendada' para 'isEmEspera'
+  const isAgendada = appointment.status === "Agendada";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -223,7 +223,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
 
         {!isEditing && (
           <DialogFooter className="flex flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-            {isEmEspera && ( // Alterado de 'isAgendada' para 'isEmEspera'
+            {isAgendada && (
               <Button variant="default" onClick={handleStartClick} className="w-full sm:w-auto mb-2 sm:mb-0">
                 <Play className="mr-2 h-4 w-4" /> Iniciar Consulta
               </Button>
