@@ -204,7 +204,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - No existing recipe_pdf_url, fetching medical record for prescriptions.");
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
-        .select('id, prescriptions')
+        .select('id, prescriptions, recipe_pdf_url') // Incluir recipe_pdf_url na busca direta
         .eq('appointment_id', appointment.id)
         .eq('user_id', currentUserId)
         .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
@@ -219,8 +219,14 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       }
       console.log("AppointmentHistoryDialog: Raw medical record data for Recipe PDF generation:", medicalRecordData); // Add log
       
+      // Se o prontuário médico existe e já tem uma URL de PDF de receita, use-a diretamente
+      if (medicalRecordData?.recipe_pdf_url) {
+        console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - URL de PDF de receita existente encontrada no prontuário, usando-a diretamente.");
+        return { pdfUrl: medicalRecordData.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
+      }
+
       // Ensure prescriptions is an array, even if null from DB
-      const prescriptionsFromDb = medicalRecordData.prescriptions || [];
+      const prescriptionsFromDb = medicalRecordData?.prescriptions || [];
 
       console.log("AppointmentHistoryDialog: Fetched medicalRecordData.prescriptions:", prescriptionsFromDb);
       if (prescriptionsFromDb.length === 0) { // Changed condition here
@@ -243,7 +249,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         clinicDetails,
       });
 
-      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, currentUserId, appointment.id);
+      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, appUser?.organizationId || userId, userId, appointment.id); // Pass organizationId and userId
       console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
       if (!newPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF da receita.");
@@ -261,8 +267,14 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
     onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
       if (!userId) return;
       const currentUserId: string = userId;
-      queryClient.invalidateQueries({ queryKey: ['appointments', currentUserId] });
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', currentUserId] });
+      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointment.id, userId] }); // CORRIGIDO: Usando appointment.id
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      // Force a refetch immediately after invalidation
+      queryClient.refetchQueries({ queryKey: ['appointments', userId] }); // ADDED THIS
+      queryClient.refetchQueries({ queryKey: ['historyAppointments', userId] }); // ADDED THIS
+      console.log("fetchAndGenerateRecipePdfMutation.onSuccess: Setting recipePdfBlob:", pdfBlob);
+      console.log("fetchAndGenerateRecipePdfMutation.onSuccess: Setting recipePdfUrl:", pdfUrl);
       setRecipePdfBlob(pdfBlob || null);
       setRecipePdfUrl(pdfUrl || null);
       setRecipePdfFilename(`Receita_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
@@ -304,6 +316,8 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
   };
 
   const handleOpenRecipePdfPreviewDialog = (appointment: Appointment) => {
+    console.log("handleOpenRecipePdfPreviewDialog: Clicked for appointment:", appointment.id);
+    console.log("handleOpenRecipePdfPreviewDialog: appointment.recipe_pdf_url:", appointment.recipe_pdf_url);
     fetchAndGenerateRecipePdfMutation.mutate({ appointment });
   };
 
@@ -419,6 +433,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
+                              console.log(`AppointmentHistoryDialog: Prescriptions count button clicked for appointment ${appointment.id}. Prescriptions count: ${appointment.prescriptions_count}`); // ADDED LOG
                               if (appointment.prescriptions_count && appointment.prescriptions_count > 0) {
                                 showSuccess(`${appointment.prescriptions_count} prescrição(ões) no prontuário.`);
                               } else {
@@ -448,14 +463,11 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                                 <FileText className="h-4 w-4" />
                               )}
                             </Button>
-                            {appointment.recipe_pdf_url && (
+                            {appointment.recipe_pdf_url || (appointment.prescriptions_count && appointment.prescriptions_count > 0) ? ( // Show button if URL exists OR if prescriptions exist
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleOpenRecipePdfPreviewDialog(appointment);
-                                }}
+                                onClick={(e) => { e.stopPropagation(); handleOpenRecipePdfPreviewDialog(appointment); }}
                                 disabled={fetchAndGenerateRecipePdfMutation.isPending}
                               >
                                 {fetchAndGenerateRecipePdfMutation.isPending ? (
@@ -464,7 +476,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                                   <Pill className="h-4 w-4" />
                                 )}
                               </Button>
-                            )}
+                            ) : null}
                           </div>
                         </TableCell>
                       </TableRow>

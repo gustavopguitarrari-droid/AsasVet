@@ -35,16 +35,20 @@ const PdfPreviewDialog: React.FC<PdfPreviewDialogProps> = ({
   useEffect(() => {
     if (isOpen) {
       if (pdfUrl) {
+        console.log("PdfPreviewDialog: Setting internalPdfUrl from pdfUrl:", pdfUrl);
         setInternalPdfUrl(pdfUrl); // Prioriza a URL direta
       } else if (pdfBlob) {
         const url = URL.createObjectURL(pdfBlob);
+        console.log("PdfPreviewDialog: Setting internalPdfUrl from pdfBlob (object URL):", url);
         setInternalPdfUrl(url);
         // Clean up the object URL when the component unmounts or blob changes
         return () => URL.revokeObjectURL(url);
       } else {
+        console.log("PdfPreviewDialog: No pdfUrl or pdfBlob, setting internalPdfUrl to null.");
         setInternalPdfUrl(null);
       }
     } else {
+      console.log("PdfPreviewDialog: Dialog closed, setting internalPdfUrl to null.");
       setInternalPdfUrl(null); // Limpa a URL interna ao fechar o diálogo
     }
   }, [isOpen, pdfBlob, pdfUrl]); // Adicionado pdfUrl como dependência
