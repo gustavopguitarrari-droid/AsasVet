@@ -150,6 +150,15 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         prescriptions: medicalRecordData.prescriptions || [],
       };
 
+      const clinicDetails = {
+        companyName: appUser?.companyName || 'AsasVet',
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        phone: appUser?.phone || '',
+        email: appUser?.email || '',
+        veterinarianCrmv: appUser?.crmv || '',
+        veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
+      };
+
       const blob = await generateMedicalRecordPdf({ 
         appointment, 
         medicalRecord: medicalRecordForPdf, 
@@ -189,7 +198,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
       console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.recipe_pdf_url); // ADDED LOG
       if (appointment.recipe_pdf_url) {
         console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found, using it directly.");
-        return { pdfUrl: appointment.recipe_pdf_url, appointment };
+        return { pdfUrl: appointment.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
       }
 
       console.log("AppointmentHistoryDialog: fetchAndGenerateRecipePdfMutation - No existing recipe_pdf_url, fetching medical record for prescriptions.");
