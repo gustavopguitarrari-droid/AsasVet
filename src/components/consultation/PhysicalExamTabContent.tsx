@@ -20,7 +20,11 @@ const PhysicalExamTabContent: React.FC = () => {
             <HeartPulse className="h-4 w-4 mr-2 text-muted-foreground" /> Exame Físico
           </FormLabel>
           <FormControl>
-            <Textarea placeholder="Resultados do exame físico..." rows={8} {...field} />
+            <Textarea 
+              placeholder={`Estado geral:\nTemperatura:\nFrequência cardíaca:\nFrequência respiratória:\nMucosas:\nLinfonodos:\nPalpação abdominal:\nSistema locomotor:\nSistema nervoso:\nPele e anexos:`} 
+              rows={8} 
+              {...field} 
+            />
           </FormControl>
           <FormMessage />
         </FormItem>

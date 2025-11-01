@@ -17,10 +17,14 @@ const DiagnosisTabContent: React.FC = () => {
       render={({ field }) => (
         <FormItem>
           <FormLabel className="flex items-center">
-            <FlaskConical className="h-4 w-4 mr-2 text-muted-foreground" /> Diagnóstico
+            <FlaskConical className="h-4 w-4 mr-2 text-muted-foreground" /> Suspeita
           </FormLabel>
           <FormControl>
-            <Textarea placeholder="Diagnóstico da condição do paciente..." rows={8} {...field} />
+            <Textarea 
+              placeholder={`Diagnóstico diferencial:\nHipótese diagnóstica principal:\nExames complementares solicitados:`} 
+              rows={8} 
+              {...field} 
+            />
           </FormControl>
           <FormMessage />
         </FormItem>

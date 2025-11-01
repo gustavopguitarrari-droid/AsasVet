@@ -20,7 +20,11 @@ const AnamnesisTabContent: React.FC = () => {
             <Stethoscope className="h-4 w-4 mr-2 text-muted-foreground" /> Anamnese
           </FormLabel>
           <FormControl>
-            <Textarea placeholder="Histórico do paciente, queixas principais..." rows={8} {...field} />
+            <Textarea 
+              placeholder={`Queixa principal:\nHistórico da doença atual:\nHistórico médico pregresso:\nVacinação:\nAlimentação:\nAmbiente:\nComportamento:`} 
+              rows={8} 
+              {...field} 
+            />
           </FormControl>
           <FormMessage />
         </FormItem>

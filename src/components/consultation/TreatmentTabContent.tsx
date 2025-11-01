@@ -20,7 +20,11 @@ const TreatmentTabContent: React.FC = () => {
             <Pill className="h-4 w-4 mr-2 text-muted-foreground" /> Tratamento
           </FormLabel>
           <FormControl>
-            <Textarea placeholder="Plano de tratamento e recomendações..." rows={8} {...field} />
+            <Textarea 
+              placeholder={`Plano terapêutico:\nMedicações (se não for usar a aba de prescrições):\nOrientações ao tutor:\nPróximo retorno:`} 
+              rows={8} 
+              {...field} 
+            />
           </FormControl>
           <FormMessage />
         </FormItem>
