@@ -31,7 +31,7 @@ interface DashboardItemConfig {
 const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "totalClients", name: "Total de Tutores", isVisible: true, category: "overview" },
   { id: "totalPets", name: "Total de Animais", isVisible: true, category: "overview" },
-  { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview" },
+  { id: "scheduledAppointments", name: "Consultas em Espera", isVisible: true, category: "overview" },
   { id: "averageWaitingTime", name: "Média de Tempo de Espera", isVisible: true, category: "overview" },
   { id: "averageConsultationTime", name: "Média de Tempo da Consulta", isVisible: true, category: "overview" },
   { id: "recentPets", name: "Últimos Animais Cadastrados", isVisible: true, category: "overview" },
@@ -237,7 +237,7 @@ const Dashboard = () => {
           <Link to="/medical-records" key={item.id} className="block">
             <Card className={cn("bg-pink-600", baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Consultas Agendadas</CardTitle>
+                <CardTitle className="text-sm font-medium">Consultas em Espera</CardTitle>
                 <CalendarDays className={iconClasses} />
               </CardHeader>
               <CardContent>
@@ -250,7 +250,7 @@ const Dashboard = () => {
                     "Nenhuma"
                   )}
                 </div>
-                {/* Removido o parágrafo com o texto "Consulta agendada" ou "Consultas agendadas" */}
+                <p className={textMutedClasses}>aguardando atendimento</p>
               </CardContent>
             </Card>
           </Link>
