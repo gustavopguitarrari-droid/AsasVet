@@ -120,7 +120,7 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[600px]"> {/* Aumentado o max-w aqui */}
         <DialogHeader>
           <DialogTitle>
             {isEditing ? "Editar Consulta" : `Detalhes da Consulta: ${appointment.pet_name}`}
