@@ -55,7 +55,7 @@ const Dashboard = () => {
   const [dashboardConfig, setDashboardConfig] = React.useState<DashboardItemConfig[]>(
     initialDashboardConfig
   );
-  const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "animalHealth" | "recentActivity">("recentActivity");
+  const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "recentActivity">("recentActivity"); // 'animalHealth' removido
   const [vetsOnDutyToday, setVetsOnDutyToday] = React.useState<number>(0);
 
   const { user } = useUser();
@@ -398,10 +398,10 @@ const Dashboard = () => {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "animalHealth" | "recentActivity")} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-auto p-1">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "recentActivity")} className="w-full"> {/* 'animalHealth' removido do tipo */}
+        <TabsList className="grid w-full grid-cols-3 h-auto p-1"> {/* Alterado para grid-cols-3 */}
           <TabsTrigger value="recentActivity" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Atividade Recente</TabsTrigger>
-          <TabsTrigger value="animalHealth" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Saúde Animal</TabsTrigger>
+          {/* <TabsTrigger value="animalHealth" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Saúde Animal</TabsTrigger> */}
           <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Visão Geral</TabsTrigger>
           <TabsTrigger value="financial" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Financeiro</TabsTrigger>
         </TabsList>
@@ -419,13 +419,14 @@ const Dashboard = () => {
               .map(item => getCardComponent(item))}
           </div>
         </TabsContent>
-        <TabsContent value="animalHealth" className="mt-4">
+        {/* Removido o TabsContent para 'animalHealth' */}
+        {/* <TabsContent value="animalHealth" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "animalHealth")
               .map(item => getCardComponent(item))}
           </div>
-        </TabsContent>
+        </TabsContent> */}
         <TabsContent value="recentActivity" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {dashboardConfig
