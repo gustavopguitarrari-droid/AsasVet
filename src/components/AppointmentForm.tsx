@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format, parseISO, isValid, isSameDay } from "date-fns"; // Importar isSameDay
+import { format, parseISO, isValid, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
@@ -213,6 +213,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
                         "w-full pl-3 text-left font-normal",
                         !field.value && "text-muted-foreground"
                       )}
+                      disabled // Adicionado disabled aqui para bloquear o PopoverTrigger
                     >
                       {field.value ? (
                         format(field.value, "PPP", { locale: ptBR })
@@ -229,7 +230,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
                       onSelect={field.onChange}
                       initialFocus
                       locale={ptBR}
-                      disabled={(date) => !isSameDay(date, new Date())} // Desabilita todos os dias, exceto o atual
+                      disabled={(date) => !isSameDay(date, new Date())}
                     />
                   </PopoverContent>
                 </Popover>
