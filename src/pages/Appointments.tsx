@@ -437,6 +437,7 @@ const Appointments = () => {
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       showSuccess("Histórico de consultas limpo com sucesso!");
       setIsHistoryDialogOpen(false);
+      window.location.reload(); // Recarrega a página após a limpeza do histórico
     },
     onError: (err) => {
       showError(`Erro ao limpar histórico: ${err.message}`);
