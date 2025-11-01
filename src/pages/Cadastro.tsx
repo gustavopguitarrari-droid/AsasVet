@@ -106,13 +106,14 @@ const Cadastro = () => {
   const [imagePreviewAlt, setImagePreviewAlt] = useState("");
 
   const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
-    queryKey: ['clients', userId],
+    queryKey: ['clients', userId, organizationId], // Adicionado organizationId ao queryKey
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId || !organizationId) return []; // Habilitar query apenas se organizationId estiver disponível
       const { data, error } = await supabase
         .from('clients')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('organization_id', organizationId); // Filtrar por organization_id
       if (error) throw error;
 
       return data.map(dbClient => ({
@@ -135,13 +136,13 @@ const Cadastro = () => {
         photoUrl: dbClient.photo_url || undefined,
       }));
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   const { data: pets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
-    queryKey: ['pets', userId],
+    queryKey: ['pets', userId, organizationId], // Adicionado organizationId ao queryKey
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId || !organizationId) return []; // Habilitar query apenas se organizationId estiver disponível
       const { data, error } = await supabase
         .from('pets')
         .select('*');
@@ -160,7 +161,7 @@ const Cadastro = () => {
         ownerId: dbPet.owner_id,
       }));
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   const addClientMutation = useMutation({
@@ -244,7 +245,7 @@ const Cadastro = () => {
       }
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['clients', userId] });
+      queryClient.invalidateQueries({ queryKey: ['clients', userId, organizationId] }); // Invalida com organizationId
       showSuccess("Tutor adicionado com sucesso!");
       setIsAddClientDialogOpen(false);
     },
@@ -318,7 +319,7 @@ const Cadastro = () => {
       return updatedClient;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients', userId] });
+      queryClient.invalidateQueries({ queryKey: ['clients', userId, organizationId] }); // Invalida com organizationId
       showSuccess("Tutor atualizado com sucesso!");
       setIsEditClientDialogOpen(false);
       setIsClientDetailsDialogOpen(false);
@@ -373,8 +374,8 @@ const Cadastro = () => {
       return clientId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['clients', userId] });
-      queryClient.invalidateQueries({ queryKey: ['pets', userId] });
+      queryClient.invalidateQueries({ queryKey: ['clients', userId, organizationId] }); // Invalida com organizationId
+      queryClient.invalidateQueries({ queryKey: ['pets', userId, organizationId] }); // Invalida com organizationId
       showSuccess("Tutor e seus animais excluídos com sucesso!");
       setIsClientDetailsDialogOpen(false);
     },
@@ -442,7 +443,7 @@ const Cadastro = () => {
       return finalPet;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pets', userId] });
+      queryClient.invalidateQueries({ queryKey: ['pets', userId, organizationId] }); // Invalida com organizationId
       showSuccess("Animal adicionado com sucesso!");
       setIsAddPetDialogOpen(false);
     },
@@ -496,7 +497,7 @@ const Cadastro = () => {
       return updatedPet;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pets', userId] });
+      queryClient.invalidateQueries({ queryKey: ['pets', userId, organizationId] }); // Invalida com organizationId
       showSuccess("Animal atualizado com sucesso!");
       setIsEditPetDialogOpen(false);
       setIsPetDetailsDialogOpen(false);
@@ -535,7 +536,7 @@ const Cadastro = () => {
       return petId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pets', userId] });
+      queryClient.invalidateQueries({ queryKey: ['pets', userId, organizationId] }); // Invalida com organizationId
       showSuccess("Animal excluído com sucesso!");
       setIsPetDetailsDialogOpen(false);
     },
