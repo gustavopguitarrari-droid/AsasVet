@@ -153,10 +153,13 @@ const AppointmentDetailsDialog: React.FC<AppointmentDetailsDialogProps> = ({
           />
         ) : (
           <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-3 items-center gap-4">
-              <p className="text-sm font-medium text-muted-foreground">ID:</p>
-              <p className="col-span-2 text-sm">{appointment.id}</p>
-            </div>
+            {/* Oculta o ID quando não estiver editando */}
+            {isEditing && (
+              <div className="grid grid-cols-3 items-center gap-4">
+                <p className="text-sm font-medium text-muted-foreground">ID:</p>
+                <p className="col-span-2 text-sm">{appointment.id}</p>
+              </div>
+            )}
             <Separator />
             <div className="grid grid-cols-3 items-center gap-4">
               <p className="text-sm font-medium text-muted-foreground">Data:</p>
