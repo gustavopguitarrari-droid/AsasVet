@@ -7,11 +7,11 @@ import { format, startOfWeek, endOfWeek, isWithinInterval, isSameDay, parseISO }
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button"; // Importar Button
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"; // Importar useMutation e useQueryClient
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { CalendarEvent } from "@/components/EventCalendar";
-import { Button } from "@/components/ui/button"; // Importar Button
 import { showSuccess, showError } from "@/utils/toast"; // Importar toasts
 
 // Mapeamento de cores para as categorias de eventos (já definido em globals.css)
@@ -26,18 +26,18 @@ const categoryColorMap: Record<CalendarEvent["category"], string> = {
 
 const UpcomingEventsCard: React.FC = () => {
   const { user: appUser } = useUser();
-  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Usar organizationId
   const queryClient = useQueryClient(); // Inicializar queryClient
 
   // Query para buscar eventos do Supabase
   const { data: events = [], isLoading, error } = useQuery<CalendarEvent[]>({
-    queryKey: ['upcomingEvents', userId],
+    queryKey: ['upcomingEvents', organizationId], // Alterado para organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!organizationId) return []; // Alterado para organizationId
       const { data, error } = await supabase
         .from('events')
         .select('*')
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // Filtrar por organization_id
         .neq('status', 'Cancelada') // Excluir eventos cancelados
         .gte('date', format(new Date(), 'yyyy-MM-dd'))
         .order('date', { ascending: true })
@@ -56,26 +56,26 @@ const UpcomingEventsCard: React.FC = () => {
         status: (event.status || "Agendada") as CalendarEvent["status"],
       }));
     },
-    enabled: !!userId,
+    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
   });
 
   // Mutação para atualizar o status do evento
   const updateEventStatusMutation = useMutation({
     mutationFn: async ({ eventId, newStatus }: { eventId: string; newStatus: CalendarEvent["status"] }) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!organizationId) throw new Error("Organization ID not available."); // Alterado para organizationId
       const { data, error } = await supabase
         .from('events')
         .update({ status: newStatus })
         .eq('id', eventId)
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // Filtrar por organization_id
         .select()
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['upcomingEvents', userId] }); // Invalida a query para refetch
-      queryClient.invalidateQueries({ queryKey: ['events', userId] }); // Invalida a query da agenda principal
+      queryClient.invalidateQueries({ queryKey: ['upcomingEvents', organizationId] }); // Invalida a query para refetch
+      queryClient.invalidateQueries({ queryKey: ['events', organizationId] }); // Invalida a query da agenda principal
       showSuccess("Evento confirmado como realizado!");
     },
     onError: (err) => {

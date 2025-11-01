@@ -97,6 +97,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         "/cadastro",
         "/medical-records",
         "/products", // NEW: Allow veterinarians to see Products
+        "/profile", // Perfil deve ser acessível a todos os cargos
       ];
       return allNavItems.filter(item => allowedPaths.includes(item.path));
     }

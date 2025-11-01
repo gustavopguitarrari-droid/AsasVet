@@ -18,6 +18,7 @@ const allowedVeterinarioPaths = [
   '/cadastro',
   '/medical-records', // Agenda
   '/profile', // Perfil deve ser acessível a todos os cargos
+  '/products', // Produtos deve ser acessível a Veterinários
 ];
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {

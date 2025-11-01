@@ -12,17 +12,17 @@ import { differenceInSeconds, parseISO, isValid } from "date-fns";
 
 const AverageWaitingTimeCard: React.FC = () => {
   const { user: appUser } = useUser();
-  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Usar organizationId
 
   // Query para buscar consultas que foram iniciadas (Em Andamento ou Realizada)
   const { data: startedAppointments = [], isLoading } = useQuery<Appointment[]>({
-    queryKey: ['startedAppointmentsWaitingTime', userId],
+    queryKey: ['startedAppointmentsWaitingTime', organizationId], // Alterado para organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!organizationId) return []; // Alterado para organizationId
       const { data, error } = await supabase
         .from('appointments')
         .select('created_at, start_time')
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // Filtrar por organization_id
         .in('status', ['Em Andamento', 'Realizada']) // Inclui consultas em andamento e realizadas
         .not('start_time', 'is', null); // Garante que start_time não é nulo
       if (error) {
@@ -31,7 +31,7 @@ const AverageWaitingTimeCard: React.FC = () => {
       }
       return data as Appointment[];
     },
-    enabled: !!userId,
+    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
   });
 
   const calculateAverageWaitingTime = (appointments: Appointment[]) => {

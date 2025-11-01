@@ -28,22 +28,23 @@ const COLORS = [
 
 const PetsBySpeciesChart: React.FC = () => {
   const { user: appUser } = useUser();
-  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Usar organizationId
 
   const { data: pets = [], isLoading, error } = useQuery<Pet[]>({
-    queryKey: ['petsBySpeciesChart', userId],
+    queryKey: ['petsBySpeciesChart', organizationId], // Alterado para organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!organizationId) return []; // Alterado para organizationId
       const { data, error } = await supabase
         .from('pets')
-        .select('species'); // Apenas a coluna 'species' é necessária
+        .select('species')
+        .in('owner_id', supabase.from('clients').select('id').eq('organization_id', organizationId)); // Filtrar pets pelos clientes da organização
       if (error) {
         console.error("Erro ao buscar animais por espécie:", error);
         throw error;
       }
       return data as Pet[];
     },
-    enabled: !!userId,
+    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
   });
 
   const chartData = React.useMemo(() => {

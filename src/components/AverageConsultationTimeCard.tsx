@@ -12,17 +12,17 @@ import { differenceInSeconds, parseISO, isValid } from "date-fns";
 
 const AverageConsultationTimeCard: React.FC = () => {
   const { user: appUser } = useUser();
-  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Usar organizationId
 
   // Query para buscar consultas finalizadas
   const { data: completedAppointments = [], isLoading } = useQuery<Appointment[]>({
-    queryKey: ['completedAppointmentsDuration', userId],
+    queryKey: ['completedAppointmentsDuration', organizationId], // Alterado para organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!organizationId) return []; // Alterado para organizationId
       const { data, error } = await supabase
         .from('appointments')
         .select('start_time, completion_timestamp')
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // Filtrar por organization_id
         .eq('status', 'Realizada')
         .not('start_time', 'is', null) // Garante que start_time não é nulo
         .not('completion_timestamp', 'is', null); // Garante que completion_timestamp não é nulo
@@ -32,7 +32,7 @@ const AverageConsultationTimeCard: React.FC = () => {
       }
       return data as Appointment[];
     },
-    enabled: !!userId,
+    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
   });
 
   const calculateAverageTime = (appointments: Appointment[]) => {

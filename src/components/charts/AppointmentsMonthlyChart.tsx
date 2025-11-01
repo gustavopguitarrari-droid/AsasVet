@@ -26,7 +26,7 @@ const AppointmentsMonthlyChart: React.FC = () => {
   const gridLineColor = "hsl(var(--border))";
 
   const { user: appUser } = useUser();
-  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Usar organizationId
 
   // Calcula os últimos 6 meses para o gráfico
   const today = new Date();
@@ -43,9 +43,9 @@ const AppointmentsMonthlyChart: React.FC = () => {
   }, [monthsInterval]);
 
   const { data: appointments = [], isLoading, error } = useQuery<Appointment[]>({
-    queryKey: ['monthlyAppointmentsChart', userId],
+    queryKey: ['monthlyAppointmentsChart', organizationId], // Alterado para organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!organizationId) return []; // Alterado para organizationId
 
       const sixMonthsAgo = format(startOfMonth(subMonths(today, 5)), 'yyyy-MM-dd');
       const nowFormatted = format(endOfMonth(today), 'yyyy-MM-dd');
@@ -53,7 +53,7 @@ const AppointmentsMonthlyChart: React.FC = () => {
       const { data, error } = await supabase
         .from('appointments')
         .select('date, status')
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // Filtrar por organization_id
         .eq('status', 'Realizada')
         .gte('date', sixMonthsAgo)
         .lte('date', nowFormatted);
@@ -64,7 +64,7 @@ const AppointmentsMonthlyChart: React.FC = () => {
       }
       return data as Appointment[];
     },
-    enabled: !!userId,
+    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
   });
 
   const chartData = React.useMemo(() => {

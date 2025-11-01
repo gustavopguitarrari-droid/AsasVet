@@ -23,15 +23,16 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
 
 const RecentPetsCard: React.FC = () => {
   const { user: appUser } = useUser();
-  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Usar organizationId
 
   const { data: recentPets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
-    queryKey: ['recentPetsDashboard', userId],
+    queryKey: ['recentPetsDashboard', organizationId], // Alterado para organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!organizationId) return []; // Alterado para organizationId
       const { data, error } = await supabase
         .from('pets')
         .select('*')
+        .in('owner_id', supabase.from('clients').select('id').eq('organization_id', organizationId)) // Filtrar pets pelos clientes da organização
         .order('created_at', { ascending: false })
         .limit(5);
       if (error) {
@@ -40,24 +41,24 @@ const RecentPetsCard: React.FC = () => {
       }
       return data as Pet[];
     },
-    enabled: !!userId,
+    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
   });
 
   const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
-    queryKey: ['allClientsForRecentPets', userId],
+    queryKey: ['allClientsForRecentPets', organizationId], // Alterado para organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!organizationId) return []; // Alterado para organizationId
       const { data, error } = await supabase
         .from('clients')
         .select('id, name') // Only need id and name
-        .eq('user_id', userId);
+        .eq('organization_id', organizationId); // Filtrar por organization_id
       if (error) {
         console.error("Erro ao buscar clientes para últimos animais:", error);
         throw error;
       }
       return data as Client[];
     },
-    enabled: !!userId,
+    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
   });
 
   const clientMap = React.useMemo(() => {

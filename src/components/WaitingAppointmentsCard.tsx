@@ -11,16 +11,16 @@ import { Link } from "react-router-dom";
 
 const WaitingAppointmentsCard: React.FC = () => {
   const { user: appUser } = useUser();
-  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Usar organizationId
 
   const { data: waitingAppointmentsCount = 0, isLoading } = useQuery<number>({
-    queryKey: ['waitingAppointmentsCount', userId],
+    queryKey: ['waitingAppointmentsCount', organizationId], // Alterado para organizationId
     queryFn: async () => {
-      if (!userId) return 0;
+      if (!organizationId) return 0; // Alterado para organizationId
       const { count, error } = await supabase
         .from('appointments')
         .select('*', { count: 'exact' })
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // Filtrar por organization_id
         .eq('status', 'Agendada'); // Contar apenas consultas com status 'Agendada'
       if (error) {
         console.error("Erro ao buscar contagem de consultas em espera:", error);
@@ -28,7 +28,7 @@ const WaitingAppointmentsCard: React.FC = () => {
       }
       return count || 0;
     },
-    enabled: !!userId,
+    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
   });
 
   return (

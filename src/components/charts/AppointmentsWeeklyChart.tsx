@@ -26,7 +26,7 @@ const AppointmentsWeeklyChart: React.FC = () => {
   const gridLineColor = "hsl(var(--border))";
 
   const { user: appUser } = useUser();
-  const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Usar organizationId
 
   // Calcula as últimas 5 semanas para o gráfico
   const today = new Date();
@@ -54,9 +54,9 @@ const AppointmentsWeeklyChart: React.FC = () => {
 
 
   const { data: appointments = [], isLoading, error } = useQuery<Appointment[]>({
-    queryKey: ['weeklyAppointmentsChart', userId],
+    queryKey: ['weeklyAppointmentsChart', organizationId], // Alterado para organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!organizationId) return []; // Alterado para organizationId
 
       const fiveWeeksAgoStart = format(startOfWeek(subWeeks(today, 4), weekOptions), 'yyyy-MM-dd');
       const nowFormattedEnd = format(endOfWeek(today, weekOptions), 'yyyy-MM-dd');
@@ -64,7 +64,7 @@ const AppointmentsWeeklyChart: React.FC = () => {
       const { data, error } = await supabase
         .from('appointments')
         .select('date, status')
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // Filtrar por organization_id
         .eq('status', 'Realizada')
         .gte('date', fiveWeeksAgoStart)
         .lte('date', nowFormattedEnd);
@@ -75,7 +75,7 @@ const AppointmentsWeeklyChart: React.FC = () => {
       }
       return data as Appointment[];
     },
-    enabled: !!userId,
+    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
   });
 
   const chartData = React.useMemo(() => {

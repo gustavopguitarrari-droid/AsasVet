@@ -49,7 +49,8 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       const userMetadata = supabaseUser.user_metadata;
       
       // Ensure organization_id is always a string if present, otherwise provide a fallback
-      const organizationId = data?.organization_id?.toString() || userMetadata.organization_id?.toString() || supabaseUser.id; // Fallback to user.id if not found
+      // Prioriza o organization_id do perfil, depois dos metadados, depois o próprio ID do usuário
+      const organizationId = data?.organization_id?.toString() || userMetadata.organization_id?.toString() || supabaseUser.id;
 
       return {
         id: supabaseUser.id,
