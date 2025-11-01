@@ -254,7 +254,7 @@ const ConsultationPage: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       showSuccess("Consulta finalizada com sucesso!");
-      navigate('/consultas');
+      navigate('/consultas', { state: { activeTab: 'finalizadas' } }); // Redireciona para a aba 'Finalizadas'
     },
     onError: (err) => {
       showError(`Erro ao finalizar consulta: ${err.message}`);
