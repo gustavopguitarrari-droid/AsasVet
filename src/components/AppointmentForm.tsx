@@ -210,10 +210,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-full pl-3 text-left font-normal",
+                        "w-full pl-3 text-left font-normal h-10", // Adicionado h-10
                         !field.value && "text-muted-foreground"
                       )}
-                      disabled // Adicionado disabled aqui para bloquear o PopoverTrigger
+                      disabled
                     >
                       {field.value ? (
                         format(field.value, "PPP", { locale: ptBR })
@@ -242,10 +242,10 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({ onSubmit, onCancel, i
             control={form.control}
             name="time"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col"> {/* Adicionado flex flex-col para consistência */}
                 <FormLabel>Hora da Consulta</FormLabel>
                 <FormControl>
-                  <Input type="time" {...field} disabled />
+                  <Input type="time" {...field} disabled className="h-10" /> {/* Adicionado h-10 */}
                 </FormControl>
                 <FormMessage />
               </FormItem>
