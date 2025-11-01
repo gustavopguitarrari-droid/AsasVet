@@ -384,8 +384,8 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                   <TableHead>Finalização/Cancelamento</TableHead>
                   <TableHead>Duração</TableHead>
                   <TableHead>Tempo de Espera</TableHead>
-                  <TableHead>Receitas</TableHead>
                   <TableHead className="text-right">Prontuário</TableHead>
+                  <TableHead className="text-right">Receita</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -432,57 +432,40 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                         </TableCell>
                         <TableCell>{duration}</TableCell>
                         <TableCell>{waitingTime}</TableCell>
-                        <TableCell>
+                        <TableCell className="text-right">
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log(`AppointmentHistoryDialog: Prescriptions count button clicked for appointment ${appointment.id}. Prescriptions count: ${appointment.medical_records?.prescriptions?.length}`); // ADDED LOG
-                              if (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0) {
-                                showSuccess(`${appointment.medical_records.prescriptions.length} prescrição(ões) no prontuário.`);
-                              } else {
-                                showError("Nenhuma prescrição encontrada para esta consulta.");
-                              }
+                              handleOpenMedicalRecordPdfPreviewDialog(appointment);
                             }}
-                            className="flex items-center justify-center gap-1"
+                            disabled={fetchAndGeneratePdfMutation.isPending}
                           >
-                            <Pill className="h-4 w-4" />
-                            <span>{appointment.medical_records?.prescriptions?.length || 0}</span>
+                            {fetchAndGeneratePdfMutation.isPending ? (
+                              <span className="loading-spinner h-4 w-4" />
+                            ) : (
+                              <FileText className="h-4 w-4" />
+                            )}
                           </Button>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex justify-end space-x-2">
+                          {appointment.medical_records?.recipe_pdf_url || (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0) ? (
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenMedicalRecordPdfPreviewDialog(appointment);
-                              }}
-                              disabled={fetchAndGeneratePdfMutation.isPending}
+                              onClick={(e) => { e.stopPropagation(); handleOpenRecipePdfPreviewDialog(appointment); }}
+                              disabled={fetchAndGenerateRecipePdfMutation.isPending}
                             >
-                              {fetchAndGeneratePdfMutation.isPending ? (
+                              {fetchAndGenerateRecipePdfMutation.isPending ? (
                                 <span className="loading-spinner h-4 w-4" />
                               ) : (
-                                <FileText className="h-4 w-4" />
+                                <Pill className="h-4 w-4" />
                               )}
                             </Button>
-                            {appointment.medical_records?.recipe_pdf_url || (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0) ? ( // Show button if URL exists OR if prescriptions exist
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => { e.stopPropagation(); handleOpenRecipePdfPreviewDialog(appointment); }}
-                                disabled={fetchAndGenerateRecipePdfMutation.isPending}
-                              >
-                                {fetchAndGenerateRecipePdfMutation.isPending ? (
-                                  <span className="loading-spinner h-4 w-4" />
-                                ) : (
-                                  <Pill className="h-4 w-4" />
-                                )}
-                              </Button>
-                            ) : null}
-                          </div>
+                          ) : (
+                            <span className="text-muted-foreground text-xs">N/A</span>
+                          )}
                         </TableCell>
                       </TableRow>
                     );

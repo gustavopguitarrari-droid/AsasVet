@@ -825,54 +825,37 @@ const Appointments = () => {
               })()
             : "N/A"
         )},
-        { id: 'prescriptions', header: 'Receitas', render: (appointment: Appointment) => (
+        { id: 'medicalRecordPdf', header: 'Prontuário', className: 'text-right', render: (appointment: Appointment) => (
           <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              console.log(`Appointments.tsx: Clicking prescriptions count button for appointment ${appointment.id}. prescriptions_count: ${appointment.medical_records?.prescriptions?.length}`); // ADDED LOG
-              if (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0) {
-                showSuccess(`${appointment.medical_records.prescriptions.length} prescrição(ões) no prontuário.`);
-              } else {
-                showError("Nenhuma prescrição encontrada para esta consulta.");
-              }
-            }}
-            className="flex items-center justify-center gap-1"
-          >
-            <Pill className="h-4 w-4" />
-            <span>{appointment.medical_records?.prescriptions?.length || 0}</span>
-          </Button>
-        )},
-        { id: 'pdfActions', header: 'Prontuário', className: 'text-right', render: (appointment: Appointment) => (
-          <div className="flex justify-end space-x-2">
-            <Button
               variant="outline"
               size="sm"
               onClick={(e) => { e.stopPropagation(); handleOpenMedicalRecordPdfPreviewDialog(appointment); }}
               disabled={fetchAndGeneratePdfMutation.isPending}
-            >
+          >
               {fetchAndGeneratePdfMutation.isPending ? (
-                <span className="loading-spinner h-4 w-4" />
-              ) : (
-                <FileText className="h-4 w-4" />
-              )}
-            </Button>
-            {appointment.medical_records?.recipe_pdf_url || (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0) ? ( // Show button if URL exists OR if prescriptions exist
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={(e) => { e.stopPropagation(); handleOpenRecipePdfPreviewDialog(appointment); }}
-                disabled={fetchAndGenerateRecipePdfMutation.isPending}
-              >
-                {fetchAndGenerateRecipePdfMutation.isPending ? (
                   <span className="loading-spinner h-4 w-4" />
-                ) : (
-                  <Pill className="h-4 w-4" />
-                )}
+              ) : (
+                  <FileText className="h-4 w-4" />
+              )}
+          </Button>
+        )},
+        { id: 'recipePdf', header: 'Receita', className: 'text-right', render: (appointment: Appointment) => (
+          (appointment.medical_records?.recipe_pdf_url || (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0)) ? (
+              <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={(e) => { e.stopPropagation(); handleOpenRecipePdfPreviewDialog(appointment); }}
+                  disabled={fetchAndGenerateRecipePdfMutation.isPending}
+              >
+                  {fetchAndGenerateRecipePdfMutation.isPending ? (
+                      <span className="loading-spinner h-4 w-4" />
+                  ) : (
+                      <Pill className="h-4 w-4" />
+                  )}
               </Button>
-            ) : null}
-          </div>
+          ) : (
+              <span className="text-muted-foreground text-xs">N/A</span>
+          )
         )},
       ];
     }
