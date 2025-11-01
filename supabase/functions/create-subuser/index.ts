@@ -21,6 +21,7 @@ serve(async (req) => {
     // Verify the user making the request is an admin
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
+      console.error('Edge Function: Unauthorized - No Authorization header.');
       return new Response(JSON.stringify({ error: 'Unauthorized: No Authorization header' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -31,12 +32,13 @@ serve(async (req) => {
     const { data: { user: authUser }, error: authError } = await supabaseAdmin.auth.getUser(token);
 
     if (authError || !authUser) {
-      console.error('Auth error:', authError?.message);
+      console.error('Edge Function: Auth error:', authError?.message);
       return new Response(JSON.stringify({ error: 'Unauthorized: Invalid token' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    console.log('Edge Function: Admin user authenticated:', authUser.id);
 
     // Fetch the profile of the authenticated user to check their role and get their organization_id
     const { data: adminProfile, error: profileError } = await supabaseAdmin
@@ -46,16 +48,20 @@ serve(async (req) => {
       .single();
 
     if (profileError || !adminProfile || adminProfile.role !== 'Administrador') {
-      console.error('Profile error or not admin:', profileError?.message, adminProfile?.role);
+      console.error('Edge Function: Profile error or not admin:', profileError?.message, adminProfile?.role);
       return new Response(JSON.stringify({ error: 'Forbidden: Only administrators can create sub-users.' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    console.log('Edge Function: Requesting user is an Administrator with organization_id:', adminProfile.organization_id);
 
     const { email, password, first_name, last_name, role } = await req.json();
+    console.log('Edge Function: Received payload for new sub-user:', { email, first_name, last_name, role });
+
 
     if (!email || !password || !first_name || !last_name || !role) {
+      console.error('Edge Function: Missing required fields in payload.');
       return new Response(JSON.stringify({ error: 'Missing required fields: email, password, first_name, last_name, role' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -64,6 +70,7 @@ serve(async (req) => {
 
     // IMPORTANT: Prevent creating a sub-user with 'Administrador' role
     if (role === 'Administrador') {
+      console.error('Edge Function: Forbidden - Attempt to create sub-user with Administrator role.');
       return new Response(JSON.stringify({ error: 'Forbidden: Cannot create a sub-user with Administrator role.' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -84,12 +91,13 @@ serve(async (req) => {
     });
 
     if (createUserError) {
-      console.error('Error creating user:', createUserError.message);
+      console.error('Edge Function: Error creating user in auth.users:', createUserError.message);
       return new Response(JSON.stringify({ error: createUserError.message }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+    console.log('Edge Function: Sub-user created successfully in auth.users with ID:', newUser.user?.id);
 
     return new Response(JSON.stringify({ message: 'Sub-user created successfully', userId: newUser.user?.id }), {
       status: 200,
@@ -97,7 +105,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Unhandled error:', error.message);
+    console.error('Edge Function: Unhandled error:', error.message);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

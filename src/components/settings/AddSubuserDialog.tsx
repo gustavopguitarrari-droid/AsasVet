@@ -91,8 +91,23 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
       onClose(); // Fechar o diálogo após sucesso
     },
     onError: (err: any) => {
-      console.error("Erro ao criar subusuário:", err.message);
-      showError(`Erro ao criar subusuário: ${err.message}`);
+      console.error("Erro ao criar subusuário (detalhes):", err); // Log the full error object
+      let errorMessage = "Erro desconhecido ao criar subusuário.";
+      if (err.message) {
+        errorMessage = err.message;
+      }
+      // Attempt to parse the detailed error from the Edge Function response
+      if (err.context?.data) {
+        try {
+          const errorData = JSON.parse(err.context.data);
+          if (errorData.error) {
+            errorMessage = errorData.error;
+          }
+        } catch (parseError) {
+          console.warn("Failed to parse Edge Function error context data:", parseError);
+        }
+      }
+      showError(`Erro ao criar subusuário: ${errorMessage}`);
     },
   });
 
@@ -150,15 +165,15 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center">
-                    <Mail className="h-4 w-4 mr-2 text-muted-foreground" /> E-mail
-                  </FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="email@exemplo.com" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  <FormItem>
+                    <FormLabel className="flex items-center">
+                      <Mail className="h-4 w-4 mr-2 text-muted-foreground" /> E-mail
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="email@exemplo.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
               )}
             />
 
@@ -166,15 +181,15 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center">
-                    <Lock className="h-4 w-4 mr-2 text-muted-foreground" /> Senha
-                  </FormLabel>
-                  <FormControl>
-                    <Input type="password" placeholder="••••••••" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  <FormItem>
+                    <FormLabel className="flex items-center">
+                      <Lock className="h-4 w-4 mr-2 text-muted-foreground" /> Senha
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
               )}
             />
 
@@ -182,18 +197,18 @@ const AddSubuserDialog: React.FC<AddSubuserDialogProps> = ({ isOpen, onClose, on
               control={form.control}
               name="role"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center">
-                    <Briefcase className="h-4 w-4 mr-2 text-muted-foreground" /> Cargo
-                  </FormLabel>
-                  <FormControl>
-                    <RoleSelect
-                      value={field.value}
-                      onValueChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                  <FormItem>
+                    <FormLabel className="flex items-center">
+                      <Briefcase className="h-4 w-4 mr-2 text-muted-foreground" /> Cargo
+                    </FormLabel>
+                    <FormControl>
+                      <RoleSelect
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
               )}
             />
 
