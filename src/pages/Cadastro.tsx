@@ -388,6 +388,20 @@ const Cadastro = () => {
     mutationFn: async (data: PetFormValues) => {
       if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Adicionado organizationId
 
+      console.log("addPetMutation: Payload being sent to Supabase:", {
+        owner_id: data.ownerId,
+        name: data.name,
+        species: data.species,
+        breed: data.breed,
+        age: data.age,
+        gender: data.gender,
+        color: data.color,
+        weight: data.weight,
+        observations: data.observations,
+        photo_url: null,
+        organization_id: organizationId,
+      });
+
       let photoUrl: string | null = null;
       let newPetId: string | undefined;
 
@@ -410,6 +424,7 @@ const Cadastro = () => {
         .single();
 
       if (insertError || !insertedPet) {
+        console.error("addPetMutation: Error inserting pet into Supabase:", insertError);
         throw insertError || new Error("Failed to create pet.");
       }
       newPetId = insertedPet.id;
@@ -888,6 +903,7 @@ const Cadastro = () => {
                     allClients={clients}
                     defaultOwnerId={defaultOwnerIdForPet}
                     defaultOwnerName={defaultOwnerNameForPet}
+                    isSubmittingParent={addPetMutation.isPending}
                   />
                 </DialogContent>
               </Dialog>
@@ -1093,6 +1109,7 @@ const Cadastro = () => {
               onCancel={() => setIsEditPetDialogOpen(false)}
               initialData={petToEdit}
               allClients={clients}
+              isSubmittingParent={updatePetMutation.isPending}
             />
           )}
         </DialogContent>
@@ -1112,6 +1129,7 @@ const Cadastro = () => {
             allClients={clients}
             defaultOwnerId={defaultOwnerIdForPet}
             defaultOwnerName={defaultOwnerNameForPet}
+            isSubmittingParent={addPetMutation.isPending}
           />
         </DialogContent>
       </Dialog>

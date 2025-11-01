@@ -58,9 +58,10 @@ interface PetFormProps {
   allClients: Client[]; // Lista de todos os tutores para seleção
   defaultOwnerId?: string; // Para pré-selecionar um tutor
   defaultOwnerName?: string; // Nome do tutor padrão
+  isSubmittingParent?: boolean; // Nova prop para indicar se a mutação pai está pendente
 }
 
-const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allClients, defaultOwnerId, defaultOwnerName }) => {
+const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allClients, defaultOwnerId, defaultOwnerName, isSubmittingParent = false }) => {
   const { user: appUser } = useUser();
   const userId = appUser?.id;
 
@@ -229,6 +230,8 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
     console.log("PetForm (handleSubmit): Dados do formulário sendo submetidos:", data);
     onSubmit(data);
   };
+
+  const isFormSubmitting = form.formState.isSubmitting || isSubmittingParent;
 
   return (
     <>
@@ -462,10 +465,10 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
           />
 
           <DialogFooter className="mt-6">
-            <Button variant="outline" onClick={onCancel}>
+            <Button variant="outline" onClick={onCancel} type="button" disabled={isFormSubmitting}>
               Cancelar
             </Button>
-            <Button type="submit">
+            <Button type="submit" disabled={!form.formState.isValid || isFormSubmitting}>
               <PlusCircle className="mr-2 h-4 w-4" /> {initialData ? "Salvar Alterações" : "Adicionar Animal"}
             </Button>
           </DialogFooter>
