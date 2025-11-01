@@ -120,7 +120,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess }) => {
             address_neighborhood: data.neighborhood,
             address_city: data.city,
             address_state: data.state,
-            role: 'Veterinário', // Default role for new sign-ups
+            // REMOVIDO: role: 'Veterinário', // O cargo será definido pelo trigger handle_new_user como 'Administrador'
           },
         },
       });
