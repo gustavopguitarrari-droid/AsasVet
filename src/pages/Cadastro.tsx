@@ -49,6 +49,7 @@ const Cadastro = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // Obter organizationId
   const location = useLocation();
   const { setPageTitle } = usePageTitle(); // Obter setPageTitle do contexto
 
@@ -164,8 +165,8 @@ const Cadastro = () => {
 
   const addClientMutation = useMutation({
     mutationFn: async (data: ClientFormValues) => {
-      if (!userId) {
-        throw new Error("User not authenticated.");
+      if (!userId || !organizationId) { // Adicionado organizationId aqui
+        throw new Error("User not authenticated or organization ID not available.");
       }
 
       const { data: existingCpf, error: cpfCheckError } = await supabase
@@ -189,6 +190,7 @@ const Cadastro = () => {
         .from('clients')
         .insert({
           user_id: userId,
+          organization_id: organizationId, // Adicionado organization_id aqui
           name: data.name,
           email: data.email,
           phone: data.phone,
@@ -213,7 +215,7 @@ const Cadastro = () => {
       newClientId = insertedClient.id;
 
       if (data.photoUrl) {
-        photoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'clients', newClientId);
+        photoUrl = await uploadImageToSupabase(data.photoUrl, organizationId, 'clients', newClientId); // Usar organizationId
         if (!photoUrl) {
           await supabase.from('clients').delete().eq('id', newClientId);
           throw new Error("Failed to upload client photo.");
@@ -253,7 +255,7 @@ const Cadastro = () => {
 
   const updateClientMutation = useMutation({
     mutationFn: async (data: ClientFormValues & { id: string }) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Adicionado organizationId
 
       const oldClient = clients.find(c => c.id === data.id);
       let newPhotoUrl: string | null | undefined = data.photoUrl;
@@ -278,7 +280,7 @@ const Cadastro = () => {
           await deleteImageFromSupabase(oldClient.photoUrl);
         }
         if (data.photoUrl && data.photoUrl.startsWith('data:image')) {
-          newPhotoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'clients', data.id);
+          newPhotoUrl = await uploadImageToSupabase(data.photoUrl, organizationId, 'clients', data.id); // Usar organizationId
           if (!newPhotoUrl) throw new Error("Failed to upload new client photo.");
         } else if (!data.photoUrl) {
           newPhotoUrl = null;
@@ -304,6 +306,7 @@ const Cadastro = () => {
           address_state: data.address.state,
           observations: data.observations,
           photo_url: newPhotoUrl,
+          organization_id: organizationId, // Garantir que organization_id seja atualizado/mantido
         })
         .eq('id', data.id)
         .eq('user_id', userId)
@@ -327,7 +330,7 @@ const Cadastro = () => {
 
   const deleteClientMutation = useMutation({
     mutationFn: async (clientId: string) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Adicionado organizationId
 
       const { data: clientToDelete, error: fetchError } = await supabase
         .from('clients')
@@ -362,7 +365,8 @@ const Cadastro = () => {
         .from('clients')
         .delete()
         .eq('id', clientId)
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('organization_id', organizationId); // Adicionado organization_id para segurança
       if (error) {
         throw error;
       }
@@ -381,7 +385,7 @@ const Cadastro = () => {
 
   const addPetMutation = useMutation({
     mutationFn: async (data: PetFormValues) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Adicionado organizationId
 
       let photoUrl: string | null = null;
       let newPetId: string | undefined;
@@ -399,6 +403,7 @@ const Cadastro = () => {
           weight: data.weight,
           observations: data.observations,
           photo_url: null,
+          organization_id: organizationId, // Adicionado organization_id aqui
         })
         .select('id')
         .single();
@@ -409,7 +414,7 @@ const Cadastro = () => {
       newPetId = insertedPet.id;
 
       if (data.photoUrl) {
-        photoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'pets', newPetId);
+        photoUrl = await uploadImageToSupabase(data.photoUrl, organizationId, 'pets', newPetId); // Usar organizationId
         if (!photoUrl) {
           await supabase.from('pets').delete().eq('id', newPetId);
           throw new Error("Failed to upload pet photo.");
@@ -448,7 +453,7 @@ const Cadastro = () => {
 
   const updatePetMutation = useMutation({
     mutationFn: async (data: PetFormValues & { id: string }) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Adicionado organizationId
 
       const oldPet = pets.find(p => p.id === data.id);
       let newPhotoUrl: string | null | undefined = data.photoUrl;
@@ -458,7 +463,7 @@ const Cadastro = () => {
           await deleteImageFromSupabase(oldPet.photoUrl);
         }
         if (data.photoUrl && data.photoUrl.startsWith('data:image')) {
-          newPhotoUrl = await uploadImageToSupabase(data.photoUrl, userId, 'pets', data.id);
+          newPhotoUrl = await uploadImageToSupabase(data.photoUrl, organizationId, 'pets', data.id); // Usar organizationId
           if (!newPhotoUrl) throw new Error("Failed to upload new pet photo.");
         } else if (!data.photoUrl) {
           newPhotoUrl = null;
@@ -480,6 +485,7 @@ const Cadastro = () => {
           weight: data.weight,
           observations: data.observations,
           photo_url: newPhotoUrl,
+          organization_id: organizationId, // Garantir que organization_id seja atualizado/mantido
         })
         .eq('id', data.id)
         .select()
@@ -502,7 +508,7 @@ const Cadastro = () => {
 
   const deletePetMutation = useMutation({
     mutationFn: async (petId: string) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Adicionado organizationId
 
       const { data: petToDelete, error: fetchError } = await supabase
         .from('pets')
@@ -521,7 +527,8 @@ const Cadastro = () => {
       const { error } = await supabase
         .from('pets')
         .delete()
-        .eq('id', petId);
+        .eq('id', petId)
+        .eq('organization_id', organizationId); // Adicionado organization_id para segurança
       if (error) {
         throw error;
       }
