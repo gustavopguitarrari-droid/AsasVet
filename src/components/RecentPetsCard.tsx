@@ -29,10 +29,24 @@ const RecentPetsCard: React.FC = () => {
     queryKey: ['recentPetsDashboard', organizationId], // Alterado para organizationId
     queryFn: async () => {
       if (!organizationId) return []; // Alterado para organizationId
+
+      // FIX: Execute the subquery first to get an array of client IDs
+      const { data: clientIdsData, error: clientIdsError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('organization_id', organizationId);
+
+      if (clientIdsError) {
+        console.error("Erro ao buscar IDs de clientes para últimos animais:", clientIdsError);
+        throw clientIdsError;
+      }
+
+      const ownerIds = clientIdsData.map(client => client.id);
+
       const { data, error } = await supabase
         .from('pets')
         .select('*')
-        .in('owner_id', supabase.from('clients').select('id').eq('organization_id', organizationId)) // Filtrar pets pelos clientes da organização
+        .in('owner_id', ownerIds) // FIX: Pass the array of owner IDs
         .order('created_at', { ascending: false })
         .limit(5);
       if (error) {

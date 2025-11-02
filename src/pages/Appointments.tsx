@@ -517,6 +517,7 @@ const Appointments = () => {
         throw new Error("User not authenticated.");
       }
       const currentUserId: string = userId;
+      const organizationId = appUser?.organizationId; // Get organizationId from appUser
 
       console.log(`Appointments.tsx: fetchAndGenerateRecipePdfMutation called for appointment ${appointment.id}. Current appointment object:`, appointment); // ADDED LOG
       console.log("Appointments: fetchAndGenerateRecipePdfMutation.mutationFn - Received appointment:", appointment); // ADDED LOG
@@ -562,7 +563,7 @@ const Appointments = () => {
       });
 
       // Upload the newly generated PDF and get its URL
-      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, currentUserId, appointment.id);
+      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, organizationId!, currentUserId, appointment.id);
       console.log("Appointments: fetchAndGenerateRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
       if (!newPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF da receita.");
@@ -928,7 +929,7 @@ const Appointments = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          {/* Botões movidos para cá, alinhados à direita */}
+          {/* Botões movidos para acá, alinhados à direita */}
           <div className="flex space-x-2 mt-4 md:mt-0"> {/* Adicionado margem superior para mobile */}
             <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
               <History className="mr-2 h-4 w-4" /> Ver Histórico

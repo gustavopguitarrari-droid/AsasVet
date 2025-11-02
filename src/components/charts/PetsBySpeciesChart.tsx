@@ -34,10 +34,24 @@ const PetsBySpeciesChart: React.FC = () => {
     queryKey: ['petsBySpeciesChart', organizationId], // Alterado para organizationId
     queryFn: async () => {
       if (!organizationId) return []; // Alterado para organizationId
+
+      // FIX: Execute the subquery first to get an array of client IDs
+      const { data: clientIdsData, error: clientIdsError } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('organization_id', organizationId);
+
+      if (clientIdsError) {
+        console.error("Erro ao buscar IDs de clientes para animais por espécie:", clientIdsError);
+        throw clientIdsError;
+      }
+
+      const ownerIds = clientIdsData.map(client => client.id);
+
       const { data, error } = await supabase
         .from('pets')
         .select('species')
-        .in('owner_id', supabase.from('clients').select('id').eq('organization_id', organizationId)); // Filtrar pets pelos clientes da organização
+        .in('owner_id', ownerIds); // FIX: Pass the array of owner IDs
       if (error) {
         console.error("Erro ao buscar animais por espécie:", error);
         throw error;
