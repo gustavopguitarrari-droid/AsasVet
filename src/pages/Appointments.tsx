@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText, Pill, ArrowLeft } from "lucide-react";
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText, Pill, Horse, Cow } from "lucide-react"; // Importar ArrowRight, FileText e Pill, Horse, Cow
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -20,7 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import AppointmentDetailsDialog from "@/components/AppointmentDetailsDialog";
 import AppointmentChronometer from "@/components/AppointmentChronometer";
-import AppointmentHistoryDialog from "@/components/AppointmentHistoryDialog"; // Importação atualizada
+import AppointmentHistoryDialog from "@/components/AppointmentHistoryDialog";
 import { format, parseISO, differenceInSeconds, isValid } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -29,12 +29,12 @@ import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { Client, Pet } from "@/types/cadastro";
 import { useNavigate, useLocation } from "react-router-dom"; // Importar useLocation
-import { usePageTitle } from "@/context/PageTitleContext";
-import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm";
-import PdfPreviewDialog from "@/components/PdfPreviewDialog";
-import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf';
-import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase, uploadMedicalRecordPdfToSupabase } from '@/utils/supabaseStorage';
-import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf'; // CORREÇÃO AQUI: Importação correta
+import { usePageTitle } from "@/context/PageTitleContext"; // NOVO: Importar usePageTitle
+import { generateMedicalRecordPdf } from "@/utils/generateMedicalRecordPdf"; // Importar função de PDF
+import { MedicalRecordFormValues } from "@/components/consultation/MedicalRecordForm"; // Importar tipo de formulário
+import PdfPreviewDialog from "@/components/PdfPreviewDialog"; // Importar diálogo de pré-visualização
+import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf'; // NOVO: Importar função de PDF de receita
+import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase, uploadMedicalRecordPdfToSupabase } from '@/utils/supabaseStorage'; // NOVO: Funções de storage para receita
 
 // Definir as opções de serviço como um array para reutilização
 const serviceOptions = [
@@ -69,14 +69,14 @@ export interface Appointment {
   time: string; // HH:mm
   client_name: string;
   pet_name: string;
-  species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros" | "Equino" | "Bovino";
-  service: typeof serviceOptions[number];
+  species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros" | "Equino" | "Bovino"; // Tipo de enumeração atualizado
+  service: typeof serviceOptions[number]; // Tipo de enumeração
   veterinarian: string;
   status: "Agendada" | "Realizada" | "Cancelada" | "Em Andamento";
-  completion_timestamp?: string | null;
+  completion_timestamp?: string | null; // Alterado para timestamp ISO (UTC)
   created_at: string;
   start_time?: string | null;
-  pet_id: string | null;
+  pet_id: string | null; // NOVO: Adicionado pet_id
   client_id: string | null; // Adicionado client_id
   // NOVO: Adicionado para refletir os dados do prontuário aninhado
   medical_records?: MedicalRecord | null; // Alterado para ser um objeto único ou null
@@ -91,15 +91,16 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
-  Equino: MoreHorizontal,
-  Bovino: MoreHorizontal,
+  Equino: Horse, // Adicionado Equino
+  Bovino: Cow,   // Adicionado Bovino
   Outros: MoreHorizontal,
 };
 
+// Definir um tipo para a definição da coluna
 interface ColumnDefinition {
   id: string;
   header: string;
-  className?: string;
+  className?: string; // Torna className opcional
   render: (appointment: Appointment) => React.ReactNode;
 }
 
@@ -110,7 +111,7 @@ const Appointments = () => {
   const veterinarianName = appUser?.name || "Veterinário Desconhecido";
   const navigate = useNavigate();
   const location = useLocation(); // Inicializar useLocation
-  const { setPageTitle } = usePageTitle();
+  const { setPageTitle } = usePageTitle(); // NOVO: Obter setPageTitle do contexto
 
   const [activeTab, setActiveTab] = React.useState<string>("em-espera");
   const [searchTerm, setSearchTerm] = React.useState<string>("");
@@ -120,14 +121,16 @@ const Appointments = () => {
   const [isAddAppointmentDialogOpen, setIsAddAppointmentDialogOpen] = React.useState<boolean>(false);
   const [isHistoryDialogOpen, setIsHistoryDialogOpen] = React.useState<boolean>(false);
 
+  // Estados para o diálogo de pré-visualização de PDF
   const [isPdfPreviewDialogOpen, setIsPdfPreviewDialogOpen] = useState(false);
   const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const [pdfFilename, setPdfFilename] = useState("");
   const [pdfAppointment, setPdfAppointment] = useState<Appointment | null>(null);
 
+  // Estados para o diálogo de pré-visualização de PDF de receita
   const [isRecipePdfPreviewDialogOpen, setIsRecipePdfPreviewDialogOpen] = useState(false);
   const [recipePdfBlob, setRecipePdfBlob] = useState<Blob | null>(null);
-  const [recipePdfUrl, setRecipePdfUrl] = useState<string | null>(null);
+  const [recipePdfUrl, setRecipePdfUrl] = useState<string | null>(null); // NOVO: Para URL direta
   const [recipePdfFilename, setRecipePdfFilename] = useState("");
 
   React.useEffect(() => {
@@ -154,8 +157,9 @@ const Appointments = () => {
       default:
         tabName = "";
     }
-    setPageTitle(`Consultas - ${tabName}`);
+    setPageTitle(`Consultas - ${tabName}`); // Definir o título dinâmico
 
+    // Função de limpeza para redefinir o título quando o componente for desmontado
     return () => {
       setPageTitle(""); 
     };
@@ -255,8 +259,8 @@ const Appointments = () => {
           number: dbClient.address_number || '',
           complement: dbClient.address_complement || undefined,
           neighborhood: dbClient.address_neighborhood || '',
-          city: dbClient.localidade || '', // Corrected from dbClient.address_city
-          state: dbClient.uf || '', // Corrected from dbClient.address_state
+          city: dbClient.address_city || '', // Corrected from dbClient.localidade
+          state: dbClient.address_state || '', // Corrected from dbClient.uf
         },
         observations: dbClient.observations || undefined,
         photoUrl: dbClient.photo_url || undefined,
@@ -276,10 +280,10 @@ const Appointments = () => {
       return data.map(dbPet => ({
         id: dbPet.id,
         name: dbPet.name,
-        species: dbPet.species as Pet["species"],
+        species: dbPet.species as Pet["species"], // Cast para o tipo de enumeração
         breed: dbPet.breed,
         age: dbPet.age,
-        gender: dbPet.gender as Pet["gender"],
+        gender: dbPet.gender as Pet["gender"], // Cast para o tipo de enumeração
         color: dbPet.color,
         observations: dbPet.observations || undefined,
         photoUrl: dbPet.photo_url || undefined,
@@ -308,13 +312,13 @@ const Appointments = () => {
           service: newAppointmentData.service,
           veterinarian: veterinarianName,
           status: "Agendada",
-          client_id: newAppointmentData.selectedClientId, // Ensure client_id is passed
-          pet_id: newAppointmentData.selectedPetId,
+          pet_id: newAppointmentData.selectedPetId, // Adicionado pet_id
+          client_id: newAppointmentData.selectedClientId, // Adicionado client_id
         })
         .select()
         .single();
       if (error) throw error;
-      return data as Appointment;
+      return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
@@ -342,15 +346,15 @@ const Appointments = () => {
           status: updatedAppointment.status,
           completion_timestamp: updatedAppointment.completion_timestamp,
           start_time: updatedAppointment.start_time,
-          client_id: updatedAppointment.client_id, // Ensure client_id is passed
-          pet_id: updatedAppointment.pet_id,
+          pet_id: updatedAppointment.pet_id, // Adicionado pet_id
+          client_id: updatedAppointment.client_id, // Adicionado client_id
         })
         .eq('id', updatedAppointment.id)
         .eq('user_id', userId)
         .select()
         .single();
       if (error) throw error;
-      return data as Appointment;
+      return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
@@ -379,7 +383,7 @@ const Appointments = () => {
         .select()
         .single();
       if (error) throw error;
-      return data as Appointment;
+      return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
@@ -410,7 +414,7 @@ const Appointments = () => {
         .select()
         .single();
       if (error) throw error;
-      return data as Appointment;
+      return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
@@ -422,6 +426,7 @@ const Appointments = () => {
     },
   });
 
+  // NEW: Mutation for clearing history appointments
   const clearHistoryAppointmentsMutation = useMutation({
     mutationFn: async () => {
       if (!userId) throw new Error("User not authenticated.");
@@ -435,16 +440,15 @@ const Appointments = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalidate active appointments too
       showSuccess("Histórico de consultas limpo com sucesso!");
       setIsHistoryDialogOpen(false);
-      // REMOVIDO: window.location.reload(); // Recarrega a página após a limpeza do histórico
     },
     onError: (err) => {
       showError(`Erro ao limpar histórico: ${err.message}`);
     },
   });
 
+  // Mutation to fetch the medical record and generate the PDF
   const fetchAndGeneratePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
       if (!userId) {
@@ -452,17 +456,13 @@ const Appointments = () => {
       }
       const currentUserId: string = userId;
 
-      if (appointment.medical_records?.medical_record_pdf_url) {
-        console.log("Appointments: fetchAndGeneratePdfMutation - Existing medical_record_pdf_url found, using it directly.");
-        return { pdfUrl: appointment.medical_records.medical_record_pdf_url, appointment };
-      }
-
+      // First, fetch the medical record
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
         .eq('appointment_id', appointment.id)
         .eq('user_id', currentUserId)
-        .maybeSingle();
+        .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
 
       if (fetchError) {
         throw fetchError;
@@ -472,6 +472,7 @@ const Appointments = () => {
         throw new Error("Prontuário médico não encontrado para esta consulta.");
       }
 
+      // Map medical record data to form values for PDF generation
       const medicalRecordForPdf: MedicalRecordFormValues = {
         anamnesis: medicalRecordData.anamnesis || undefined,
         physicalExam: medicalRecordData.physical_exam || undefined,
@@ -480,43 +481,25 @@ const Appointments = () => {
         prescriptions: medicalRecordData.prescriptions || [],
       };
 
-      const clinicDetails = {
-        companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
-        phone: appUser?.phone || '',
-        email: appUser?.email || '',
-        veterinarianCrmv: appUser?.crmv || '',
-        veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
-      };
-
-      const pdfBlob = await generateMedicalRecordPdf({ 
+      // Generate the PDF
+      const blob = await generateMedicalRecordPdf({ 
         appointment, 
         medicalRecord: medicalRecordForPdf, 
         logoUrl: appUser?.logoUrl,
-        clinicDetails,
+        clinicDetails: {
+          companyName: appUser?.companyName || 'AsasVet',
+          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+          phone: appUser?.phone || '',
+          email: appUser?.email || '',
+          veterinarianCrmv: appUser?.crmv || '',
+          veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
+        }
       });
 
-      const newPdfUrl = await uploadMedicalRecordPdfToSupabase(pdfBlob, appUser?.organizationId || userId, currentUserId, medicalRecordData.id);
-
-      if (!newPdfUrl) {
-        throw new Error("Falha ao fazer upload do PDF do prontuário.");
-      }
-
-      await supabase
-        .from('medical_records')
-        .update({ medical_record_pdf_url: newPdfUrl })
-        .eq('id', medicalRecordData.id)
-        .eq('user_id', currentUserId)
-        .select('medical_record_pdf_url')
-        .single();
-
-      return { pdfBlob, pdfUrl: newPdfUrl, appointment };
+      return { blob, appointment };
     },
-    onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
-      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointment.id, userId] }); // CORRIGIDO: Usando appointment.id
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
-      setPdfBlob(pdfBlob || null);
+    onSuccess: ({ blob, appointment }) => {
+      setPdfBlob(blob);
       setPdfFilename(`Prontuario_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
       setPdfAppointment(appointment);
       setIsPdfPreviewDialogOpen(true);
@@ -527,6 +510,7 @@ const Appointments = () => {
     },
   });
 
+  // NOVO: Mutação para buscar o prontuário médico e gerar o PDF da receita
   const fetchAndGenerateRecipePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
       if (!userId) {
@@ -538,46 +522,32 @@ const Appointments = () => {
       console.log("Appointments: fetchAndGenerateRecipePdfMutation.mutationFn - Received appointment:", appointment); // ADDED LOG
 
       console.log("Appointments: fetchAndGenerateRecipePdfMutation - Checking for existing recipe_pdf_url:", appointment.medical_records?.recipe_pdf_url); // ADDED LOG
+      // Se já existe uma URL de PDF de receita, use-a diretamente
       if (appointment.medical_records?.recipe_pdf_url) {
         console.log("Appointments: fetchAndGenerateRecipePdfMutation - Existing recipe_pdf_url found on passed appointment, using it directly:", appointment.medical_records.recipe_pdf_url); // ADDED LOG
-        return { pdfUrl: appointment.medical_records.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
+        return { pdfUrl: appointment.medical_records.recipe_pdf_url, appointment };
       }
 
-      console.log("Appointments: fetchAndGenerateRecipePdfMutation - No recipe_pdf_url on passed appointment, fetching medical record directly from DB."); // ADDED LOG
-      // Sempre buscar o prontuário médico diretamente para garantir os dados mais recentes
+      // Caso contrário, busque as prescrições e gere o PDF
+      console.log("Appointments: fetchAndGenerateRecipePdfMutation - No existing recipe_pdf_url, fetching medical record for prescriptions.");
       const { data: medicalRecordData, error: fetchError } = await supabase
         .from('medical_records')
-        .select('id, prescriptions, recipe_pdf_url') // Incluir recipe_pdf_url na busca direta
+        .select('id, prescriptions')
         .eq('appointment_id', appointment.id)
         .eq('user_id', currentUserId)
-        .maybeSingle();
-
-      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Fetched medicalRecordData directly:", medicalRecordData);
+        .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
 
       if (fetchError) {
-        console.error("Appointments: fetchAndGenerateRecipePdfMutation - Erro ao buscar prontuário médico:", fetchError);
         throw fetchError;
       }
 
-      // Se o prontuário médico existe e já tem uma URL de PDF de receita, use-a diretamente
-      if (medicalRecordData?.recipe_pdf_url) {
-        console.log("Appointments: fetchAndGenerateRecipePdfMutation - URL de PDF de receita existente encontrada no prontuário, usando-a diretamente.");
-        return { pdfUrl: medicalRecordData.recipe_pdf_url, appointment, pdfBlob: null }; // Return pdfBlob as null, as we are using the existing URL
-      }
-
-      // Ensure prescriptions is an array, even if null from DB
-      const prescriptionsFromDb = medicalRecordData?.prescriptions || [];
-      console.log("Appointments: fetchAndGenerateRecipePdfMutation - Prescriptions from direct DB fetch:", prescriptionsFromDb); // ADDED LOG
-
-      // Se não há URL de PDF de receita existente ou não há prescrições, lance o erro
-      if (prescriptionsFromDb.length === 0) { // Changed condition here
-        console.error("Appointments: fetchAndGenerateRecipePdfMutation - Prescriptions array is empty after direct DB fetch."); // ADDED LOG
+      if (!medicalRecordData || !medicalRecordData.prescriptions || medicalRecordData.prescriptions.length === 0) {
         throw new Error("Nenhuma prescrição encontrada no prontuário para gerar a receita.");
       }
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',
@@ -586,17 +556,19 @@ const Appointments = () => {
 
       const pdfBlob = await generatePrescriptionPdf({
         appointment,
-        prescriptions: prescriptionsFromDb,
+        prescriptions: medicalRecordData.prescriptions,
         logoUrl: appUser?.logoUrl,
         clinicDetails,
       });
 
-      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, appUser?.organizationId || userId, currentUserId, appointment.id);
+      // Upload the newly generated PDF and get its URL
+      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, currentUserId, appointment.id);
       console.log("Appointments: fetchAndGenerateRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
       if (!newPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF da receita.");
       }
 
+      // Update the medical record with the new PDF URL
       await supabase
         .from('medical_records')
         .update({ recipe_pdf_url: newPdfUrl })
@@ -607,21 +579,15 @@ const Appointments = () => {
       return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
     onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
-      if (!userId) return;
-      const currentUserId: string = userId;
-      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointment.id, userId] }); // CORRIGIDO: Usando appointment.id
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalida para atualizar recipe_pdf_url
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
-      // Force a refetch immediately after invalidation
-      queryClient.refetchQueries({ queryKey: ['appointments', userId] }); // ADDED THIS
-      queryClient.refetchQueries({ queryKey: ['historyAppointments', userId] }); // ADDED THIS
-      setRecipePdfBlob(pdfBlob || null);
-      setRecipePdfUrl(pdfUrl || null);
+      setRecipePdfBlob(pdfBlob || null); // Pode ser null se a URL existente foi usada
+      setRecipePdfUrl(pdfUrl || null); // Define a URL direta
       setRecipePdfFilename(`Receita_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
       setIsRecipePdfPreviewDialogOpen(true);
     },
     onError: (err: any) => {
-      console.error("Appointments: fetchAndGenerateRecipePdfMutation - Erro ao gerar e salvar PDF da receita:", err);
+      console.error("Appointments: fetchAndGenerateRecipePdfMutation - Erro ao gerar PDF da receita do histórico:", err);
       showError(`Erro ao gerar receita: ${err.message || "Erro desconhecido"}`);
     },
   });
@@ -698,6 +664,7 @@ const Appointments = () => {
   const totalCanceladas = appointments.filter(a => a.status === "Cancelada").length;
   const totalEmAndamento = appointments.filter(a => a.status === "Em Andamento").length;
 
+  // Helper function to format time as HH:mm:ss
   const formatDuration = (totalSeconds: number) => {
     if (totalSeconds < 0) return "N/A";
     const hours = Math.floor(totalSeconds / 3600);
@@ -708,16 +675,19 @@ const Appointments = () => {
       .join(":");
   };
 
+  // Handler to open PDF preview dialog
   const handleOpenMedicalRecordPdfPreviewDialog = (appointment: Appointment) => {
     fetchAndGeneratePdfMutation.mutate({ appointment });
   };
 
+  // Handler to open Recipe PDF preview dialog
   const handleOpenRecipePdfPreviewDialog = (appointment: Appointment) => {
-    console.log(`Appointments.tsx: Clicking recipe PDF button for appointment ${appointment.id}. recipe_pdf_url: ${appointment.medical_records?.recipe_pdf_url}, prescriptions_count: ${appointment.medical_records?.prescriptions?.length}`); // ADDED LOG
     fetchAndGenerateRecipePdfMutation.mutate({ appointment });
   };
 
+  // Handler to confirm PDF download
   const handleConfirmPdfDownload = (filename: string, downloadUrl: string) => {
+    // Create a download link
     const a = document.createElement('a');
     a.href = downloadUrl;
     a.download = filename;
@@ -740,7 +710,8 @@ const Appointments = () => {
     setIsRecipePdfPreviewDialogOpen(false);
   };
 
-  const getColumns = (currentTab: string): ColumnDefinition[] => {
+  // Define as colunas da tabela dinamicamente
+  const getColumns = (currentTab: string): ColumnDefinition[] => { // Usando o tipo ColumnDefinition
     const baseColumns: ColumnDefinition[] = [
       { id: 'pet', header: 'Paciente', render: (appointment: Appointment) => {
         const IconComponent = speciesIconMap[appointment.species] || MoreHorizontal;
@@ -871,7 +842,7 @@ const Appointments = () => {
         )},
       ];
     }
-    return [];
+    return []; // Fallback, though all tabs should be covered
   };
 
   const columns = getColumns(activeTab);
@@ -887,10 +858,7 @@ const Appointments = () => {
   if (error || clientsError || petsError || historyError) {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
-        <p>Erro ao carregar dados: ${error?.message || clientsError?.message || petsError?.message || historyError?.message}</p>
-        <Button onClick={() => navigate('/consultas')} className="ml-4">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
-        </Button>
+        <p>Erro ao carregar dados: {error?.message || clientsError?.message || petsError?.message || historyError?.message}</p>
       </div>
     );
   }
@@ -944,7 +912,7 @@ const Appointments = () => {
         </div>
 
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "em-espera" | "em-andamento" | "finalizadas")} className="w-full md:w-auto flex-1">
+          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "em-espera" | "em-andamento" | "finalizadas")} className="w-full md:w-auto flex-1"> {/* Adicionado flex-1 */}
             <TabsList className="grid w-full grid-cols-3 bg-muted/50">
               <TabsTrigger value="em-espera" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">Em Espera</TabsTrigger>
               <TabsTrigger value="em-andamento" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">Em Andamento</TabsTrigger>
@@ -960,7 +928,8 @@ const Appointments = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <div className="flex space-x-2 mt-4 md:mt-0">
+          {/* Botões movidos para cá, alinhados à direita */}
+          <div className="flex space-x-2 mt-4 md:mt-0"> {/* Adicionado margem superior para mobile */}
             <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
               <History className="mr-2 h-4 w-4" /> Ver Histórico
             </Button>
@@ -976,7 +945,7 @@ const Appointments = () => {
                 </DialogHeader>
                 <AppointmentForm
                   onSubmit={handleAddAppointment}
-                  onCancel={() => setIsAddAppointmentDialogOpen(false)}
+                  onCancel={() => setIsAddAppointmentDialogOpen(false)} // Passa o handler de cancelamento
                   allClients={clients}
                   allPets={pets}
                 />
@@ -1005,9 +974,9 @@ const Appointments = () => {
                     )}
                   >
                     {columns.map(col => (
-                      <TableCell key={col.id} className={cn(col.className)}>
+                      <React.Fragment key={col.id}>
                         {col.render(appointment)}
-                      </TableCell>
+                      </React.Fragment>
                     ))}
                   </TableRow>
                 ))
