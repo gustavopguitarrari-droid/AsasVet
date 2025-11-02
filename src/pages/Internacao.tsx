@@ -69,6 +69,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
+  Equino: MoreHorizontal, // Alterado de Horse para MoreHorizontal
+  Bovino: MoreHorizontal,   // Alterado de Cow para MoreHorizontal
   Outros: MoreHorizontal,
 };
 
@@ -78,6 +80,8 @@ const speciesColorMap: { [key: string]: string } = {
   Pássaro: "text-sidebar-item-bg-3",
   Roedor: "text-sidebar-item-bg-7",
   Peixe: "text-sidebar-item-bg-5",
+  Equino: "text-sidebar-item-bg-2",
+  Bovino: "text-sidebar-item-bg-6",
   Outros: "text-sidebar-item-bg-9",
 };
 

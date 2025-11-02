@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText, Pill, Horse, Cow } from "lucide-react"; // Importar ArrowRight, FileText e Pill, Horse, Cow
+import { PlusCircle, Search, CalendarCheck, CalendarX, CalendarClock, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, History, ArrowRight, FileText, Pill } from "lucide-react"; // Importar ArrowRight, FileText e Pill, Horse, Cow
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -57,7 +57,7 @@ interface MedicalRecord {
   treatment?: string | null;
   prescriptions: { medication: string; dosage: string; frequency: string; instructions?: string }[]; // Alterado para array não nulo
   recipe_pdf_url?: string | null;
-  medical_record_pdf_url?: string | null; // NOVO: URL do PDF do prontuário
+  medical_record_pdf_url?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -91,8 +91,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
-  Equino: Horse, // Adicionado Equino
-  Bovino: Cow,   // Adicionado Bovino
+  Equino: MoreHorizontal, // Alterado de Horse para MoreHorizontal
+  Bovino: MoreHorizontal,   // Alterado de Cow para MoreHorizontal
   Outros: MoreHorizontal,
 };
 

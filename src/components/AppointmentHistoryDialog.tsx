@@ -49,8 +49,8 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
-  Equino: MoreHorizontal, // Adicionado Equino
-  Bovino: MoreHorizontal,   // Adicionado Bovino
+  Equino: MoreHorizontal, // Alterado de Horse para MoreHorizontal
+  Bovino: MoreHorizontal,   // Alterado de Cow para MoreHorizontal
   Outros: MoreHorizontal,
 };
 
@@ -126,7 +126,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
                       <FileText className="h-4 w-4 mr-1" /> Prontuário
                     </Button>
                   )}
-                  {(appointment.recipe_pdf_url || (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0)) && (
+                  {(appointment.medical_records?.recipe_pdf_url || (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0)) && (
                     <Button variant="outline" size="sm" onClick={() => onViewRecipePdf(appointment)}>
                       <Pill className="h-4 w-4 mr-1" /> Receita
                     </Button>
