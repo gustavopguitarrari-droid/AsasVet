@@ -488,7 +488,7 @@ const Appointments = () => {
         logoUrl: appUser?.logoUrl,
         clinicDetails: {
           companyName: appUser?.companyName || 'AsasVet',
-          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
           phone: appUser?.phone || '',
           email: appUser?.email || '',
           veterinarianCrmv: appUser?.crmv || '',
@@ -584,7 +584,7 @@ const Appointments = () => {
       queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
       setRecipePdfBlob(pdfBlob || null); // Pode ser null se a URL existente foi usada
       setRecipePdfUrl(pdfUrl || null); // Define a URL direta
-      setRecipePdfFilename(`Receita_${appointment.pet_name}_${format(parseISO(appointment.date), 'yyyyMMdd')}.pdf`);
+      setRecipePdfFilename(`Receita_${appointment.pet_name}_${format(parseISO(appointment.date || new Date().toISOString()), 'yyyyMMdd')}.pdf`);
       setIsRecipePdfPreviewDialogOpen(true);
     },
     onError: (err: any) => {
@@ -734,14 +734,16 @@ const Appointments = () => {
           <AppointmentChronometer startTime={appointment.created_at} />
         )},
         { id: 'actions', header: 'Ações', className: 'text-right', render: (appointment: Appointment) => (
-          <Button
-            variant="default"
-            size="sm"
-            onClick={(e) => { e.stopPropagation(); handleStartAppointment(appointment.id); }}
-            disabled={startAppointmentMutation.isPending}
-          >
-            <Play className="mr-2 h-4 w-4" /> Iniciar
-          </Button>
+          <div onClick={(e) => e.stopPropagation()}> {/* Adicionado div com stopPropagation */}
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => handleStartAppointment(appointment.id)}
+              disabled={startAppointmentMutation.isPending}
+            >
+              <Play className="mr-2 h-4 w-4" /> Iniciar
+            </Button>
+          </div>
         )},
       ];
     } else if (currentTab === "em-andamento") {
@@ -759,13 +761,15 @@ const Appointments = () => {
           appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />
         )},
         { id: 'actions', header: 'Ações', className: 'text-right', render: (appointment: Appointment) => (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={(e) => { e.stopPropagation(); navigate(`/consultation/${appointment.id}`); }}
-          >
-            <ArrowRight className="mr-2 h-4 w-4" /> Voltar para Consulta
-          </Button>
+          <div onClick={(e) => e.stopPropagation()}> {/* Adicionado div com stopPropagation */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate(`/consultation/${appointment.id}`)}
+            >
+              <ArrowRight className="mr-2 h-4 w-4" /> Voltar para Consulta
+            </Button>
+          </div>
         )},
       ];
     } else if (currentTab === "finalizadas") {
@@ -810,25 +814,28 @@ const Appointments = () => {
             : "N/A"
         )},
         { id: 'medicalRecordPdf', header: 'Prontuário', className: 'text-right', render: (appointment: Appointment) => (
-          <Button
-              variant="outline"
-              size="sm"
-              onClick={(e) => { e.stopPropagation(); handleOpenMedicalRecordPdfPreviewDialog(appointment); }}
-              disabled={fetchAndGeneratePdfMutation.isPending}
-          >
-              {fetchAndGeneratePdfMutation.isPending ? (
-                  <span className="loading-spinner h-4 w-4" />
-              ) : (
-                  <FileText className="h-4 w-4" />
-              )}
-          </Button>
+          <div onClick={(e) => e.stopPropagation()}> {/* Adicionado div com stopPropagation */}
+            <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleOpenMedicalRecordPdfPreviewDialog(appointment)}
+                disabled={fetchAndGeneratePdfMutation.isPending}
+            >
+                {fetchAndGeneratePdfMutation.isPending ? (
+                    <span className="loading-spinner h-4 w-4" />
+                ) : (
+                    <FileText className="h-4 w-4" />
+                )}
+            </Button>
+          </div>
         )},
         { id: 'recipePdf', header: 'Receita', className: 'text-right', render: (appointment: Appointment) => (
           (appointment.medical_records?.recipe_pdf_url || (appointment.medical_records?.prescriptions && appointment.medical_records.prescriptions.length > 0)) ? (
+            <div onClick={(e) => e.stopPropagation()}> {/* Adicionado div com stopPropagation */}
               <Button
                   variant="outline"
                   size="sm"
-                  onClick={(e) => { e.stopPropagation(); handleOpenRecipePdfPreviewDialog(appointment); }}
+                  onClick={() => handleOpenRecipePdfPreviewDialog(appointment)}
                   disabled={fetchAndGenerateRecipePdfMutation.isPending}
               >
                   {fetchAndGenerateRecipePdfMutation.isPending ? (
@@ -837,6 +844,7 @@ const Appointments = () => {
                       <Pill className="h-4 w-4" />
                   )}
               </Button>
+            </div>
           ) : (
               <span className="text-muted-foreground text-xs">N/A</span>
           )
@@ -860,6 +868,9 @@ const Appointments = () => {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
         <p>Erro ao carregar dados: {error?.message || clientsError?.message || petsError?.message || historyError?.message}</p>
+        <Button onClick={() => navigate('/consultas')} className="ml-4">
+          <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
+        </Button>
       </div>
     );
   }
@@ -975,9 +986,9 @@ const Appointments = () => {
                     )}
                   >
                     {columns.map(col => (
-                      <React.Fragment key={col.id}>
+                      <TableCell key={col.id} className={cn(col.className)}> {/* Renderiza TableCell aqui */}
                         {col.render(appointment)}
-                      </React.Fragment>
+                      </TableCell>
                     ))}
                   </TableRow>
                 ))
