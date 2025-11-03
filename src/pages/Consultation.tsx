@@ -422,6 +422,7 @@ const ConsultationPage: React.FC = () => {
         id: existingMedicalRecordId, // Pass existing ID if available
         user_id: userId,
         appointment_id: appointmentId,
+        organization_id: organizationId, // NOVO: Adicionado organization_id aqui
         anamnesis: recordData.anamnesis || null,
         physical_exam: recordData.physicalExam || null,
         diagnosis: recordData.diagnosis || null,
@@ -511,13 +512,14 @@ const ConsultationPage: React.FC = () => {
   // NOVO: Mutação para adicionar um débito ao animal
   const addAnimalDebitMutation = useMutation({
     mutationFn: async (debitData: AddAnimalDebitFormValues) => {
-      if (!userId || !appointmentId || !appointment?.pet_id) {
-        throw new Error("User, Appointment, or Pet ID not available.");
+      if (!userId || !appointmentId || !appointment?.pet_id || !organizationId) { // Adicionado organizationId
+        throw new Error("User, Appointment, Pet ID, or Organization ID not available.");
       }
       const { data, error } = await supabase
         .from('animal_debits')
         .insert({
           user_id: userId,
+          organization_id: organizationId, // Adicionado organization_id
           pet_id: appointment.pet_id,
           appointment_id: appointmentId,
           description: debitData.description,
