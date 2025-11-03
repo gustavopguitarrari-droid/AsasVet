@@ -4,7 +4,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card'; // Removido CardHeader, CardTitle
-import { PawPrint, ShieldCheck, CalendarCheck, Users, MessageSquareText } from 'lucide-react'; // Ícones simplificados
+import { PawPrint, ShieldCheck, CalendarCheck, Users, MessageSquareText, PlayCircle } from 'lucide-react'; // Ícones simplificados, adicionado PlayCircle
 import { cn } from '@/lib/utils';
 import LandingHeader from '@/components/LandingHeader';
 
@@ -56,6 +56,27 @@ const LandingPage: React.FC = () => {
             </Link>
           </div>
         </div>
+      </section>
+
+      {/* Video Showcase Section */}
+      <section id="video" className="py-20 px-8 bg-background text-center">
+        <h2 className="text-4xl font-bold mb-12 text-primary flex items-center justify-center">
+          <PlayCircle className="h-10 w-10 mr-4" /> Veja o AsasVet em Ação
+        </h2>
+        <div className="relative w-full max-w-4xl mx-auto aspect-video rounded-lg shadow-xl overflow-hidden border-2 border-primary">
+          <iframe
+            className="absolute top-0 left-0 w-full h-full"
+            src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=dQw4w9WgXcQ" // Placeholder video (Rick Astley)
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          ></iframe>
+        </div>
+        <p className="text-sm text-muted-foreground mt-4">
+          (Este é um vídeo de demonstração. O vídeo real do sistema será adicionado em breve!)
+        </p>
       </section>
 
       {/* Core Features Section */}

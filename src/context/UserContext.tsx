@@ -27,6 +27,7 @@ export interface User {
   addressState?: string;
   colorTheme?: string;
   organizationId: string; // NOVO: ID da organização/clínica à qual o usuário pertence (TORNADO OBRIGATÓRIO)
+  planName?: string; // NOVO: Nome do plano do usuário
 }
 
 interface UserContextType {

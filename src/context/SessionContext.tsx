@@ -17,7 +17,7 @@ interface SessionContextType {
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export const SessionContextProvider = ({ children }: { children: ReactNode }) => {
+export const SessionContextProvider = ({ children }: { ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [supabaseUser, setSupabaseUserState] = useState<SupabaseUser | null>(null); // Renamed to avoid conflict with appUser
   const [isLoadingSession, setIsLoadingSession] = useState(true); // Loading state for initial session fetch
@@ -74,6 +74,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         addressCity: data?.address_city || userMetadata.address_city?.toString() || undefined,
         addressState: data?.address_state || userMetadata.address_state?.toString() || undefined,
         colorTheme: data?.color_theme || userMetadata.color_theme?.toString() || undefined,
+        planName: data?.plan_name || userMetadata.plan_name?.toString() || undefined, // NOVO: Incluir plan_name
         registeredTime: data?.registered_time || supabaseUser.created_at,
         organizationId: organizationId, // Usar o valor garantido
       };

@@ -51,7 +51,7 @@ const formSchema = z.object({
 export type SignUpFormValues = z.infer<typeof formSchema>;
 
 interface SignUpFormProps {
-  onSuccess: () => void;
+  onSuccess: (userId: string) => void; // Modificado para passar userId
 }
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess }) => {
@@ -104,7 +104,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess }) => {
   const onSubmit = async (data: SignUpFormValues) => {
     setIsSubmitting(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data: authData, error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -129,8 +129,13 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess }) => {
         showError(`Erro no cadastro: ${error.message}`);
       } else {
         showSuccess("Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta.");
-        onSuccess(); // Call the success callback
-        navigate('/login'); // Redirect to login after successful signup
+        if (authData.user?.id) {
+          onSuccess(authData.user.id); // Passa o userId para o callback
+        } else {
+          // Fallback se o userId não estiver disponível imediatamente
+          console.warn("User ID not available after signup, redirecting to login.");
+          navigate('/login');
+        }
       }
     } catch (err: any) {
       console.error("Erro inesperado durante o cadastro:", err);

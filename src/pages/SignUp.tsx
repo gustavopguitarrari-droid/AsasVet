@@ -1,18 +1,26 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import SignUpForm from '@/components/SignUpForm';
+import PlanSelectionDialog from '@/components/PlanSelectionDialog'; // Importar o novo diálogo
 import { showSuccess } from '@/utils/toast'; // Importar showSuccess
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
+  const [isPlanSelectionDialogOpen, setIsPlanSelectionDialogOpen] = useState(false);
+  const [newlyRegisteredUserId, setNewlyRegisteredUserId] = useState<string | null>(null);
 
-  const handleSignUpSuccess = () => {
-    showSuccess("Cadastro realizado com sucesso! Verifique seu e-mail para confirmar a conta.");
-    navigate('/login'); // Redireciona para a página de login após o cadastro
+  const handleSignUpSuccess = (userId: string) => {
+    setNewlyRegisteredUserId(userId);
+    setIsPlanSelectionDialogOpen(true); // Abre o diálogo de seleção de plano
+  };
+
+  const handlePlanSelected = () => {
+    setIsPlanSelectionDialogOpen(false);
+    navigate('/login'); // Redireciona para a página de login após a seleção do plano
   };
 
   return (
@@ -34,6 +42,15 @@ const SignUp: React.FC = () => {
           </Button>
         </p>
       </div>
+
+      {newlyRegisteredUserId && (
+        <PlanSelectionDialog
+          isOpen={isPlanSelectionDialogOpen}
+          onClose={() => setIsPlanSelectionDialogOpen(false)}
+          userId={newlyRegisteredUserId}
+          onPlanSelected={handlePlanSelected}
+        />
+      )}
     </div>
   );
 };
