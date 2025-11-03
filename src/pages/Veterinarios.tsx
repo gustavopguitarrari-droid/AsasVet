@@ -280,7 +280,7 @@ const Veterinarios = () => {
         <TabsContent value="equipe" className="mt-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <RoleFilter selectedRole={selectedRole} onSelectRole={handleSelectRole} />
-            <div className="flex items-center gap-2 w-full md:w-auto"> {/* Novo contêiner para busca e botão */}
+            <div className="flex items-center gap-2 w-full flex-1"> {/* Alterado md:w-auto para flex-1 */}
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
