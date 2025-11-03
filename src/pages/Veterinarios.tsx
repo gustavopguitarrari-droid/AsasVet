@@ -290,15 +290,7 @@ const Veterinarios = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              {isAdmin ? (
-                <Button onClick={() => setIsAddMemberDialogOpen(true)} className="shrink-0">
-                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
-                </Button>
-              ) : (
-                <p className="text-destructive font-semibold flex items-center shrink-0">
-                  <AlertCircle className="h-5 w-5 mr-2" /> Apenas administradores podem adicionar membros.
-                </p>
-              )}
+              {/* Botão de adicionar membro removido */}
             </div>
           </div>
 
