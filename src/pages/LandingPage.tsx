@@ -34,24 +34,24 @@ const coreFeatures = [
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground theme-neutral-modern">
       <LandingHeader />
 
       {/* Hero Section - Modern & Minimalist */}
       <section className="relative h-screen flex items-center justify-center text-center p-8 login-art-bg pt-20">
         <div className="relative z-10 max-w-4xl mx-auto text-white space-y-6">
-          <PawPrint className="h-24 w-24 mx-auto text-primary-foreground animate-pulse" />
-          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight drop-shadow-lg">
+          <PawPrint className="h-24 w-24 mx-auto text-primary animate-pulse" /> {/* Alterado para text-primary */}
+          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight drop-shadow-lg text-foreground"> {/* Alterado para text-foreground */}
             AsasVet: Simplifique a Gestão da Sua Clínica Veterinária
           </h1>
-          <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto"> {/* Alterado para text-muted-foreground */}
             Foco total no cuidado animal, nós cuidamos da burocracia.
           </p>
           <div className="flex justify-center space-x-4 mt-8">
             <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-8 py-4 shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}>
               Comece Grátis
             </Link>
-            <Link to="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-white border-white hover:bg-white hover:text-primary text-lg px-8 py-4 shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}>
+            <Link to="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-primary border-primary hover:bg-primary hover:text-primary-foreground text-lg px-8 py-4 shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}> {/* Ajustado para usar cores do tema */}
               Entrar
             </Link>
           </div>

@@ -32,8 +32,6 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
-    --radius: 0.5rem;
-
     /* Default Theme (Blue-ish) - Light Mode */
     --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 222.2 47.4% 70%; /* Lighter primary for active */
@@ -439,7 +437,7 @@
     --event-color-consulta: 30 40% 35%;
     --event-color-cirurgia: 0 84.2% 60.2%;
     --event-color-vacina: 40 35% 50%;
-    --event-color-exame: 20 45% 30%;
+    --event-color-exame: 20 45% 40%;
     --event-color-retorno: 50 35% 55%;
     --event-color-outros: 60 30% 35%;
 
@@ -454,6 +452,37 @@
     --login-background-gradient-start: 30 40% 90%;
     --login-background-gradient-end: 30 40% 80%;
     --login-background-pattern-color: 30 40% 40%;
+  }
+
+  /* Neutral Modern Theme */
+  .theme-neutral-modern {
+    --background: 0 0% 98%; /* Very light off-white */
+    --foreground: 210 10% 15%; /* Deep charcoal for text */
+
+    --primary: 210 10% 25%; /* Darker charcoal for primary elements */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
+
+    --secondary: 210 10% 90%; /* Light gray for secondary elements */
+    --secondary-foreground: 210 10% 25%; /* Dark charcoal text on secondary */
+
+    --muted: 210 10% 95%; /* Slightly darker off-white */
+    --muted-foreground: 210 10% 45%; /* Medium gray for muted text */
+
+    --card: 0 0% 100%; /* White card background */
+    --card-foreground: 210 10% 15%; /* Deep charcoal text on card */
+
+    --border: 210 10% 88%; /* Light gray border */
+    --input: 210 10% 90%;
+    --ring: 210 10% 25%;
+
+    /* Adapt other specific colors if needed, e.g., for hero/login backgrounds */
+    --login-background-gradient-start: 210 10% 95%; /* Lightest gray */
+    --login-background-gradient-end: 210 10% 85%;   /* Slightly darker gray */
+    --login-background-pattern-color: 210 10% 60%; /* Medium gray for pattern */
+
+    --profile-header-gradient-start: 210 10% 20%;
+    --profile-header-gradient-end: 210 10% 40%;
+    --profile-header-pattern-color: 0 0% 100%;
   }
 
   /* Custom Color Themes - Dark Mode Overrides */
