@@ -90,7 +90,7 @@ const ConsultationPage: React.FC = () => {
         .from('appointments')
         .select('*')
         .eq('id', appointmentId)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização veja a consulta
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .single();
       if (error) throw error;
@@ -108,7 +108,7 @@ const ConsultationPage: React.FC = () => {
         .from('medical_records')
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, recipe_pdf_url, medical_record_pdf_url, created_at, updated_at')
         .eq('appointment_id', appointmentId)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização veja o prontuário
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .maybeSingle();
       if (error) {
@@ -231,7 +231,7 @@ const ConsultationPage: React.FC = () => {
         .from('animal_debits')
         .select('*')
         .eq('appointment_id', appointmentId)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização veja os débitos
         .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) throw error;
       return data as AnimalDebit[];
@@ -251,7 +251,7 @@ const ConsultationPage: React.FC = () => {
           completion_timestamp: now.toISOString(),
         })
         .eq('id', id)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização finalize
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
@@ -305,7 +305,7 @@ const ConsultationPage: React.FC = () => {
         .from('medical_records')
         .select('recipe_pdf_url')
         .eq('id', currentMedicalRecordId)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização veja o prontuário
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .single();
 
@@ -345,7 +345,7 @@ const ConsultationPage: React.FC = () => {
         .from('medical_records')
         .update({ recipe_pdf_url: newPdfUrl })
         .eq('id', currentMedicalRecordId)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização atualize o prontuário
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
@@ -398,7 +398,7 @@ const ConsultationPage: React.FC = () => {
         .from('medical_records')
         .select('id, medical_record_pdf_url')
         .eq('appointment_id', appointmentId)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização veja o prontuário
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .maybeSingle();
 
@@ -469,7 +469,7 @@ const ConsultationPage: React.FC = () => {
         .from('medical_records')
         .update({ medical_record_pdf_url: newMedicalRecordPdfUrl })
         .eq('id', medicalRecordIdForPdf)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização atualize o prontuário
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
@@ -530,7 +530,7 @@ const ConsultationPage: React.FC = () => {
       const { data, error } = await supabase
         .from('animal_debits')
         .insert({
-          user_id: userId,
+          user_id: userId, // O user_id aqui é o do usuário logado, que está adicionando o débito
           organization_id: organizationId, // NOVO: Adicionado organization_id
           pet_id: appointment.pet_id,
           appointment_id: appointmentId,
@@ -566,7 +566,7 @@ const ConsultationPage: React.FC = () => {
         .from('animal_debits')
         .select('*')
         .eq('id', debitId)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização marque como pago
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .single();
 
@@ -612,7 +612,7 @@ const ConsultationPage: React.FC = () => {
           transaction_id: transactionId,
         })
         .eq('id', debitId)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização atualize o débito
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();

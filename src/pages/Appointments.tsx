@@ -354,7 +354,7 @@ const Appointments = () => {
           client_id: updatedAppointment.client_id, // Adicionado client_id
         })
         .eq('id', updatedAppointment.id)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização atualize
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
@@ -384,7 +384,7 @@ const Appointments = () => {
           start_time: null,
         })
         .eq('id', appointmentId)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização cancele
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
@@ -416,7 +416,7 @@ const Appointments = () => {
           start_time: now.toISOString(),
         })
         .eq('id', appointmentId)
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização inicie
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
@@ -470,7 +470,7 @@ const Appointments = () => {
         .from('medical_records')
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
         .eq('appointment_id', appointment.id)
-        .eq('user_id', currentUserId)
+        // .eq('user_id', currentUserId) // REMOVIDO: Permite que qualquer membro da organização veja o prontuário
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
 
@@ -544,7 +544,7 @@ const Appointments = () => {
         .from('medical_records')
         .select('id, prescriptions')
         .eq('appointment_id', appointment.id)
-        .eq('user_id', currentUserId)
+        // .eq('user_id', currentUserId) // REMOVIDO: Permite que qualquer membro da organização veja o prontuário
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
 
@@ -584,7 +584,7 @@ const Appointments = () => {
         .from('medical_records')
         .update({ recipe_pdf_url: newPdfUrl })
         .eq('id', medicalRecordData.id)
-        .eq('user_id', currentUserId)
+        // .eq('user_id', currentUserId) // REMOVIDO: Permite que qualquer membro da organização atualize o prontuário
         .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       console.log("Appointments: fetchAndGenerateRecipePdfMutation - Medical record updated with new recipe_pdf_url.");
 
