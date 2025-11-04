@@ -110,7 +110,7 @@ const ConsultationPage: React.FC = () => {
         .eq('appointment_id', appointmentId)
         // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização veja o prontuário
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
-        .maybeSingle();
+        .maybeSingle(); // ALTERADO: Usando maybeSingle() aqui
       if (error) {
         console.error("ConsultationPage: Error fetching medical record:", error);
         throw error;

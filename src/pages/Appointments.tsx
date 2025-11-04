@@ -419,8 +419,11 @@ const Appointments = () => {
         // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização inicie
         .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
-        .single();
+        .maybeSingle(); // ALTERADO: Usando maybeSingle() aqui
       if (error) throw error;
+      if (!data) {
+        throw new Error("Nenhuma consulta encontrada ou permissão negada para iniciar.");
+      }
       return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: (data) => {
