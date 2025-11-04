@@ -65,28 +65,30 @@ const Products = () => {
   }, [setPageTitle]);
 
   const { data: products = [], isLoading, error } = useQuery<Product[]>({
-    queryKey: ['products', userId],
+    queryKey: ['products', userId, organizationId], // Adicionado organizationId ao queryKey
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId || !organizationId) return []; // Habilitar query apenas se organizationId estiver disponível
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('user_id', userId);
+        // .eq('user_id', userId) // REMOVIDO: A política de RLS já filtra por organization_id
+        .eq('organization_id', organizationId); // Filtrar por organization_id
       if (error) throw error;
       return data as Product[];
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   const addProductMutation = useMutation({
     mutationFn: async (newProductData: AddProductFormValues) => {
-      if (!userId) {
-        throw new Error("User ID not available.");
+      if (!userId || !organizationId) { // Adicionado organizationId aqui
+        throw new Error("User ID or Organization ID not available.");
       }
       const { data, error } = await supabase
         .from('products')
         .insert({
           user_id: userId,
+          organization_id: organizationId, // Adicionado organization_id aqui
           name: newProductData.name,
           price: newProductData.price,
           category: newProductData.category,
@@ -97,7 +99,7 @@ const Products = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', userId] });
+      queryClient.invalidateQueries({ queryKey: ['products', userId, organizationId] }); // Invalida com organizationId
       showSuccess("Produto/Serviço adicionado com sucesso!");
       setIsAddProductDialogOpen(false);
     },
@@ -108,8 +110,8 @@ const Products = () => {
 
   const updateProductMutation = useMutation({
     mutationFn: async (updatedProductData: Product) => {
-      if (!userId) {
-        throw new Error("User ID not available.");
+      if (!userId || !organizationId) { // Adicionado organizationId aqui
+        throw new Error("User ID or Organization ID not available.");
       }
       const { data, error } = await supabase
         .from('products')
@@ -120,13 +122,14 @@ const Products = () => {
         })
         .eq('id', updatedProductData.id)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // Adicionado organization_id para segurança
         .select()
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', userId] });
+      queryClient.invalidateQueries({ queryKey: ['products', userId, organizationId] }); // Invalida com organizationId
       showSuccess("Produto/Serviço atualizado com sucesso!");
       setIsEditProductDialogOpen(false);
     },
@@ -137,19 +140,20 @@ const Products = () => {
 
   const deleteProductMutation = useMutation({
     mutationFn: async (productId: string) => {
-      if (!userId) {
-        throw new Error("User ID not available.");
+      if (!userId || !organizationId) { // Adicionado organizationId aqui
+        throw new Error("User ID or Organization ID not available.");
       }
       const { error } = await supabase
         .from('products')
         .delete()
         .eq('id', productId)
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('organization_id', organizationId); // Adicionado organization_id para segurança
       if (error) throw error;
       return productId;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', userId] });
+      queryClient.invalidateQueries({ queryKey: ['products', userId, organizationId] }); // Invalida com organizationId
       showSuccess("Produto/Serviço excluído com sucesso!");
     },
     onError: (err) => {

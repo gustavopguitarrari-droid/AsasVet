@@ -50,7 +50,7 @@ const Cadastro = () => {
   const { user: appUser } = useUser();
   const userId = appUser?.id;
   const organizationId = appUser?.organizationId; // Obter organizationId
-  const location = useLocation();
+  const location = useLocation(); // Inicializar useLocation
   const { setPageTitle } = usePageTitle(); // Obter setPageTitle do contexto
 
   const [activeTab, setActiveTab] = useState<string>("tutores");
@@ -112,7 +112,7 @@ const Cadastro = () => {
       const { data, error } = await supabase
         .from('clients')
         .select('*')
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: A política de RLS já filtra por organization_id
         .eq('organization_id', organizationId); // Filtrar por organization_id
       if (error) throw error;
 
@@ -173,7 +173,8 @@ const Cadastro = () => {
       const { data: existingCpf, error: cpfCheckError } = await supabase
         .from('clients')
         .select('id')
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Verificar CPF existente em toda a organização
+        .eq('organization_id', organizationId)
         .eq('cpf', data.cpf)
         .single();
 
@@ -264,7 +265,8 @@ const Cadastro = () => {
       const { data: existingCpf, error: cpfCheckError } = await supabase
         .from('clients')
         .select('id')
-        .eq('user_id', userId)
+        // .eq('user_id', userId) // REMOVIDO: Verificar CPF existente em toda a organização
+        .eq('organization_id', organizationId)
         .eq('cpf', data.cpf)
         .neq('id', data.id)
         .single();

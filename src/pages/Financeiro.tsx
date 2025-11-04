@@ -31,18 +31,19 @@ const Financeiro = () => {
 
   // Query para buscar transações
   const { data: transactions = [], isLoading, error } = useQuery<Transaction[]>({
-    queryKey: ['transactions', userId], // Changed to userId
+    queryKey: ['transactions', userId, organizationId], // Adicionado organizationId ao queryKey
     queryFn: async () => {
-      if (!userId) return []; // Changed to userId
+      if (!userId || !organizationId) return []; // Habilitar query apenas se organizationId estiver disponível
       const { data, error } = await supabase
         .from('transactions')
         .select('*')
-        .eq('user_id', userId) // Filter by user_id
+        // .eq('user_id', userId) // REMOVIDO: A política de RLS já filtra por organization_id
+        .eq('organization_id', organizationId) // Filtrar por organization_id
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data as Transaction[];
     },
-    enabled: !!userId, // Enable query only if userId is available
+    enabled: !!userId && !!organizationId, // Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   // Mutação para adicionar uma nova transação
@@ -68,7 +69,7 @@ const Financeiro = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['transactions', userId] }); // Changed to userId
+      queryClient.invalidateQueries({ queryKey: ['transactions', userId, organizationId] }); // Invalida com organizationId
       showSuccess("Transação adicionada com sucesso!");
       setIsAddTransactionDialogOpen(false);
     },
@@ -76,10 +77,6 @@ const Financeiro = () => {
       showError(`Erro ao adicionar transação: ${err.message}`);
     },
   });
-
-  const handleAddTransaction = (data: TransactionFormValues) => {
-    addTransactionMutation.mutate(data);
-  };
 
   const filteredTransactions = transactions.filter((transaction) =>
     transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
