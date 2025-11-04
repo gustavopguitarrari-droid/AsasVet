@@ -64,10 +64,11 @@ const LandingPage: React.FC = () => {
           <PlayCircle className="h-10 w-10 mr-4" /> Veja o AsasVet em Ação
         </h2>
         <div className="relative w-full max-w-4xl mx-auto aspect-video rounded-lg shadow-xl overflow-hidden border-2 border-primary">
+          {/* Placeholder for a real system video. Replace 'YOUR_SYSTEM_VIDEO_EMBED_URL' with your actual video URL. */}
           <iframe
             className="absolute top-0 left-0 w-full h-full"
-            src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=dQw4w9WgXcQ" // Placeholder video (Rick Astley)
-            title="YouTube video player"
+            src="https://www.youtube.com/embed/VIDEO_ID_DO_SEU_SISTEMA" // Substitua 'VIDEO_ID_DO_SEU_SISTEMA' pelo ID real do seu vídeo no YouTube
+            title="AsasVet System Showcase"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             referrerPolicy="strict-origin-when-cross-origin"
@@ -75,7 +76,7 @@ const LandingPage: React.FC = () => {
           ></iframe>
         </div>
         <p className="text-sm text-muted-foreground mt-4">
-          (Este é um vídeo de demonstração. O vídeo real do sistema será adicionado em breve!)
+          (Este é um vídeo de demonstração. Substitua o 'VIDEO_ID_DO_SEU_SISTEMA' no código pelo ID do seu vídeo real no YouTube!)
         </p>
       </section>
 

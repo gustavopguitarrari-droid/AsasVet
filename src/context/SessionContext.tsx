@@ -17,7 +17,7 @@ interface SessionContextType {
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
 
-export const SessionContextProvider = ({ children }: { ReactNode }) => {
+export const SessionContextProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [supabaseUser, setSupabaseUserState] = useState<SupabaseUser | null>(null); // Renamed to avoid conflict with appUser
   const [isLoadingSession, setIsLoadingSession] = useState(true); // Loading state for initial session fetch

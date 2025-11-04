@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format, parseISO, isValid } from "date-fns";
-import { CalendarIcon, Search, User, PawPrint, MoreHorizontal } from "lucide-react";
+import { CalendarIcon, Search, User, PawPrint, MoreHorizontal, Check, ChevronsUpDown } from "lucide-react";
 import { ptBR } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
@@ -29,12 +29,19 @@ import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
 import { Label } from "@/components/ui/label";
 import { TeamMember } from "@/pages/Veterinarios";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 const formSchema = z.object({
   bayName: z.string().min(1, "O nome da baia é obrigatório."),
   
   // Campos para seleção de cliente/pet
-  cpfSearch: z.string().optional(),
   selectedClientId: z.string().min(1, "Selecione um tutor."),
   selectedPetId: z.string().min(1, "Selecione um animal."),
 
@@ -80,7 +87,6 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
     defaultValues: {
       bayName: initialData?.bayName || "",
       
-      cpfSearch: "",
       selectedClientId: initialData?.selectedClientId || "",
       selectedPetId: initialData?.selectedPetId || "",
 
@@ -96,7 +102,8 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
     },
   });
 
-  const [cpfInput, setCpfInput] = useState<string>("");
+  const [openClientCombobox, setOpenClientCombobox] = useState(false);
+  const [clientSearchInput, setClientSearchInput] = useState<string>("");
   const [selectedClientFromSearch, setSelectedClientFromSearch] = useState<Client | null>(null);
   const [selectedPetFromDropdown, setSelectedPetFromDropdown] = useState<Pet | null>(null);
 
@@ -104,7 +111,6 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
     form.reset({
       bayName: initialData?.bayName || "",
       
-      cpfSearch: "",
       selectedClientId: initialData?.selectedClientId || "",
       selectedPetId: initialData?.selectedPetId || "",
 
@@ -118,7 +124,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
       veterinarian: initialData?.veterinarian || (allVeterinarians.length > 0 ? `${allVeterinarians[0].first_name} ${allVeterinarians[0].last_name}` : ""),
       risk: initialData?.risk || "Sem risco",
     });
-    setCpfInput("");
+    setClientSearchInput("");
     setSelectedClientFromSearch(null);
     setSelectedPetFromDropdown(null);
 
@@ -129,7 +135,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
         setSelectedClientFromSearch(client);
         form.setValue("selectedClientId", client.id);
         form.setValue("ownerName", client.name);
-        setCpfInput(client.cpf); // Pre-fill CPF input
+        setClientSearchInput(client.name); // Pre-fill combobox input
       }
     }
     if (initialData?.selectedPetId) {
@@ -143,41 +149,29 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
     }
   }, [initialData, form, allClients, allPets, allVeterinarians]);
 
-  const handleSearchCpf = () => {
-    const cleanCpf = cpfInput.replace(/\D/g, '');
-    if (cleanCpf.length !== 11) {
-      showError("CPF inválido. Digite 11 dígitos.");
-      setSelectedClientFromSearch(null);
-      form.setValue("selectedClientId", "");
-      form.setValue("ownerName", "");
-      setSelectedPetFromDropdown(null);
-      form.setValue("selectedPetId", "");
-      form.setValue("petName", "");
-      form.setValue("species", "Cachorro");
-      return;
-    }
+  const filteredClients = React.useMemo(() => {
+    if (!clientSearchInput) return allClients;
+    const lowerCaseSearchTerm = clientSearchInput.toLowerCase();
+    return allClients.filter(client => 
+      client.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+      client.cpf.replace(/\D/g, '').includes(lowerCaseSearchTerm.replace(/\D/g, ''))
+    );
+  }, [allClients, clientSearchInput]);
 
-    const foundClient = allClients.find(client => client.cpf.replace(/\D/g, '') === cleanCpf);
-
-    if (foundClient) {
-      setSelectedClientFromSearch(foundClient);
-      form.setValue("selectedClientId", foundClient.id);
-      form.setValue("ownerName", foundClient.name);
-      showSuccess(`Tutor ${foundClient.name} encontrado!`);
+  const handleSelectClient = (clientId: string) => {
+    const client = allClients.find(c => c.id === clientId);
+    if (client) {
+      setSelectedClientFromSearch(client);
+      form.setValue("selectedClientId", client.id);
+      form.setValue("ownerName", client.name);
+      setClientSearchInput(client.name); // Display selected client's name in input
+      showSuccess(`Tutor ${client.name} selecionado!`);
       // Reset pet selection when client changes
       setSelectedPetFromDropdown(null);
       form.setValue("selectedPetId", "");
       form.setValue("petName", "");
       form.setValue("species", "Cachorro");
-    } else {
-      showError("Tutor não encontrado com este CPF.");
-      setSelectedClientFromSearch(null);
-      form.setValue("selectedClientId", "");
-      form.setValue("ownerName", "");
-      setSelectedPetFromDropdown(null);
-      form.setValue("selectedPetId", "");
-      form.setValue("petName", "");
-      form.setValue("species", "Cachorro");
+      setOpenClientCombobox(false); // Close combobox
     }
   };
 
@@ -225,30 +219,56 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
           )}
         />
 
-        {/* Busca de Tutor por CPF */}
+        {/* Busca de Tutor por CPF ou Nome - Usando Combobox */}
         <div className="space-y-2 border p-3 rounded-md">
           <Label className="flex items-center">
-            <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor por CPF
+            <User className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Tutor (Nome ou CPF)
           </Label>
-          <div className="flex space-x-2">
-            <Input
-              placeholder="Digite o CPF do tutor (somente números)"
-              value={cpfInput}
-              onChange={(e) => setCpfInput(e.target.value)}
-              maxLength={11}
-              className="flex-1"
-              disabled={!!initialData?.selectedClientId}
-            />
-            <Button type="button" onClick={handleSearchCpf} size="icon" disabled={!!initialData?.selectedClientId}>
-              <Search className="h-4 w-4" />
-              <span className="sr-only">Buscar Tutor</span>
-            </Button>
-          </div>
-          {selectedClientFromSearch && (
-            <p className="text-sm text-muted-foreground mt-2">
-              Tutor selecionado: <span className="font-semibold">{selectedClientFromSearch.name}</span>
-            </p>
-          )}
+          <Popover open={openClientCombobox} onOpenChange={setOpenClientCombobox}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={openClientCombobox}
+                className="w-full justify-between"
+                disabled={!!initialData?.selectedClientId}
+              >
+                {selectedClientFromSearch
+                  ? selectedClientFromSearch.name
+                  : "Buscar ou selecionar tutor..."}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+              <Command>
+                <CommandInput
+                  placeholder="Buscar tutor por nome ou CPF..."
+                  value={clientSearchInput}
+                  onValueChange={setClientSearchInput}
+                />
+                <CommandList>
+                  <CommandEmpty>Nenhum tutor encontrado.</CommandEmpty>
+                  <CommandGroup>
+                    {filteredClients.map((client) => (
+                      <CommandItem
+                        key={client.id}
+                        value={`${client.name} ${client.cpf}`} // Use both for searchability
+                        onSelect={() => handleSelectClient(client.id)}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedClientFromSearch?.id === client.id ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {client.name} (CPF: {client.cpf})
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           <FormField
             control={form.control}
             name="selectedClientId"
