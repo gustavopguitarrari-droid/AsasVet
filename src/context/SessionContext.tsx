@@ -75,6 +75,8 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         addressState: data?.address_state || userMetadata.address_state?.toString() || undefined,
         colorTheme: data?.color_theme || userMetadata.color_theme?.toString() || undefined,
         planName: data?.plan_name || userMetadata.plan_name?.toString() || undefined, // NOVO: Incluir plan_name
+        stripeCustomerId: data?.stripe_customer_id || undefined, // NOVO: Incluir stripe_customer_id
+        stripeSubscriptionId: data?.stripe_subscription_id || undefined, // NOVO: Incluir stripe_subscription_id
         registeredTime: data?.registered_time || supabaseUser.created_at,
         organizationId: organizationId, // Usar o valor garantido
       };

@@ -54,6 +54,9 @@ export const useAutoSaveProfile = (currentUser: User | null) => {
             color_theme: currentUser.colorTheme,
             logo_url: currentUser.logoUrl,
             organization_id: currentUser.organizationId, // NOVO: Incluído organization_id
+            stripe_customer_id: currentUser.stripeCustomerId, // NOVO: Incluído stripeCustomerId
+            stripe_subscription_id: currentUser.stripeSubscriptionId, // NOVO: Incluído stripeSubscriptionId
+            plan_name: currentUser.planName, // NOVO: Incluído planName
             // updated_at is handled by a database trigger
           };
 

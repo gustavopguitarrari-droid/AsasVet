@@ -6,27 +6,27 @@ import { CreditCard, Crown, CheckCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useUser } from "@/context/UserContext"; // Importar useUser
+import { useMutation } from "@tanstack/react-query"; // Importar useMutation
+import { supabase } from "@/integrations/supabase/client"; // Importar supabase
+import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
 
 interface Plan {
   id: string;
   name: string;
   price: string;
   features: string[];
-  type: "active" | "downgrade" | "upgrade";
-  buttonText: string;
-  buttonVariant: "default" | "outline" | "secondary" | "destructive" | "ghost" | "link";
+  stripePriceId: string; // NOVO: ID do preço do Stripe
   badgeColorClass: string;
 }
 
-const mockPlans: Plan[] = [
+const availablePlans: Plan[] = [
   {
     id: "basic",
     name: "Plano Básico",
     price: "R$ 49,90/mês",
     features: ["1 Subusuário", "Gerenciamento de Clientes e Pets", "Agenda Básica"],
-    type: "downgrade",
-    buttonText: "Fazer Downgrade",
-    buttonVariant: "outline",
+    stripePriceId: "price_1Pj110Rz1234567890abcdef", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
     badgeColorClass: "bg-gray-500",
   },
   {
@@ -34,9 +34,7 @@ const mockPlans: Plan[] = [
     name: "Plano Premium",
     price: "R$ 99,90/mês",
     features: ["3 Subusuários", "Gerenciamento Completo", "Internação", "Caixa e Financeiro", "Suporte Prioritário"],
-    type: "active",
-    buttonText: "Gerenciar Assinatura",
-    buttonVariant: "default",
+    stripePriceId: "price_1Pj110Rz1234567890abcdef", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
     badgeColorClass: "bg-green-500",
   },
   {
@@ -44,18 +42,58 @@ const mockPlans: Plan[] = [
     name: "Plano Empresarial",
     price: "R$ 199,90/mês",
     features: ["10 Subusuários", "Todos os recursos Premium", "Relatórios Avançados", "Integrações Personalizadas", "Suporte Dedicado 24/7"],
-    type: "upgrade",
-    buttonText: "Fazer Upgrade",
-    buttonVariant: "default",
+    stripePriceId: "price_1Pj110Rz1234567890abcdef", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
     badgeColorClass: "bg-blue-500",
   },
 ];
 
 const MyPlanSettings: React.FC = () => {
-  const handlePlanAction = (planName: string, action: string) => {
-    console.log(`${action} clicked for ${planName}`);
-    // Aqui você implementaria a lógica real para downgrade/upgrade/gerenciamento
-    // Por exemplo, abrir um modal de confirmação ou redirecionar para uma página de checkout.
+  const { user: appUser } = useUser();
+  const currentPlanName = appUser?.planName || "Plano Básico"; // Assume "Plano Básico" como padrão se não houver plano
+
+  const createStripeCheckoutSessionMutation = useMutation({
+    mutationFn: async ({ priceId, userId }: { priceId: string; userId: string }) => {
+      const session = await supabase.auth.getSession();
+      if (!session.data.session) throw new Error("User not authenticated.");
+
+      const { data, error } = await supabase.functions.invoke('create-stripe-checkout', {
+        body: JSON.stringify({ priceId, userId }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.data.session.access_token}`,
+        },
+      });
+
+      if (error) throw new Error(error.message);
+      if (data.error) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: (data) => {
+      if (data.url) {
+        window.location.href = data.url; // Redireciona para o checkout do Stripe
+      } else {
+        showError("Não foi possível obter a URL de checkout do Stripe.");
+      }
+    },
+    onError: (err: any) => {
+      console.error("Erro ao iniciar checkout do Stripe:", err);
+      showError(`Erro ao iniciar checkout: ${err.message}`);
+    },
+  });
+
+  const handlePlanAction = (plan: Plan) => {
+    if (!appUser?.id) {
+      showError("Usuário não autenticado. Por favor, faça login novamente.");
+      return;
+    }
+
+    if (plan.name === currentPlanName) {
+      showSuccess("Você já está neste plano!");
+      // Aqui você pode adicionar lógica para gerenciar a assinatura existente, se houver
+      return;
+    }
+
+    createStripeCheckoutSessionMutation.mutate({ priceId: plan.stripePriceId, userId: appUser.id });
   };
 
   return (
@@ -67,23 +105,23 @@ const MyPlanSettings: React.FC = () => {
       </CardHeader>
       <CardContent className="space-y-6">
         <p className="text-muted-foreground">
-          Visualize os detalhes do seu plano atual, opções de downgrade e upgrade.
+          Visualize os detalhes do seu plano atual e explore opções de upgrade.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {mockPlans.map((plan) => (
+          {availablePlans.map((plan) => (
             <Card
               key={plan.id}
               className={cn(
                 "flex flex-col justify-between p-6",
-                plan.type === "active" ? "border-2 border-primary shadow-lg" : "border"
+                plan.name === currentPlanName ? "border-2 border-primary shadow-lg" : "border"
               )}
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-xl font-bold">{plan.name}</h3>
                   <Badge className={cn("text-white", plan.badgeColorClass)}>
-                    {plan.type === "active" ? "Ativo" : (plan.type === "downgrade" ? "Anterior" : "Superior")}
+                    {plan.name === currentPlanName ? "Ativo" : "Disponível"}
                   </Badge>
                 </div>
                 <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
@@ -96,18 +134,19 @@ const MyPlanSettings: React.FC = () => {
                 </ul>
               </div>
               <Button
-                variant={plan.buttonVariant}
-                className={cn("w-full", plan.type === "active" && "bg-primary text-primary-foreground hover:bg-primary/90")}
-                onClick={() => handlePlanAction(plan.name, plan.buttonText)}
+                variant={plan.name === currentPlanName ? "default" : "outline"}
+                className={cn("w-full", plan.name === currentPlanName && "bg-primary text-primary-foreground hover:bg-primary/90")}
+                onClick={() => handlePlanAction(plan)}
+                disabled={createStripeCheckoutSessionMutation.isPending}
               >
-                {plan.buttonText}
+                {createStripeCheckoutSessionMutation.isPending ? "Carregando..." : (plan.name === currentPlanName ? "Plano Atual" : "Selecionar Plano")}
               </Button>
             </Card>
           ))}
         </div>
 
         <p className="text-sm text-muted-foreground">
-          (Funcionalidade de gerenciamento de planos em desenvolvimento)
+          (Os IDs de preço do Stripe são placeholders. Substitua-os pelos IDs reais dos seus produtos/preços no Stripe.)
         </p>
       </CardContent>
     </Card>

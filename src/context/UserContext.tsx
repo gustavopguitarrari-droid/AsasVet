@@ -28,6 +28,8 @@ export interface User {
   colorTheme?: string;
   organizationId: string; // NOVO: ID da organização/clínica à qual o usuário pertence (TORNADO OBRIGATÓRIO)
   planName?: string; // NOVO: Nome do plano do usuário
+  stripeCustomerId?: string; // NOVO: ID do cliente Stripe
+  stripeSubscriptionId?: string; // NOVO: ID da assinatura Stripe
 }
 
 interface UserContextType {
