@@ -15,7 +15,7 @@ const allowedVeterinarioPaths = [
   '/painel',
   '/consultas',
   '/internacao',
-  '/cadastro',
+  '/cadastro', // Adicionado acesso ao Cadastro para Veterinários
   '/medical-records', // Agenda
   '/profile', // Perfil deve ser acessível a todos os cargos
   '/products', // Produtos deve ser acessível a Veterinários
