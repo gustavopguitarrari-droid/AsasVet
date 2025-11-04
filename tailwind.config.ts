@@ -20,7 +20,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', ...defaultTheme.fontFamily.sans], // Definir Inter como a fonte sans-serif principal
+        sans: defaultTheme.fontFamily.sans, // Revertido para a fonte sans-serif padrão
       },
       colors: {
         border: "hsl(var(--border))",
