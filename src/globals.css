@@ -131,78 +131,92 @@
 /* Custom Color Themes */
 .theme-default {
   --primary: 220 80% 60%; /* Azul para o tema padrão */
+  --primary-darker: 220 80% 50%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 .dark .theme-default {
   --primary: 220 80% 40%; /* Azul mais escuro para o tema padrão no modo escuro */
+  --primary-darker: 220 80% 30%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 
 .theme-green {
   --primary: 142.1 76.2% 36.3%; /* green-500 */
+  --primary-darker: 142.1 76.2% 26.3%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 .dark .theme-green {
   --primary: 142.1 76.2% 36.3%; /* green-500 */
+  --primary-darker: 142.1 76.2% 26.3%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 
 .theme-purple {
   --primary: 262.1 83.3% 57.8%; /* purple-600 */
+  --primary-darker: 262.1 83.3% 47.8%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 .dark .theme-purple {
   --primary: 262.1 83.3% 57.8%; /* purple-600 */
+  --primary-darker: 262.1 83.3% 47.8%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 
 .theme-orange {
   --primary: 28.1 91.2% 50.6%; /* orange-500 */
+  --primary-darker: 28.1 91.2% 40.6%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 .dark .theme-orange {
   --primary: 28.1 91.2% 50.6%; /* orange-500 */
+  --primary-darker: 28.1 91.2% 40.6%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 
 .theme-teal {
   --primary: 177.1 70% 35%; /* teal-500 */
+  --primary-darker: 177.1 70% 25%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 .dark .theme-teal {
   --primary: 177.1 70% 35%; /* teal-500 */
+  --primary-darker: 177.1 70% 25%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 
 .theme-pink {
   --primary: 330 80% 70%; /* pink-500 */
+  --primary-darker: 330 80% 60%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 .dark .theme-pink {
   --primary: 330 80% 70%; /* pink-500 */
+  --primary-darker: 330 80% 60%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 
 .theme-brown {
   --primary: 30 40% 30%; /* amber-800 */
+  --primary-darker: 30 40% 20%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 .dark .theme-brown {
   --primary: 30 40% 30%; /* amber-800 */
+  --primary-darker: 30 40% 20%; /* Versão mais escura para gradiente */
   --primary-foreground: 210 20% 98%;
 }
 
 /* Custom Background Gradients */
 .sidebar-gradient-bg {
-  background: linear-gradient(180deg, hsl(var(--sidebar-background)) 0%, hsl(var(--sidebar-background)) 100%);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
 }
 
 .profile-header-art-bg {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
 }
 
 .login-art-bg {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary)) 100%);
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
 }
 
 /* Original #root and other styles */
@@ -257,6 +271,7 @@
   --foreground: 222.2 84% 4.9%;
   --muted-foreground: 215.4 16.3% 46.9%;
   --primary: 222.2 47.4% 11.2%;
+  --primary-darker: 222.2 47.4% 8.2%; /* Darker shade for gradient */
   --primary-foreground: 210 20% 98%;
   --border: 214.3 31.8% 91.4%;
   --card: 0 0% 100%;
@@ -268,6 +283,7 @@
   --foreground: 210 20% 98%;
   --muted-foreground: 215 20.2% 65.1%;
   --primary: 210 20% 98%;
+  --primary-darker: 210 20% 88%; /* Darker shade for gradient */
   --primary-foreground: 222.2 47.4% 11.2%;
   --border: 217.2 32.6% 17.5%;
   --card: 222.2 84% 4.9%;
