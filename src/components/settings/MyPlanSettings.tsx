@@ -47,6 +47,13 @@ const availablePlans: Plan[] = [
   },
 ];
 
+interface PlanSelectionDialogProps {
+  isOpen: boolean;
+  onClose: () => void;
+  userId: string;
+  onPlanSelected: () => void;
+}
+
 const MyPlanSettings: React.FC = () => {
   const { user: appUser } = useUser();
   const currentPlanName = appUser?.planName || "Plano Básico"; // Assume "Plano Básico" como padrão se não houver plano
