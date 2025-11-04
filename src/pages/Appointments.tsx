@@ -108,6 +108,7 @@ const Appointments = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
   const userId = appUser?.id;
+  const organizationId = appUser?.organizationId; // NOVO: Obter organizationId
   const veterinarianName = appUser?.name || "Veterinário Desconhecido";
   const navigate = useNavigate();
   const location = useLocation(); // Inicializar useLocation
@@ -167,9 +168,9 @@ const Appointments = () => {
 
   // --- Queries ---
   const { data: appointments = [], isLoading, error } = useQuery<Appointment[]>({
-    queryKey: ['appointments', userId],
+    queryKey: ['appointments', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId || !organizationId) return []; // NOVO: Habilitar query apenas se organizationId estiver disponível
       const { data, error } = await supabase
         .from('appointments')
         .select(`
@@ -180,7 +181,7 @@ const Appointments = () => {
             medical_record_pdf_url
           )
         `)
-        .eq('user_id', userId);
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) throw error;
       console.log("Appointments.tsx: Raw data from Supabase for appointments query:", data);
       return data.map(app => {
@@ -198,13 +199,13 @@ const Appointments = () => {
         return mappedApp;
       }) as Appointment[];
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   const { data: historyAppointments = [], isLoading: isLoadingHistory, error: historyError } = useQuery<Appointment[]>({
-    queryKey: ['historyAppointments', userId],
+    queryKey: ['historyAppointments', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId || !organizationId) return []; // NOVO: Habilitar query apenas se organizationId estiver disponível
       const { data, error } = await supabase
         .from('appointments')
         .select(`
@@ -215,7 +216,7 @@ const Appointments = () => {
             medical_record_pdf_url
           )
         `)
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .in('status', ['Realizada', 'Cancelada']);
       if (error) throw error;
       console.log("Appointments.tsx: Raw data from Supabase for historyAppointments query:", data);
@@ -234,17 +235,18 @@ const Appointments = () => {
         return mappedApp;
       }) as Appointment[];
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
-    queryKey: ['clients', userId],
+    queryKey: ['clients', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId || !organizationId) return []; // NOVO: Habilitar query apenas se organizationId estiver disponível
       const { data, error } = await supabase
         .from('clients')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) throw error;
       return data.map(dbClient => ({
         id: dbClient.id,
@@ -266,16 +268,17 @@ const Appointments = () => {
         photoUrl: dbClient.photo_url || undefined,
       }));
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   const { data: pets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
-    queryKey: ['pets', userId],
+    queryKey: ['pets', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId || !organizationId) return []; // NOVO: Habilitar query apenas se organizationId estiver disponível
       const { data, error } = await supabase
         .from('pets')
-        .select('*');
+        .select('*')
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) throw error;
       return data.map(dbPet => ({
         id: dbPet.id,
@@ -290,13 +293,13 @@ const Appointments = () => {
         ownerId: dbPet.owner_id,
       }));
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   // --- Mutations ---
   const addAppointmentMutation = useMutation({
     mutationFn: async (newAppointmentData: AppointmentFormValues) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // NOVO: Adicionado organizationId
 
       const appointmentDate = format(newAppointmentData.date, "yyyy-MM-dd");
 
@@ -304,6 +307,7 @@ const Appointments = () => {
         .from('appointments')
         .insert({
           user_id: userId,
+          organization_id: organizationId, // NOVO: Adicionado organization_id
           date: appointmentDate,
           time: newAppointmentData.time,
           client_name: newAppointmentData.client,
@@ -321,7 +325,7 @@ const Appointments = () => {
       return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalida com organizationId
       showSuccess("Consulta agendada com sucesso!");
       setIsAddAppointmentDialogOpen(false);
     },
@@ -332,7 +336,7 @@ const Appointments = () => {
 
   const updateAppointmentMutation = useMutation({
     mutationFn: async (updatedAppointment: Appointment) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // NOVO: Adicionado organizationId
       const { data, error } = await supabase
         .from('appointments')
         .update({
@@ -351,14 +355,15 @@ const Appointments = () => {
         })
         .eq('id', updatedAppointment.id)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
       if (error) throw error;
       return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalida com organizationId
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] }); // NOVO: Invalida com organizationId
       showSuccess("Consulta atualizada com sucesso!");
       setIsDetailsDialogOpen(false);
     },
@@ -369,7 +374,7 @@ const Appointments = () => {
 
   const cancelAppointmentMutation = useMutation({
     mutationFn: async (appointmentId: string) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // NOVO: Adicionado organizationId
       const now = new Date();
       const { data, error } = await supabase
         .from('appointments')
@@ -380,14 +385,15 @@ const Appointments = () => {
         })
         .eq('id', appointmentId)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
       if (error) throw error;
       return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalida com organizationId
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] }); // NOVO: Invalida com organizationId
       showSuccess("Consulta cancelada com sucesso!");
       setIsDetailsDialogOpen(false);
     },
@@ -398,7 +404,7 @@ const Appointments = () => {
 
   const startAppointmentMutation = useMutation({
     mutationFn: async (appointmentId: string) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // NOVO: Adicionado organizationId
       if (!appUser?.name) throw new Error("User name not available to assign as veterinarian.");
 
       const now = new Date();
@@ -411,13 +417,14 @@ const Appointments = () => {
         })
         .eq('id', appointmentId)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
       if (error) throw error;
       return data as Appointment; // Cast para o tipo correto
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalida com organizationId
       showSuccess("Consulta iniciada com sucesso!");
       navigate(`/consultation/${data.id}`);
     },
@@ -429,17 +436,18 @@ const Appointments = () => {
   // NEW: Mutation for clearing history appointments
   const clearHistoryAppointmentsMutation = useMutation({
     mutationFn: async () => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // NOVO: Adicionado organizationId
       const { error } = await supabase
         .from('appointments')
         .delete()
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .in('status', ['Realizada', 'Cancelada']);
       if (error) throw error;
       return true;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] }); // NOVO: Invalida com organizationId
       showSuccess("Histórico de consultas limpo com sucesso!");
       setIsHistoryDialogOpen(false);
       window.location.reload(); // Recarrega a página após limpar o histórico
@@ -452,8 +460,8 @@ const Appointments = () => {
   // Mutation to fetch the medical record and generate the PDF
   const fetchAndGeneratePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
-      if (!userId) {
-        throw new Error("User not authenticated.");
+      if (!userId || !organizationId) { // NOVO: Adicionado organizationId
+        throw new Error("User not authenticated or organization ID not available.");
       }
       const currentUserId: string = userId;
 
@@ -463,6 +471,7 @@ const Appointments = () => {
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, created_at, updated_at')
         .eq('appointment_id', appointment.id)
         .eq('user_id', currentUserId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
 
       if (fetchError) {
@@ -514,11 +523,10 @@ const Appointments = () => {
   // NOVO: Mutação para buscar o prontuário médico e gerar o PDF da receita
   const fetchAndGenerateRecipePdfMutation = useMutation({
     mutationFn: async ({ appointment }: { appointment: Appointment }) => {
-      if (!userId) {
-        throw new Error("User not authenticated.");
+      if (!userId || !organizationId) { // NOVO: Adicionado organizationId
+        throw new Error("User not authenticated or organization ID not available.");
       }
       const currentUserId: string = userId;
-      const organizationId = appUser?.organizationId; // Get organizationId from appUser
 
       console.log(`Appointments.tsx: fetchAndGenerateRecipePdfMutation called for appointment ${appointment.id}. Current appointment object:`, appointment); // ADDED LOG
       console.log("Appointments: fetchAndGenerateRecipePdfMutation.mutationFn - Received appointment:", appointment); // ADDED LOG
@@ -537,6 +545,7 @@ const Appointments = () => {
         .select('id, prescriptions')
         .eq('appointment_id', appointment.id)
         .eq('user_id', currentUserId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .maybeSingle(); // ALTERADO: Usando .maybeSingle() aqui
 
       if (fetchError) {
@@ -549,7 +558,7 @@ const Appointments = () => {
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',
@@ -575,14 +584,15 @@ const Appointments = () => {
         .from('medical_records')
         .update({ recipe_pdf_url: newPdfUrl })
         .eq('id', medicalRecordData.id)
-        .eq('user_id', currentUserId);
+        .eq('user_id', currentUserId)
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       console.log("Appointments: fetchAndGenerateRecipePdfMutation - Medical record updated with new recipe_pdf_url.");
 
       return { pdfBlob, pdfUrl: newPdfUrl, appointment };
     },
     onSuccess: ({ pdfBlob, pdfUrl, appointment }) => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalida para atualizar recipe_pdf_url
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalida com organizationId
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] }); // NOVO: Invalida com organizationId
       setRecipePdfBlob(pdfBlob || null); // Pode ser null se a URL existente foi usada
       setRecipePdfUrl(pdfUrl || null); // Define a URL direta
       setRecipePdfFilename(`Receita_${appointment.pet_name}_${format(parseISO(appointment.date || new Date().toISOString()), 'yyyyMMdd')}.pdf`);

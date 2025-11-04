@@ -60,71 +60,75 @@ const Dashboard = () => {
 
   const { user } = useUser();
   const userId = user?.id;
+  const organizationId = user?.organizationId; // NOVO: Obter organizationId
 
   // Query para buscar a contagem de clientes
   const { data: totalClients = 0, isLoading: isLoadingClients } = useQuery<number>({
-    queryKey: ['totalClients', userId],
+    queryKey: ['totalClients', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return 0;
+      if (!userId || !organizationId) return 0; // NOVO: Habilitar query apenas se organizationId estiver disponível
       const { count, error } = await supabase
         .from('clients')
         .select('*', { count: 'exact' })
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) {
         console.error("Erro ao buscar contagem de clientes:", error);
         throw error;
       }
       return count || 0;
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   // Query para buscar a contagem de pets
   const { data: totalPets = 0, isLoading: isLoadingPets } = useQuery<number>({
-    queryKey: ['totalPets', userId],
+    queryKey: ['totalPets', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return 0;
+      if (!userId || !organizationId) return 0; // NOVO: Habilitar query apenas se organizationId estiver disponível
       const { count, error } = await supabase
         .from('pets')
-        .select('*', { count: 'exact' });
+        .select('*', { count: 'exact' })
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) {
         console.error("Erro ao buscar contagem de pets:", error);
         throw error;
       }
       return count || 0;
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   // Query para buscar a contagem de consultas agendadas (agora da tabela 'events')
   const { data: scheduledAppointmentsCount = 0, isLoading: isLoadingScheduledAppointments } = useQuery<number>({
-    queryKey: ['scheduledAppointmentsCount', userId],
+    queryKey: ['scheduledAppointmentsCount', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return 0;
+      if (!userId || !organizationId) return 0; // NOVO: Habilitar query apenas se organizationId estiver disponível
       const { count, error } = await supabase
-        .from('events')
+        .from('appointments') // Alterado para 'appointments'
         .select('*', { count: 'exact' })
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .eq('status', 'Agendada');
       if (error) {
-        console.error("Erro ao buscar contagem de consultas agendadas (events):", error);
+        console.error("Erro ao buscar contagem de consultas agendadas (appointments):", error);
         throw error;
       }
-      console.log("Contagem de consultas agendadas (events) do Supabase:", count);
+      console.log("Contagem de consultas agendadas (appointments) do Supabase:", count);
       return count || 0;
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   // NOVO: Query para buscar a contagem de pacientes internados
   const { data: internedPatientsCount = 0, isLoading: isLoadingInternedPatients } = useQuery<number>({
-    queryKey: ['internedPatientsCount', userId],
+    queryKey: ['internedPatientsCount', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return 0;
+      if (!userId || !organizationId) return 0; // NOVO: Habilitar query apenas se organizationId estiver disponível
       const { count, error } = await supabase
         .from('interned_patients')
         .select('*', { count: 'exact' })
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .neq('status', 'Alta')
         .neq('status', 'Óbito');
       if (error) {
@@ -133,7 +137,7 @@ const Dashboard = () => {
       }
       return count || 0;
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   React.useEffect(() => {

@@ -83,31 +83,33 @@ const ConsultationPage: React.FC = () => {
 
   // Query para buscar os detalhes da consulta
   const { data: appointment, isLoading, error } = useQuery<Appointment>({
-    queryKey: ['appointment', appointmentId, userId],
+    queryKey: ['appointment', appointmentId, userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId || !appointmentId) throw new Error("User or Appointment ID not available.");
+      if (!userId || !appointmentId || !organizationId) throw new Error("User, Appointment ID, or Organization ID not available."); // NOVO: Adicionado organizationId
       const { data, error } = await supabase
         .from('appointments')
         .select('*')
         .eq('id', appointmentId)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .single();
       if (error) throw error;
       return data;
     },
-    enabled: !!userId && !!appointmentId,
+    enabled: !!userId && !!appointmentId && !!organizationId, // NOVO: Habilitar query apenas se userId, appointmentId E organizationId estiverem disponíveis
   });
 
   // Query para buscar o prontuário médico da consulta
   const { data: medicalRecord, isLoading: isLoadingMedicalRecord, error: medicalRecordError } = useQuery<MedicalRecord | null>({
-    queryKey: ['medicalRecord', appointmentId, userId],
+    queryKey: ['medicalRecord', appointmentId, userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId || !appointmentId) return null; // Return null if IDs are not available
+      if (!userId || !appointmentId || !organizationId) return null; // NOVO: Adicionado organizationId
       const { data, error } = await supabase
         .from('medical_records')
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, recipe_pdf_url, medical_record_pdf_url, created_at, updated_at')
         .eq('appointment_id', appointmentId)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .maybeSingle();
       if (error) {
         console.error("ConsultationPage: Error fetching medical record:", error);
@@ -124,18 +126,19 @@ const ConsultationPage: React.FC = () => {
         prescriptions: data.prescriptions || [],
       } as MedicalRecord;
     },
-    enabled: !!userId && !!appointmentId,
+    enabled: !!userId && !!appointmentId && !!organizationId, // NOVO: Habilitar query apenas se userId, appointmentId E organizationId estiverem disponíveis
   });
 
   // Fetch all clients
   const { data: allClients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
-    queryKey: ['allClientsConsultation', userId],
+    queryKey: ['allClientsConsultation', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId || !organizationId) return []; // NOVO: Adicionado organizationId
       const { data, error } = await supabase
         .from('clients')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) throw error;
       return data.map(dbClient => ({
         id: dbClient.id,
@@ -157,17 +160,18 @@ const ConsultationPage: React.FC = () => {
         photoUrl: dbClient.photo_url || undefined,
       }));
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   // Fetch all pets
   const { data: allPets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
-    queryKey: ['allPetsConsultation', userId],
+    queryKey: ['allPetsConsultation', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId || !organizationId) return []; // NOVO: Adicionado organizationId
       const { data, error } = await supabase
         .from('pets')
-        .select('*');
+        .select('*')
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) throw error;
       return data.map(dbPet => ({
         id: dbPet.id,
@@ -183,59 +187,62 @@ const ConsultationPage: React.FC = () => {
         ownerId: dbPet.owner_id,
       }));
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   // Fetch all veterinarians (team members with role 'Veterinário')
   const { data: allVeterinarians = [], isLoading: isLoadingVeterinarians, error: veterinariansError } = useQuery<TeamMember[]>({
-    queryKey: ['allVeterinariansConsultation', userId],
+    queryKey: ['allVeterinariansConsultation', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId || !organizationId) return []; // NOVO: Adicionado organizationId
       const { data, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email, phone, crmv, role')
-        .eq('role', 'Veterinário');
+        .eq('role', 'Veterinário')
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) throw error;
       return data as TeamMember[];
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   // NOVO: Query para buscar todos os produtos/serviços
   const { data: products = [], isLoading: isLoadingProducts, error: productsError } = useQuery<Product[]>({
-    queryKey: ['productsConsultation', userId],
+    queryKey: ['productsConsultation', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId) return [];
+      if (!userId || !organizationId) return []; // NOVO: Adicionado organizationId
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) throw error;
       return data as Product[];
     },
-    enabled: !!userId,
+    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
   // NOVO: Query para buscar débitos do animal para esta consulta
   const { data: animalDebits = [], isLoading: isLoadingAnimalDebits, error: animalDebitsError } = useQuery<AnimalDebit[]>({
-    queryKey: ['animalDebits', appointmentId, userId],
+    queryKey: ['animalDebits', appointmentId, userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId || !appointmentId) return [];
+      if (!userId || !appointmentId || !organizationId) return []; // NOVO: Adicionado organizationId
       const { data, error } = await supabase
         .from('animal_debits')
         .select('*')
         .eq('appointment_id', appointmentId)
-        .eq('user_id', userId);
+        .eq('user_id', userId)
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) throw error;
       return data as AnimalDebit[];
     },
-    enabled: !!userId && !!appointmentId,
+    enabled: !!userId && !!appointmentId && !!organizationId, // NOVO: Habilitar query apenas se userId, appointmentId E organizationId estiverem disponíveis
   });
 
   // Mutação para finalizar a consulta
   const finalizeAppointmentMutation = useMutation({
     mutationFn: async (id: string) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // NOVO: Adicionado organizationId
       const now = new Date();
       const { data, error } = await supabase
         .from('appointments')
@@ -245,14 +252,15 @@ const ConsultationPage: React.FC = () => {
         })
         .eq('id', id)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId] });
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalida com organizationId
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] }); // NOVO: Invalida com organizationId
       showSuccess("Consulta finalizada com sucesso!");
       // Redireciona para a aba 'finalizadas' na página de consultas
       navigate('/consultas', { state: { activeTab: 'finalizadas' } });
@@ -285,7 +293,7 @@ const ConsultationPage: React.FC = () => {
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',
@@ -298,6 +306,7 @@ const ConsultationPage: React.FC = () => {
         .select('recipe_pdf_url')
         .eq('id', currentMedicalRecordId)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .single();
 
       if (fetchCurrentRecordError) {
@@ -337,6 +346,7 @@ const ConsultationPage: React.FC = () => {
         .update({ recipe_pdf_url: newPdfUrl })
         .eq('id', currentMedicalRecordId)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
 
@@ -350,10 +360,10 @@ const ConsultationPage: React.FC = () => {
     onSuccess: async ({ pdfBlob, newPdfUrl, shouldOpenPreview }) => { // Adicionado 'async' aqui
       console.log("generateAndSaveRecipePdfMutation: onSuccess - Invalidating queries and showing success.");
       console.log("generateAndSaveRecipePdfMutation: Prescriptions after save:", medicalRecordFormRef.current?.getValues().prescriptions);
-      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
-      await queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalidate
-      await queryClient.refetchQueries({ queryKey: ['appointments', userId] }); // Force refetch
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId, organizationId] }); // NOVO: Invalida com organizationId
+      await queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalidate
+      await queryClient.refetchQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Force refetch
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] }); // NOVO: Invalida com organizationId
       showSuccess("Receita PDF gerada e salva com sucesso!");
       if (shouldOpenPreview) {
         setRecipePdfBlob(pdfBlob);
@@ -389,6 +399,7 @@ const ConsultationPage: React.FC = () => {
         .select('id, medical_record_pdf_url')
         .eq('appointment_id', appointmentId)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .maybeSingle();
 
       if (fetchCurrentRecordError && fetchCurrentRecordError.code !== 'PGRST116') { // PGRST116 means no rows found
@@ -459,6 +470,7 @@ const ConsultationPage: React.FC = () => {
         .update({ medical_record_pdf_url: newMedicalRecordPdfUrl })
         .eq('id', medicalRecordIdForPdf)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
 
@@ -470,10 +482,10 @@ const ConsultationPage: React.FC = () => {
       return finalRecord;
     },
     onSuccess: async (data) => { // 'data' here is the updated medical record from Supabase
-      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId] });
-      await queryClient.invalidateQueries({ queryKey: ['appointments', userId] }); // Invalidate
-      await queryClient.refetchQueries({ queryKey: ['appointments', userId] }); // Force refetch
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId] });
+      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId, organizationId] }); // NOVO: Invalida com organizationId
+      await queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalidate
+      await queryClient.refetchQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Force refetch
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] }); // NOVO: Invalida com organizationId
       showSuccess("Prontuário salvo com sucesso!");
 
       if (isAttemptingFinalize) {
@@ -519,7 +531,7 @@ const ConsultationPage: React.FC = () => {
         .from('animal_debits')
         .insert({
           user_id: userId,
-          organization_id: organizationId, // Adicionado organization_id
+          organization_id: organizationId, // NOVO: Adicionado organization_id
           pet_id: appointment.pet_id,
           appointment_id: appointmentId,
           description: debitData.description,
@@ -533,7 +545,7 @@ const ConsultationPage: React.FC = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId] });
+      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] }); // NOVO: Invalida com organizationId
       showSuccess("Débito adicionado ao animal com sucesso!");
       setIsAddAnimalDebitDialogOpen(false);
     },
@@ -555,6 +567,7 @@ const ConsultationPage: React.FC = () => {
         .select('*')
         .eq('id', debitId)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .single();
 
       if (fetchDebitError || !debitToPay) {
@@ -600,6 +613,7 @@ const ConsultationPage: React.FC = () => {
         })
         .eq('id', debitId)
         .eq('user_id', userId)
+        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
 
@@ -612,8 +626,8 @@ const ConsultationPage: React.FC = () => {
       return updatedDebit;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId] });
-      queryClient.invalidateQueries({ queryKey: ['transactions', userId] });
+      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] }); // NOVO: Invalida com organizationId
+      queryClient.invalidateQueries({ queryKey: ['transactions', userId, organizationId] }); // NOVO: Invalida com organizationId
       showSuccess("Débito marcado como pago e transação registrada!");
     },
     onError: (err: any) => {
