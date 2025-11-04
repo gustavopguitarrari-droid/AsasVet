@@ -108,9 +108,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
 
   return (
     <div className="relative flex h-full flex-col overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm">
-      <Link to="/painel" className="mb-6 flex items-center justify-center text-4xl font-bold text-white cursor-pointer">
+      <Link to="/painel" className="mb-6 flex items-center justify-center text-4xl font-bold text-sidebar-foreground cursor-pointer">
         {!isCollapsed && "AsasVet"}{" "}
-        <PawPrint className={cn("h-10 w-10 text-white", !isCollapsed && "ml-2")} strokeWidth={2.5} />
+        <PawPrint className={cn("h-10 w-10 text-sidebar-foreground", !isCollapsed && "ml-2")} strokeWidth={2.5} />
       </Link>
       <nav className="flex-1 space-y-2">
         {filteredNavItems.map((item) => {
