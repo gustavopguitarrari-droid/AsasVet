@@ -130,12 +130,12 @@
 
 /* Custom Color Themes */
 .theme-default {
-  --primary: 222.2 47.4% 11.2%;
+  --primary: 220 80% 60%; /* Azul para o tema padrão */
   --primary-foreground: 210 20% 98%;
 }
 .dark .theme-default {
-  --primary: 210 20% 98%;
-  --primary-foreground: 222.2 47.4% 11.2%;
+  --primary: 220 80% 40%; /* Azul mais escuro para o tema padrão no modo escuro */
+  --primary-foreground: 210 20% 98%;
 }
 
 .theme-green {
