@@ -10,17 +10,6 @@ interface ProtectedRouteProps {
   children: React.ReactNode;
 }
 
-// Rotas permitidas para o cargo "Veterinário"
-const allowedVeterinarioPaths = [
-  '/painel',
-  '/consultas',
-  '/internacao',
-  '/cadastro', // Adicionado acesso ao Cadastro para Veterinários
-  '/medical-records', // Agenda
-  '/profile', // Perfil deve ser acessível a todos os cargos
-  '/products', // Produtos deve ser acessível a Veterinários
-];
-
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { session, isLoading } = useSession();
   const { user: appUser } = useUser();
@@ -55,14 +44,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       );
   }
 
-
-  // Se o usuário for um "Veterinário" e a rota atual não estiver na lista de permitidas, redireciona para o Painel
-  if (appUser.role === "Veterinário" && !allowedVeterinarioPaths.includes(location.pathname)) {
-    console.log(`ProtectedRoute - Veterinário tentando acessar caminho proibido: ${location.pathname}. Redirecionando para /painel.`);
-    return <Navigate to="/painel" replace />;
-  }
-
-  // Se autenticado e autorizado, renderiza o layout e o conteúdo da rota
+  // Se autenticado, renderiza o layout e o conteúdo da rota.
+  // As restrições de acesso a páginas específicas por cargo foram removidas aqui.
   return <Layout>{children}</Layout>;
 };
 

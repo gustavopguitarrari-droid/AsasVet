@@ -71,7 +71,6 @@ const Products = () => {
       const { data, error } = await supabase
         .from('products')
         .select('*')
-        // .eq('user_id', userId) // REMOVIDO: A política de RLS já filtra por organization_id
         .eq('organization_id', organizationId); // Filtrar por organization_id
       if (error) throw error;
       return data as Product[];
@@ -121,7 +120,6 @@ const Products = () => {
           category: updatedProductData.category,
         })
         .eq('id', updatedProductData.id)
-        .eq('user_id', userId)
         .eq('organization_id', organizationId) // Adicionado organization_id para segurança
         .select()
         .single();
@@ -147,7 +145,6 @@ const Products = () => {
         .from('products')
         .delete()
         .eq('id', productId)
-        .eq('user_id', userId)
         .eq('organization_id', organizationId); // Adicionado organization_id para segurança
       if (error) throw error;
       return productId;

@@ -81,28 +81,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
   const { user: appUser } = useUser(); // Obter o usuário com o cargo do UserContext
 
-  // Filtra os itens de navegação com base no cargo do usuário
+  // Filtra os itens de navegação para mostrar todos se o usuário estiver autenticado
   const filteredNavItems = React.useMemo(() => {
     if (!appUser) {
       return []; // Não mostra nada se o usuário não estiver carregado
     }
-    if (appUser.role === "Administrador") {
-      return allNavItems; // Administradores veem todos os itens
-    }
-    if (appUser.role === "Veterinário") {
-      const allowedPaths = [
-        "/painel",
-        "/consultas",
-        "/internacao",
-        "/cadastro",
-        "/medical-records",
-        "/products", // NEW: Allow veterinarians to see Products
-        "/profile", // Perfil deve ser acessível a todos os cargos
-      ];
-      return allNavItems.filter(item => allowedPaths.includes(item.path));
-    }
-    // Para outros cargos ou cargos não definidos, mostra apenas o Painel como padrão
-    return allNavItems.filter(item => item.path === "/painel");
+    return allNavItems; // Todos os usuários autenticados veem todos os itens
   }, [appUser]);
 
 

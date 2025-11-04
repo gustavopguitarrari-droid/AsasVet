@@ -112,7 +112,6 @@ const Cadastro = () => {
       const { data, error } = await supabase
         .from('clients')
         .select('*')
-        // .eq('user_id', userId) // REMOVIDO: A política de RLS já filtra por organization_id
         .eq('organization_id', organizationId); // Filtrar por organization_id
       if (error) throw error;
 
@@ -145,7 +144,8 @@ const Cadastro = () => {
       if (!userId || !organizationId) return []; // Habilitar query apenas se organizationId estiver disponível
       const { data, error } = await supabase
         .from('pets')
-        .select('*');
+        .select('*')
+        .eq('organization_id', organizationId);
       if (error) throw error;
       return data.map(dbPet => ({
         id: dbPet.id,
@@ -173,7 +173,6 @@ const Cadastro = () => {
       const { data: existingCpf, error: cpfCheckError } = await supabase
         .from('clients')
         .select('id')
-        // .eq('user_id', userId) // REMOVIDO: Verificar CPF existente em toda a organização
         .eq('organization_id', organizationId)
         .eq('cpf', data.cpf)
         .single();
@@ -265,7 +264,6 @@ const Cadastro = () => {
       const { data: existingCpf, error: cpfCheckError } = await supabase
         .from('clients')
         .select('id')
-        // .eq('user_id', userId) // REMOVIDO: Verificar CPF existente em toda a organização
         .eq('organization_id', organizationId)
         .eq('cpf', data.cpf)
         .neq('id', data.id)
@@ -312,7 +310,7 @@ const Cadastro = () => {
           organization_id: organizationId, // Garantir que organization_id seja atualizado/mantido
         })
         .eq('id', data.id)
-        .eq('user_id', userId)
+        .eq('organization_id', organizationId) // Adicionado organization_id para segurança
         .select()
         .single();
       if (error) {
@@ -368,7 +366,6 @@ const Cadastro = () => {
         .from('clients')
         .delete()
         .eq('id', clientId)
-        .eq('user_id', userId)
         .eq('organization_id', organizationId); // Adicionado organization_id para segurança
       if (error) {
         throw error;
@@ -506,6 +503,7 @@ const Cadastro = () => {
           organization_id: organizationId, // Garantir que organization_id seja atualizado/mantido
         })
         .eq('id', data.id)
+        .eq('organization_id', organizationId) // Adicionado organization_id para segurança
         .select()
         .single();
       if (error) {

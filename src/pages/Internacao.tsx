@@ -153,14 +153,14 @@ const Internacao = () => {
 
   // Fetch interned patients
   const { data: internedPatients = [], isLoading: isLoadingPatients, error: patientsError, refetch: refetchInternedPatients } = useQuery<InternedPatient[]>({
-    queryKey: ['interned_patients', userId],
+    queryKey: ['interned_patients', appUser?.organizationId],
     queryFn: async () => {
-      if (!userId) return [];
-      console.log("Internacao.tsx: Fetching interned_patients (excluding Alta/Óbito) from Supabase for user:", userId);
+      if (!appUser?.organizationId) return [];
+      console.log("Internacao.tsx: Fetching interned_patients (excluding Alta/Óbito) from Supabase for organization:", appUser.organizationId);
       const { data, error } = await supabase
         .from('interned_patients')
         .select('*')
-        .eq('user_id', userId)
+        .eq('organization_id', appUser.organizationId)
         .neq('status', 'Alta') // CORREÇÃO AQUI: Usando neq
         .neq('status', 'Óbito'); // CORREÇÃO AQUI: Usando neq
 
@@ -172,19 +172,19 @@ const Internacao = () => {
       data.forEach(p => console.log(`Internacao.tsx: Patient ${p.id} - Status: '${p.status}'`));
       return data as InternedPatient[]; // Cast para o tipo correto
     },
-    enabled: !!userId,
+    enabled: !!appUser?.organizationId,
   });
 
   // Fetch history patients
   const { data: historyPatients = [], isLoading: isLoadingHistory, error: historyError } = useQuery<InternedPatient[]>({
-    queryKey: ['history_patients', userId],
+    queryKey: ['history_patients', appUser?.organizationId],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!appUser?.organizationId) return [];
       console.log("Internacao.tsx: Fetching history_patients from Supabase...");
       const { data, error } = await supabase
         .from('interned_patients')
         .select('*')
-        .eq('user_id', userId)
+        .eq('organization_id', appUser.organizationId)
         .in('status', ['Alta', 'Óbito']); // Only discharged/deceased patients
       if (error) {
         console.error("Internacao.tsx: Error fetching history_patients:", error);
@@ -193,19 +193,19 @@ const Internacao = () => {
       console.log("Internacao.tsx: history_patients fetched:", data);
       return data as InternedPatient[]; // Cast para o tipo correto
     },
-    enabled: !!userId,
+    enabled: !!appUser?.organizationId,
   });
 
   // Fetch patient actions
   const { data: patientActions = [], isLoading: isLoadingActions, error: actionsError } = useQuery<PatientAction[]>({
-    queryKey: ['patient_actions', userId],
+    queryKey: ['patient_actions', appUser?.organizationId],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!appUser?.organizationId) return [];
       console.log("Internacao.tsx: Fetching patient_actions from Supabase...");
       const { data, error } = await supabase
         .from('patient_actions')
         .select('*')
-        .eq('user_id', userId);
+        .eq('organization_id', appUser.organizationId);
       if (error) {
         console.error("Internacao.tsx: Error fetching patient_actions:", error);
         throw error;
@@ -213,18 +213,18 @@ const Internacao = () => {
       console.log("Internacao.tsx: patient_actions fetched:", data);
       return data as PatientAction[]; // Cast para o tipo correto
     },
-    enabled: !!userId,
+    enabled: !!appUser?.organizationId,
   });
 
   // Fetch all clients
   const { data: allClients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
-    queryKey: ['allClientsInternment', userId],
+    queryKey: ['allClientsInternment', appUser?.organizationId],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!appUser?.organizationId) return [];
       const { data, error } = await supabase
         .from('clients')
         .select('*')
-        .eq('user_id', userId);
+        .eq('organization_id', appUser.organizationId);
       if (error) throw error;
       return data.map(dbClient => ({
         id: dbClient.id,
@@ -246,17 +246,18 @@ const Internacao = () => {
         photoUrl: dbClient.photo_url || undefined,
       }));
     },
-    enabled: !!userId,
+    enabled: !!appUser?.organizationId,
   });
 
   // Fetch all pets
   const { data: allPets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
-    queryKey: ['allPetsInternment', userId],
+    queryKey: ['allPetsInternment', appUser?.organizationId],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!appUser?.organizationId) return [];
       const { data, error } = await supabase
         .from('pets')
-        .select('*');
+        .select('*')
+        .eq('organization_id', appUser.organizationId);
       if (error) throw error;
       return data.map(dbPet => ({
         id: dbPet.id,
@@ -272,28 +273,29 @@ const Internacao = () => {
         ownerId: dbPet.owner_id,
       }));
     },
-    enabled: !!userId,
+    enabled: !!appUser?.organizationId,
   });
 
   // Fetch all veterinarians (team members with role 'Veterinário')
   const { data: allVeterinarians = [], isLoading: isLoadingVeterinarians, error: veterinariansError } = useQuery<TeamMember[]>({
-    queryKey: ['allVeterinariansInternment', userId],
+    queryKey: ['allVeterinariansInternment', appUser?.organizationId],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!appUser?.organizationId) return [];
       const { data, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email, phone, crmv, role')
-        .eq('role', 'Veterinário');
+        .eq('role', 'Veterinário')
+        .eq('organization_id', appUser.organizationId);
       if (error) throw error;
       return data as TeamMember[];
     },
-    enabled: !!userId,
+    enabled: !!appUser?.organizationId,
   });
 
   // Mutation for adding a new patient
   const addPatientMutation = useMutation({
     mutationFn: async (newPatientData: InternmentFormValues) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !appUser?.organizationId) throw new Error("User not authenticated or organization ID not available.");
 
       const client = allClients.find(c => c.id === newPatientData.selectedClientId);
       const pet = allPets.find(p => p.id === newPatientData.selectedPetId);
@@ -312,6 +314,7 @@ const Internacao = () => {
         .from('interned_patients')
         .insert({
           user_id: userId,
+          organization_id: appUser.organizationId, // NOVO: Adiciona organization_id
           client_id: client.id, // NOVO: Adiciona client_id
           pet_id: pet.id,       // NOVO: Adiciona pet_id
           bay_name: newPatientData.bayName,
@@ -335,7 +338,7 @@ const Internacao = () => {
       return data as InternedPatient; // Cast para o tipo correto
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['interned_patients', userId] });
+      queryClient.invalidateQueries({ queryKey: ['interned_patients', appUser?.organizationId] });
       showSuccess("Paciente internado com sucesso!");
       setIsAddDialogOpen(false);
     },
@@ -347,7 +350,7 @@ const Internacao = () => {
   // Mutation for updating a patient
   const updatePatientMutation = useMutation({
     mutationFn: async (updatedPatient: InternedPatient) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !appUser?.organizationId) throw new Error("User not authenticated or organization ID not available.");
       console.log("Internacao.tsx: Attempting to update patient in DB:", updatedPatient);
 
       const veterinarian = allVeterinarians.find(v => `${v.first_name} ${v.last_name}` === updatedPatient.veterinarian);
@@ -371,7 +374,7 @@ const Internacao = () => {
           // client_id e pet_id não são atualizáveis via este formulário
         })
         .eq('id', updatedPatient.id)
-        .eq('user_id', userId)
+        .eq('organization_id', appUser.organizationId) // NOVO: Filtrar por organization_id
         .select()
         .single();
       if (error) {
@@ -386,12 +389,12 @@ const Internacao = () => {
       console.log("Internacao.tsx: Updated patient status in onSuccess:", data.status);
       
       // Invalidate and refetch both queries to ensure they get fresh data from Supabase
-      await queryClient.invalidateQueries({ queryKey: ['interned_patients', userId] });
-      await queryClient.refetchQueries({ queryKey: ['interned_patients', userId] });
+      await queryClient.invalidateQueries({ queryKey: ['interned_patients', appUser?.organizationId] });
+      await queryClient.refetchQueries({ queryKey: ['interned_patients', appUser?.organizationId] });
       console.log("Internacao.tsx: Invalidated and refetched interned_patients query.");
 
-      await queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
-      await queryClient.refetchQueries({ queryKey: ['history_patients', userId] });
+      await queryClient.invalidateQueries({ queryKey: ['history_patients', appUser?.organizationId] });
+      await queryClient.refetchQueries({ queryKey: ['history_patients', appUser?.organizationId] });
       console.log("Internacao.tsx: Invalidated and refetched history_patients query.");
 
       showSuccess("Paciente atualizado com sucesso!");
@@ -406,7 +409,7 @@ const Internacao = () => {
   // Mutation for saving all patient actions (inserting new, updating existing, deleting removed)
   const saveAllActionsMutation = useMutation({
     mutationFn: async (actionsToSave: PatientAction[]) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !appUser?.organizationId) throw new Error("User not authenticated or organization ID not available.");
       console.log("saveAllActionsMutation: actionsToSave received:", actionsToSave);
 
       const existingActionsForPatient = patientActions.filter(a => a.patient_id === actionPatientId);
@@ -427,6 +430,7 @@ const Internacao = () => {
           return {
             ...rest,
             user_id: userId, // Ensure userId is correctly passed
+            organization_id: appUser.organizationId, // NOVO: Adiciona organization_id
             frequency: action.frequency || null, // Ensure null for optional fields
             quantity: action.quantity || null,
             route: action.route || null,
@@ -444,11 +448,11 @@ const Internacao = () => {
           frequency: action.frequency || null,
           quantity: action.quantity || null,
           route: action.route || null,
-        }).eq('id', action.id).eq('user_id', userId));
+        }).eq('id', action.id).eq('organization_id', appUser.organizationId));
       }
 
       if (deletedActions.length > 0) {
-        promises.push(supabase.from('patient_actions').delete().in('id', deletedActions.map(a => a.id)).eq('user_id', userId));
+        promises.push(supabase.from('patient_actions').delete().in('id', deletedActions.map(a => a.id)).eq('organization_id', appUser.organizationId));
       }
 
       const results = await Promise.all(promises);
@@ -463,7 +467,7 @@ const Internacao = () => {
     },
     onSuccess: () => {
       console.log("saveAllActionsMutation: onSuccess - Invalidating patient_actions query.");
-      queryClient.invalidateQueries({ queryKey: ['patient_actions', userId] });
+      queryClient.invalidateQueries({ queryKey: ['patient_actions', appUser?.organizationId] });
       showSuccess("Ações do paciente salvas com sucesso!");
       setIsAddActionDialogOpen(false);
     },
@@ -476,14 +480,14 @@ const Internacao = () => {
   // Mutation for updating completion status of actions
   const updateActionsCompletionMutation = useMutation({
     mutationFn: async (actionsToUpdate: PatientAction[]) => {
-      if (!userId) throw new Error("User not authenticated.");
+      if (!userId || !appUser?.organizationId) throw new Error("User not authenticated or organization ID not available.");
       console.log("updateActionsCompletionMutation: actionsToUpdate received:", actionsToUpdate);
       const promises = actionsToUpdate.map(action =>
         supabase
           .from('patient_actions')
           .update({ is_completed: action.is_completed })
           .eq('id', action.id)
-          .eq('user_id', userId)
+          .eq('organization_id', appUser.organizationId)
       );
       const results = await Promise.all(promises);
       for (const result of results) {
@@ -497,7 +501,7 @@ const Internacao = () => {
     },
     onSuccess: () => {
       console.log("updateActionsCompletionMutation: onSuccess - Invalidating patient_actions query.");
-      queryClient.invalidateQueries({ queryKey: ['patient_actions', userId] });
+      queryClient.invalidateQueries({ queryKey: ['patient_actions', appUser?.organizationId] });
       showSuccess("Status das ações atualizado!");
       setIsConfirmActionsDialogOpen(false);
     },
@@ -510,12 +514,12 @@ const Internacao = () => {
   // NEW: Mutation for clearing history patients
   const clearHistoryMutation = useMutation({
     mutationFn: async () => {
-      if (!userId) throw new Error("User not authenticated.");
-      console.log("Internacao.tsx: Attempting to clear history patients for user:", userId);
+      if (!userId || !appUser?.organizationId) throw new Error("User not authenticated or organization ID not available.");
+      console.log("Internacao.tsx: Attempting to clear history patients for organization:", appUser.organizationId);
       const { error } = await supabase
         .from('interned_patients')
         .delete()
-        .eq('user_id', userId)
+        .eq('organization_id', appUser.organizationId)
         .in('status', ['Alta', 'Óbito']);
       if (error) {
         console.error("Internacao.tsx: Error clearing history patients:", error);
@@ -525,7 +529,7 @@ const Internacao = () => {
       return true;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['history_patients', userId] });
+      queryClient.invalidateQueries({ queryKey: ['history_patients', appUser?.organizationId] });
       showSuccess("Histórico de pacientes internados limpo com sucesso!");
       setIsHistoryDialogOpen(false); // Fecha o diálogo após a limpeza
     },
