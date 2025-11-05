@@ -166,7 +166,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                       <p className={cn("font-medium", (isCancelled || isRealizada) && "line-through text-white/80")}>
                         {event.title}
                       </p>
-                      <Badge variant="secondary" className="mt-1 text-xs bg-white/20 text-white">
+                      <Badge variant="secondary" className="mt-1 text-xs bg-white/40 text-white"> {/* Alterado para bg-white/40 */}
                         {event.category}
                       </Badge>
                     </div>
