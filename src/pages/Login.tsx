@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } => 'react';
+import React, { useEffect, useState } from 'react';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { useSession } from '@/context/SessionContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 
