@@ -206,6 +206,19 @@
   --primary-foreground: 210 20% 98%;
 }
 
+/* NOVO TEMA: Aqua Suave */
+.theme-aqua {
+  --primary: 180 60% 40%; /* Um tom de aqua/verde-azulado */
+  --primary-darker: 180 60% 30%; /* Versão mais escura para gradiente */
+  --primary-foreground: 210 20% 98%;
+}
+.dark .theme-aqua {
+  --primary: 180 60% 50%; /* Um tom de aqua/verde-azulado mais claro para o modo escuro */
+  --primary-darker: 180 60% 40%; /* Versão mais escura para gradiente */
+  --primary-foreground: 222.2 47.4% 11.2%;
+}
+
+
 /* Custom Background Gradients */
 .sidebar-gradient-bg {
   background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);

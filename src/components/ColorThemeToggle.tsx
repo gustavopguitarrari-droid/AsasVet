@@ -20,6 +20,7 @@ const colorThemes = [
   { name: "Ciano", value: "teal", colorClass: "bg-teal-500" }, // Nova cor para o botão
   { name: "Rosa", value: "pink", colorClass: "bg-pink-500" }, // Nova cor para o botão
   { name: "Marrom", value: "brown", colorClass: "bg-amber-800" }, // Nova cor para o botão (usando amber para um tom de marrom)
+  { name: "Aqua Suave", value: "aqua", colorClass: "bg-teal-500" }, // NOVO: Aqua Suave
 ];
 
 const ColorThemeToggle = () => {
