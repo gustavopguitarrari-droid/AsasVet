@@ -226,7 +226,7 @@
 }
 
 .login-art-bg {
-  background-image: url('/images/vet-clinic-bg.png');
+  background-image: url('/images/vet-clinic-bg-new.png'); /* Nova imagem de fundo */
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
