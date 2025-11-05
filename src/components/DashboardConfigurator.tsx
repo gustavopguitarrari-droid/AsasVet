@@ -28,15 +28,15 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
-import { showSuccess, showError } from "@/utils/toast"; // Importar toasts
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"; // NOVO: Importar RadioGroup
+import { showSuccess, showError } from "@/utils/toast";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface DashboardItemConfig {
   id: string;
   name: string;
   isVisible: boolean;
   category: "overview" | "financial" | "recentActivity";
-  order: number; // Adicionado propriedade 'order'
+  order: number;
 }
 
 interface DashboardConfiguratorProps {
@@ -60,7 +60,6 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
 }) => {
   const [tempConfig, setTempConfig] = React.useState<DashboardItemConfig[]>(config);
   const [cardToAddId, setCardToAddId] = React.useState<string | null>(null);
-  // NOVO: Estado para a direção do layout do menu
   const [menuPosition, setMenuPosition] = React.useState<"lateral" | "superior">(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('layoutDirection') === 'vertical' ? 'superior' : 'lateral');
@@ -69,7 +68,6 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
   });
 
   React.useEffect(() => {
-    // Garante que a ordem seja inicializada se estiver faltando (ex: ao carregar de um localStorage antigo)
     const initializedConfig = config.map((item, index) => ({
       ...item,
       order: item.order !== undefined ? item.order : index,
@@ -77,7 +75,6 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     setTempConfig(initializedConfig);
   }, [config]);
 
-  // NOVO: Efeito para atualizar o localStorage quando a posição do menu muda
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       localStorage.setItem('layoutDirection', menuPosition === 'superior' ? 'vertical' : 'horizontal');
@@ -87,9 +84,8 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
   const handleRemoveCardFromPanel = (id: string) => {
     setTempConfig((prevConfig) => {
       const updatedConfig = prevConfig.map((item) =>
-        item.id === id ? { ...item, isVisible: false, order: -1 } : item // Define order como -1 para itens não visíveis
+        item.id === id ? { ...item, isVisible: false, order: -1 } : item
       );
-      // Re-indexar a categoria de onde o item foi removido
       const removedItem = prevConfig.find(item => item.id === id);
       if (removedItem && removedItem.isVisible) {
         const categoryItems = updatedConfig
@@ -110,9 +106,8 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
       const updatedConfig = prevConfig.map((item) =>
         item.id === id ? { ...item, isVisible: true, category: category } : item
       );
-      // Encontra o maior 'order' na categoria de destino para o novo item
       const maxOrderInCategory = Math.max(
-        -1, // Garante que o primeiro item tenha order 0
+        -1,
         ...updatedConfig
           .filter(item => item.isVisible && item.category === category)
           .map(item => item.order)
@@ -135,7 +130,6 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
       return;
     }
 
-    // Se o item foi solto na mesma posição, não faz nada
     if (source.droppableId === destination.droppableId && source.index === destination.index) {
       return;
     }
@@ -143,32 +137,26 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     setTempConfig(prevConfig => {
       const newConfig = Array.from(prevConfig);
       const draggedItemIndex = newConfig.findIndex(item => item.id === draggableId);
-      const draggedItem = { ...newConfig[draggedItemIndex] }; // Cria uma cópia para modificar
+      const draggedItem = { ...newConfig[draggedItemIndex] };
 
-      // Remove o item da sua posição original na lista conceitual (filtrada por categoria)
       const sourceCategoryItems = newConfig
         .filter(item => item.isVisible && item.category === source.droppableId)
         .sort((a, b) => a.order - b.order);
       
-      sourceCategoryItems.splice(source.index, 1); // Remove da lista de origem
+      sourceCategoryItems.splice(source.index, 1);
 
-      // Atualiza a categoria do item arrastado se ele foi movido para uma categoria diferente
       if (source.droppableId !== destination.droppableId) {
         draggedItem.category = destination.droppableId as DashboardItemConfig["category"];
       }
 
-      // Insere o item arrastado na sua nova posição na lista conceitual de destino
       const destinationCategoryItems = newConfig
-        .filter(item => item.isVisible && item.category === destination.droppableId && item.id !== draggableId) // Exclui o item arrastado temporariamente
+        .filter(item => item.isVisible && item.category === destination.droppableId && item.id !== draggableId)
         .sort((a, b) => a.order - b.order);
       
-      destinationCategoryItems.splice(destination.index, 0, draggedItem); // Insere na lista de destino
+      destinationCategoryItems.splice(destination.index, 0, draggedItem);
 
-      // Reatribui os valores de 'order' para todos os itens afetados
-      // Primeiro, atualiza o item arrastado na configuração principal
       newConfig[draggedItemIndex] = draggedItem;
 
-      // Em seguida, reindexa a categoria de origem (se diferente da de destino)
       if (source.droppableId !== destination.droppableId) {
         sourceCategoryItems.forEach((item, idx) => {
           const originalIndex = newConfig.findIndex(cfg => cfg.id === item.id);
@@ -176,13 +164,11 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
         });
       }
 
-      // Reindexa a categoria de destino
       destinationCategoryItems.forEach((item, idx) => {
         const originalIndex = newConfig.findIndex(cfg => cfg.id === item.id);
         if (originalIndex !== -1) newConfig[originalIndex].order = idx;
       });
 
-      // Finalmente, ordena a configuração inteira para garantir consistência ao salvar
       return newConfig.sort((a, b) => {
         if (a.isVisible === b.isVisible) {
           if (a.category === b.category) {
@@ -190,7 +176,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
           }
           return a.category.localeCompare(b.category);
         }
-        return a.isVisible ? -1 : 1; // Itens visíveis primeiro
+        return a.isVisible ? -1 : 1;
       });
     });
   };
@@ -198,7 +184,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
   const handleSave = () => {
     onSave(tempConfig);
     onOpenChange(false);
-    window.location.reload(); // NOVO: Recarrega a página
+    window.location.reload();
   };
 
   const availableCards = React.useMemo(() => {
@@ -231,7 +217,6 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
           </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 overflow-hidden">
-          {/* Left side: Available Cards */}
           <div className="flex flex-col space-y-4 overflow-y-auto pr-2">
             <h3 className="text-lg font-semibold">Cards Disponíveis</h3>
             <ScrollArea className="flex-1 pr-2">
@@ -263,7 +248,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                             onValueChange={(value: DashboardItemConfig["category"]) =>
                               handleAddCardToCategory(item.id, value)
                             }
-                            defaultValue="overview" // Categoria padrão
+                            defaultValue="overview"
                           >
                             <SelectTrigger className="w-full h-8 text-sm">
                               <SelectValue placeholder="Selecionar Categoria" />
@@ -285,7 +270,6 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
             </ScrollArea>
           </div>
 
-          {/* Right side: Configured Cards */}
           <div className="flex flex-col space-y-4 overflow-y-auto pl-2">
             <h3 className="text-lg font-semibold">Cards no Painel</h3>
             <ScrollArea className="flex-1 pl-2">
@@ -294,7 +278,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
               ) : (
                 <DragDropContext onDragEnd={onDragEnd}>
                   {allCategories.map((category) => {
-                    const items = (groupedConfigured[category] || []).sort((a, b) => a.order - b.order); // Ordena por 'order'
+                    const items = (groupedConfigured[category] || []).sort((a, b) => a.order - b.order);
                     return (
                       <Collapsible key={category} defaultOpen={true} className="space-y-2 border rounded-md p-2 mb-4">
                         <CollapsibleTrigger asChild>
@@ -310,7 +294,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                                 {...provided.droppableProps}
                                 ref={provided.innerRef}
                                 className={cn(
-                                  "min-h-[50px] p-2 rounded-md", // Adicionado min-height para droppable vazio
+                                  "min-h-[50px] p-2 rounded-md",
                                   snapshot.isDraggingOver && "bg-accent/30"
                                 )}
                               >
@@ -323,7 +307,6 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
                                         {...provided.dragHandleProps}
                                         style={{
                                           ...provided.draggableProps.style,
-                                          // Adiciona um z-index alto quando arrastando para que o item fique acima de outros elementos
                                           zIndex: snapshot.isDragging ? 9999 : 'auto',
                                         }}
                                       >
@@ -369,7 +352,6 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
             </ScrollArea>
           </div>
         </div>
-        {/* NOVO: Opção de Posição do Menu */}
         <div className="border-t pt-4 mt-4">
           <h3 className="text-lg font-semibold mb-2">Posição do Menu de Navegação</h3>
           <RadioGroup
@@ -395,3 +377,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+};
+
+export default DashboardConfigurator;
