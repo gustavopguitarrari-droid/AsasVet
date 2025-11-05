@@ -54,12 +54,12 @@
     --sidebar-item-bg-9: 0 0% 50%; /* Gray */
 
     /* Event Category Colors (distinct and vibrant) */
-    --event-consulta: 210 80% 50%; /* Azul vibrante */
-    --event-cirurgia: 340 80% 50%; /* Rosa-avermelhado */
-    --event-vacina: 120 70% 40%; /* Verde claro */
-    --event-exame: 40 90% 50%; /* Laranja-amarelado */
-    --event-retorno: 260 70% 50%; /* Roxo */
-    --event-outros: 200 10% 40%; /* Cinza azulado */
+    --event-consulta: 210 80% 35%; /* Azul vibrante */
+    --event-cirurgia: 340 80% 35%; /* Rosa-avermelhado */
+    --event-vacina: 120 70% 25%; /* Verde claro */
+    --event-exame: 40 90% 35%; /* Laranja-amarelado */
+    --event-retorno: 260 70% 35%; /* Roxo */
+    --event-outros: 200 10% 25%; /* Cinza azulado */
   }
 
   .dark {
@@ -113,12 +113,12 @@
     --sidebar-item-bg-9: 0 0% 30%;
 
     /* Event Category Colors (distinct and vibrant for dark mode) */
-    --event-consulta: 210 80% 60%; /* Azul mais claro */
-    --event-cirurgia: 340 80% 60%; /* Rosa-avermelhado mais claro */
-    --event-vacina: 120 70% 50%; /* Verde claro */
-    --event-exame: 40 90% 60%; /* Laranja-amarelado mais claro */
-    --event-retorno: 260 70% 60%; /* Roxo mais claro */
-    --event-outros: 200 10% 50%; /* Cinza azulado mais claro */
+    --event-consulta: 210 80% 45%; /* Azul mais claro */
+    --event-cirurgia: 340 80% 45%; /* Rosa-avermelhado mais claro */
+    --event-vacina: 120 70% 35%; /* Verde claro */
+    --event-exame: 40 90% 45%; /* Laranja-amarelado mais claro */
+    --event-retorno: 260 70% 45%; /* Roxo mais claro */
+    --event-outros: 200 10% 35%; /* Cinza azulado mais claro */
   }
 
   body {
