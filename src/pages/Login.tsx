@@ -43,9 +43,7 @@ const Login = () => {
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Link>
         </Button>
-        <h2 className="text-2xl font-bold text-center text-white mt-8">
-          Bem-vindo ao AsasVet
-        </h2>
+        {/* Removido: <h2 className="text-2xl font-bold text-center text-white mt-8">Bem-vindo ao AsasVet</h2> */}
         <Auth
           supabaseClient={supabase}
           providers={[]}
