@@ -265,7 +265,7 @@
   filter: drop-shadow(0 0 2em #646cffaa);
 }
 .logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  filter: drop_shadow(0 0 2em #61dafbaa);
 }
 
 @keyframes logo-spin {
@@ -314,4 +314,9 @@
   --border: 217.2 32.6% 17.5%;
   --card: 222.2 84% 4.9%;
   --card-foreground: 210 20% 98%;
+}
+
+/* Custom CSS for Auth labels */
+.custom-auth-labels label {
+  font-weight: bold !important; /* Força o negrito */
 }

@@ -102,6 +102,7 @@ const Login = () => {
               },
             },
           }}
+          className="custom-auth-labels" // Adicionando a classe aqui
         />
         {authView === 'sign_in' && (
           <p className="text-center text-sm text-white">
