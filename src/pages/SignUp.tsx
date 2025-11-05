@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, PawPrint } from 'lucide-react'; // Importar PawPrint
 import SignUpForm from '@/components/SignUpForm';
 import PlanSelectionDialog from '@/components/PlanSelectionDialog'; // Importar o novo diálogo
 import { showSuccess } from '@/utils/toast'; // Importar showSuccess
@@ -31,9 +31,12 @@ const SignUp: React.FC = () => {
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Link>
         </Button>
-        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mt-8">
-          Crie sua Conta AsasVet
-        </h2>
+        <div className="flex items-center justify-center text-foreground mt-8 mb-6">
+          <PawPrint className="h-8 w-8 mr-2 text-primary" />
+          <h2 className="text-2xl font-bold">
+            Crie sua Conta AsasVet
+          </h2>
+        </div>
         <SignUpForm onSuccess={handleSignUpSuccess} />
         <p className="text-center text-sm text-muted-foreground">
           Já tem uma conta?{' '}
