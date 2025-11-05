@@ -263,7 +263,7 @@ const Veterinarios = () => {
         <TabsContent value="escala" className="mt-4">
           {organizationId ? (
             <CustomTeamCalendar
-              veterinarians={teamMembers.filter(member => member.role === "Veterinário").map(v => ({
+              veterinarians={teamMembers.filter(member => member.role === "Veterinário" || member.role === "Administrador").map(v => ({
                 id: v.id,
                 name: `${v.first_name} ${v.last_name}`,
                 crmv: v.crmv || "N/A",

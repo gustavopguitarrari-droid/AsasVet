@@ -190,7 +190,7 @@ const ConsultationPage: React.FC = () => {
     enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
-  // Fetch all veterinarians (team members with role 'Veterinário')
+  // Fetch all veterinarians (team members with role 'Veterinário' or 'Administrador')
   const { data: allVeterinarians = [], isLoading: isLoadingVeterinarians, error: veterinariansError } = useQuery<TeamMember[]>({
     queryKey: ['allVeterinariansConsultation', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
@@ -198,8 +198,8 @@ const ConsultationPage: React.FC = () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email, phone, crmv, role')
-        .eq('role', 'Veterinário')
-        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
+        .in('role', ['Veterinário', 'Administrador']); // NOVO: Inclui administradores
       if (error) throw error;
       return data as TeamMember[];
     },

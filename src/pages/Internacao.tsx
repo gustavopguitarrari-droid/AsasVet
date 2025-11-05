@@ -276,7 +276,7 @@ const Internacao = () => {
     enabled: !!appUser?.organizationId,
   });
 
-  // Fetch all veterinarians (team members with role 'Veterinário')
+  // Fetch all veterinarians (team members with role 'Veterinário' or 'Administrador')
   const { data: allVeterinarians = [], isLoading: isLoadingVeterinarians, error: veterinariansError } = useQuery<TeamMember[]>({
     queryKey: ['allVeterinariansInternment', appUser?.organizationId],
     queryFn: async () => {
@@ -284,8 +284,8 @@ const Internacao = () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email, phone, crmv, role')
-        .eq('role', 'Veterinário')
-        .eq('organization_id', appUser.organizationId);
+        .eq('organization_id', appUser.organizationId)
+        .in('role', ['Veterinário', 'Administrador']); // NOVO: Inclui administradores
       if (error) throw error;
       return data as TeamMember[];
     },
