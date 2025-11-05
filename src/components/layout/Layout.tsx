@@ -9,10 +9,11 @@ import { MadeWithDyad } from "@/components/made-with-dyad";
 import { cn } from "@/lib/utils";
 import FloatingChatButton from "@/components/FloatingChatButton";
 import ChatDialog from "@/components/ChatDialog";
-import FloatingCashierButton from "@/components/FloatingCashierButton"; // NOVO: Importar o botão do caixa
-import CashierDialog from "@/components/CashierDialog"; // NOVO: Importar o diálogo do caixa
-import DemoModeBanner from "@/components/DemoModeBanner"; // NOVO: Importar DemoModeBanner
-import { useUser } from "@/context/UserContext"; // NOVO: Importar useUser
+import FloatingCashierButton from "@/components/FloatingCashierButton";
+import CashierDialog from "@/components/CashierDialog";
+import DemoModeBanner from "@/components/DemoModeBanner";
+import { useUser } from "@/context/UserContext";
+import { usePageTitle } from "@/context/PageTitleContext"; // Importar usePageTitle
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,8 +22,17 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
   const [isChatDialogOpen, setIsChatDialogOpen] = React.useState(false);
-  const [isCashierDialogOpen, setIsCashierDialogOpen] = React.useState(false); // NOVO: Estado para o diálogo do caixa
-  const { user } = useUser(); // NOVO: Obter o usuário para verificar o modo de demonstração
+  const [isCashierDialogOpen, setIsCashierDialogOpen] = React.useState(false);
+  const { user } = useUser();
+  const { pageTitle } = usePageTitle(); // Obter o título da página do contexto
+
+  // NOVO: Estado para a direção do layout, lido do localStorage
+  const [layoutDirection, setLayoutDirection] = React.useState<"horizontal" | "vertical">(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('layoutDirection') as "horizontal" | "vertical") || "horizontal";
+    }
+    return "horizontal";
+  });
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
@@ -32,39 +42,51 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setIsChatDialogOpen(true);
   };
 
-  const handleCashierButtonClick = () => { // NOVO: Handler para o botão do caixa
+  const handleCashierButtonClick = () => {
     setIsCashierDialogOpen(true);
   };
 
-  // Ajusta os tamanhos do sidebar com base no estado de recolhimento
-  const sidebarSize = isSidebarCollapsed ? 6 : 18;
+  // NOVO: Ajusta os tamanhos e a direção do painel com base em layoutDirection
+  const sidebarSize = layoutDirection === "horizontal" ? (isSidebarCollapsed ? 6 : 18) : 8; // 8% de altura para o menu superior
   const sidebarMinSize = sidebarSize;
-  const sidebarMaxSize = sidebarSize;
+  const sidebarMaxSize = layoutDirection === "horizontal" ? sidebarSize : 10; // Max 10% para o menu superior
 
   return (
     <div className="flex h-screen w-screen overflow-hidden">
-      <ResizablePanelGroup direction="horizontal">
+      <ResizablePanelGroup direction={layoutDirection}>
         <ResizablePanel
           defaultSize={sidebarSize}
           minSize={sidebarMinSize}
           maxSize={sidebarMaxSize}
-          className="transition-all duration-300 ease-in-out relative"
+          className={cn(
+            "transition-all duration-300 ease-in-out relative",
+            layoutDirection === "vertical" && "flex-shrink-0" // Garante que o painel superior não encolha
+          )}
         >
-          <Sidebar isCollapsed={isSidebarCollapsed} onToggleCollapse={toggleSidebar} />
+          <Sidebar
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={toggleSidebar}
+            layoutDirection={layoutDirection} // Passa a nova prop
+          />
         </ResizablePanel>
         <ResizablePanel defaultSize={100 - sidebarSize}>
           <div className="flex h-full flex-col">
-            <Header />
-            <main className="flex-1 overflow-y-auto p-6">{children}</main>
+            {layoutDirection === "horizontal" && <Header />} {/* Renderiza Header apenas se o menu for lateral */}
+            <main className="flex-1 overflow-y-auto p-6">
+              {layoutDirection === "vertical" && ( // Exibe o título da página se o menu for superior
+                <h1 className="text-3xl font-bold mb-6">{pageTitle || "AsasVet"}</h1>
+              )}
+              {children}
+            </main>
             <MadeWithDyad />
           </div>
         </ResizablePanel>
       </ResizablePanelGroup>
-      <FloatingCashierButton onClick={handleCashierButtonClick} /> {/* NOVO: Botão do caixa */}
+      <FloatingCashierButton onClick={handleCashierButtonClick} />
       <FloatingChatButton onClick={handleChatButtonClick} />
       <ChatDialog isOpen={isChatDialogOpen} onClose={() => setIsChatDialogOpen(false)} />
-      <CashierDialog isOpen={isCashierDialogOpen} onClose={() => setIsCashierDialogOpen(false)} /> {/* NOVO: Diálogo do caixa */}
-      {user?.isDemoMode && <DemoModeBanner />} {/* NOVO: Renderiza o banner se estiver em modo de demonstração */}
+      <CashierDialog isOpen={isCashierDialogOpen} onClose={() => setIsCashierDialogOpen(false)} />
+      {user?.isDemoMode && <DemoModeBanner />}
     </div>
   );
 };

@@ -29,6 +29,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { showSuccess, showError } from "@/utils/toast"; // Importar toasts
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"; // NOVO: Importar RadioGroup
 
 interface DashboardItemConfig {
   id: string;
@@ -59,6 +60,13 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
 }) => {
   const [tempConfig, setTempConfig] = React.useState<DashboardItemConfig[]>(config);
   const [cardToAddId, setCardToAddId] = React.useState<string | null>(null);
+  // NOVO: Estado para a direção do layout do menu
+  const [menuPosition, setMenuPosition] = React.useState<"lateral" | "superior">(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('layoutDirection') === 'vertical' ? 'superior' : 'lateral');
+    }
+    return 'lateral';
+  });
 
   React.useEffect(() => {
     // Garante que a ordem seja inicializada se estiver faltando (ex: ao carregar de um localStorage antigo)
@@ -68,6 +76,13 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     }));
     setTempConfig(initializedConfig);
   }, [config]);
+
+  // NOVO: Efeito para atualizar o localStorage quando a posição do menu muda
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('layoutDirection', menuPosition === 'superior' ? 'vertical' : 'horizontal');
+    }
+  }, [menuPosition]);
 
   const handleRemoveCardFromPanel = (id: string) => {
     setTempConfig((prevConfig) => {
@@ -211,7 +226,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
         <DialogHeader>
           <DialogTitle>Configurar Painel</DialogTitle>
           <DialogDescription>
-            Adicione cards da esquerda para o painel e organize-os na direita.
+            Personalize a exibição dos cards e a posição do menu de navegação.
           </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 overflow-hidden">
@@ -352,6 +367,24 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
               )}
             </ScrollArea>
           </div>
+        </div>
+        {/* NOVO: Opção de Posição do Menu */}
+        <div className="border-t pt-4 mt-4">
+          <h3 className="text-lg font-semibold mb-2">Posição do Menu de Navegação</h3>
+          <RadioGroup
+            value={menuPosition}
+            onValueChange={(value: "lateral" | "superior") => setMenuPosition(value)}
+            className="flex space-x-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="lateral" id="menu-lateral" />
+              <Label htmlFor="menu-lateral">Lateral</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="superior" id="menu-superior" />
+              <Label htmlFor="menu-superior">Superior</Label>
+            </div>
+          </RadioGroup>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>

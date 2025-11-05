@@ -8,9 +8,19 @@ import ColorThemeToggle from "@/components/ColorThemeToggle"; // Importar o novo
 import LiveClockCalendar from "@/components/LiveClockCalendar"; // Importar o novo LiveClockCalendar
 import { usePageTitle } from "@/context/PageTitleContext"; // NOVO: Importar usePageTitle
 
-const Header = () => {
+interface HeaderProps {
+  // NOVO: Adiciona a prop layoutDirection para controle condicional
+  layoutDirection?: "horizontal" | "vertical"; 
+}
+
+const Header: React.FC<HeaderProps> = ({ layoutDirection }) => {
   const location = useLocation();
   const { pageTitle } = usePageTitle(); // NOVO: Obter o título do contexto
+
+  // Se o layout for vertical, o Header não deve renderizar nada, pois seus elementos foram movidos para o Sidebar.
+  if (layoutDirection === "vertical") {
+    return null;
+  }
 
   const getTitle = () => {
     // Se um título específico da página for definido via contexto, use-o
