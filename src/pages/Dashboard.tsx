@@ -26,29 +26,28 @@ interface DashboardItemConfig {
   id: string;
   name: string;
   isVisible: boolean;
-  category: "overview" | "financial" | "animalHealth" | "recentActivity";
+  category: "overview" | "financial" | "recentActivity";
+  order: number; // NOVO: Adicionado propriedade 'order'
 }
 
 const initialDashboardConfig: DashboardItemConfig[] = [
-  { id: "totalClients", name: "Total de Tutores", isVisible: true, category: "overview" },
-  { id: "totalPets", name: "Total de Animais", isVisible: true, category: "overview" },
-  { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview" },
-  { id: "waitingAppointments", name: "Consultas Em Espera", isVisible: true, category: "overview" },
-  { id: "averageWaitingTime", name: "Média de Tempo de Espera", isVisible: true, category: "overview" },
-  { id: "averageConsultationTime", name: "Média de Tempo da Consulta", isVisible: true, category: "overview" },
-  { id: "recentPets", name: "Últimos Animais Cadastrados", isVisible: true, category: "overview" },
-  { id: "upcomingEvents", name: "Próximos Eventos", isVisible: true, category: "recentActivity" },
-  { id: "financialSummary", name: "Resumo Financeiro", isVisible: true, category: "financial" },
-  { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial" },
-  // Itens de 'Saúde Animal' movidos para 'overview'
-  { id: "internmentStatus", name: "Status de Internação", isVisible: true, category: "overview" },
-  { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true, category: "overview" },
-  { id: "medicalRecordsSummary", name: "Resumo da Agenda", isVisible: true, category: "overview" },
-  // Novos itens de gráfico movidos para 'overview'
-  { id: "appointmentsMonthlyChart", name: "Consultas por Mês (Gráfico)", isVisible: true, category: "overview" },
-  { id: "appointmentsWeeklyChart", name: "Consultas por Semana (Gráfico)", isVisible: true, category: "overview" },
-  { id: "revenueMonthlyChart", name: "Receita por Mês (Gráfico)", isVisible: true, category: "financial" },
-  { id: "petsBySpeciesChart", name: "Animais por Espécie (Gráfico)", isVisible: true, category: "overview" },
+  { id: "totalClients", name: "Total de Tutores", isVisible: true, category: "overview", order: 0 },
+  { id: "totalPets", name: "Total de Animais", isVisible: true, category: "overview", order: 1 },
+  { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview", order: 2 },
+  { id: "waitingAppointments", name: "Consultas Em Espera", isVisible: true, category: "overview", order: 3 },
+  { id: "averageWaitingTime", name: "Média de Tempo de Espera", isVisible: true, category: "overview", order: 4 },
+  { id: "averageConsultationTime", name: "Média de Tempo da Consulta", isVisible: true, category: "overview", order: 5 },
+  { id: "recentPets", name: "Últimos Animais Cadastrados", isVisible: true, category: "recentActivity", order: 0 },
+  { id: "upcomingEvents", name: "Próximos Eventos", isVisible: true, category: "recentActivity", order: 1 },
+  { id: "financialSummary", name: "Resumo Financeiro", isVisible: true, category: "financial", order: 0 },
+  { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial", order: 1 },
+  { id: "internmentStatus", name: "Status de Internação", isVisible: true, category: "overview", order: 6 },
+  { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true, category: "overview", order: 7 },
+  { id: "medicalRecordsSummary", name: "Resumo da Agenda", isVisible: true, category: "overview", order: 8 },
+  { id: "appointmentsMonthlyChart", name: "Consultas por Mês (Gráfico)", isVisible: true, category: "overview", order: 9 },
+  { id: "appointmentsWeeklyChart", name: "Consultas por Semana (Gráfico)", isVisible: true, category: "overview", order: 10 },
+  { id: "revenueMonthlyChart", name: "Receita por Mês (Gráfico)", isVisible: true, category: "financial", order: 2 },
+  { id: "petsBySpeciesChart", name: "Animais por Espécie (Gráfico)", isVisible: true, category: "overview", order: 11 },
 ];
 
 const Dashboard = () => {
@@ -160,11 +159,12 @@ const Dashboard = () => {
     const mergedConfig = initialDashboardConfig.map(initialItem => {
       const savedItem = savedConfigMap.get(initialItem.id);
       if (savedItem) {
-        // Se o item existe na configuração salva, use suas propriedades isVisible e category
+        // Se o item existe na configuração salva, use suas propriedades isVisible, category e order
         return {
           ...initialItem, // Mantém id e name do initialConfig (para pegar novos nomes se atualizados)
           isVisible: savedItem.isVisible,
           category: savedItem.category,
+          order: savedItem.order !== undefined ? savedItem.order : initialItem.order, // Usa a ordem salva ou a inicial
         };
       }
       // Se não existe na configuração salva, use o item do initialConfig
@@ -177,7 +177,7 @@ const Dashboard = () => {
   // Efeito para carregar a escala de veterinários do localStorage
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedSchedule = localStorage.getItem('teamSchedule');
+      const savedSchedule = localStorage.getItem(`teamSchedule_${organizationId}`); // Usar a chave específica da organização
       if (savedSchedule) {
         try {
           const scheduleMap = new Map<string, string[]>(JSON.parse(savedSchedule));
@@ -192,7 +192,7 @@ const Dashboard = () => {
         setVetsOnDutyToday(0);
       }
     }
-  }, []);
+  }, [organizationId]); // Adicionado organizationId como dependência
 
   const handleSaveConfig = (newConfig: DashboardItemConfig[]) => {
     setDashboardConfig(newConfig);
@@ -414,6 +414,7 @@ const Dashboard = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "overview")
+              .sort((a, b) => a.order - b.order) // Ordena os cards visíveis
               .map(item => getCardComponent(item))}
           </div>
         </TabsContent>
@@ -421,6 +422,7 @@ const Dashboard = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "financial")
+              .sort((a, b) => a.order - b.order) // Ordena os cards visíveis
               .map(item => getCardComponent(item))}
           </div>
         </TabsContent>
@@ -429,6 +431,7 @@ const Dashboard = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "recentActivity")
+              .sort((a, b) => a.order - b.order) // Ordena os cards visíveis
               .map(item => getCardComponent(item))}
           </div>
         </TabsContent>
