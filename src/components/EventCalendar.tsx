@@ -182,7 +182,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-foreground hover:bg-foreground/20" {/* Alterado para text-foreground */}
+                        // Alterado para text-foreground
+                        className="h-8 w-8 text-foreground hover:bg-foreground/20"
                         onClick={(e) => {
                           e.stopPropagation();
                           onEventClick(event);
