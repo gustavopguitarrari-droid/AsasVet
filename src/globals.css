@@ -226,7 +226,23 @@
 }
 
 .login-art-bg {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
+  background-image: url('/images/vet-clinic-bg.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* Adicione um overlay escuro para melhorar a legibilidade do texto */
+  position: relative;
+}
+
+.login-art-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Overlay escuro */
+  z-index: 0;
 }
 
 /* Original #root and other styles */
