@@ -198,6 +198,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
   const handleSave = () => {
     onSave(tempConfig);
     onOpenChange(false);
+    window.location.reload(); // NOVO: Recarrega a página
   };
 
   const availableCards = React.useMemo(() => {
@@ -394,7 +395,3 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-};
-
-export default DashboardConfigurator;
