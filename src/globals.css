@@ -129,85 +129,80 @@
 }
 
 /* Custom Color Themes */
-/* REMOVIDO: .theme-default */
-/* REMOVIDO: .theme-teal */
-/* REMOVIDO: .theme-brown */
-/* REMOVIDO: .theme-aqua */
-
-.theme-green { /* Verde Escuro */
-  --primary: 142.1 76.2% 36.3%; /* green-500 */
-  --primary-darker: 142.1 76.2% 26.3%;
-  --primary-foreground: 210 20% 98%;
-}
-.dark .theme-green {
-  --primary: 142.1 76.2% 36.3%; /* green-500 */
-  --primary-darker: 142.1 76.2% 26.3%;
-  --primary-foreground: 210 20% 98%;
-}
-
-.theme-light-green { /* Novo Verde (mais claro) */
-  --primary: 120 60% 40%;
-  --primary-darker: 120 60% 30%;
-  --primary-foreground: 210 20% 98%;
-}
-.dark .theme-light-green {
-  --primary: 120 60% 50%;
-  --primary-darker: 120 60% 40%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-}
-
-.theme-red { /* Novo Vermelho */
-  --primary: 0 80% 50%;
-  --primary-darker: 0 80% 40%;
-  --primary-foreground: 210 20% 98%;
-}
-.dark .theme-red {
-  --primary: 0 80% 60%;
-  --primary-darker: 0 80% 50%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-}
-
-.theme-pink {
-  --primary: 330 80% 70%; /* pink-500 */
-  --primary-darker: 330 80% 60%;
-  --primary-foreground: 210 20% 98%;
-}
-.dark .theme-pink {
-  --primary: 330 80% 70%; /* pink-500 */
-  --primary-darker: 330 80% 60%;
-  --primary-foreground: 210 20% 98%;
-}
-
-.theme-purple {
-  --primary: 262.1 83.3% 57.8%; /* purple-600 */
-  --primary-darker: 262.1 83.3% 47.8%;
-  --primary-foreground: 210 20% 98%;
-}
-.dark .theme-purple {
-  --primary: 262.1 83.3% 57.8%; /* purple-600 */
-  --primary-darker: 262.1 83.3% 47.8%;
-  --primary-foreground: 210 20% 98%;
-}
-
-.theme-orange { /* Laranja (novo padrão) */
-  --primary: 28.1 91.2% 50.6%; /* orange-500 */
-  --primary-darker: 28.1 91.2% 40.6%;
-  --primary-foreground: 210 20% 98%;
+.theme-orange { /* Laranja Pôr do Sol (Padrão) */
+  --primary: 28 85% 55%; /* Um laranja vibrante */
+  --primary-darker: 28 85% 45%;
+  --primary-foreground: 0 0% 100%;
 }
 .dark .theme-orange {
-  --primary: 28.1 91.2% 50.6%; /* orange-500 */
-  --primary-darker: 28.1 91.2% 40.6%;
-  --primary-foreground: 210 20% 98%;
+  --primary: 28 85% 65%; /* Laranja mais claro para contraste no escuro */
+  --primary-darker: 28 85% 55%;
+  --primary-foreground: 222.2 47.4% 11.2%;
 }
 
-.theme-yellow { /* Novo Amarelo */
-  --primary: 60 90% 60%;
-  --primary-darker: 60 90% 50%;
+.theme-blue { /* Azul Oceano */
+  --primary: 210 80% 45%; /* Azul médio-escuro */
+  --primary-darker: 210 80% 35%;
+  --primary-foreground: 0 0% 100%;
+}
+.dark .theme-blue {
+  --primary: 210 80% 55%; /* Azul mais claro para contraste no escuro */
+  --primary-darker: 210 80% 45%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+}
+
+.theme-green { /* Verde Esmeralda */
+  --primary: 160 70% 35%; /* Verde esmeralda */
+  --primary-darker: 160 70% 25%;
+  --primary-foreground: 0 0% 100%;
+}
+.dark .theme-green {
+  --primary: 160 70% 45%; /* Verde mais claro para contraste no escuro */
+  --primary-darker: 160 70% 35%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+}
+
+.theme-purple { /* Púrpura Real */
+  --primary: 270 60% 45%; /* Roxo profundo */
+  --primary-darker: 270 60% 35%;
+  --primary-foreground: 0 0% 100%;
+}
+.dark .theme-purple {
+  --primary: 270 60% 55%; /* Roxo mais claro para contraste no escuro */
+  --primary-darker: 270 60% 45%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+}
+
+.theme-pink { /* Rosa Chiclete */
+  --primary: 330 80% 65%; /* Rosa vibrante */
+  --primary-darker: 330 80% 55%;
+  --primary-foreground: 0 0% 100%;
+}
+.dark .theme-pink {
+  --primary: 330 80% 75%; /* Rosa mais claro para contraste no escuro */
+  --primary-darker: 330 80% 65%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+}
+
+.theme-yellow { /* Amarelo Dourado */
+  --primary: 45 90% 55%; /* Amarelo dourado */
+  --primary-darker: 45 90% 45%;
   --primary-foreground: 222.2 47.4% 11.2%; /* Texto escuro para contraste */
 }
 .dark .theme-yellow {
-  --primary: 60 90% 70%;
-  --primary-darker: 60 90% 60%;
+  --primary: 45 90% 65%; /* Amarelo mais claro para contraste no escuro */
+  --primary-darker: 45 90% 55%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+}
+
+.theme-red { /* Vermelho Rubi */
+  --primary: 0 80% 45%; /* Vermelho intenso */
+  --primary-darker: 0 80% 35%;
+  --primary-foreground: 0 0% 100%;
+}
+.dark .theme-red {
+  --primary: 0 80% 55%; /* Vermelho mais claro para contraste no escuro */
+  --primary-darker: 0 80% 45%;
   --primary-foreground: 222.2 47.4% 11.2%;
 }
 

@@ -13,13 +13,13 @@ import { useColorTheme } from "@/context/ColorThemeContext";
 import { cn } from "@/lib/utils";
 
 const colorThemes = [
-  { name: "Laranja", value: "orange", colorClass: "bg-orange-500" },
-  { name: "Verde Escuro", value: "green", colorClass: "bg-green-500" },
-  { name: "Verde", value: "light-green", colorClass: "bg-green-400" },
-  { name: "Vermelho", value: "red", colorClass: "bg-red-500" },
-  { name: "Rosa", value: "pink", colorClass: "bg-pink-500" },
-  { name: "Roxo", value: "purple", colorClass: "bg-purple-600" },
-  { name: "Amarelo", value: "yellow", colorClass: "bg-yellow-500" },
+  { name: "Laranja Pôr do Sol", value: "orange", colorClass: "bg-orange-500" },
+  { name: "Azul Oceano", value: "blue", colorClass: "bg-blue-500" },
+  { name: "Verde Esmeralda", value: "green", colorClass: "bg-green-500" },
+  { name: "Púrpura Real", value: "purple", colorClass: "bg-purple-600" },
+  { name: "Rosa Chiclete", value: "pink", colorClass: "bg-pink-500" },
+  { name: "Amarelo Dourado", value: "yellow", colorClass: "bg-yellow-500" },
+  { name: "Vermelho Rubi", value: "red", colorClass: "bg-red-500" },
 ];
 
 const ColorThemeToggle = () => {
