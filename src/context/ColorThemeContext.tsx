@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'; // Importar
 import { supabase } from '@/integrations/supabase/client'; // Importar supabase
 import { showError, showSuccess } from '@/utils/toast'; // Importar toasts
 
-type ColorTheme = 'default' | 'green' | 'purple' | 'orange' | 'teal' | 'pink' | 'brown' | 'aqua'; // NOVO: Adicionado 'aqua'
+type ColorTheme = 'orange' | 'green' | 'light-green' | 'red' | 'pink' | 'purple' | 'yellow'; // NOVO: Tipos de tema atualizados
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -19,8 +19,8 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   const { user, setUser } = useUser(); // Obter o usuário e a função setUser do UserContext
   const queryClient = useQueryClient();
 
-  // O tema de cor agora vem do perfil do usuário. Se não houver usuário ou tema, usa 'aqua'.
-  const currentColorTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'aqua'; // NOVO: Padrão para 'aqua'
+  // O tema de cor agora vem do perfil do usuário. Se não houver usuário ou tema, usa 'orange'.
+  const currentColorTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'orange'; // NOVO: Padrão para 'orange'
 
   // Mutação para atualizar o tema de cor no perfil do usuário
   const updateColorThemeMutation = useMutation({
@@ -54,7 +54,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const root = window.document.documentElement;
     // Remove todas as classes de tema existentes
-    root.classList.remove('theme-default', 'theme-green', 'theme-purple', 'theme-orange', 'theme-teal', 'theme-pink', 'theme-brown', 'theme-aqua'); // NOVO: Adicionado 'theme-aqua'
+    root.classList.remove('theme-default', 'theme-green', 'theme-light-green', 'theme-red', 'theme-pink', 'theme-purple', 'theme-orange', 'theme-yellow'); // NOVO: Classes de tema atualizadas
     // Adiciona a classe do tema atual do usuário
     root.classList.add(`theme-${currentColorTheme}`);
   }, [currentColorTheme]); // Depende do tema de cor do usuário
@@ -66,7 +66,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
       showError("Faça login para salvar seu tema de cor.");
       // Fallback para aplicar o tema visualmente mesmo sem salvar se não houver usuário
       const root = window.document.documentElement;
-      root.classList.remove('theme-default', 'theme-green', 'theme-purple', 'theme-orange', 'theme-teal', 'theme-pink', 'theme-brown', 'theme-aqua'); // NOVO: Adicionado 'theme-aqua'
+      root.classList.remove('theme-default', 'theme-green', 'theme-light-green', 'theme-red', 'theme-pink', 'theme-purple', 'theme-orange', 'theme-yellow'); // NOVO: Classes de tema atualizadas
       root.classList.add(`theme-${theme}`);
     }
   };

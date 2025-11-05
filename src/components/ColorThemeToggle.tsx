@@ -13,14 +13,13 @@ import { useColorTheme } from "@/context/ColorThemeContext";
 import { cn } from "@/lib/utils";
 
 const colorThemes = [
-  { name: "Padrão", value: "default", colorClass: "bg-primary" },
-  { name: "Verde", value: "green", colorClass: "bg-green-500" }, // Usando green-500 já definido
-  { name: "Roxo", value: "purple", colorClass: "bg-purple-600" }, // Nova cor para o botão
-  { name: "Laranja", value: "orange", colorClass: "bg-orange-500" }, // Nova cor para o botão
-  { name: "Ciano", value: "teal", colorClass: "bg-teal-500" }, // Nova cor para o botão
-  { name: "Rosa", value: "pink", colorClass: "bg-pink-500" }, // Nova cor para o botão
-  { name: "Marrom", value: "brown", colorClass: "bg-amber-800" }, // Nova cor para o botão (usando amber para um tom de marrom)
-  { name: "Aqua Suave", value: "aqua", colorClass: "bg-teal-500" }, // NOVO: Aqua Suave
+  { name: "Laranja", value: "orange", colorClass: "bg-orange-500" },
+  { name: "Verde Escuro", value: "green", colorClass: "bg-green-500" },
+  { name: "Verde", value: "light-green", colorClass: "bg-green-400" },
+  { name: "Vermelho", value: "red", colorClass: "bg-red-500" },
+  { name: "Rosa", value: "pink", colorClass: "bg-pink-500" },
+  { name: "Roxo", value: "purple", colorClass: "bg-purple-600" },
+  { name: "Amarelo", value: "yellow", colorClass: "bg-yellow-500" },
 ];
 
 const ColorThemeToggle = () => {

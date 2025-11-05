@@ -78,7 +78,8 @@ export default {
         },
         // Adicionando a cor verde para o badge de sucesso
         green: {
-          500: "hsl(142.1 76.2% 36.3%)", // Um tom de verde para o modo claro
+          500: "hsl(142.1 76.2% 36.3%)", // Um tom de verde para o modo claro (Verde Escuro)
+          400: "hsl(120 60% 40%)", // Novo tom de verde (Verde)
         },
         // Novas cores para os botões de seleção de tema
         purple: {
@@ -102,10 +103,12 @@ export default {
         },
         yellow: {
           500: "hsl(45 93% 47.1%)", // Para risco 'Médio'
+          400: "hsl(60 90% 60%)", // Novo tom de amarelo (Amarelo)
         },
         red: {
           500: "hsl(0 84.2% 60.2%)", // Para risco 'Emergência' (vermelho vivo)
           700: "hsl(0 84.2% 40%)", // Para risco 'Emergência' (vermelho mais escuro, se necessário)
+          400: "hsl(0 80% 50%)", // Novo tom de vermelho (Vermelho)
         },
       },
       borderRadius: {
