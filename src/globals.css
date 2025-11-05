@@ -54,12 +54,12 @@
     --sidebar-item-bg-9: 0 0% 50%; /* Gray */
 
     /* Event Category Colors (distinct and vibrant, darker for light theme) */
-    --event-consulta: 210 80% 25%; /* Azul vibrante mais escuro */
-    --event-cirurgia: 340 80% 25%; /* Rosa-avermelhado mais escuro */
-    --event-vacina: 120 70% 15%; /* Verde claro mais escuro */
-    --event-exame: 40 90% 25%; /* Laranja-amarelado mais escuro */
-    --event-retorno: 260 70% 25%; /* Roxo mais escuro */
-    --event-outros: 200 10% 15%; /* Cinza azulado mais escuro */
+    --event-consulta: 210 80% 15%; /* Azul vibrante muito escuro */
+    --event-cirurgia: 340 80% 15%; /* Rosa-avermelhado muito escuro */
+    --event-vacina: 120 70% 5%; /* Verde claro muito escuro */
+    --event-exame: 40 90% 15%; /* Laranja-amarelado muito escuro */
+    --event-retorno: 260 70% 15%; /* Roxo muito escuro */
+    --event-outros: 200 10% 5%; /* Cinza azulado muito escuro */
   }
 
   .dark {
@@ -69,8 +69,8 @@
     --card: 222.2 84% 4.9%;
     --card-foreground: 210 20% 98%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
 
     --primary: 210 20% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
@@ -296,6 +296,6 @@
   --primary-darker: 210 20% 88%; /* Darker shade for gradient */
   --primary-foreground: 222.2 47.4% 11.2%;
   --border: 217.2 32.6% 17.5%;
-  --card: 0 0% 4.9%;
+  --card: 222.2 84% 4.9%;
   --card-foreground: 210 20% 98%;
 }
