@@ -22,25 +22,25 @@ interface Plan {
 
 const availablePlans: Plan[] = [
   {
-    id: "basic",
-    name: "Plano Básico",
-    price: "R$ 49,90/mês",
+    id: "vet-domiciliar",
+    name: "Vet Domiciliar",
+    price: "R$ 119,90/mês",
     features: ["1 Subusuário", "Gerenciamento de Clientes e Pets", "Agenda Básica"],
     stripePriceId: "price_1Pj110Rz1234567890abcdef", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
     badgeColorClass: "bg-gray-500",
   },
   {
-    id: "premium",
-    name: "Plano Premium",
-    price: "R$ 99,90/mês",
+    id: "clinica-vet",
+    name: "Clínica Vet",
+    price: "R$ 200,00/mês",
     features: ["3 Subusuários", "Gerenciamento Completo", "Internação", "Caixa e Financeiro", "Suporte Prioritário"],
     stripePriceId: "price_1Pj110Rz1234567890abcdef", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
     badgeColorClass: "bg-green-500",
   },
   {
-    id: "enterprise",
-    name: "Plano Empresarial",
-    price: "R$ 199,90/mês",
+    id: "hospital-vet",
+    name: "Hospital Vet",
+    price: "R$ 299,00/mês",
     features: ["10 Subusuários", "Todos os recursos Premium", "Relatórios Avançados", "Integrações Personalizadas", "Suporte Dedicado 24/7"],
     stripePriceId: "price_1Pj110Rz1234567890abcdef", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
     badgeColorClass: "bg-blue-500",
@@ -56,7 +56,7 @@ interface PlanSelectionDialogProps {
 
 const MyPlanSettings: React.FC = () => {
   const { user: appUser } = useUser();
-  const currentPlanName = appUser?.planName || "Plano Básico"; // Assume "Plano Básico" como padrão se não houver plano
+  const currentPlanName = appUser?.planName || "Vet Domiciliar"; // Assume "Vet Domiciliar" como padrão se não houver plano
 
   const createStripeCheckoutSessionMutation = useMutation({
     mutationFn: async ({ priceId, userId }: { priceId: string; userId: string }) => {
