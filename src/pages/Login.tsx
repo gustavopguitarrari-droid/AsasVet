@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { useSession } from '@/context/SessionContext'; // Importar useSession
 
 const Login = () => {
   const navigate = useNavigate();
