@@ -139,7 +139,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
                       <item.icon className={cn(isVerticalLayout ? "h-5 w-5" : "h-8 w-8")} strokeWidth={isVerticalLayout ? 2 : 3.5} />
                     </div>
                     {!isCollapsed && (
-                      <span className={cn(isActive && "text-sidebar-primary-foreground", isVerticalLayout && "text-xs mt-1")}>
+                      <span className={cn(isActive && "text-sidebar-primary-foreground", isVerticalLayout && "text-xs mt-1", "uppercase")}>
                         {item.name}
                       </span>
                     )}
