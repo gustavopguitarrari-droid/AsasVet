@@ -8,16 +8,12 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useSession } from '@/context/SessionContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
-// Removido: import SignUpForm from '@/components/SignUpForm'; // Não é mais necessário aqui
-// Removido: import { cn } from '@/lib/utils'; // Não é mais necessário para estilo condicional
 
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useSession();
   const location = useLocation();
-  // A view inicial agora será sempre 'sign_in' ou 'forgotten_password'
   const [authView, setAuthView] = useState<'sign_in' | 'forgotten_password' | 'update_password'>(() => {
-    // Se houver um estado de 'view' na localização, use-o (ex: para 'forgotten_password')
     const state = location.state as { view?: 'forgotten_password' | 'update_password' };
     return state?.view || 'sign_in';
   });
@@ -39,20 +35,17 @@ const Login = () => {
     );
   }
 
-  // Removido: handleSignUpSuccess não é mais necessário aqui
-
   return (
     <div className="min-h-screen flex items-center justify-center login-art-bg p-4">
-      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative"> {/* Estilo simplificado */}
+      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative">
         <Button asChild variant="ghost" className="absolute top-4 left-4">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Link>
         </Button>
-        <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white mt-8">
+        <h2 className="text-2xl font-bold text-center text-white mt-8">
           Bem-vindo ao AsasVet
         </h2>
-        {/* O formulário de cadastro foi movido para a página SignUp.tsx */}
         <Auth
           supabaseClient={supabase}
           providers={[]}
@@ -63,18 +56,19 @@ const Login = () => {
                 colors: {
                   brand: 'hsl(var(--primary))',
                   brandAccent: 'hsl(var(--primary-foreground))',
+                  inputBackground: 'rgba(255, 255, 255, 0.1)', // Fundo do input mais escuro
+                  inputBorder: 'rgba(255, 255, 255, 0.3)', // Borda do input mais clara
+                  inputLabel: 'hsl(var(--primary-foreground))', // Rótulos brancos
+                  inputText: 'hsl(var(--primary-foreground))', // Texto do input branco
+                  anchorText: 'hsl(var(--primary-foreground))', // Links brancos
+                  messageText: 'hsl(var(--primary-foreground))', // Mensagens brancas
                 },
               },
             },
           }}
-          theme="light"
+          theme="dark" // Usar tema escuro para o Auth UI para melhor contraste
           redirectTo={window.location.origin + '/painel'}
           view={authView}
-          // onAuthStateChange={(event, session) => { // REMOVIDO: Esta prop não existe no componente Auth
-          //   if (event === 'SIGNED_IN') {
-          //     navigate('/painel');
-          //   }
-          // }}
           localization={{
             variables: {
               sign_in: {
@@ -84,10 +78,10 @@ const Login = () => {
                 password_input_placeholder: 'Sua senha',
                 button_label: 'Entrar',
                 social_provider_text: 'Entrar com {{provider}}',
-                link_text: '', // Definido explicitamente como string vazia
+                link_text: '',
               },
-              sign_up: { // Adicionado explicitamente a seção sign_up
-                link_text: '', // Definir o link_text como vazio para evitar renderização
+              sign_up: {
+                link_text: '',
               },
               forgotten_password: {
                 email_label: 'Email',
@@ -104,20 +98,18 @@ const Login = () => {
             },
           }}
         />
-        {/* Links personalizados para alternar entre as views */}
         {authView === 'sign_in' && (
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm text-white">
             Não tem uma conta?{' '}
-            <Button variant="link" className="p-0 h-auto" onClick={() => navigate('/signup')}> {/* Direciona para a nova página de cadastro */}
+            <Button variant="link" className="p-0 h-auto text-white hover:text-gray-200" onClick={() => navigate('/signup')}>
               Cadastre-se
             </Button>
           </p>
         )}
-        {/* Removido: Link para 'sign_up' quando já está em 'sign_up' */}
         {authView === 'forgotten_password' && (
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm text-white">
             Lembrou da senha?{' '}
-            <Button variant="link" className="p-0 h-auto" onClick={() => setAuthView('sign_in')}>
+            <Button variant="link" className="p-0 h-auto text-white hover:text-gray-200" onClick={() => setAuthView('sign_in')}>
               Entrar
             </Button>
           </p>
