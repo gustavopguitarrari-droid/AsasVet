@@ -26,7 +26,7 @@ const availablePlans: Plan[] = [
     name: "Vet Domiciliar",
     price: "R$ 119,90/mês",
     features: ["1 Subusuário", "Gerenciamento de Clientes e Pets", "Agenda Básica"],
-    stripePriceId: "price_1Pj110Rz1234567890abcdef", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
+    stripePriceId: "price_1SPttkF1WTKnJRQoScNCQLjp", // ID do plano Vet Domiciliar
     badgeColorClass: "bg-gray-500",
   },
   {
