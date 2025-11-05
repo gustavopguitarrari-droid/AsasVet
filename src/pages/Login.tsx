@@ -51,22 +51,22 @@ const Login = () => {
             variables: {
               default: {
                 colors: {
-                  brand: 'hsl(210 80% 45%)',
-                  brandAccent: 'hsl(210 80% 55%)',
+                  brand: 'hsl(188 39% 38%)', // Azul-esverdeado principal
+                  brandAccent: 'hsl(188 39% 48%)', // Azul-esverdeado mais claro para hover
                   inputBackground: 'rgba(255, 255, 255, 0.1)',
                   inputBorder: 'rgba(255, 255, 255, 0.3)',
-                  inputLabel: 'hsl(0 0% 100%)', // Definido como branco puro para o tema padrão
+                  inputLabel: 'hsl(0 0% 100%)',
                   inputText: 'hsl(var(--primary-foreground))',
                   anchorText: 'hsl(var(--primary-foreground))',
                   messageText: 'hsl(var(--primary-foreground))',
                 },
               },
-              dark: { // Sobrescrevendo especificamente para o tema escuro
+              dark: {
                 colors: {
-                  inputLabel: 'hsl(0 0% 100%)', // Branco puro para rótulos no tema escuro
-                  inputText: 'hsl(0 0% 100%)', // Branco puro para o texto de entrada no tema escuro
-                  anchorText: 'hsl(0 0% 100%)', // Branco puro para links no tema escuro
-                  messageText: 'hsl(0 0% 100%)', // Branco puro para mensagens no tema escuro
+                  inputLabel: 'hsl(0 0% 100%)',
+                  inputText: 'hsl(0 0% 100%)',
+                  anchorText: 'hsl(0 0% 100%)',
+                  messageText: 'hsl(0 0% 100%)',
                 },
               },
             },
@@ -102,7 +102,7 @@ const Login = () => {
               },
             },
           }}
-          className="custom-auth-labels" // Adicionando a classe aqui
+          className="custom-auth-labels"
         />
         {authView === 'sign_in' && (
           <p className="text-center text-sm text-white">
