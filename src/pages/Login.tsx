@@ -54,19 +54,19 @@ const Login = () => {
             variables: {
               default: {
                 colors: {
-                  brand: 'hsl(var(--primary))',
-                  brandAccent: 'hsl(var(--primary-foreground))',
-                  inputBackground: 'rgba(255, 255, 255, 0.1)', // Fundo do input mais escuro
-                  inputBorder: 'rgba(255, 255, 255, 0.3)', // Borda do input mais clara
-                  inputLabel: 'hsl(var(--primary-foreground))', // Rótulos brancos
-                  inputText: 'hsl(var(--primary-foreground))', // Texto do input branco
-                  anchorText: 'hsl(var(--primary-foreground))', // Links brancos
-                  messageText: 'hsl(var(--primary-foreground))', // Mensagens brancas
+                  brand: 'hsl(210 80% 45%)', // Cor azul para o botão principal
+                  brandAccent: 'hsl(210 80% 55%)', // Um azul um pouco mais claro para o hover/foco
+                  inputBackground: 'rgba(255, 255, 255, 0.1)',
+                  inputBorder: 'rgba(255, 255, 255, 0.3)',
+                  inputLabel: 'hsl(var(--primary-foreground))',
+                  inputText: 'hsl(var(--primary-foreground))',
+                  anchorText: 'hsl(var(--primary-foreground))',
+                  messageText: 'hsl(var(--primary-foreground))',
                 },
               },
             },
           }}
-          theme="dark" // Usar tema escuro para o Auth UI para melhor contraste
+          theme="dark"
           redirectTo={window.location.origin + '/painel'}
           view={authView}
           localization={{
