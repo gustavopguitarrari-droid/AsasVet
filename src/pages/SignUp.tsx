@@ -26,7 +26,7 @@ const SignUp: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center login-art-bg p-4">
       <div className="w-full max-w-full md:max-w-4xl lg:max-w-6xl h-[90vh] overflow-y-auto p-8 space-y-6 bg-white dark:bg-gray-800 rounded-lg shadow-md relative">
-        <Button asChild variant="ghost" className="absolute top-4 left-4">
+        <Button asChild variant="ghost" className="absolute top-4 left-4 text-white font-bold">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Link>
