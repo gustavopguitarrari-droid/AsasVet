@@ -6,10 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import SubusersSettings from "@/components/settings/SubusersSettings";
 import MyPlanSettings from "@/components/settings/MyPlanSettings";
 import LogoUploadSettings from "@/components/settings/LogoUploadSettings";
-import ImportDataSettings from "@/components/settings/ImportDataSettings"; // NOVO: Importar o componente de importação
+import ImportDataSettings from "@/components/settings/ImportDataSettings";
 
 const Settings = () => {
   return (
@@ -18,9 +17,8 @@ const Settings = () => {
       <p className="text-muted-foreground">Gerencie as preferências da sua conta e do aplicativo.</p>
 
       <Tabs defaultValue="security" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 h-auto p-1">
+        <TabsList className="grid w-full grid-cols-3 h-auto p-1">
           <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Geral</TabsTrigger>
-          <TabsTrigger value="subusers" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Equipe</TabsTrigger>
           <TabsTrigger value="my-plan" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Meu Plano</TabsTrigger>
           <TabsTrigger value="personalization" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Personalização</TabsTrigger>
         </TabsList>
@@ -61,11 +59,7 @@ const Settings = () => {
             </CardContent>
           </Card>
 
-          <ImportDataSettings /> {/* NOVO: Adicionado o componente de importação de dados aqui */}
-        </TabsContent>
-
-        <TabsContent value="subusers" className="mt-4">
-          <SubusersSettings />
+          <ImportDataSettings />
         </TabsContent>
 
         <TabsContent value="my-plan" className="mt-4">

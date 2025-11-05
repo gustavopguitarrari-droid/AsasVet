@@ -31,10 +31,10 @@ import {
   AlertDialogTitle as AlertDialogTitleComponent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import TeamMemberFormDialog, { TeamMemberFormValues } from "@/components/team/TeamMemberFormDialog"; // Importar o novo formulário
-import { useLocation } from "react-router-dom"; // Importar useLocation
+import TeamMemberFormDialog, { TeamMemberFormValues } from "@/components/team/TeamMemberFormDialog";
+import { useLocation } from "react-router-dom";
 
-export interface TeamMember { // Renomeado de Veterinario para TeamMember para ser mais genérico
+export interface TeamMember {
   id: string;
   first_name: string;
   last_name: string;
@@ -43,7 +43,7 @@ export interface TeamMember { // Renomeado de Veterinario para TeamMember para s
   crmv?: string | null;
   role: string;
   avatar_url?: string | null;
-  organization_id?: string; // NOVO: Adicionado organization_id
+  organization_id?: string;
 }
 
 const roleIconMap: { [key: string]: React.ElementType } = {
@@ -59,46 +59,43 @@ const roleIconMap: { [key: string]: React.ElementType } = {
 const Veterinarios = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
-  const organizationId = appUser?.organizationId; // Usar organizationId
+  const organizationId = appUser?.organizationId;
   const isAdmin = appUser?.role === "Administrador";
-  const location = useLocation(); // Inicializar useLocation
+  const location = useLocation();
 
   const [selectedRole, setSelectedRole] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState<boolean>(false);
   const [selectedTeamMember, setSelectedTeamMember] = useState<TeamMember | null>(null);
-  const [activeTab, setActiveTab] = useState<string>("equipe"); // Estado inicial da aba
+  const [activeTab, setActiveTab] = useState<string>("equipe");
 
   const [isAddMemberDialogOpen, setIsAddMemberDialogOpen] = useState(false);
   const [isEditMemberDialogOpen, setIsEditMemberDialogOpen] = useState(false);
   const [memberToEdit, setMemberToEdit] = useState<TeamMember | undefined>(undefined);
 
-  // Efeito para verificar o estado da rota e definir a aba ativa
   useEffect(() => {
     if (location.state && (location.state as any).activeTab) {
       setActiveTab((location.state as any).activeTab);
     }
   }, [location.state]);
 
-  // Query para buscar todos os perfis (membros da equipe)
   const { data: teamMembers = [], isLoading, error } = useQuery<TeamMember[]>({
-    queryKey: ['teamMembers', organizationId], // Alterado para usar organizationId
+    queryKey: ['teamMembers', organizationId],
     queryFn: async () => {
-      if (!organizationId) return []; // Usar organizationId
+      if (!organizationId) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, email, phone, crmv, role, avatar_url, organization_id') // Incluído organization_id
-        .eq('organization_id', organizationId); // Filtrar por organization_id
+        .select('id, first_name, last_name, email, phone, crmv, role, avatar_url, organization_id')
+        .eq('organization_id', organizationId);
       if (error) throw error;
       return data;
     },
-    enabled: !!organizationId, // Só busca se o organizationId estiver disponível
+    enabled: !!organizationId,
   });
 
-  // Mutação para adicionar um novo membro da equipe
   const addTeamMemberMutation = useMutation({
     mutationFn: async (newMemberData: TeamMemberFormValues) => {
-      if (!appUser?.id || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Usar organizationId
+      if (!appUser?.id || !organizationId) throw new Error("User not authenticated or organization ID not available.");
       const session = await supabase.auth.getSession();
       if (!session.data.session) throw new Error("User not authenticated.");
 
@@ -109,7 +106,7 @@ const Veterinarios = () => {
           first_name: newMemberData.firstName,
           last_name: newMemberData.lastName,
           role: newMemberData.role,
-          organization_id: organizationId, // Pass organizationId to the edge function
+          organization_id: organizationId,
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -122,7 +119,7 @@ const Veterinarios = () => {
       return responseData;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teamMembers', organizationId] }); // Invalida a query com organizationId
+      queryClient.invalidateQueries({ queryKey: ['teamMembers', organizationId] });
       showSuccess("Membro da equipe adicionado com sucesso!");
       setIsAddMemberDialogOpen(false);
     },
@@ -131,10 +128,9 @@ const Veterinarios = () => {
     },
   });
 
-  // Mutação para atualizar o perfil de um membro da equipe
   const updateTeamMemberProfileMutation = useMutation({
     mutationFn: async (updatedMemberData: TeamMemberFormValues & { id: string }) => {
-      if (!appUser?.id || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Usar organizationId
+      if (!appUser?.id || !organizationId) throw new Error("User not authenticated or organization ID not available.");
       const session = await supabase.auth.getSession();
       if (!session.data.session) throw new Error("User not authenticated.");
 
@@ -147,7 +143,7 @@ const Veterinarios = () => {
           phone: updatedMemberData.phone,
           crmv: updatedMemberData.crmv,
           role: updatedMemberData.role,
-          organization_id: organizationId, // Pass organizationId to the edge function
+          organization_id: organizationId,
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -160,20 +156,19 @@ const Veterinarios = () => {
       return responseData;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teamMembers', organizationId] }); // Invalida a query com organizationId
+      queryClient.invalidateQueries({ queryKey: ['teamMembers', organizationId] });
       showSuccess("Perfil do membro atualizado com sucesso!");
       setIsEditMemberDialogOpen(false);
-      setIsDetailsDialogOpen(false); // Fecha o diálogo de detalhes se estiver aberto
+      setIsDetailsDialogOpen(false);
     },
     onError: (err: any) => {
       showError(`Erro ao atualizar perfil: ${err.message}`);
     },
   });
 
-  // Mutação para deletar um membro da equipe
   const deleteTeamMemberMutation = useMutation({
     mutationFn: async (memberIdToDelete: string) => {
-      if (!appUser?.id || !organizationId) throw new Error("User not authenticated or organization ID not available."); // Usar organizationId
+      if (!appUser?.id || !organizationId) throw new Error("User not authenticated or organization ID not available.");
       const session = await supabase.auth.getSession();
       if (!session.data.session) throw new Error("User not authenticated.");
 
@@ -190,9 +185,9 @@ const Veterinarios = () => {
       return responseData;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teamMembers', organizationId] }); // Invalida a query com organizationId
+      queryClient.invalidateQueries({ queryKey: ['teamMembers', organizationId] });
       showSuccess("Membro da equipe excluído com sucesso!");
-      setIsDetailsDialogOpen(false); // Fecha o diálogo de detalhes
+      setIsDetailsDialogOpen(false);
     },
     onError: (err: any) => {
       showError(`Erro ao excluir membro: ${err.message}`);
@@ -224,10 +219,10 @@ const Veterinarios = () => {
     addTeamMemberMutation.mutate(data);
   };
 
-  const handleEditMember = (member: TeamMember) => {
+  const handleEditMember = (member: TeamBuilder) => {
     setMemberToEdit(member);
     setIsEditMemberDialogOpen(true);
-    setIsDetailsDialogOpen(false); // Fecha o diálogo de detalhes antes de abrir o de edição
+    setIsDetailsDialogOpen(false);
   };
 
   const handleUpdateMember = (data: TeamMemberFormValues) => {
@@ -280,7 +275,7 @@ const Veterinarios = () => {
         <TabsContent value="equipe" className="mt-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
             <RoleFilter selectedRole={selectedRole} onSelectRole={handleSelectRole} />
-            <div className="flex items-center gap-2 w-full flex-1"> {/* Alterado md:w-auto para flex-1 */}
+            <div className="flex items-center gap-2 w-full flex-1">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -290,7 +285,11 @@ const Veterinarios = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              {/* Botão de adicionar membro removido */}
+              {isAdmin && ( // Apenas administradores podem adicionar membros
+                <Button onClick={() => setIsAddMemberDialogOpen(true)} className="font-bold shrink-0">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
+                </Button>
+              )}
             </div>
           </div>
 
@@ -349,7 +348,7 @@ const Veterinarios = () => {
         onEdit={handleEditMember}
         onDelete={handleDeleteMember}
         isAdmin={isAdmin}
-        currentUserId={appUser?.id} // Usar appUser?.id
+        currentUserId={appUser?.id}
       />
 
       <TeamMemberFormDialog
