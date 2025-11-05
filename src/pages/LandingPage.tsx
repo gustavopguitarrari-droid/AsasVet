@@ -38,7 +38,7 @@ const LandingPage: React.FC = () => {
       <LandingHeader />
 
       {/* Hero Section - Modern & Minimalist */}
-      <section className="relative h-screen flex items-center justify-center text-center p-8 login-art-bg pt-20">
+      <section className="relative h-screen flex items-center justify-center text-center p-8 pt-20">
         <div className="relative z-10 max-w-4xl mx-auto text-white space-y-6">
           <PawPrint className="h-24 w-24 mx-auto text-primary animate-pulse" /> {/* Alterado para text-primary */}
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight drop-shadow-lg text-foreground"> {/* Alterado para text-foreground */}
