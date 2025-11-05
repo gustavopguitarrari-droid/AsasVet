@@ -85,6 +85,7 @@ export default {
         },
         green: {
           500: "hsl(160 70% 35%)", // Verde Esmeralda
+          400: "hsl(120 80% 40%)", // Verde Vivo
         },
         purple: {
           600: "hsl(270 60% 45%)", // Púrpura Real

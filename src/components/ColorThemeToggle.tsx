@@ -16,6 +16,7 @@ const colorThemes = [
   { name: "Laranja Pôr do Sol", value: "orange", colorClass: "bg-orange-500" },
   { name: "Azul Oceano", value: "blue", colorClass: "bg-blue-500" },
   { name: "Verde Esmeralda", value: "green", colorClass: "bg-green-500" },
+  { name: "Verde Vivo", value: "vivid-green", colorClass: "bg-green-400" }, // Adicionado Verde Vivo
   { name: "Púrpura Real", value: "purple", colorClass: "bg-purple-600" },
   { name: "Rosa Chiclete", value: "pink", colorClass: "bg-pink-500" },
   { name: "Amarelo Dourado", value: "yellow", colorClass: "bg-yellow-500" },

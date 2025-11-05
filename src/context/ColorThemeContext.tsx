@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'; // Importar
 import { supabase } from '@/integrations/supabase/client'; // Importar supabase
 import { showError, showSuccess } from '@/utils/toast'; // Importar toasts
 
-type ColorTheme = 'orange' | 'blue' | 'green' | 'purple' | 'pink' | 'yellow' | 'red'; // NOVO: Tipos de tema atualizados
+type ColorTheme = 'orange' | 'blue' | 'green' | 'vivid-green' | 'purple' | 'pink' | 'yellow' | 'red'; // NOVO: Tipos de tema atualizados
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -54,7 +54,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const root = window.document.documentElement;
     // Remove todas as classes de tema existentes
-    root.classList.remove('theme-orange', 'theme-blue', 'theme-green', 'theme-purple', 'theme-pink', 'theme-yellow', 'theme-red'); // NOVO: Classes de tema atualizadas
+    root.classList.remove('theme-orange', 'theme-blue', 'theme-green', 'theme-vivid-green', 'theme-purple', 'theme-pink', 'theme-yellow', 'theme-red'); // NOVO: Classes de tema atualizadas
     // Adiciona a classe do tema atual do usuário
     root.classList.add(`theme-${currentColorTheme}`);
   }, [currentColorTheme]); // Depende do tema de cor do usuário
@@ -66,7 +66,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
       showError("Faça login para salvar seu tema de cor.");
       // Fallback para aplicar o tema visualmente mesmo sem salvar se não houver usuário
       const root = window.document.documentElement;
-      root.classList.remove('theme-orange', 'theme-blue', 'theme-green', 'theme-purple', 'theme-pink', 'theme-yellow', 'theme-red'); // NOVO: Classes de tema atualizadas
+      root.classList.remove('theme-orange', 'theme-blue', 'theme-green', 'theme-vivid-green', 'theme-purple', 'theme-pink', 'theme-yellow', 'theme-red'); // NOVO: Classes de tema atualizadas
       root.classList.add(`theme-${theme}`);
     }
   };

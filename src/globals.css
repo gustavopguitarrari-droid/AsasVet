@@ -162,6 +162,17 @@
   --primary-foreground: 222.2 47.4% 11.2%;
 }
 
+.theme-vivid-green { /* NOVO: Verde Vivo */
+  --primary: 120 80% 40%; /* Um verde bem vivo */
+  --primary-darker: 120 80% 30%;
+  --primary-foreground: 0 0% 100%;
+}
+.dark .theme-vivid-green {
+  --primary: 120 80% 50%; /* Verde mais claro para contraste no escuro */
+  --primary-darker: 120 80% 40%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+}
+
 .theme-purple { /* Púrpura Real */
   --primary: 270 60% 45%; /* Roxo profundo */
   --primary-darker: 270 60% 35%;
