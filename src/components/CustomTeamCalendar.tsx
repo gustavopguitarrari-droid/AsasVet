@@ -13,7 +13,7 @@ import {
   isToday,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react"; // Removido Eraser
+import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -49,17 +49,21 @@ interface Veterinario {
 
 interface CustomTeamCalendarProps {
   veterinarians: Veterinario[];
+  organizationId: string; // NOVO: Adicionado organizationId
 }
 
-const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }) => {
+const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians, organizationId }) => {
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [selectedDay, setSelectedDay] = useState<Date | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [editingDaySchedule, setEditingDaySchedule] = useState<string[]>([]);
 
+  // NOVO: Gerar a chave do localStorage com base no organizationId
+  const localStorageKey = `teamSchedule_${organizationId}`;
+
   const [schedule, setSchedule] = useState<Map<string, string[]>>(() => {
     if (typeof window !== 'undefined') {
-      const savedSchedule = localStorage.getItem('teamSchedule');
+      const savedSchedule = localStorage.getItem(localStorageKey); // Usar a nova chave
       if (savedSchedule) {
         try {
           return new Map(JSON.parse(savedSchedule));
@@ -73,9 +77,9 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('teamSchedule', JSON.stringify(Array.from(schedule.entries())));
+      localStorage.setItem(localStorageKey, JSON.stringify(Array.from(schedule.entries()))); // Usar a nova chave
     }
-  }, [schedule]);
+  }, [schedule, localStorageKey]); // Adicionado localStorageKey como dependência
 
   const daysInMonth = useMemo(() => {
     const start = startOfMonth(currentMonth);
@@ -128,7 +132,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
 
   const handleClearSchedule = () => {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('teamSchedule');
+      localStorage.removeItem(localStorageKey); // Usar a nova chave
       setSchedule(new Map<string, string[]>());
       setSelectedDay(undefined);
       setEditingDaySchedule([]);
@@ -157,7 +161,7 @@ const CustomTeamCalendar: React.FC<CustomTeamCalendarProps> = ({ veterinarians }
         {/* Botão de Limpar Escala */}
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="outline" className="absolute top-4 right-4 flex items-center"> {/* Alterado variant e removido size="sm" */}
+            <Button variant="outline" className="absolute top-4 right-4 flex items-center">
               Limpar Escala
             </Button>
           </AlertDialogTrigger>

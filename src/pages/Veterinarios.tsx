@@ -219,7 +219,7 @@ const Veterinarios = () => {
     addTeamMemberMutation.mutate(data);
   };
 
-  const handleEditMember = (member: TeamBuilder) => {
+  const handleEditMember = (member: TeamMember) => {
     setMemberToEdit(member);
     setIsEditMemberDialogOpen(true);
     setIsDetailsDialogOpen(false);
@@ -261,15 +261,24 @@ const Veterinarios = () => {
         </TabsList>
 
         <TabsContent value="escala" className="mt-4">
-          <CustomTeamCalendar veterinarians={teamMembers.filter(member => member.role === "Veterinário").map(v => ({
-            id: v.id,
-            name: `${v.first_name} ${v.last_name}`,
-            crmv: v.crmv || "N/A",
-            email: v.email,
-            phone: v.phone || "N/A",
-            role: v.role,
-            organization_id: v.organization_id,
-          }))} />
+          {organizationId ? (
+            <CustomTeamCalendar
+              veterinarians={teamMembers.filter(member => member.role === "Veterinário").map(v => ({
+                id: v.id,
+                name: `${v.first_name} ${v.last_name}`,
+                crmv: v.crmv || "N/A",
+                email: v.email,
+                phone: v.phone || "N/A",
+                role: v.role,
+                organization_id: v.organization_id,
+              }))}
+              organizationId={organizationId} // Passa o organizationId
+            />
+          ) : (
+            <div className="flex items-center justify-center h-48 text-muted-foreground">
+              <AlertCircle className="h-5 w-5 mr-2" /> ID da organização não disponível.
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="equipe" className="mt-4">
