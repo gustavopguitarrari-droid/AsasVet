@@ -33,21 +33,22 @@ const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "totalClients", name: "Total de Tutores", isVisible: true, category: "overview" },
   { id: "totalPets", name: "Total de Animais", isVisible: true, category: "overview" },
   { id: "scheduledAppointments", name: "Consultas Agendadas", isVisible: true, category: "overview" },
-  { id: "waitingAppointments", name: "Consultas Em Espera", isVisible: true, category: "overview" }, // NOVO: Adicionado o card de consultas em espera
+  { id: "waitingAppointments", name: "Consultas Em Espera", isVisible: true, category: "overview" },
   { id: "averageWaitingTime", name: "Média de Tempo de Espera", isVisible: true, category: "overview" },
   { id: "averageConsultationTime", name: "Média de Tempo da Consulta", isVisible: true, category: "overview" },
   { id: "recentPets", name: "Últimos Animais Cadastrados", isVisible: true, category: "overview" },
   { id: "upcomingEvents", name: "Próximos Eventos", isVisible: true, category: "recentActivity" },
   { id: "financialSummary", name: "Resumo Financeiro", isVisible: true, category: "financial" },
   { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial" },
-  { id: "internmentStatus", name: "Status de Internação", isVisible: true, category: "animalHealth" },
-  { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true, category: "animalHealth" },
-  { id: "medicalRecordsSummary", name: "Resumo da Agenda", isVisible: true, category: "animalHealth" },
-  // Novos itens de gráfico
-  { id: "appointmentsMonthlyChart", name: "Consultas por Mês (Gráfico)", isVisible: true, category: "animalHealth" },
-  { id: "appointmentsWeeklyChart", name: "Consultas por Semana (Gráfico)", isVisible: true, category: "animalHealth" },
+  // Itens de 'Saúde Animal' movidos para 'overview'
+  { id: "internmentStatus", name: "Status de Internação", isVisible: true, category: "overview" },
+  { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true, category: "overview" },
+  { id: "medicalRecordsSummary", name: "Resumo da Agenda", isVisible: true, category: "overview" },
+  // Novos itens de gráfico movidos para 'overview'
+  { id: "appointmentsMonthlyChart", name: "Consultas por Mês (Gráfico)", isVisible: true, category: "overview" },
+  { id: "appointmentsWeeklyChart", name: "Consultas por Semana (Gráfico)", isVisible: true, category: "overview" },
   { id: "revenueMonthlyChart", name: "Receita por Mês (Gráfico)", isVisible: true, category: "financial" },
-  { id: "petsBySpeciesChart", name: "Animais por Espécie (Gráfico)", isVisible: true, category: "animalHealth" },
+  { id: "petsBySpeciesChart", name: "Animais por Espécie (Gráfico)", isVisible: true, category: "overview" },
 ];
 
 const Dashboard = () => {
