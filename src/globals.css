@@ -13,8 +13,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%; /* Default primary */
-    --primary-foreground: 210 20% 98%;
+    --primary: 188 39% 38%; /* NOVO PADRÃO: Azul-Esverdeado Principal */
+    --primary-darker: 188 39% 30%; /* NOVO PADRÃO: Azul-Esverdeado Principal mais escuro */
+    --primary-foreground: 0 0% 100%; /* Branco para o foreground do novo padrão */
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -72,8 +73,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 210 20% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 188 39% 48%; /* NOVO PADRÃO: Azul-Esverdeado Principal (mais claro para dark mode) */
+    --primary-darker: 188 39% 38%; /* NOVO PADRÃO: Azul-Esverdeado Principal (original para dark mode) */
+    --primary-foreground: 222.2 47.4% 11.2%; /* Texto escuro para o foreground do novo padrão */
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 20% 98%;
@@ -127,7 +129,7 @@
 }
 
 /* Custom Color Themes */
-.theme-orange { /* Laranja Pôr do Sol (Padrão) */
+.theme-orange { /* Laranja Pôr do Sol */
   --primary: 28 85% 55%; /* Um laranja vibrante */
   --primary-darker: 28 85% 45%;
   --primary-foreground: 0 0% 100%;
@@ -160,7 +162,7 @@
   --primary-foreground: 222.2 47.4% 11.2%;
 }
 
-.theme-vivid-green { /* NOVO: Verde Vivo */
+.theme-vivid-green { /* Verde Vivo */
   --primary: 120 80% 40%; /* Um verde bem vivo */
   --primary-darker: 120 80% 30%;
   --primary-foreground: 0 0% 100%;
@@ -212,6 +214,17 @@
 .dark .theme-red {
   --primary: 0 80% 55%; /* Vermelho mais claro para contraste no escuro */
   --primary-darker: 0 80% 45%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+}
+
+.theme-teal-blue { /* NOVO: Azul-Esverdeado Principal */
+  --primary: 188 39% 38%;
+  --primary-darker: 188 39% 30%;
+  --primary-foreground: 0 0% 100%;
+}
+.dark .theme-teal-blue {
+  --primary: 188 39% 48%;
+  --primary-darker: 188 39% 38%;
   --primary-foreground: 222.2 47.4% 11.2%;
 }
 
