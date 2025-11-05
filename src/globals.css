@@ -53,13 +53,13 @@
     --sidebar-item-bg-8: 60 90% 60%; /* Yellow */
     --sidebar-item-bg-9: 0 0% 50%; /* Gray */
 
-    /* Event Category Colors (arbitrary distinct colors) */
-    --event-consulta: 220 80% 40%; /* Darker Blue */
-    --event-cirurgia: 0 80% 40%; /* Darker Red */
-    --event-vacina: 140 70% 25%; /* Darker Green */
-    --event-exame: 40 90% 40%; /* Darker Orange */
-    --event-retorno: 260 70% 40%; /* Darker Purple */
-    --event-outros: 0 0% 30%; /* Darker Gray */
+    /* Event Category Colors (distinct and vibrant) */
+    --event-consulta: 210 80% 50%; /* Azul vibrante */
+    --event-cirurgia: 340 80% 50%; /* Rosa-avermelhado */
+    --event-vacina: 120 70% 40%; /* Verde claro */
+    --event-exame: 40 90% 50%; /* Laranja-amarelado */
+    --event-retorno: 260 70% 50%; /* Roxo */
+    --event-outros: 200 10% 40%; /* Cinza azulado */
   }
 
   .dark {
@@ -112,13 +112,13 @@
     --sidebar-item-bg-8: 60 90% 40%;
     --sidebar-item-bg-9: 0 0% 30%;
 
-    /* Event Category Colors (arbitrary distinct colors for dark mode) */
-    --event-consulta: 220 80% 50%;
-    --event-cirurgia: 0 80% 50%;
-    --event-vacina: 140 70% 30%;
-    --event-exame: 40 90% 50%;
-    --event-retorno: 260 70% 50%;
-    --event-outros: 0 0% 40%;
+    /* Event Category Colors (distinct and vibrant for dark mode) */
+    --event-consulta: 210 80% 60%; /* Azul mais claro */
+    --event-cirurgia: 340 80% 60%; /* Rosa-avermelhado mais claro */
+    --event-vacina: 120 70% 50%; /* Verde claro */
+    --event-exame: 40 90% 60%; /* Laranja-amarelado mais claro */
+    --event-retorno: 260 70% 60%; /* Roxo mais claro */
+    --event-outros: 200 10% 50%; /* Cinza azulado mais claro */
   }
 
   body {

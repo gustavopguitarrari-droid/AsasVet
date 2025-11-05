@@ -48,6 +48,16 @@ const categoryColorMap: Record<CalendarEvent["category"], string> = {
   Outros: "bg-event-outros",
 };
 
+// Definição das categorias para a legenda
+const eventCategories = [
+  { name: "Consulta", value: "Consulta", colorClass: "bg-event-consulta" },
+  { name: "Cirurgia", value: "Cirurgia", colorClass: "bg-event-cirurgia" },
+  { name: "Vacina", value: "Vacina", colorClass: "bg-event-vacina" },
+  { name: "Exame", value: "Exame", colorClass: "bg-event-exame" },
+  { name: "Retorno", value: "Retorno", colorClass: "bg-event-retorno" },
+  { name: "Outros", value: "Outros", colorClass: "bg-event-outros" },
+];
+
 const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick, searchTerm, onClearAllEvents, isClearingEvents }) => {
   const [selectedDay, setSelectedDay] = React.useState<Date | undefined>(new Date());
 
@@ -126,6 +136,16 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {/* Legenda de Cores */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {eventCategories.map((category) => (
+              <div key={category.value} className="flex items-center space-x-1">
+                <span className={cn("h-3 w-3 rounded-full", category.colorClass)}></span>
+                <span className="text-xs text-muted-foreground">{category.name}</span>
+              </div>
+            ))}
+          </div>
+
           {eventsForSelectedDay.length > 0 ? (
             <div className="space-y-3">
               {eventsForSelectedDay.map((event) => {
