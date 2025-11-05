@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } => 'react';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,7 +37,7 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center login-art-bg p-4">
-      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative bg-background/50 backdrop-blur-sm">
+      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative">
         <Button asChild variant="ghost" className="absolute top-4 left-4">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
