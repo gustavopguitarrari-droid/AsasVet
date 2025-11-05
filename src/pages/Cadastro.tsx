@@ -170,14 +170,15 @@ const Cadastro = () => {
         throw new Error("User not authenticated or organization ID not available.");
       }
 
+      // Check for existing CPF before attempting to insert
       const { data: existingCpf, error: cpfCheckError } = await supabase
         .from('clients')
         .select('id')
         .eq('organization_id', organizationId)
         .eq('cpf', data.cpf)
-        .single();
+        .maybeSingle(); // Use maybeSingle to handle no results without throwing an error
 
-      if (cpfCheckError && cpfCheckError.code !== 'PGRST116') {
+      if (cpfCheckError && cpfCheckError.code !== 'PGRST116') { // PGRST116 means no rows found
         throw new Error("Erro ao verificar CPF existente.");
       }
       if (existingCpf) {
@@ -267,7 +268,7 @@ const Cadastro = () => {
         .eq('organization_id', organizationId)
         .eq('cpf', data.cpf)
         .neq('id', data.id)
-        .single();
+        .maybeSingle(); // Use maybeSingle to handle no results without throwing an error
 
       if (cpfCheckError && cpfCheckError.code !== 'PGRST116') {
         throw new Error("Erro ao verificar CPF existente.");
@@ -879,7 +880,7 @@ const Cadastro = () => {
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Buscar animais por nome, raça ou tutor..."
-                  className="pl-9 w-64"
+                  className="pl-9"
                   value={petSearchTerm}
                   onChange={(e) => setPetSearchTerm(e.target.value)}
                 />
