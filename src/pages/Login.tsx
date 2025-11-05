@@ -43,7 +43,6 @@ const Login = () => {
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Link>
         </Button>
-        {/* Removido: <h2 className="text-2xl font-bold text-center text-white mt-8">Bem-vindo ao AsasVet</h2> */}
         <Auth
           supabaseClient={supabase}
           providers={[]}
@@ -56,7 +55,7 @@ const Login = () => {
                   brandAccent: 'hsl(210 80% 55%)', // Um azul um pouco mais claro para o hover/foco
                   inputBackground: 'rgba(255, 255, 255, 0.1)',
                   inputBorder: 'rgba(255, 255, 255, 0.3)',
-                  inputLabel: 'hsl(var(--primary-foreground))',
+                  inputLabel: 'hsl(0 0% 100%)', // Definido como branco puro
                   inputText: 'hsl(var(--primary-foreground))',
                   anchorText: 'hsl(var(--primary-foreground))',
                   messageText: 'hsl(var(--primary-foreground))',
