@@ -6,7 +6,7 @@ import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, PawPrint } from 'lucide-react'; // Importar PawPrint
+import { ArrowLeft } from 'lucide-react';
 import { useSession } from '@/context/SessionContext';
 
 const Login = () => {
@@ -43,12 +43,9 @@ const Login = () => {
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Link>
         </Button>
-        <div className="flex items-center justify-center text-white mt-8 mb-6">
-          <PawPrint className="h-8 w-8 mr-2 text-white" />
-          <h2 className="text-2xl font-bold">
-            Bem-vindo ao AsasVet
-          </h2>
-        </div>
+        <h2 className="text-2xl font-bold text-center text-white mt-8">
+          Bem-vindo ao AsasVet
+        </h2>
         <Auth
           supabaseClient={supabase}
           providers={[]}
