@@ -51,6 +51,8 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       // Ensure organization_id is always a string if present, otherwise provide a fallback
       // Prioriza o organization_id do perfil, depois dos metadados, depois o próprio ID do usuário
       const organizationId = data?.organization_id?.toString() || userMetadata.organization_id?.toString() || supabaseUser.id;
+      const planName = data?.plan_name || userMetadata.plan_name?.toString() || "Vet Domiciliar"; // Default to "Vet Domiciliar"
+      const isDemoMode = planName === "Vet Domiciliar"; // Determine demo mode based on plan name
 
       return {
         id: supabaseUser.id,
@@ -74,11 +76,12 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         addressCity: data?.address_city || userMetadata.address_city?.toString() || undefined,
         addressState: data?.address_state || userMetadata.address_state?.toString() || undefined,
         colorTheme: data?.color_theme || userMetadata.color_theme?.toString() || undefined,
-        planName: data?.plan_name || userMetadata.plan_name?.toString() || undefined, // NOVO: Incluir plan_name
+        planName: planName, // NOVO: Incluir plan_name
         stripeCustomerId: data?.stripe_customer_id || undefined, // NOVO: Incluir stripe_customer_id
         stripeSubscriptionId: data?.stripe_subscription_id || undefined, // NOVO: Incluir stripe_subscription_id
         registeredTime: data?.registered_time || supabaseUser.created_at,
         organizationId: organizationId, // Usar o valor garantido
+        isDemoMode: isDemoMode, // NOVO: Adicionar isDemoMode
       };
     },
     enabled: !!supabaseUser?.id,

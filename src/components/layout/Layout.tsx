@@ -11,6 +11,8 @@ import FloatingChatButton from "@/components/FloatingChatButton";
 import ChatDialog from "@/components/ChatDialog";
 import FloatingCashierButton from "@/components/FloatingCashierButton"; // NOVO: Importar o botão do caixa
 import CashierDialog from "@/components/CashierDialog"; // NOVO: Importar o diálogo do caixa
+import DemoModeBanner from "@/components/DemoModeBanner"; // NOVO: Importar DemoModeBanner
+import { useUser } from "@/context/UserContext"; // NOVO: Importar useUser
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,6 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
   const [isChatDialogOpen, setIsChatDialogOpen] = React.useState(false);
   const [isCashierDialogOpen, setIsCashierDialogOpen] = React.useState(false); // NOVO: Estado para o diálogo do caixa
+  const { user } = useUser(); // NOVO: Obter o usuário para verificar o modo de demonstração
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(!isSidebarCollapsed);
@@ -61,6 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <FloatingChatButton onClick={handleChatButtonClick} />
       <ChatDialog isOpen={isChatDialogOpen} onClose={() => setIsChatDialogOpen(false)} />
       <CashierDialog isOpen={isCashierDialogOpen} onClose={() => setIsCashierDialogOpen(false)} /> {/* NOVO: Diálogo do caixa */}
+      {user?.isDemoMode && <DemoModeBanner />} {/* NOVO: Renderiza o banner se estiver em modo de demonstração */}
     </div>
   );
 };

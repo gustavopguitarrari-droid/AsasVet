@@ -34,7 +34,7 @@ const availablePlans: Plan[] = [
     name: "Clínica Vet",
     price: "R$ 200,00/mês",
     features: ["3 Subusuários", "Gerenciamento Completo", "Internação", "Caixa e Financeiro", "Suporte Prioritário"],
-    stripePriceId: "price_1Pj110Rz1234567890abcdef", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
+    stripePriceId: "price_YOUR_CLINICA_VET_PRICE_ID", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
     badgeColorClass: "bg-green-500",
   },
   {
@@ -42,7 +42,7 @@ const availablePlans: Plan[] = [
     name: "Hospital Vet",
     price: "R$ 299,00/mês",
     features: ["10 Subusuários", "Todos os recursos Premium", "Relatórios Avançados", "Integrações Personalizadas", "Suporte Dedicado 24/7"],
-    stripePriceId: "price_1Pj110Rz1234567890abcdef", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
+    stripePriceId: "price_YOUR_HOSPITAL_VET_PRICE_ID", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
     badgeColorClass: "bg-blue-500",
   },
 ];

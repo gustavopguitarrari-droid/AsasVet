@@ -30,6 +30,7 @@ export interface User {
   planName?: string; // NOVO: Nome do plano do usuário
   stripeCustomerId?: string; // NOVO: ID do cliente Stripe
   stripeSubscriptionId?: string; // NOVO: ID da assinatura Stripe
+  isDemoMode: boolean; // NOVO: Indica se o usuário está no modo de demonstração
 }
 
 interface UserContextType {
