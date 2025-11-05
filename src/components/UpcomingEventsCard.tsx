@@ -116,27 +116,28 @@ const UpcomingEventsCard: React.FC = () => {
             <div
               key={event.id}
               className={cn(
-                "flex items-center justify-between p-2 rounded-md border bg-card",
+                "flex items-center justify-between p-2 rounded-md border text-white", // Adicionado text-white aqui
+                categoryColorMap[event.category], // Aplicado o background da categoria aqui
                 isCompleted && "opacity-70" // Reduz a opacidade se o evento estiver completo
               )}
             >
               <div className="flex flex-col">
-                <p className={cn("font-medium", isCompleted && "line-through text-muted-foreground")}>
+                <p className={cn("font-medium", isCompleted && "line-through text-white/80")}> {/* Ajustado a cor do texto para concluído */}
                   {event.title}
                 </p>
-                <p className={cn("text-sm text-muted-foreground", isCompleted && "line-through")}>
+                <p className={cn("text-sm text-white/80", isCompleted && "line-through")}> {/* Ajustado a cor do texto para concluído */}
                   {format(event.date, "dd/MM", { locale: ptBR })} às {event.time}
                 </p>
               </div>
               <div className="flex items-center space-x-2">
-                <Badge className={cn("text-white", categoryColorMap[event.category])}>
+                <Badge className="bg-white/20 text-white"> {/* Badge com fundo branco semi-transparente */}
                   {event.category}
                 </Badge>
                 {!isCompleted && (
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 text-green-600 hover:bg-green-100"
+                    className="h-8 w-8 text-white hover:bg-white/20" // Ajustado as cores do botão
                     onClick={() => handleConfirmEvent(event.id)}
                     disabled={updateEventStatusMutation.isPending}
                   >
