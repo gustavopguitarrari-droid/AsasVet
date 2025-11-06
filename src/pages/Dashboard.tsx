@@ -365,7 +365,7 @@ const Dashboard = () => {
 
   const getGreeting = () => {
     if (!user) {
-      return "Bem-vindo(a) ao AsasVet!";
+      return "Bem-vindo(a)!"; // Removido "ao AsasVet!"
     }
     const prefix = user.gender === "Feminino" ? "Dra." : "Dr.";
     return `Bem-vindo(a) ${prefix} ${user.name}!`;
