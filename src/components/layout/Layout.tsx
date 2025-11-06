@@ -59,19 +59,22 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel
               defaultSize={28}
-              minSize={8}      // Definido minSize
-              maxSize={28}     // Definido maxSize
+              minSize={8}
+              maxSize={28}
               collapsedSize={8}
               collapsible={true}
               collapsed={isSidebarCollapsed}
-              className="transition-all duration-300 ease-in-out relative"
+              className={cn(
+                "transition-all duration-300 ease-in-out relative",
+                "sidebar-gradient-bg text-sidebar-foreground" // Movido para cá
+              )}
             >
               <Sidebar
                 isCollapsed={isSidebarCollapsed}
                 onToggleCollapse={toggleSidebar}
               />
             </ResizablePanel>
-            <ResizablePanel defaultSize={72}>
+            <ResizablePanel defaultSize={72} className="bg-background"> {/* Adicionado bg-background */}
               <div className="flex h-full flex-col">
                 <main className="flex-1 overflow-y-auto p-6">
                   {children}
