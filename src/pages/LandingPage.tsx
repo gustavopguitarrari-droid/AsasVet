@@ -42,20 +42,20 @@ const LandingPage: React.FC = () => {
         className="relative h-screen flex items-center justify-center text-center p-8 pt-20 bg-cover bg-center"
         style={{ backgroundImage: "url('/images/vet-landing-bg.png')" }}
       >
-        <div className="absolute inset-0 bg-black opacity-40"></div> {/* Overlay escuro para legibilidade */}
+        <div className="absolute inset-0 bg-black opacity-20"></div> {/* Opacidade ajustada para 20% */}
         <div className="relative z-10 max-w-4xl mx-auto text-white space-y-6">
-          <PawPrint className="h-24 w-24 mx-auto text-white animate-pulse" /> {/* Alterado para text-white */}
-          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight drop-shadow-lg text-white"> {/* Alterado para text-white */}
+          <PawPrint className="h-24 w-24 mx-auto text-white animate-pulse" />
+          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight drop-shadow-lg text-white">
             Simplifique a Gestão da Sua Clínica Veterinária
           </h1>
-          <p className="text-lg md:text-xl text-white max-w-2xl mx-auto"> {/* Alterado para text-white */}
+          <p className="text-lg md:text-xl text-white max-w-2xl mx-auto">
             Foco total no cuidado animal, nós cuidamos da burocracia.
           </p>
           <div className="flex justify-center space-x-4 mt-8">
             <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-8 py-4 shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}>
               Comece Grátis
             </Link>
-            <Link to="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-white border-white hover:bg-white hover:text-primary text-lg px-8 py-4 shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}> {/* Ajustado para usar cores do tema */}
+            <Link to="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-white border-white hover:bg-white hover:text-primary text-lg px-8 py-4 shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}>
               Entrar
             </Link>
           </div>
