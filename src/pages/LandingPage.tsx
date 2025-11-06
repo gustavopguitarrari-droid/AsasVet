@@ -34,7 +34,7 @@ const coreFeatures = [
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-verde-bambu text-marrom-avela theme-nature-vet">
+    <div className="min-h-screen bg-verde-bambu text-marrom-avela theme-nature-vet login-art-bg">
       <LandingHeader />
 
       {/* Hero Section */}
