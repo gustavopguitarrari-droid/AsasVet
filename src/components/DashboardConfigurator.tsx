@@ -77,6 +77,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Isso agora define o 'layoutDirection' no localStorage, que Layout.tsx lê
       localStorage.setItem('layoutDirection', menuPosition === 'superior' ? 'vertical' : 'horizontal');
     }
   }, [menuPosition]);
@@ -184,7 +185,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
   const handleSave = () => {
     onSave(tempConfig);
     onOpenChange(false);
-    window.location.reload();
+    window.location.reload(); // Recarrega a página para aplicar as mudanças de layout
   };
 
   const availableCards = React.useMemo(() => {

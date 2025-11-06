@@ -22,7 +22,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useUser } from "@/context/UserContext";
-// Removed: ThemeToggle, ColorThemeToggle, LiveClockCalendar, UserProfile imports
 
 interface NavItem {
   name: string;
@@ -30,7 +29,7 @@ interface NavItem {
   path: string;
 }
 
-const allNavItems: NavItem[] = [
+export const allNavItems: NavItem[] = [ // Export allNavItems
   { name: "Painel", icon: LayoutDashboard, path: "/painel" },
   { name: "Consultas", icon: ClipboardList, path: "/consultas" },
   { name: "Internação", icon: Plus, path: "/internacao" },
@@ -45,10 +44,10 @@ const allNavItems: NavItem[] = [
 interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
-  layoutDirection: "horizontal" | "vertical";
+  // Removido: layoutDirection: "horizontal" | "vertical";
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layoutDirection }) => {
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => { // Removido layoutDirection
   const location = useLocation();
   const { user: appUser } = useUser();
 
@@ -59,50 +58,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
     return allNavItems;
   }, [appUser]);
 
-  const isVerticalLayout = layoutDirection === "vertical";
-
-  if (isVerticalLayout) {
-    return (
-      <div className="flex flex-row items-center justify-between w-full h-16 px-4 py-2 overflow-x-auto overflow-y-hidden whitespace-nowrap border-b sidebar-gradient-bg text-sidebar-foreground shadow-sm">
-        <Link to="/painel" className="flex items-center flex-shrink-0 mr-4">
-          <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-10 w-auto" />
-        </Link>
-        <nav className="flex flex-row space-x-2 overflow-x-auto overflow-y-hidden flex-1">
-          {filteredNavItems.map((item) => {
-            const isActive = location.pathname === item.path;
-            return (
-              <Tooltip key={item.name} delayDuration={0}>
-                <TooltipTrigger asChild>
-                  <Button
-                    asChild
-                    variant="ghost"
-                    className={cn(
-                      "h-12 px-3 text-base text-sidebar-foreground flex-shrink-0",
-                      "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                      isActive && "bg-sidebar-primary text-sidebar-primary-foreground"
-                    )}
-                  >
-                    <Link to={item.path} className="flex items-center">
-                      <item.icon className="h-5 w-5 mr-2" strokeWidth={2} />
-                      <span className="uppercase">{item.name}</span>
-                    </Link>
-                  </Button>
-                </TooltipTrigger>
-              </Tooltip>
-            );
-          })}
-        </nav>
-      </div>
-    );
-  }
-
-  // Horizontal Layout (Sidebar on the left)
+  // Este componente agora renderiza APENAS o menu lateral vertical.
   return (
     <div className={cn(
       "relative flex flex-col h-full p-4 border-r sidebar-gradient-bg text-sidebar-foreground shadow-sm",
       isCollapsed ? "w-[80px]" : "w-[280px]"
     )}>
-      {/* Logo and Title */}
+      {/* Logo e Título */}
       <Link to="/painel" className={cn(
         "flex items-center text-sidebar-foreground cursor-pointer mb-6",
         isCollapsed ? "justify-center" : "justify-start"
@@ -116,7 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
         )}
       </Link>
 
-      {/* Navigation Items */}
+      {/* Itens de Navegação */}
       <nav className="flex-1 space-y-2 overflow-y-auto pr-2">
         {filteredNavItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -154,7 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
         })}
       </nav>
 
-      {/* Footer Section (Only Collapse Button remains here) */}
+      {/* Seção do Rodapé (apenas o botão de recolher permanece aqui) */}
       <div className={cn(
         "mt-auto pt-4 border-t border-sidebar-border flex flex-col",
         isCollapsed ? "items-center" : "items-stretch"
