@@ -29,7 +29,7 @@ const LandingHeader: React.FC = () => {
       {/* Center: Logo (always visible) */}
       <div className="flex-shrink-0 absolute left-1/2 -translate-x-1/2"> {/* Centraliza o logo */}
         <Link to="/" className="flex items-center" onClick={handleScrollToTop}>
-          <img src="/images/logooficial.png" alt="AsasVet Logo" className="h-20 w-auto" /> {/* Aumentado para h-20 */}
+          <img src="/images/logooficial.png" alt="AsasVet Logo" className="h-32 w-auto md:h-40" /> {/* Aumentado para h-32 e md:h-40 */}
         </Link>
       </div>
 
