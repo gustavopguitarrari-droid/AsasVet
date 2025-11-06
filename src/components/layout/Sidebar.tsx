@@ -5,9 +5,9 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users, 
-  PawPrint, // Ícone de pata de animal
-  CalendarDays, // Usado para Agenda
-  ClipboardList, // Ícone para Consultas
+  PawPrint,
+  CalendarDays,
+  ClipboardList,
   DollarSign,
   Plus,
   Stethoscope,
@@ -15,8 +15,8 @@ import {
   ArrowRightToLine,
   ReceiptText,
   Package,
-  Tag, // NEW: Import Tag icon for Products
-  Settings, // Settings icon for profile dropdown
+  Tag,
+  Settings,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -29,7 +29,7 @@ interface NavItem {
   path: string;
 }
 
-export const allNavItems: NavItem[] = [ // Export allNavItems
+export const allNavItems: NavItem[] = [
   { name: "Painel", icon: LayoutDashboard, path: "/painel" },
   { name: "Consultas", icon: ClipboardList, path: "/consultas" },
   { name: "Internação", icon: Plus, path: "/internacao" },
@@ -44,10 +44,9 @@ export const allNavItems: NavItem[] = [ // Export allNavItems
 interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
-  // Removido: layoutDirection: "horizontal" | "vertical";
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => { // Removido layoutDirection
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   const location = useLocation();
   const { user: appUser } = useUser();
 
@@ -58,10 +57,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
     return allNavItems;
   }, [appUser]);
 
-  // Este componente agora renderiza APENAS o menu lateral vertical.
   return (
     <div className={cn(
-      "relative flex flex-col h-full p-4 border-r sidebar-gradient-bg text-sidebar-foreground shadow-sm",
+      "relative flex flex-col h-full p-4 border-r sidebar-gradient-bg text-sidebar-foreground shadow-sm transition-all duration-300 ease-in-out",
       isCollapsed ? "w-[80px]" : "w-[280px]"
     )}>
       {/* Logo e Título */}
@@ -70,11 +68,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         isCollapsed ? "justify-center" : "justify-start"
       )}>
         <img src="/public/images/logooficial.png" alt="AsasVet Logo" className={cn(
+          "transition-all duration-300 ease-in-out",
           isCollapsed ? "h-12 w-auto" : "h-16 w-auto",
           !isCollapsed && "mr-3"
         )} />
         {!isCollapsed && (
-          <span className="text-2xl font-bold">AsasVet</span>
+          <span className="text-2xl font-bold opacity-100 transition-opacity duration-300 ease-in-out">AsasVet</span>
         )}
       </Link>
 
@@ -91,19 +90,22 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                   className={cn(
                     "w-full text-sidebar-foreground",
                     "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    isCollapsed ? "h-14 w-14 rounded-full flex items-center justify-center" : "justify-start text-xl py-6",
+                    isCollapsed ? "h-14 w-14 rounded-full flex items-center justify-center p-0" : "justify-start text-xl py-6 px-4",
                     isActive && "bg-sidebar-primary text-sidebar-primary-foreground"
                   )}
                 >
                   <Link to={item.path} className="flex items-center w-full">
                     <div className={cn(
-                      "flex items-center justify-center",
+                      "flex items-center justify-center flex-shrink-0",
                       isCollapsed ? "h-8 w-8" : "h-8 w-8 mr-3"
                     )}>
                       <item.icon className="h-6 w-6" strokeWidth={2} />
                     </div>
                     {!isCollapsed && (
-                      <span className={cn(isActive && "text-sidebar-primary-foreground", "uppercase")}>
+                      <span className={cn(
+                        isActive && "text-sidebar-primary-foreground",
+                        "uppercase text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis transition-opacity duration-300 ease-in-out"
+                      )}>
                         {item.name}
                       </span>
                     )}
@@ -123,7 +125,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       )}>
         <div className={cn(
           "flex items-center",
-          isCollapsed ? "justify-center" : "justify-between",
+          isCollapsed ? "justify-center" : "justify-end", // Alinhado à direita quando expandido
           "mb-4"
         )}>
           <Button
@@ -133,7 +135,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
             className={cn(
               "rounded-full",
               "border border-sidebar-border shadow-md",
-              isCollapsed ? "ml-0" : "ml-auto"
+              "transition-all duration-300 ease-in-out",
+              isCollapsed ? "ml-0" : "ml-auto" // Ajusta a margem para centralizar/alinhar
             )}
           >
             {isCollapsed ? <ArrowRightToLine className="h-4 w-4" /> : <ArrowLeftToLine className="h-4 w-4" />}
