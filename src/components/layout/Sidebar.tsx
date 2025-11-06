@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   return (
     <div className={cn(
       "relative flex flex-col h-full p-4 border-r sidebar-gradient-bg text-sidebar-foreground shadow-sm transition-all duration-300 ease-in-out",
-      isCollapsed ? "w-[80px]" : "w-[280px]"
+      "w-full" // Removido w-[80px] e w-[280px], agora o painel pai controla a largura
     )}>
       {/* Logo e Título */}
       <Link to="/painel" className={cn(

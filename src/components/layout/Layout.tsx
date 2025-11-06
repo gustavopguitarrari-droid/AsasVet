@@ -57,9 +57,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="flex flex-1 overflow-hidden">
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel
-              defaultSize={280} // Largura padrão para sidebar vertical
-              minSize={80}
-              maxSize={280}
+              defaultSize={28} // Alterado para porcentagem
+              minSize={8}      // Alterado para porcentagem
+              maxSize={28}     // Alterado para porcentagem
               className="transition-all duration-300 ease-in-out relative"
             >
               <Sidebar
@@ -67,7 +67,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 onToggleCollapse={toggleSidebar}
               />
             </ResizablePanel>
-            <ResizablePanel defaultSize={720}> {/* Largura restante, assumindo 1000 total */}
+            <ResizablePanel defaultSize={72}> {/* Alterado para porcentagem */}
               <div className="flex h-full flex-col">
                 <main className="flex-1 overflow-y-auto p-6">
                   {children}
