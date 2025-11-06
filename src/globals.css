@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 @layer base {
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
   :root {
     /* Cores do tema padrão (Azul Escuro/Cinza) */
     --background: 0 0% 100%;
@@ -349,15 +356,15 @@
     --sidebar-ring: var(--ring);
 
     /* Sidebar Item Backgrounds (cores distintas para itens) */
-    --sidebar-item-bg-1: 220 80% 60%; /* Blue */
-    --sidebar-item-bg-2: 10 80% 60%; /* Reddish-orange */
-    --sidebar-item-bg-3: 140 70% 40%; /* Green */
-    --sidebar-item-bg-4: 260 70% 60%; /* Purple */
-    --sidebar-item-bg-5: 40 90% 60%; /* Orange */
-    --sidebar-item-bg-6: 180 70% 40%; /* Cyan */
-    --sidebar-item-bg-7: 300 70% 60%; /* Magenta */
-    --sidebar-item-bg-8: 60 90% 60%; /* Yellow */
-    --sidebar-item-bg-9: 0 0% 50%; /* Gray */
+    --sidebar-item-bg-1: 220 80% 60%;
+    --sidebar-item-bg-2: 10 80% 60%;
+    --sidebar-item-bg-3: 140 70% 40%;
+    --sidebar-item-bg-4: 260 70% 60%;
+    --sidebar-item-bg-5: 40 90% 60%;
+    --sidebar-item-bg-6: 180 70% 40%;
+    --sidebar-item-bg-7: 300 70% 60%;
+    --sidebar-item-bg-8: 60 90% 60%;
+    --sidebar-item-bg-9: 0 0% 50%;
 
     /* Cores para Categorias de Eventos */
     --event-consulta: 220 80% 60%;
