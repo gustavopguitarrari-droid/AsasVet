@@ -22,6 +22,7 @@ const colorThemes = [
   { name: "Amarelo Dourado", value: "yellow", colorClass: "bg-yellow-500" },
   { name: "Vermelho Rubi", value: "red", colorClass: "bg-red-500" },
   { name: "Azul-Esverdeado", value: "teal-blue", colorClass: "bg-teal-blue-500" },
+  { name: "Nature Vet", value: "nature-vet", colorClass: "bg-verde-folha-seca" }, // NOVO TEMA
 ];
 
 const ColorThemeToggle = () => {

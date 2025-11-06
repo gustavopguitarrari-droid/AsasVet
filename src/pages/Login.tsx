@@ -38,7 +38,7 @@ const Login = () => {
 
   return (
     <div className={cn(
-      "min-h-screen flex items-center justify-center p-4",
+      "min-h-screen flex items-center justify-center p-4 theme-nature-vet", // Adicionado theme-nature-vet aqui
       "login-art-bg" // Mantém a classe original
     )}>
       <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative bg-white dark:bg-gray-800 bg-opacity-30">
@@ -55,8 +55,8 @@ const Login = () => {
             variables: {
               default: {
                 colors: {
-                  brand: 'hsl(222.2 47.4% 11.2%)',
-                  brandAccent: 'hsl(217.2 32.6% 17.5%)',
+                  brand: 'hsl(var(--primary))', // Adapta-se ao tema
+                  brandAccent: 'hsl(var(--primary-darker))', // Adapta-se ao tema
                   inputBackground: 'rgba(255, 255, 255, 0.1)',
                   inputBorder: 'rgba(255, 255, 255, 0.3)',
                   inputLabel: 'hsl(var(--foreground))',
@@ -67,8 +67,8 @@ const Login = () => {
               },
               dark: {
                 colors: {
-                  brand: 'hsl(210 40% 98%)',
-                  brandAccent: 'hsl(217.2 32.6% 17.5%)',
+                  brand: 'hsl(var(--primary))', // Adapta-se ao tema
+                  brandAccent: 'hsl(var(--primary-darker))', // Adapta-se ao tema
                   inputLabel: 'hsl(var(--foreground))',
                   inputText: 'hsl(var(--foreground))',
                   anchorText: 'hsl(var(--primary))',
