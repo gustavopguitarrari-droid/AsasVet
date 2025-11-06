@@ -479,15 +479,16 @@
   background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
 }
 
-.login-art-bg {
-  background-image: url('/images/vet-landing-bg.png'); /* Nova imagem de fundo */
+/* Classe para a Landing Page com a nova imagem */
+.landing-page-hero-bg {
+  background-image: url('/images/landing-page-hero-bg.png');
   background-size: cover;
   background-position: center;
   position: relative;
-  transition: background-image 0.3s ease-in-out; /* Adiciona transição suave */
+  transition: background-image 0.3s ease-in-out;
 }
 
-.login-art-bg::before {
+.landing-page-hero-bg::before {
   content: '';
   position: absolute;
   top: 0;
@@ -496,7 +497,13 @@
   bottom: 0;
   background: hsl(var(--primary) / 0.5); /* Overlay semi-transparente com a cor primária */
   z-index: 0;
-  transition: background 0.3s ease-in-out; /* Adiciona transição suave ao overlay */
+  transition: background 0.3s ease-in-out;
+}
+
+/* Ajustado para a página de Login - sem imagem de fundo, apenas o tema */
+.login-art-bg {
+  position: relative; /* Mantém a posição relativa para o conteúdo interno */
+  transition: background-image 0.3s ease-in-out; /* Mantém a transição, mesmo sem imagem */
 }
 
 /* Original #root and other styles */
