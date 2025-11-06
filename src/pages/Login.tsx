@@ -45,7 +45,7 @@ const Login = () => {
       "min-h-screen flex items-center justify-center p-4 theme-nature-vet",
       "login-art-bg"
     )}>
-      <div className="w-full max-w-sm p-6 space-y-4 rounded-lg shadow-md relative bg-creme-terra/70 backdrop-blur-sm border border-marrom-avela/20 z-10">
+      <div className="w-full max-w-sm p-6 space-y-4 rounded-lg shadow-md relative bg-creme-terra/70 backdrop-blur-sm border border-marrom-avela/20 z-10 max-h-[80vh] overflow-y-auto">
         <Button asChild variant="ghost" className="absolute top-4 left-4 text-marrom-avela font-bold hover:bg-verde-folha-seca/20">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
