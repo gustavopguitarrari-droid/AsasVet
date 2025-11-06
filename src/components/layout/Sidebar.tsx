@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -105,9 +107,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
         "flex items-center text-sidebar-foreground cursor-pointer",
         isVerticalLayout ? "flex-shrink-0 mr-4" : "mb-6 justify-center"
       )}>
-        {/* <img src="/images/logooficial.png" alt="AsasVet Logo" className={cn(
-          isVerticalLayout ? "h-16 w-auto" : (isCollapsed ? "h-20 w-auto" : "h-24 w-auto") // Aumentado para h-16, h-20, h-24
-        )} /> */}
+        <img src="/public/images/logooficial.png" alt="AsasVet Logo" className={cn(
+          isVerticalLayout ? "h-10 w-auto" : (isCollapsed ? "h-12 w-auto" : "h-16 w-auto") // Ajustado o tamanho do logo
+        )} />
       </Link>
       <nav className={cn(
         "flex-1",

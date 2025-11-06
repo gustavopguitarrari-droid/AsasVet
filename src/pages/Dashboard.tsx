@@ -376,6 +376,7 @@ const Dashboard = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           {/* Substituído o logo dinâmico por uma imagem estática */}
+          <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-16 w-auto" />
           
           <div>
             <h2 className="text-3xl font-bold">{getGreeting()}</h2>

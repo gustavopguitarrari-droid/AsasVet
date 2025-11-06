@@ -71,7 +71,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </ResizablePanel>
         <ResizablePanel defaultSize={100 - sidebarSize}>
           <div className="flex h-full flex-col">
-            {layoutDirection === "horizontal" && <Header />} {/* Renderiza Header apenas se o menu for lateral */}
+            {layoutDirection === "horizontal" && <Header layoutDirection={layoutDirection} />} {/* Renderiza Header apenas se o menu for lateral */}
             <main className="flex-1 overflow-y-auto p-6">
               {layoutDirection === "vertical" && ( // Exibe o título da página se o menu for superior
                 <h1 className="text-3xl font-bold mb-6">{pageTitle || "AsasVet"}</h1>
