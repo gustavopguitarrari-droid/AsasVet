@@ -41,7 +41,7 @@ const LandingPage: React.FC = () => {
 
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center text-center p-8 pt-20 login-art-bg text-white">
-        <div className="relative z-10 max-w-5xl mx-auto space-y-8">
+        <div className="relative z-10 max-w-5xl mx-auto space-y-6"> {/* Alterado de space-y-8 para space-y-6 */}
           <h1 className="text-5xl md:text-7xl font-extrabold leading-tight drop-shadow-lg animate-fade-in-down">
             A Gestão Veterinária que Você Sempre Sonhou
           </h1>
