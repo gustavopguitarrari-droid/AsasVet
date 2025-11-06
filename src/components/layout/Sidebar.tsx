@@ -22,10 +22,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useUser } from "@/context/UserContext";
-import ThemeToggle from "@/components/ThemeToggle";
-import ColorThemeToggle from "@/components/ColorThemeToggle";
-import LiveClockCalendar from "@/components/LiveClockCalendar";
-import UserProfile from "@/components/UserProfile";
+// Removed: ThemeToggle, ColorThemeToggle, LiveClockCalendar, UserProfile imports
 
 interface NavItem {
   name: string;
@@ -91,17 +88,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
                     </Link>
                   </Button>
                 </TooltipTrigger>
-                {/* Tooltip not needed for vertical layout as text is always visible */}
               </Tooltip>
             );
           })}
         </nav>
-        <div className="flex items-center space-x-2 flex-shrink-0 ml-4">
-          <LiveClockCalendar />
-          <ColorThemeToggle />
-          <ThemeToggle />
-          <UserProfile />
-        </div>
       </div>
     );
   }
@@ -110,7 +100,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
   return (
     <div className={cn(
       "relative flex flex-col h-full p-4 border-r sidebar-gradient-bg text-sidebar-foreground shadow-sm",
-      isCollapsed ? "w-[80px]" : "w-[280px]" // Fixed width for collapsed/expanded
+      isCollapsed ? "w-[80px]" : "w-[280px]"
     )}>
       {/* Logo and Title */}
       <Link to="/painel" className={cn(
@@ -118,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
         isCollapsed ? "justify-center" : "justify-start"
       )}>
         <img src="/public/images/logooficial.png" alt="AsasVet Logo" className={cn(
-          isCollapsed ? "h-12 w-auto" : "h-16 w-auto", // Adjusted logo height
+          isCollapsed ? "h-12 w-auto" : "h-16 w-auto",
           !isCollapsed && "mr-3"
         )} />
         {!isCollapsed && (
@@ -139,14 +129,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
                   className={cn(
                     "w-full text-sidebar-foreground",
                     "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    isCollapsed ? "h-14 w-14 rounded-full flex items-center justify-center" : "justify-start text-xl py-6", // Increased padding for expanded
+                    isCollapsed ? "h-14 w-14 rounded-full flex items-center justify-center" : "justify-start text-xl py-6",
                     isActive && "bg-sidebar-primary text-sidebar-primary-foreground"
                   )}
                 >
                   <Link to={item.path} className="flex items-center w-full">
                     <div className={cn(
                       "flex items-center justify-center",
-                      isCollapsed ? "h-8 w-8" : "h-8 w-8 mr-3" // Icon size
+                      isCollapsed ? "h-8 w-8" : "h-8 w-8 mr-3"
                     )}>
                       <item.icon className="h-6 w-6" strokeWidth={2} />
                     </div>
@@ -164,7 +154,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
         })}
       </nav>
 
-      {/* Footer Section (User Profile, Theme Toggles, Collapse Button) */}
+      {/* Footer Section (Only Collapse Button remains here) */}
       <div className={cn(
         "mt-auto pt-4 border-t border-sidebar-border flex flex-col",
         isCollapsed ? "items-center" : "items-stretch"
@@ -172,18 +162,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
         <div className={cn(
           "flex items-center",
           isCollapsed ? "justify-center" : "justify-between",
-          "mb-2"
-        )}>
-          {!isCollapsed && <LiveClockCalendar />}
-          <ColorThemeToggle />
-          <ThemeToggle />
-        </div>
-        <div className={cn(
-          "flex items-center",
-          isCollapsed ? "justify-center" : "justify-between",
           "mb-4"
         )}>
-          <UserProfile />
           <Button
             variant="default"
             size="icon"

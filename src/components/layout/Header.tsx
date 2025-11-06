@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ThemeToggle"; // Importar o ThemeToggle ex
 import ColorThemeToggle from "@/components/ColorThemeToggle"; // Importar o novo ColorThemeToggle
 import LiveClockCalendar from "@/components/LiveClockCalendar"; // Importar o novo LiveClockCalendar
 import { usePageTitle } from "@/context/PageTitleContext"; // NOVO: Importar usePageTitle
+import { cn } from "@/lib/utils"; // Importar cn
 
 interface HeaderProps {
   // NOVO: Adiciona a prop layoutDirection para controle condicional
@@ -16,11 +17,6 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ layoutDirection }) => {
   const location = useLocation();
   const { pageTitle } = usePageTitle(); // NOVO: Obter o título do contexto
-
-  // Se o layout for vertical, o Header não deve renderizar nada, pois seus elementos foram movidos para o Sidebar.
-  if (layoutDirection === "vertical") {
-    return null;
-  }
 
   const getTitle = () => {
     // Se um título específico da página for definido via contexto, use-o
@@ -62,15 +58,17 @@ const Header: React.FC<HeaderProps> = ({ layoutDirection }) => {
   };
 
   return (
-    <header className="flex items-center justify-between border-b bg-background p-4 shadow-sm">
-      <h1 className="text-2xl font-semibold">{getTitle()}</h1> {/* Usar getTitle() */}
-      {/* Removidos os elementos que foram movidos para o Sidebar no layout horizontal */}
-      {/* <div className="flex items-center space-x-2">
+    <header className={cn(
+      "flex items-center justify-between border-b bg-background p-4 shadow-sm",
+      layoutDirection === "vertical" ? "h-16" : "h-auto"
+    )}>
+      <h1 className="text-2xl font-semibold">{getTitle()}</h1>
+      <div className="flex items-center space-x-2">
         <LiveClockCalendar />
         <ColorThemeToggle />
         <ThemeToggle />
         <UserProfile />
-      </div> */}
+      </div>
     </header>
   );
 };
