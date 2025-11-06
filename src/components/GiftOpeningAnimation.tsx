@@ -23,7 +23,7 @@ const GiftOpeningAnimation: React.FC<GiftOpeningAnimationProps> = ({ onAnimation
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center login-art-bg p-4 text-white relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-primary p-4 text-white relative overflow-hidden">
       <div className={cn(
         "relative z-10 flex flex-col items-center text-center space-y-6 transition-all duration-1000 ease-in-out",
         isOpening ? "opacity-0 scale-150" : "opacity-100 scale-100"
