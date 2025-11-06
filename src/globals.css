@@ -51,7 +51,7 @@
     --sidebar-item-bg-4: 260 70% 60%; /* Purple */
     --sidebar-item-bg-5: 40 90% 60%; /* Orange */
     --sidebar-item-bg-6: 180 70% 40%; /* Cyan */
-    --sidebar-item-bg-7: 300 70% 60%; /* Magenta */
+    --sidebar-item-bg-7: 300 70% 40%; /* Magenta */
     --sidebar-item-bg-8: 60 90% 60%; /* Yellow */
     --sidebar-item-bg-9: 0 0% 50%; /* Gray */
 
@@ -459,7 +459,7 @@
 }
 
 .login-art-bg {
-  background-image: url('/images/vet-landing-bg.png'); /* Reutiliza a imagem da landing page */
+  background-image: url('/images/Gemini_Generated_Image_ipd3omipd3omipd3.png'); /* Nova imagem de fundo */
   background-size: cover;
   background-position: center;
   position: relative;
@@ -467,13 +467,14 @@
 }
 
 .login-art-bg::before {
+  /* Removido o overlay de cor para mostrar a imagem como está */
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(var(--verde-folha-seca), 0.8); /* Uma cor sólida com transparência */
+  background: transparent; /* Torna o overlay transparente */
   z-index: 1;
 }
 
