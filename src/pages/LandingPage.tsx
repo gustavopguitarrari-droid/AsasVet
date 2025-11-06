@@ -50,7 +50,7 @@ const LandingPage: React.FC = () => {
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 mt-10 animate-fade-in-up">
             <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-white hover:bg-gray-100 text-primary text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
-              Comece Grátis Agora
+              Teste Grátis Agora
             </Link>
             <Link to="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-primary border-primary hover:bg-primary hover:text-primary-foreground text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
               Já sou Cliente
@@ -92,7 +92,7 @@ const LandingPage: React.FC = () => {
             Junte-se a centenas de veterinários que já estão otimizando seus processos com o AsasVet.
           </p>
           <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-white text-primary hover:bg-gray-100 text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
-            Comece Sua Jornada Gratuita
+            Teste Sua Jornada Gratuita
           </Link>
         </div>
       </section>
