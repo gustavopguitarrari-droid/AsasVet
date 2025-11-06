@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
@@ -8,6 +8,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useSession } from '@/context/SessionContext';
+import { cn } from '@/lib/utils'; // Import cn for conditional classes
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,6 +19,9 @@ const Login = () => {
     return state?.view || 'sign_in';
   });
 
+  const [isButtonHovered, setIsButtonHovered] = useState(false); // Novo estado para hover
+  const loginCardRef = useRef<HTMLDivElement>(null); // Ref para o card de login
+
   useEffect(() => {
     console.log('Login Page - isLoading:', isLoading, 'session:', session);
     if (session && !isLoading) {
@@ -25,6 +29,28 @@ const Login = () => {
       navigate('/painel');
     }
   }, [session, isLoading, navigate]);
+
+  useEffect(() => {
+    const loginCardElement = loginCardRef.current;
+    if (!loginCardElement) return;
+
+    // Encontra o botão "Entrar" dentro do DOM renderizado pelo componente Auth
+    // Geralmente é um botão com type="submit"
+    const signInButton = loginCardElement.querySelector('button[type="submit"]');
+
+    if (signInButton) {
+      const handleMouseEnter = () => setIsButtonHovered(true);
+      const handleMouseLeave = () => setIsButtonHovered(false);
+
+      signInButton.addEventListener('mouseenter', handleMouseEnter);
+      signInButton.addEventListener('mouseleave', handleMouseLeave);
+
+      return () => {
+        signInButton.removeEventListener('mouseenter', handleMouseEnter);
+        signInButton.removeEventListener('mouseleave', handleMouseLeave);
+      };
+    }
+  }, [authView]); // Re-executa o efeito se a view de autenticação mudar
 
   if (isLoading) {
     console.log('Login Page - Currently loading session...');
@@ -36,8 +62,11 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center login-art-bg p-4">
-      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative bg-white dark:bg-gray-800 bg-opacity-30">
+    <div className={cn(
+      "min-h-screen flex items-center justify-center p-4",
+      isButtonHovered ? "login-art-bg-hover" : "login-art-bg" // Aplica a classe condicional de background
+    )}>
+      <div ref={loginCardRef} className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative bg-white dark:bg-gray-800 bg-opacity-30">
         <Button asChild variant="ghost" className="absolute top-4 left-4 text-white font-bold">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
