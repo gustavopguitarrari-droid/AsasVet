@@ -64,12 +64,13 @@ const Header: React.FC<HeaderProps> = ({ layoutDirection }) => {
   return (
     <header className="flex items-center justify-between border-b bg-background p-4 shadow-sm">
       <h1 className="text-2xl font-semibold">{getTitle()}</h1> {/* Usar getTitle() */}
-      <div className="flex items-center space-x-2">
-        <LiveClockCalendar /> {/* Adicionado o LiveClockCalendar aqui */}
+      {/* Removidos os elementos que foram movidos para o Sidebar no layout horizontal */}
+      {/* <div className="flex items-center space-x-2">
+        <LiveClockCalendar />
         <ColorThemeToggle />
         <ThemeToggle />
         <UserProfile />
-      </div>
+      </div> */}
     </header>
   );
 };
