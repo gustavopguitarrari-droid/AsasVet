@@ -4,352 +4,7 @@
 
 @layer base {
   :root {
-    /* Cores do tema padrão (Azul Escuro/Cinza) */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-darker: 222.2 47.4% 8%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 222.2 84% 4.9%;
-
-    /* Sidebar colors (adaptam-se ao tema principal) */
-    --sidebar-background: var(--primary);
-    --sidebar-foreground: var(--primary-foreground);
-    --sidebar-primary: var(--primary-foreground);
-    --sidebar-primary-foreground: var(--primary);
-    --sidebar-accent: var(--primary-foreground);
-    --sidebar-accent-foreground: var(--primary);
-    --sidebar-border: var(--border);
-    --sidebar-ring: var(--ring);
-
-    /* Sidebar Item Backgrounds (cores distintas para itens) */
-    --sidebar-item-bg-1: 220 80% 60%; /* Blue */
-    --sidebar-item-bg-2: 10 80% 60%; /* Reddish-orange */
-    --sidebar-item-bg-3: 140 70% 40%; /* Green */
-    --sidebar-item-bg-4: 260 70% 60%; /* Purple */
-    --sidebar-item-bg-5: 40 90% 60%; /* Orange */
-    --sidebar-item-bg-6: 180 70% 40%; /* Cyan */
-    --sidebar-item-bg-7: 300 70% 60%; /* Magenta */
-    --sidebar-item-bg-8: 60 90% 60%; /* Yellow */
-    --sidebar-item-bg-9: 0 0% 50%; /* Gray */
-
-    /* Cores para Categorias de Eventos */
-    --event-consulta: 220 80% 60%;
-    --event-cirurgia: 10 80% 60%;
-    --event-vacina: 140 70% 40%;
-    --event-exame: 260 70% 60%;
-    --event-retorno: 40 90% 60%;
-    --event-outros: 0 0% 50%;
-  }
-
-  .dark {
-    /* Cores do tema padrão (Dark) */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-darker: 210 40% 80%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-
-    /* Sidebar colors para dark mode (adaptam-se ao tema principal) */
-    --sidebar-background: var(--primary);
-    --sidebar-foreground: var(--primary-foreground);
-    --sidebar-primary: var(--primary-foreground);
-    --sidebar-primary-foreground: var(--primary);
-    --sidebar-accent: var(--primary-foreground);
-    --sidebar-accent-foreground: var(--primary);
-    --sidebar-border: var(--border);
-    --sidebar-ring: var(--ring);
-
-    /* Sidebar Item Backgrounds (cores distintas para itens em dark mode) */
-    --sidebar-item-bg-1: 220 80% 40%;
-    --sidebar-item-bg-2: 10 80% 40%;
-    --sidebar-item-bg-3: 140 70% 20%;
-    --sidebar-item-bg-4: 260 70% 40%;
-    --sidebar-item-bg-5: 40 90% 40%;
-    --sidebar-item-bg-6: 180 70% 20%;
-    --sidebar-item-bg-7: 300 70% 40%;
-    --sidebar-item-bg-8: 60 90% 40%;
-    --sidebar-item-bg-9: 0 0% 30%;
-
-    /* Cores para Categorias de Eventos em dark mode */
-    --event-consulta: 220 80% 40%;
-    --event-cirurgia: 10 80% 40%;
-    --event-vacina: 140 70% 20%;
-    --event-exame: 260 70% 40%;
-    --event-retorno: 40 90% 40%;
-    --event-outros: 0 0% 30%;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-
-  /* --- Temas de Cores Personalizados --- */
-
-  /* Tema Laranja Pôr do Sol */
-  .theme-orange {
-    --primary: 28 85% 55%; /* orange-500 */
-    --primary-darker: 28 85% 45%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 28 85% 90%;
-    --secondary-foreground: 28 85% 20%;
-    --border: 28 85% 80%;
-    --input: 28 85% 80%;
-    --ring: 28 85% 55%;
-  }
-  .dark .theme-orange {
-    --primary: 28 85% 70%;
-    --primary-darker: 28 85% 60%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 28 85% 20%;
-    --secondary-foreground: 28 85% 90%;
-    --border: 28 85% 30%;
-    --input: 28 85% 30%;
-    --ring: 28 85% 70%;
-  }
-
-  /* Tema Azul Oceano */
-  .theme-blue {
-    --primary: 210 80% 45%; /* blue-500 */
-    --primary-darker: 210 80% 35%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 210 80% 90%;
-    --secondary-foreground: 210 80% 15%;
-    --border: 210 80% 70%;
-    --input: 210 80% 70%;
-    --ring: 210 80% 45%;
-  }
-  .dark .theme-blue {
-    --primary: 210 80% 65%;
-    --primary-darker: 210 80% 55%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 210 80% 20%;
-    --secondary-foreground: 210 80% 90%;
-    --border: 210 80% 30%;
-    --input: 210 80% 30%;
-    --ring: 210 80% 65%;
-  }
-
-  /* Tema Verde Esmeralda */
-  .theme-green {
-    --primary: 160 70% 35%; /* green-500 */
-    --primary-darker: 160 70% 25%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 160 70% 90%;
-    --secondary-foreground: 160 70% 10%;
-    --border: 160 70% 60%;
-    --input: 160 70% 60%;
-    --ring: 160 70% 35%;
-  }
-  .dark .theme-green {
-    --primary: 160 70% 55%;
-    --primary-darker: 160 70% 45%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 160 70% 15%;
-    --secondary-foreground: 160 70% 90%;
-    --border: 160 70% 25%;
-    --input: 160 70% 25%;
-    --ring: 160 70% 55%;
-  }
-
-  /* Tema Púrpura Real */
-  .theme-purple {
-    --primary: 270 60% 45%; /* purple-600 */
-    --primary-darker: 270 60% 35%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 270 60% 90%;
-    --secondary-foreground: 270 60% 15%;
-    --border: 270 60% 70%;
-    --input: 270 60% 70%;
-    --ring: 270 60% 45%;
-  }
-  .dark .theme-purple {
-    --primary: 270 60% 65%;
-    --primary-darker: 270 60% 55%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 270 60% 20%;
-    --secondary-foreground: 270 60% 90%;
-    --border: 270 60% 30%;
-    --input: 270 60% 30%;
-    --ring: 270 60% 65%;
-  }
-
-  /* Tema Rosa Chiclete */
-  .theme-pink {
-    --primary: 330 80% 65%; /* pink-500 */
-    --primary-darker: 330 80% 55%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 330 80% 95%;
-    --secondary-foreground: 330 80% 20%;
-    --border: 330 80% 85%;
-    --input: 330 80% 85%;
-    --ring: 330 80% 65%;
-  }
-  .dark .theme-pink {
-    --primary: 330 80% 80%;
-    --primary-darker: 330 80% 70%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 330 80% 25%;
-    --secondary-foreground: 330 80% 95%;
-    --border: 330 80% 40%;
-    --input: 330 80% 40%;
-    --ring: 330 80% 80%;
-  }
-
-  /* Tema Amarelo Dourado */
-  .theme-yellow {
-    --primary: 45 90% 55%; /* yellow-500 */
-    --primary-darker: 45 90% 45%;
-    --primary-foreground: 222.2 47.4% 11.2%; /* Dark text for yellow */
-    --secondary: 45 90% 90%;
-    --secondary-foreground: 45 90% 20%;
-    --border: 45 90% 80%;
-    --input: 45 90% 80%;
-    --ring: 45 90% 55%;
-  }
-  .dark .theme-yellow {
-    --primary: 45 90% 70%;
-    --primary-darker: 45 90% 60%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 45 90% 20%;
-    --secondary-foreground: 45 90% 90%;
-    --border: 45 90% 30%;
-    --input: 45 90% 30%;
-    --ring: 45 90% 70%;
-  }
-
-  /* Tema Vermelho Rubi */
-  .theme-red {
-    --primary: 0 80% 45%; /* red-500 */
-    --primary-darker: 0 80% 35%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 80% 90%;
-    --secondary-foreground: 0 80% 15%;
-    --border: 0 80% 70%;
-    --input: 0 80% 70%;
-    --ring: 0 80% 45%;
-  }
-  .dark .theme-red {
-    --primary: 0 80% 65%;
-    --primary-darker: 0 80% 55%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 0 80% 20%;
-    --secondary-foreground: 0 80% 90%;
-    --border: 0 80% 30%;
-    --input: 0 80% 30%;
-    --ring: 0 80% 65%;
-  }
-
-  /* Tema Azul-Esverdeado */
-  .theme-teal-blue {
-    --primary: 188 39% 38%; /* teal-blue-500 */
-    --primary-darker: 188 39% 28%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 188 39% 90%;
-    --secondary-foreground: 188 39% 10%;
-    --border: 188 39% 60%;
-    --input: 188 39% 60%;
-    --ring: 188 39% 38%;
-  }
-  .dark .theme-teal-blue {
-    --primary: 188 39% 58%;
-    --primary-darker: 188 39% 48%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 188 39% 15%;
-    --secondary-foreground: 188 39% 90%;
-    --border: 188 39% 25%;
-    --input: 188 39% 25%;
-    --ring: 188 39% 58%;
-  }
-
-  /* Landing Page specific theme (neutral-modern) */
-  .theme-neutral-modern {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-darker: 222.2 47.4% 8%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 222.2 84% 4.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-  }
-
-  .dark .theme-neutral-modern {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --primary: 210 40% 98%;
-    --primary-darker: 210 40% 80%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 100%;
-  }
-
-  /* NOVO TEMA: Nature Vet */
-  .theme-nature-vet {
+    /* Cores do tema Nature Vet (Light Mode) */
     --background: 80 40% 76%; /* Verde Bambu #C5E1A5 */
     --foreground: 20 18% 47%; /* Marrom Avelã #8D6E63 */
 
@@ -409,7 +64,8 @@
     --event-outros: 0 0% 50%;
   }
 
-  .dark .theme-nature-vet {
+  .dark {
+    /* Cores do tema Nature Vet (Dark Mode) */
     --background: 80 30% 20%; /* Darker Verde Bambu */
     --foreground: 30 10% 90%; /* Light cream/white */
 
@@ -468,94 +124,101 @@
     --event-retorno: 40 90% 40%;
     --event-outros: 0 0% 30%;
   }
-}
 
-/* Custom Background Gradients */
-.sidebar-gradient-bg {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
-}
-
-.profile-header-art-bg {
-  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
-}
-
-.login-art-bg {
-  background-image: url('/images/vet-landing-bg.png'); /* Nova imagem de fundo */
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  transition: background-image 0.3s ease-in-out; /* Adiciona transição suave */
-}
-
-.login-art-bg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: hsl(var(--primary) / 0.5); /* Overlay semi-transparente com a cor primária */
-  z-index: 0;
-  transition: background 0.3s ease-in-out; /* Adiciona transição suave ao overlay */
-}
-
-/* Original #root and other styles */
-/*
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-*/
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop_shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+  body {
+    @apply bg-background text-foreground;
   }
-  to {
-    transform: rotate(360deg);
+
+  /* --- Temas de Cores Personalizados (Removidos, Nature Vet é o padrão) --- */
+  /* As definições de .theme-orange, .theme-blue, etc. foram removidas daqui */
+
+  /* Custom Background Gradients */
+  .sidebar-gradient-bg {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
   }
-}
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+  .profile-header-art-bg {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
   }
-}
 
-.card {
-  padding: 2em;
-}
+  .login-art-bg {
+    background-image: url('/images/vet-landing-bg.png'); /* Nova imagem de fundo */
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    transition: background-image 0.3s ease-in-out; /* Adiciona transição suave */
+  }
 
-.read-the-docs {
-  color: #888;
-}
+  .login-art-bg::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: hsl(var(--primary) / 0.5); /* Overlay semi-transparente com a cor primária */
+    z-index: 0;
+    transition: background 0.3s ease-in-out; /* Adiciona transição suave ao overlay */
+  }
 
-/* Custom CSS for Auth labels */
-.custom-auth-form label {
-  font-weight: bold !important; /* Força o negrito */
-}
+  /* Original #root and other styles */
+  /*
+  #root {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+  }
+  */
 
-/* Reduz o espaçamento entre os campos de entrada no formulário de autenticação */
-.custom-auth-form > div > div {
-  margin-bottom: 0.5rem !important; /* Reduz o margin-bottom para 0.5rem */
-}
+  .logo {
+    height: 6em;
+    padding: 1.5em;
+    will-change: filter;
+    transition: filter 300ms;
+  }
+  .logo:hover {
+    filter: drop-shadow(0 0 2em #646cffaa);
+  }
+  .logo.react:hover {
+    filter: drop_shadow(0 0 2em #61dafbaa);
+  }
 
-/* Ajusta o espaçamento do botão de submit */
-.custom-auth-form button[type="submit"] {
-  margin-top: 1rem !important; /* Adiciona um pouco de margem superior ao botão */
+  @keyframes logo-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    a:nth-of-type(2) .logo {
+      animation: logo-spin infinite 20s linear;
+    }
+  }
+
+  .card {
+    padding: 2em;
+  }
+
+  .read-the-docs {
+    color: #888;
+  }
+
+  /* Custom CSS for Auth labels */
+  .custom-auth-form label {
+    font-weight: bold !important; /* Força o negrito */
+  }
+
+  /* Reduz o espaçamento entre os campos de entrada no formulário de autenticação */
+  .custom-auth-form > div > div {
+    margin-bottom: 0.5rem !important; /* Reduz o margin-bottom para 0.5rem */
+  }
+
+  /* Ajusta o espaçamento do botão de submit */
+  .custom-auth-form button[type="submit"] {
+    margin-top: 1rem !important; /* Adiciona um pouco de margem superior ao botão */
+  }
 }
