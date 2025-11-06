@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { ChevronDown, GripVertical, PlusCircle, MinusCircle } from "lucide-react";
+import { ChevronDown, GripVertical, PlusCircle, MinusCircle, Settings as SettingsIcon } from "lucide-react"; // Import SettingsIcon
 import {
   Select,
   SelectContent,

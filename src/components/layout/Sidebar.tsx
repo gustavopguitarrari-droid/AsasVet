@@ -16,6 +16,7 @@ import {
   ReceiptText,
   Package,
   Tag, // NEW: Import Tag icon for Products
+  Settings as SettingsIcon, // Renamed to avoid conflict with Settings page
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -75,6 +76,11 @@ const allNavItems: NavItem[] = [
     icon: DollarSign,
     path: "/financeiro",
   },
+  {
+    name: "Configurações", // Add settings to sidebar
+    icon: SettingsIcon,
+    path: "/settings",
+  },
   // Removido o item "Caixa"
 ];
 
@@ -100,15 +106,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
 
   return (
     <div className={cn(
-      "relative flex h-full overflow-y-auto border-r sidebar-gradient-bg p-4 text-sidebar-foreground shadow-sm",
-      isVerticalLayout ? "flex-row items-center justify-between w-full h-full overflow-x-auto overflow-y-hidden" : "flex-col"
+      "relative flex overflow-hidden border-r sidebar-gradient-bg text-sidebar-foreground shadow-sm",
+      isVerticalLayout ? "flex-row items-center justify-between w-full h-16 px-4 py-2 overflow-x-auto overflow-y-hidden" : "flex-col h-full p-4"
     )}>
       <Link to="/painel" className={cn(
         "flex items-center text-sidebar-foreground cursor-pointer",
         isVerticalLayout ? "flex-shrink-0 mr-4" : "mb-6 justify-center"
       )}>
         <img src="/public/images/logooficial.png" alt="AsasVet Logo" className={cn(
-          isVerticalLayout ? "h-10 w-auto" : (isCollapsed ? "h-12 w-auto" : "h-16 w-auto") // Ajustado o tamanho do logo
+          isVerticalLayout ? "h-10 w-auto" : (isCollapsed ? "h-12" : "h-16") // Adjusted logo height
         )} />
       </Link>
       <nav className={cn(
@@ -127,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
                   className={cn(
                     "text-sidebar-foreground",
                     "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    isVerticalLayout ? "h-10 px-3 text-base" : (isCollapsed ? "h-14 w-14 rounded-full flex items-center justify-center" : "w-full justify-start text-xl"),
+                    isVerticalLayout ? "h-12 px-3 text-base" : (isCollapsed ? "h-14 w-14 rounded-full flex items-center justify-center" : "w-full justify-start text-xl"),
                     isActive && "bg-sidebar-primary text-sidebar-primary-foreground"
                   )}
                 >
@@ -135,11 +141,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
                     <div
                       className={cn(
                         "flex items-center justify-center",
-                        isVerticalLayout ? "h-6 w-6" : (!isCollapsed && "w-14 h-14 rounded-full mr-3"),
+                        isVerticalLayout ? "h-6 w-6" : (!isCollapsed && "mr-3"), // Removed w-14 h-14 rounded-full
                         isActive && "bg-sidebar-primary"
                       )}
                     >
-                      <item.icon className={cn(isVerticalLayout ? "h-5 w-5" : "h-8 w-8")} strokeWidth={isVerticalLayout ? 2 : 3.5} />
+                      <item.icon className={cn(isVerticalLayout ? "h-5 w-5" : "h-8 w-8")} strokeWidth={2} /> {/* Consistent strokeWidth */}
                     </div>
                     {!isCollapsed && (
                       <span className={cn(isActive && "text-sidebar-primary-foreground", isVerticalLayout && "text-xs mt-1", "uppercase")}>

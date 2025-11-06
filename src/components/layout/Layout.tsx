@@ -48,8 +48,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   // NOVO: Ajusta os tamanhos e a direção do painel com base em layoutDirection
   const sidebarSize = layoutDirection === "horizontal" ? (isSidebarCollapsed ? 6 : 18) : 8; // 8% de altura para o menu superior
-  const sidebarMinSize = sidebarSize;
-  const sidebarMaxSize = layoutDirection === "horizontal" ? sidebarSize : 10; // Max 10% para o menu superior
+  const sidebarMinSize = layoutDirection === "horizontal" ? 6 : 8;
+  const sidebarMaxSize = layoutDirection === "horizontal" ? 25 : 10; // Max 10% para o menu superior
 
   return (
     <div className="flex h-screen w-screen overflow-hidden">
