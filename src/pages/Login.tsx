@@ -83,7 +83,7 @@ const Login = () => {
               },
             },
           }}
-          theme="light"
+          theme={resolvedTheme === 'dark' ? 'dark' : 'light'} // Usa o tema resolvido do next-themes
           redirectTo={window.location.origin + '/painel'}
           view={authView}
           localization={{
