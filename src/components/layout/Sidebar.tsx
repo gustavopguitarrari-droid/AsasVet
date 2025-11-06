@@ -59,8 +59,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
 
   return (
     <div className={cn(
-      "relative flex flex-col h-full p-4 border-r shadow-sm transition-all duration-300 ease-in-out", // Removido sidebar-gradient-bg e text-sidebar-foreground
-      "w-full"
+      "relative flex flex-col h-full p-4 border-r shadow-sm transition-all duration-300 ease-in-out",
+      "w-full sidebar-gradient-bg text-sidebar-foreground" // Adicionado aqui
     )}>
       {/* Logo e Título */}
       <Link to="/painel" className={cn(
