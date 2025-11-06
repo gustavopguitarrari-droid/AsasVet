@@ -333,6 +333,16 @@
 }
 
 /* Custom CSS for Auth labels */
-.custom-auth-labels label {
+.custom-auth-form label {
   font-weight: bold !important; /* Força o negrito */
+}
+
+/* Reduz o espaçamento entre os campos de entrada no formulário de autenticação */
+.custom-auth-form > div > div {
+  margin-bottom: 0.5rem !important; /* Reduz o margin-bottom para 0.5rem */
+}
+
+/* Ajusta o espaçamento do botão de submit */
+.custom-auth-form button[type="submit"] {
+  margin-top: 1rem !important; /* Adiciona um pouco de margem superior ao botão */
 }
