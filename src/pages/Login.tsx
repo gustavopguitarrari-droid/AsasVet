@@ -9,11 +9,13 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useSession } from '@/context/SessionContext';
 import { cn } from '@/lib/utils';
+import { useTheme } from 'next-themes'; // Importar useTheme
 
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useSession();
   const location = useLocation();
+  const { resolvedTheme } = useTheme(); // Obter o tema resolvido (light ou dark)
   const [authView, setAuthView] = useState<'sign_in' | 'forgotten_password' | 'update_password'>(() => {
     const state = location.state as { view?: 'forgotten_password' | 'update_password' };
     return state?.view || 'sign_in';
@@ -27,6 +29,8 @@ const Login = () => {
     }
   }, [session, isLoading, navigate]);
 
+  console.log('Login Page - Resolved Theme:', resolvedTheme); // Log para depuração
+
   if (isLoading) {
     console.log('Login Page - Currently loading session...');
     return (
@@ -39,9 +43,9 @@ const Login = () => {
   return (
     <div className={cn(
       "min-h-screen flex items-center justify-center p-4 theme-nature-vet",
-      "login-art-bg" // Usando a classe de background original
+      "login-art-bg"
     )}>
-      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative bg-creme-terra/90 backdrop-blur-sm border border-marrom-avela/20 z-10"> {/* Adicionado z-10 */}
+      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative bg-creme-terra/90 backdrop-blur-sm border border-marrom-avela/20 z-10">
         <Button asChild variant="ghost" className="absolute top-4 left-4 text-marrom-avela font-bold hover:bg-verde-folha-seca/20">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
@@ -53,10 +57,10 @@ const Login = () => {
           appearance={{
             theme: ThemeSupa,
             variables: {
-              default: {
+              default: { // Variáveis para o tema claro
                 colors: {
-                  brand: 'hsl(var(--primary))', // Adapta-se ao tema
-                  brandAccent: 'hsl(var(--primary-darker))', // Adapta-se ao tema
+                  brand: 'hsl(var(--primary))',
+                  brandAccent: 'hsl(var(--primary-darker))',
                   inputBackground: 'hsl(var(--input))',
                   inputBorder: 'hsl(var(--border))',
                   inputLabel: 'hsl(var(--foreground))',
@@ -65,10 +69,12 @@ const Login = () => {
                   messageText: 'hsl(var(--foreground))',
                 },
               },
-              dark: {
+              dark: { // Variáveis para o tema escuro
                 colors: {
-                  brand: 'hsl(var(--primary))', // Adapta-se ao tema
-                  brandAccent: 'hsl(var(--primary-darker))', // Adapta-se ao tema
+                  brand: 'hsl(var(--primary))',
+                  brandAccent: 'hsl(var(--primary-darker))',
+                  inputBackground: 'hsl(var(--input))',
+                  inputBorder: 'hsl(var(--border))',
                   inputLabel: 'hsl(var(--foreground))',
                   inputText: 'hsl(var(--foreground))',
                   anchorText: 'hsl(var(--primary))',
@@ -77,7 +83,7 @@ const Login = () => {
               },
             },
           }}
-          theme="dark"
+          theme={resolvedTheme === 'dark' ? 'dark' : 'light'} // Usa o tema resolvido do next-themes
           redirectTo={window.location.origin + '/painel'}
           view={authView}
           localization={{
