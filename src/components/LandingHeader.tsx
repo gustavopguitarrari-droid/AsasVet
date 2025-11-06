@@ -12,33 +12,20 @@ const LandingHeader: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-md border-b border-border p-4 flex items-center justify-between shadow-sm theme-neutral-modern">
-      {/* Left side: Navigation Links (hidden on small screens) */}
-      <nav className="hidden md:flex space-x-6 flex-1 justify-start">
-        <Link to="/" className="text-muted-foreground hover:text-primary transition-colors text-lg font-medium" onClick={handleScrollToTop}>
-          Início
-        </Link>
-        <a href="#features" className="text-muted-foreground hover:text-primary transition-colors text-lg font-medium">
-          Serviços
-        </a>
-        <a href="#plans" className="text-muted-foreground hover:text-primary transition-colors text-lg font-medium">
-          Plano
-        </a>
-      </nav>
-
-      {/* Center: Logo (always visible) */}
-      <div className="flex-shrink-0 absolute left-1/2 -translate-x-1/2"> {/* Centraliza o logo */}
+    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border p-4 flex items-center justify-between shadow-sm theme-neutral-modern"> {/* Fundo semi-transparente */}
+      {/* Left side: Logo */}
+      <div className="flex-shrink-0">
         <Link to="/" className="flex items-center" onClick={handleScrollToTop}>
-          <img src="/images/logooficial.png" alt="AsasVet Logo" className="h-32 w-auto md:h-40" /> {/* Aumentado para h-32 e md:h-40 */}
+          <img src="/images/logooficial.png" alt="AsasVet Logo" className="h-20 w-auto" /> {/* Tamanho do logo ajustado */}
         </Link>
       </div>
 
       {/* Right side: Auth Buttons */}
-      <div className="flex items-center space-x-4 flex-1 justify-end">
-        <Link to="/login" className={cn(buttonVariants({ variant: "ghost", size: "default" }), "text-lg font-medium")}>
+      <div className="flex items-center space-x-4">
+        <Link to="/login" className={cn(buttonVariants({ variant: "ghost", size: "default" }), "text-foreground hover:text-primary transition-colors text-lg font-medium")}>
           Login
         </Link>
-        <Link to="/signup" className={cn(buttonVariants({ variant: "default", size: "default" }), "text-lg font-medium")}>
+        <Link to="/signup" className={cn(buttonVariants({ variant: "default", size: "default" }), "bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-medium")}>
           Cadastre-se
         </Link>
       </div>

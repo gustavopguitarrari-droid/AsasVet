@@ -238,12 +238,9 @@
   background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
 }
 
+/* Removido o background-image para o login-art-bg para um visual mais limpo */
 .login-art-bg {
-  background-image: url('/images/vet-clinic-bg-new.png'); /* Nova imagem de fundo */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  /* Adicione um overlay escuro para melhorar a legibilidade do texto */
+  background-color: hsl(var(--primary)); /* Cor sólida vibrante */
   position: relative;
 }
 
@@ -254,7 +251,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.3); /* Overlay escuro com opacidade reduzida */
+  background: rgba(0, 0, 0, 0.1); /* Overlay escuro com opacidade reduzida */
   z-index: 0;
 }
 
@@ -309,9 +306,9 @@
   --background: 0 0% 100%;
   --foreground: 222.2 84% 4.9%;
   --muted-foreground: 215.4 16.3% 46.9%;
-  --primary: 222.2 47.4% 11.2%;
-  --primary-darker: 222.2 47.4% 8.2%; /* Darker shade for gradient */
-  --primary-foreground: 210 20% 98%;
+  --primary: 188 39% 38%; /* Usando o teal-blue como primary para a landing page */
+  --primary-darker: 188 39% 30%;
+  --primary-foreground: 0 0% 100%;
   --border: 214.3 31.8% 91.4%;
   --card: 0 0% 100%;
   --card-foreground: 222.2 84% 4.9%;
@@ -321,8 +318,8 @@
   --background: 222.2 84% 4.9%;
   --foreground: 210 20% 98%;
   --muted-foreground: 215 20.2% 65.1%;
-  --primary: 210 20% 98%;
-  --primary-darker: 210 20% 88%; /* Darker shade for gradient */
+  --primary: 188 39% 48%; /* teal-blue mais claro para dark mode */
+  --primary-darker: 188 39% 38%;
   --primary-foreground: 222.2 47.4% 11.2%;
   --border: 217.2 32.6% 17.5%;
   --card: 222.2 84% 4.9%;
