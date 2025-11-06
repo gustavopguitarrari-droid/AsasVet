@@ -258,25 +258,8 @@
   transition: background 0.3s ease-in-out; /* Adiciona transição suave ao overlay */
 }
 
-.login-art-bg-hover {
-  background-image: url('/images/vet-login-bg-hover.png'); /* Nova imagem de fundo no hover */
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  transition: background-image 0.3s ease-in-out; /* Adiciona transição suave */
-}
-
-.login-art-bg-hover::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5); /* Overlay escuro */
-  z-index: 0;
-  transition: background 0.3s ease-in-out; /* Adiciona transição suave ao overlay */
-}
+/* Removido: .login-art-bg-hover */
+/* Removido: .login-art-bg-hover::before */
 
 /* Original #root and other styles */
 /*
