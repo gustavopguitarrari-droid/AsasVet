@@ -42,9 +42,9 @@ const LandingPage: React.FC = () => {
         className="relative h-screen flex items-center justify-center text-center p-8 pt-20 bg-cover bg-center"
         style={{ backgroundImage: "url('/images/vet-landing-bg.png')" }}
       >
-        <div className="absolute inset-0 bg-black opacity-10"></div> {/* Opacidade ajustada para 10% */}
+        <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative z-10 max-w-4xl mx-auto text-white space-y-6">
-          <PawPrint className="h-24 w-24 mx-auto text-white animate-pulse" />
+          {/* <PawPrint className="h-24 w-24 mx-auto text-white animate-pulse" /> */} {/* Ícone removido */}
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight drop-shadow-lg text-white">
             Simplifique a Gestão da Sua Clínica Veterinária
           </h1>
