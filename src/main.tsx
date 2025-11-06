@@ -4,18 +4,21 @@ import "./globals.css";
 import { ThemeProvider } from "./components/ThemeProvider.tsx";
 import { UserProvider } from "./context/UserContext.tsx";
 import { ColorThemeProvider } from "./context/ColorThemeContext.tsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"; // Importar aqui
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ErrorBoundary from "./components/ErrorBoundary.tsx"; // Importar ErrorBoundary
 
-const queryClient = new QueryClient(); // Instanciar aqui
+const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
-  <QueryClientProvider client={queryClient}> {/* Agora é o provedor mais externo */}
-    <ThemeProvider defaultTheme="system" attribute="class" enableSystem>
-      <UserProvider>
-        <ColorThemeProvider>
-          <App />
-        </ColorThemeProvider>
-      </UserProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+  <ErrorBoundary> {/* Adicionado ErrorBoundary aqui */}
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider defaultTheme="system" attribute="class" enableSystem>
+        <UserProvider>
+          <ColorThemeProvider>
+            <App />
+          </ColorThemeProvider>
+        </UserProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
