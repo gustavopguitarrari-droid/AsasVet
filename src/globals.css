@@ -238,9 +238,10 @@
   background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
 }
 
-/* Removido o background-image para o login-art-bg para um visual mais limpo */
 .login-art-bg {
-  background-color: hsl(var(--primary)); /* Cor sólida vibrante */
+  background-image: url('/images/vet-landing-bg.png');
+  background-size: cover;
+  background-position: center;
   position: relative;
 }
 
@@ -251,7 +252,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.1); /* Overlay escuro com opacidade reduzida */
+  background: rgba(0, 0, 0, 0.5); /* Overlay escuro */
   z-index: 0;
 }
 
