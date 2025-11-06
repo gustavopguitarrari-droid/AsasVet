@@ -13,7 +13,7 @@ import { useColorTheme } from "@/context/ColorThemeContext";
 import { cn } from "@/lib/utils";
 
 const colorThemes = [
-  { name: "Padrão (Azul)", value: "default", colorClass: "bg-blue-500" },
+  { name: "Padrão (Nature Vet)", value: "nature-vet", colorClass: "bg-verde-folha-seca" }, // Renomeado e valor ajustado
   { name: "Laranja Pôr do Sol", value: "orange", colorClass: "bg-orange-500" },
   { name: "Azul Oceano", value: "blue", colorClass: "bg-blue-500" },
   { name: "Verde Esmeralda", value: "green", colorClass: "bg-green-500" },
@@ -22,7 +22,6 @@ const colorThemes = [
   { name: "Amarelo Dourado", value: "yellow", colorClass: "bg-yellow-500" },
   { name: "Vermelho Rubi", value: "red", colorClass: "bg-red-500" },
   { name: "Azul-Esverdeado", value: "teal-blue", colorClass: "bg-teal-blue-500" },
-  { name: "Nature Vet", value: "nature-vet", colorClass: "bg-verde-folha-seca" }, // NOVO TEMA
 ];
 
 const ColorThemeToggle = () => {
