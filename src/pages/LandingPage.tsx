@@ -46,7 +46,7 @@ const LandingPage: React.FC = () => {
         <div className="relative z-10 max-w-4xl mx-auto text-white space-y-6">
           <PawPrint className="h-24 w-24 mx-auto text-white animate-pulse" /> {/* Alterado para text-white */}
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight drop-shadow-lg text-white"> {/* Alterado para text-white */}
-            AsasVet: Simplifique a Gestão da Sua Clínica Veterinária
+            Simplifique a Gestão da Sua Clínica Veterinária
           </h1>
           <p className="text-lg md:text-xl text-white max-w-2xl mx-auto"> {/* Alterado para text-white */}
             Foco total no cuidado animal, nós cuidamos da burocracia.
