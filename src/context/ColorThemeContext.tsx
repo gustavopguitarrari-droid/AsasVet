@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'; // Importar
 import { supabase } from '@/integrations/supabase/client'; // Importar supabase
 import { showError, showSuccess } from '@/utils/toast'; // Importar toasts
 
-type ColorTheme = 'neutral-modern'; // NOVO: Apenas o tema 'neutral-modern'
+type ColorTheme = 'default' | 'orange' | 'blue' | 'green' | 'purple' | 'pink' | 'yellow' | 'red' | 'teal-blue' | 'neutral-modern'; // NOVO: Adicionado 'neutral-modern'
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -19,8 +19,8 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   const { user, setUser } = useUser(); // Obter o usuário e a função setUser do UserContext
   const queryClient = useQueryClient();
 
-  // O tema de cor agora vem do perfil do usuário. Se não houver usuário ou tema, usa 'neutral-modern'.
-  const currentColorTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'neutral-modern'; // NOVO: Padrão para 'neutral-modern'
+  // O tema de cor agora vem do perfil do usuário. Se não houver usuário ou tema, usa 'default'.
+  const currentColorTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'default';
 
   // Mutação para atualizar o tema de cor no perfil do usuário
   const updateColorThemeMutation = useMutation({

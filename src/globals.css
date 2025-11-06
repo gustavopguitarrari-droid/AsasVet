@@ -4,37 +4,37 @@
 
 @layer base {
   :root {
-    /* Cores do novo tema 'Moderno' */
-    --background: 168 70% 83%; /* Verde Menta (Principal) #B2F7E4 */
-    --foreground: 180 25% 25%; /* Azul Marinho Escuro (Contraste) #2F4F4F */
+    /* Cores do tema padrão */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
-    --card: 168 70% 83%; /* Verde Menta */
-    --card-foreground: 180 25% 25%; /* Azul Marinho Escuro */
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
 
-    --popover: 0 0% 100%; /* Branco */
-    --popover-foreground: 180 25% 25%; /* Azul Marinho Escuro */
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 180 25% 25%; /* Azul Marinho Escuro */
-    --primary-darker: 180 25% 15%; /* Azul Marinho Escuro mais escuro para gradientes */
-    --primary-foreground: 0 0% 100%; /* Branco */
+    --primary: 222.2 47.4% 11.2%;
+    --primary-darker: 222.2 47.4% 8%; /* Adicionado para gradientes */
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 30 100% 86%; /* Pêssego Suave (Secundária) #FFDAB9 */
-    --secondary-foreground: 180 25% 25%; /* Azul Marinho Escuro */
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --muted: 240 100% 94%; /* Lavanda Pálida (Destaque) #E6E6FA */
-    --muted-foreground: 180 25% 25%; /* Azul Marinho Escuro */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 30 100% 86%; /* Pêssego Suave */
-    --accent-foreground: 180 25% 25%; /* Azul Marinho Escuro */
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
-    --destructive: 0 84.2% 60.2%; /* Vermelho padrão */
-    --destructive-foreground: 0 0% 100%; /* Branco */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 180 25% 35%; /* Azul Marinho Médio para bordas */
-    --input: 180 25% 35%;
-    --ring: 180 25% 25%; /* Azul Marinho Escuro */
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 222.2 84% 4.9%;
 
-    /* Sidebar colors - agora derivados das variáveis do tema principal */
+    /* Sidebar colors */
     --sidebar-background: var(--primary);
     --sidebar-foreground: var(--primary-foreground);
     --sidebar-primary: var(--primary-foreground);
@@ -55,45 +55,44 @@
     --sidebar-item-bg-8: 60 90% 60%; /* Yellow */
     --sidebar-item-bg-9: 0 0% 50%; /* Gray */
 
-    /* Cores para Categorias de Eventos (ajustadas para o novo tema) */
-    --event-consulta: 180 25% 20%; /* Azul Marinho Escuro */
-    --event-cirurgia: 30 100% 70%; /* Pêssego Suave mais escuro */
-    --event-vacina: 240 100% 80%; /* Lavanda Pálida mais escura */
-    --event-exame: 168 70% 70%; /* Verde Menta mais escuro */
-    --event-retorno: 180 25% 40%; /* Azul Marinho Médio */
-    --event-outros: 0 0% 40%; /* Cinza */
+    /* Cores para Categorias de Eventos */
+    --event-consulta: 220 80% 60%;
+    --event-cirurgia: 10 80% 60%;
+    --event-vacina: 140 70% 40%;
+    --event-exame: 260 70% 60%;
+    --event-retorno: 40 90% 60%;
+    --event-outros: 0 0% 50%;
   }
 
   .dark {
-    /* Cores do novo tema 'Moderno' para Dark Mode */
-    --background: 180 25% 15%; /* Azul Marinho Escuro mais escuro */
-    --foreground: 168 70% 83%; /* Verde Menta */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    --card: 180 25% 15%;
-    --card-foreground: 168 70% 83%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 180 25% 20%;
-    --popover-foreground: 168 70% 83%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 168 70% 83%; /* Verde Menta */
-    --primary-darker: 168 70% 70%;
-    --primary-foreground: 180 25% 25%; /* Azul Marinho Escuro */
+    --primary: 210 40% 98%;
+    --primary-darker: 210 40% 80%; /* Adicionado para gradientes */
+    --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 30 100% 70%; /* Pêssego Suave mais escuro */
-    --secondary-foreground: 168 70% 83%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 240 100% 80%; /* Lavanda Pálida mais escura */
-    --muted-foreground: 168 70% 83%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 30 100% 70%;
-    --accent-foreground: 168 70% 83%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%; /* Vermelho padrão */
-    --destructive-foreground: 0 0% 100%; /* Branco */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 180 25% 25%;
-    --input: 180 25% 25%;
-    --ring: 168 70% 83%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
 
     /* Sidebar colors para dark mode */
     --sidebar-background: var(--primary);
@@ -117,12 +116,12 @@
     --sidebar-item-bg-9: 0 0% 30%;
 
     /* Cores para Categorias de Eventos em dark mode */
-    --event-consulta: 180 25% 40%;
-    --event-cirurgia: 30 100% 80%;
-    --event-vacina: 240 100% 90%;
-    --event-exame: 168 70% 80%;
-    --event-retorno: 180 25% 60%;
-    --event-outros: 0 0% 60%;
+    --event-consulta: 220 80% 40%;
+    --event-cirurgia: 10 80% 40%;
+    --event-vacina: 140 70% 20%;
+    --event-exame: 260 70% 40%;
+    --event-retorno: 40 90% 40%;
+    --event-outros: 0 0% 30%;
   }
 
   body {
@@ -207,43 +206,43 @@
 
 /* Landing Page specific theme */
 .theme-neutral-modern {
-  --background: 168 70% 83%; /* Verde Menta */
-  --foreground: 180 25% 25%; /* Azul Marinho Escuro */
-  --muted-foreground: 180 25% 40%; /* Azul Marinho Médio para texto muted */
-  --primary: 180 25% 25%; /* Azul Marinho Escuro */
-  --primary-darker: 180 25% 15%; /* Azul Marinho mais escuro */
-  --primary-foreground: 0 0% 100%; /* Branco */
-  --secondary: 30 100% 86%; /* Pêssego Suave */
-  --secondary-foreground: 180 25% 25%; /* Azul Marinho Escuro */
-  --border: 180 25% 35%; /* Azul Marinho Médio para bordas */
-  --input: 180 25% 35%; /* Azul Marinho Médio para inputs */
-  --ring: 180 25% 25%; /* Azul Marinho Escuro para ring */
-  --accent: 30 100% 86%; /* Pêssego Suave para accent */
-  --accent-foreground: 180 25% 25%; /* Azul Marinho Escuro para texto sobre accent */
-  --card: 168 70% 83%; /* Verde Menta para card */
-  --card-foreground: 180 25% 25%; /* Azul Marinho Escuro para texto sobre card */
-  --destructive: 0 84.2% 60.2%; /* Vermelho padrão */
-  --destructive-foreground: 0 0% 100%; /* Branco para texto sobre destructive */
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-darker: 222.2 47.4% 8%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 222.2 84% 4.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 100%;
 }
 
 .dark .theme-neutral-modern {
-  --background: 180 25% 15%; /* Fundo escuro */
-  --foreground: 168 70% 83%; /* Verde Menta para foreground */
-  --muted-foreground: 168 70% 70%; /* Verde Menta mais escuro para texto muted */
-  --primary: 168 70% 83%; /* Verde Menta para primary em dark mode */
-  --primary-darker: 168 70% 70%; /* Verde Menta mais escuro */
-  --primary-foreground: 180 25% 25%; /* Azul Marinho Escuro */
-  --secondary: 30 100% 70%; /* Pêssego Suave mais escuro */
-  --secondary-foreground: 168 70% 83%; /* Verde Menta */
-  --border: 180 25% 25%; /* Borda escura */
-  --input: 180 25% 25%; /* Input escuro */
-  --ring: 168 70% 83%; /* Verde Menta para ring */
-  --accent: 30 100% 70%; /* Accent escuro */
-  --accent-foreground: 168 70% 83%; /* Accent foreground escuro */
-  --card: 180 25% 15%; /* Card escuro */
-  --card-foreground: 168 70% 83%; /* Card foreground escuro */
-  --destructive: 0 62.8% 30.6%; /* Destructive escuro */
-  --destructive-foreground: 0 0% 100%; /* Destructive foreground escuro */
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --primary: 210 40% 98%;
+  --primary-darker: 210 40% 80%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 100%;
 }
 
 

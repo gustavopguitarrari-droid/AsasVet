@@ -76,18 +76,31 @@ export default {
           "item-bg-8": "hsl(var(--sidebar-item-bg-8))",
           "item-bg-9": "hsl(var(--sidebar-item-bg-9))",
         },
-        // Cores para o novo tema 'Moderno'
-        "green-mint": {
-          500: "hsl(168 70% 83%)",
+        // Cores para os novos temas
+        orange: {
+          500: "hsl(28 85% 55%)", // Laranja Pôr do Sol
         },
-        "peach-soft": {
-          500: "hsl(30 100% 86%)",
+        blue: {
+          500: "hsl(210 80% 45%)", // Azul Oceano
         },
-        "pale-lavender": {
-          500: "hsl(240 100% 94%)",
+        green: {
+          500: "hsl(160 70% 35%)", // Verde Esmeralda
+          400: "hsl(120 80% 40%)", // Verde Vivo
         },
-        "dark-navy-blue": {
-          500: "hsl(180 25% 25%)",
+        purple: {
+          600: "hsl(270 60% 45%)", // Púrpura Real
+        },
+        pink: {
+          500: "hsl(330 80% 65%)", // Rosa Chiclete
+        },
+        yellow: {
+          500: "hsl(45 90% 55%)", // Amarelo Dourado
+        },
+        red: {
+          500: "hsl(0 80% 45%)", // Vermelho Rubi
+        },
+        "teal-blue": { // NOVO: Azul-Esverdeado Principal
+          500: "hsl(188 39% 38%)",
         },
       },
       borderRadius: {
