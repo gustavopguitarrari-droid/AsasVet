@@ -20,7 +20,6 @@ import Login from "./pages/Login";
 import LandingPage from "./pages/LandingPage";
 import ConsultationPage from "./pages/Consultation";
 import SignUp from "./pages/SignUp";
-import GiftOpeningPage from "./pages/GiftOpeningPage"; // Import the new page
 import { SessionContextProvider } from "./context/SessionContext";
 import ScrollToTop from "./components/ScrollToTop";
 import { PageTitleProvider } from "./context/PageTitleContext";
@@ -37,7 +36,6 @@ const App = () => (
           <PageTitleProvider>
             <ScrollToTop />
             <Routes>
-              <Route path="/gift" element={<GiftOpeningPage />} /> {/* Nova rota inicial */}
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
