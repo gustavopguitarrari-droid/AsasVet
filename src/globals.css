@@ -239,7 +239,7 @@
 }
 
 .login-art-bg {
-  background-image: url('/images/vet-landing-bg.png');
+  background-image: url('/images/vet-login-bg.png'); /* Nova imagem de fundo */
   background-size: cover;
   background-position: center;
   position: relative;
