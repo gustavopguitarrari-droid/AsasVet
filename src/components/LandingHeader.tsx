@@ -29,8 +29,8 @@ const LandingHeader: React.FC = () => {
       {/* Center: Logo (always visible) */}
       <div className="flex-shrink-0 absolute left-1/2 -translate-x-1/2"> {/* Centraliza o logo */}
         <Link to="/" className="flex items-center text-3xl font-bold text-primary opacity-75 hover:opacity-100 transition-opacity duration-300" onClick={handleScrollToTop}>
-          <PawPrint className="h-10 w-10 mr-2" />
-          AsasVet
+          {/* <PawPrint className="h-10 w-10 mr-2" /> */} {/* Ícone de pata removido */}
+          {/* AsasVet */} {/* Texto "AsasVet" removido */}
         </Link>
       </div>
 
