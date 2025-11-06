@@ -39,9 +39,9 @@ const Login = () => {
   return (
     <div className={cn(
       "min-h-screen flex items-center justify-center p-4 theme-nature-vet",
-      "bg-verde-bambu" // Usa a cor de fundo do tema Nature Vet
+      "login-art-bg" // Usando a classe de background original
     )}>
-      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative bg-creme-terra/90 backdrop-blur-sm border border-marrom-avela/20">
+      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative bg-creme-terra/90 backdrop-blur-sm border border-marrom-avela/20 z-10"> {/* Adicionado z-10 */}
         <Button asChild variant="ghost" className="absolute top-4 left-4 text-marrom-avela font-bold hover:bg-verde-folha-seca/20">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
