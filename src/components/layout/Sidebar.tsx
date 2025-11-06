@@ -106,7 +106,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
         isVerticalLayout ? "flex-shrink-0 mr-4" : "mb-6 justify-center"
       )}>
         <img src="/images/logooficial.png" alt="AsasVet Logo" className={cn(
-          isVerticalLayout ? "h-8 w-auto" : (isCollapsed ? "h-10 w-auto" : "h-12 w-auto")
+          isVerticalLayout ? "h-10 w-auto" : (isCollapsed ? "h-12 w-auto" : "h-16 w-auto")
         )} />
       </Link>
       <nav className={cn(

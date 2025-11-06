@@ -379,7 +379,7 @@ const Dashboard = () => {
           <img
             src="/images/logooficial.png"
             alt="AsasVet Logo"
-            className="h-24 w-auto max-w-[150px] object-contain"
+            className="h-28 w-auto max-w-[180px] object-contain"
           />
           <div>
             <h2 className="text-3xl font-bold">{getGreeting()}</h2>
