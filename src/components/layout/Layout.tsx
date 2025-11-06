@@ -7,7 +7,8 @@ import {
 } from "@/components/ui/resizable";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import { MadeWithDyad } from "@/components/made-with-dyad";
+import { MadeWithDyad }
+ from "@/components/made-with-dyad";
 import { cn } from "@/lib/utils";
 import FloatingChatButton from "@/components/FloatingChatButton";
 import ChatDialog from "@/components/ChatDialog";
@@ -58,9 +59,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <ResizablePanelGroup direction="horizontal">
             <ResizablePanel
               defaultSize={28}
-              collapsedSize={8} // Tamanho quando recolhido
-              collapsible={true} // Permite recolher
-              collapsed={isSidebarCollapsed} // Controla o estado de recolhimento
+              minSize={8}      // Definido minSize
+              maxSize={28}     // Definido maxSize
+              collapsedSize={8}
+              collapsible={true}
+              collapsed={isSidebarCollapsed}
               className="transition-all duration-300 ease-in-out relative"
             >
               <Sidebar
