@@ -55,20 +55,20 @@ const Login = () => {
             variables: {
               default: {
                 colors: {
-                  brand: 'hsl(200 100% 40%)', // Novo Azul Principal
-                  brandAccent: 'hsl(200 100% 50%)', // Azul mais claro para hover
+                  brand: 'hsl(180 25% 25%)', // Azul Marinho Escuro
+                  brandAccent: 'hsl(180 25% 35%)', // Azul Marinho Médio para hover
                   inputBackground: 'rgba(255, 255, 255, 0.1)',
                   inputBorder: 'rgba(255, 255, 255, 0.3)',
-                  inputLabel: 'hsl(var(--foreground))', // Usar foreground para se adaptar ao tema
-                  inputText: 'hsl(var(--foreground))', // Usar foreground para se adaptar ao tema
-                  anchorText: 'hsl(var(--primary))', // Usar primary para links
-                  messageText: 'hsl(var(--foreground))', // Usar foreground para se adaptar ao tema
+                  inputLabel: 'hsl(var(--foreground))',
+                  inputText: 'hsl(var(--foreground))',
+                  anchorText: 'hsl(var(--primary))',
+                  messageText: 'hsl(var(--foreground))',
                 },
               },
               dark: {
                 colors: {
-                  brand: 'hsl(200 100% 50%)', // Azul Principal mais claro para dark mode
-                  brandAccent: 'hsl(200 100% 60%)', // Azul ainda mais claro para hover
+                  brand: 'hsl(168 70% 83%)', // Verde Menta para dark mode
+                  brandAccent: 'hsl(168 70% 70%)', // Verde Menta mais escuro para hover
                   inputLabel: 'hsl(var(--foreground))',
                   inputText: 'hsl(var(--foreground))',
                   anchorText: 'hsl(var(--primary))',

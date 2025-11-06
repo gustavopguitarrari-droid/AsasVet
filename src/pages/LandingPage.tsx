@@ -49,7 +49,7 @@ const LandingPage: React.FC = () => {
             Otimize seu tempo, organize sua clínica e foque no que realmente importa: o bem-estar dos animais.
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 mt-10 animate-fade-in-up">
-            <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-white hover:bg-gray-100 text-primary text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
+            <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-secondary hover:bg-secondary/90 text-secondary-foreground text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
               Teste Grátis Agora
             </Link>
             <Link to="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-primary border-primary hover:bg-primary hover:text-primary-foreground text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
@@ -91,7 +91,7 @@ const LandingPage: React.FC = () => {
           <p className="text-xl text-primary-foreground/90">
             Junte-se a centenas de veterinários que já estão otimizando seus processos com o AsasVet.
           </p>
-          <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-white text-primary hover:bg-gray-100 text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
+          <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-secondary text-secondary-foreground hover:bg-secondary/90 text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
             Teste Sua Jornada Gratuita
           </Link>
         </div>

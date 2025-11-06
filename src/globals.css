@@ -4,46 +4,47 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Cores do novo tema 'Moderno' */
+    --background: 168 70% 83%; /* Verde Menta (Principal) #B2F7E4 */
+    --foreground: 180 25% 25%; /* Azul Marinho Escuro (Contraste) #2F4F4F */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 168 70% 83%; /* Verde Menta */
+    --card-foreground: 180 25% 25%; /* Azul Marinho Escuro */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%; /* Branco */
+    --popover-foreground: 180 25% 25%; /* Azul Marinho Escuro */
 
-    --primary: 188 39% 38%; /* NOVO PADRÃO: Azul-Esverdeado Principal */
-    --primary-darker: 188 39% 30%; /* NOVO PADRÃO: Azul-Esverdeado Principal mais escuro */
-    --primary-foreground: 0 0% 100%; /* Branco para o foreground do novo padrão */
+    --primary: 180 25% 25%; /* Azul Marinho Escuro */
+    --primary-darker: 180 25% 15%; /* Azul Marinho Escuro mais escuro para gradientes */
+    --primary-foreground: 0 0% 100%; /* Branco */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 30 100% 86%; /* Pêssego Suave (Secundária) #FFDAB9 */
+    --secondary-foreground: 180 25% 25%; /* Azul Marinho Escuro */
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 240 100% 94%; /* Lavanda Pálida (Destaque) #E6E6FA */
+    --muted-foreground: 180 25% 25%; /* Azul Marinho Escuro */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 30 100% 86%; /* Pêssego Suave */
+    --accent-foreground: 180 25% 25%; /* Azul Marinho Escuro */
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive: 0 84.2% 60.2%; /* Vermelho padrão */
+    --destructive-foreground: 0 0% 100%; /* Branco */
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 180 25% 35%; /* Azul Marinho Médio para bordas */
+    --input: 180 25% 35%;
+    --ring: 180 25% 25%; /* Azul Marinho Escuro */
 
-    /* Sidebar colors - now derived from main theme variables */
-    --sidebar-background: var(--primary); /* Use primary color for sidebar background */
-    --sidebar-foreground: var(--primary-foreground); /* Use primary-foreground for sidebar text */
-    --sidebar-primary: var(--primary-foreground); /* Active item background is primary-foreground */
-    --sidebar-primary-foreground: var(--primary); /* Active item text is primary */
-    --sidebar-accent: var(--primary-foreground); /* Accent for hover, maybe a slightly different shade */
-    --sidebar-accent-foreground: var(--primary); /* Accent foreground for hover */
+    /* Sidebar colors - agora derivados das variáveis do tema principal */
+    --sidebar-background: var(--primary);
+    --sidebar-foreground: var(--primary-foreground);
+    --sidebar-primary: var(--primary-foreground);
+    --sidebar-primary-foreground: var(--primary);
+    --sidebar-accent: var(--primary-foreground);
+    --sidebar-accent-foreground: var(--primary);
     --sidebar-border: var(--border);
     --sidebar-ring: var(--ring);
 
-    /* Sidebar Item Backgrounds (arbitrary distinct colors) */
+    /* Sidebar Item Backgrounds (cores distintas para itens) */
     --sidebar-item-bg-1: 220 80% 60%; /* Blue */
     --sidebar-item-bg-2: 10 80% 60%; /* Reddish-orange */
     --sidebar-item-bg-3: 140 70% 40%; /* Green */
@@ -54,56 +55,57 @@
     --sidebar-item-bg-8: 60 90% 60%; /* Yellow */
     --sidebar-item-bg-9: 0 0% 50%; /* Gray */
 
-    /* Event Category Colors (distinct and vibrant, darker for light theme) */
-    --event-consulta: 210 80% 15%; /* Azul vibrante muito escuro */
-    --event-cirurgia: 340 80% 15%; /* Rosa-avermelhado muito escuro */
-    --event-vacina: 120 70% 5%; /* Verde claro muito escuro */
-    --event-exame: 40 90% 15%; /* Laranja-amarelado muito escuro */
-    --event-retorno: 260 70% 15%; /* Roxo muito escuro */
-    --event-outros: 200 10% 5%; /* Cinza azulado muito escuro */
+    /* Cores para Categorias de Eventos (ajustadas para o novo tema) */
+    --event-consulta: 180 25% 20%; /* Azul Marinho Escuro */
+    --event-cirurgia: 30 100% 70%; /* Pêssego Suave mais escuro */
+    --event-vacina: 240 100% 80%; /* Lavanda Pálida mais escura */
+    --event-exame: 168 70% 70%; /* Verde Menta mais escuro */
+    --event-retorno: 180 25% 40%; /* Azul Marinho Médio */
+    --event-outros: 0 0% 40%; /* Cinza */
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 20% 98%;
+    /* Cores do novo tema 'Moderno' para Dark Mode */
+    --background: 180 25% 15%; /* Azul Marinho Escuro mais escuro */
+    --foreground: 168 70% 83%; /* Verde Menta */
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 20% 98%;
+    --card: 180 25% 15%;
+    --card-foreground: 168 70% 83%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 180 25% 20%;
+    --popover-foreground: 168 70% 83%;
 
-    --primary: 188 39% 48%; /* NOVO PADRÃO: Azul-Esverdeado Principal (mais claro para dark mode) */
-    --primary-darker: 188 39% 38%; /* NOVO PADRÃO: Azul-Esverdeado Principal (original para dark mode) */
-    --primary-foreground: 222.2 47.4% 11.2%; /* Texto escuro para o foreground do novo padrão */
+    --primary: 168 70% 83%; /* Verde Menta */
+    --primary-darker: 168 70% 70%;
+    --primary-foreground: 180 25% 25%; /* Azul Marinho Escuro */
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 20% 98%;
+    --secondary: 30 100% 70%; /* Pêssego Suave mais escuro */
+    --secondary-foreground: 168 70% 83%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 240 100% 80%; /* Lavanda Pálida mais escura */
+    --muted-foreground: 168 70% 83%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 20% 98%;
+    --accent: 30 100% 70%;
+    --accent-foreground: 168 70% 83%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%; /* Vermelho padrão */
+    --destructive-foreground: 0 0% 100%; /* Branco */
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 180 25% 25%;
+    --input: 180 25% 25%;
+    --ring: 168 70% 83%;
 
-    /* Sidebar colors for dark mode - now derived from main theme variables */
-    --sidebar-background: var(--primary); /* Use primary color for sidebar background */
-    --sidebar-foreground: var(--primary-foreground); /* Use primary-foreground for sidebar text */
-    --sidebar-primary: var(--primary-foreground); /* Active item background is primary-foreground */
-    --sidebar-primary-foreground: var(--primary); /* Active item text is primary */
-    --sidebar-accent: var(--primary-foreground); /* Accent for hover, maybe a slightly different shade */
-    --sidebar-accent-foreground: var(--primary); /* Accent foreground for hover */
+    /* Sidebar colors para dark mode */
+    --sidebar-background: var(--primary);
+    --sidebar-foreground: var(--primary-foreground);
+    --sidebar-primary: var(--primary-foreground);
+    --sidebar-primary-foreground: var(--primary);
+    --sidebar-accent: var(--primary-foreground);
+    --sidebar-accent-foreground: var(--primary);
     --sidebar-border: var(--border);
     --sidebar-ring: var(--ring);
 
-    /* Sidebar Item Backgrounds (arbitrary distinct colors for dark mode) */
+    /* Sidebar Item Backgrounds (cores distintas para itens em dark mode) */
     --sidebar-item-bg-1: 220 80% 40%;
     --sidebar-item-bg-2: 10 80% 40%;
     --sidebar-item-bg-3: 140 70% 20%;
@@ -114,120 +116,19 @@
     --sidebar-item-bg-8: 60 90% 40%;
     --sidebar-item-bg-9: 0 0% 30%;
 
-    /* Event Category Colors (distinct and vibrant for dark mode) */
-    --event-consulta: 210 80% 45%; /* Azul mais claro */
-    --event-cirurgia: 340 80% 45%; /* Rosa-avermelhado mais claro */
-    --event-vacina: 120 70% 35%; /* Verde claro */
-    --event-exame: 40 90% 45%; /* Laranja-amarelado mais claro */
-    --event-retorno: 260 70% 45%; /* Roxo mais claro */
-    --event-outros: 200 10% 35%; /* Cinza azulado mais claro */
+    /* Cores para Categorias de Eventos em dark mode */
+    --event-consulta: 180 25% 40%;
+    --event-cirurgia: 30 100% 80%;
+    --event-vacina: 240 100% 90%;
+    --event-exame: 168 70% 80%;
+    --event-retorno: 180 25% 60%;
+    --event-outros: 0 0% 60%;
   }
 
   body {
     @apply bg-background text-foreground;
   }
 }
-
-/* Custom Color Themes */
-.theme-orange { /* Laranja Pôr do Sol */
-  --primary: 28 85% 55%; /* Um laranja vibrante */
-  --primary-darker: 28 85% 45%;
-  --primary-foreground: 0 0% 100%;
-}
-.dark .theme-orange {
-  --primary: 28 85% 65%; /* Laranja mais claro para contraste no escuro */
-  --primary-darker: 28 85% 55%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-}
-
-.theme-blue { /* Azul Oceano */
-  --primary: 210 80% 45%; /* Azul médio-escuro */
-  --primary-darker: 210 80% 35%;
-  --primary-foreground: 0 0% 100%;
-}
-.dark .theme-blue {
-  --primary: 210 80% 55%; /* Azul mais claro para contraste no escuro */
-  --primary-darker: 210 80% 45%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-}
-
-.theme-green { /* Verde Esmeralda */
-  --primary: 160 70% 35%; /* Verde esmeralda */
-  --primary-darker: 160 70% 25%;
-  --primary-foreground: 0 0% 100%;
-}
-.dark .theme-green {
-  --primary: 160 70% 45%; /* Verde mais claro para contraste no escuro */
-  --primary-darker: 160 70% 35%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-}
-
-.theme-vivid-green { /* Verde Vivo */
-  --primary: 120 80% 40%; /* Um verde bem vivo */
-  --primary-darker: 120 80% 30%;
-  --primary-foreground: 0 0% 100%;
-}
-.dark .theme-vivid-green {
-  --primary: 120 80% 50%; /* Verde mais claro para contraste no escuro */
-  --primary-darker: 120 80% 40%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-}
-
-.theme-purple { /* Púrpura Real */
-  --primary: 270 60% 45%; /* Roxo profundo */
-  --primary-darker: 270 60% 35%;
-  --primary-foreground: 0 0% 100%;
-}
-.dark .theme-purple {
-  --primary: 270 60% 55%; /* Roxo mais claro para contraste no escuro */
-  --primary-darker: 270 60% 45%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-}
-
-.theme-pink { /* Rosa Chiclete */
-  --primary: 330 80% 65%; /* Rosa vibrante */
-  --primary-darker: 330 80% 55%;
-  --primary-foreground: 0 0% 100%;
-}
-.dark .theme-pink {
-  --primary: 330 80% 75%; /* Rosa mais claro para contraste no escuro */
-  --primary-darker: 330 80% 65%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-}
-
-.theme-yellow { /* Amarelo Dourado */
-  --primary: 45 90% 55%; /* Amarelo dourado */
-  --primary-darker: 45 90% 45%;
-  --primary-foreground: 222.2 47.4% 11.2%; /* Texto escuro para contraste */
-}
-.dark .theme-yellow {
-  --primary: 45 90% 65%; /* Amarelo mais claro para contraste no escuro */
-  --primary-darker: 45 90% 55%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-}
-
-.theme-red { /* Vermelho Rubi */
-  --primary: 0 80% 45%; /* Vermelho intenso */
-  --primary-darker: 0 80% 35%;
-  --primary-foreground: 0 0% 100%;
-}
-.dark .theme-red {
-  --primary: 0 80% 55%; /* Vermelho mais claro para contraste no escuro */
-  --primary-darker: 0 80% 45%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-}
-
-.theme-teal-blue { /* NOVO: Azul-Esverdeado Principal */
-  --primary: 188 39% 38%;
-  --primary-darker: 188 39% 30%;
-  --primary-foreground: 0 0% 100%;
-}
-.dark .theme-teal-blue {
-  --primary: 188 39% 48%;
-  --primary-darker: 188 39% 38%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-}
-
 
 /* Custom Background Gradients */
 .sidebar-gradient-bg {
@@ -257,9 +158,6 @@
   z-index: 0;
   transition: background 0.3s ease-in-out; /* Adiciona transição suave ao overlay */
 }
-
-/* Removido: .login-art-bg-hover */
-/* Removido: .login-art-bg-hover::before */
 
 /* Original #root and other styles */
 /*
@@ -309,43 +207,43 @@
 
 /* Landing Page specific theme */
 .theme-neutral-modern {
-  --background: 0 0% 100%; /* Branco */
-  --foreground: 0 0% 29%; /* Cinza Escuro */
-  --muted-foreground: 0 0% 40%; /* Cinza Médio para texto muted */
-  --primary: 200 100% 40%; /* Azul Principal */
-  --primary-darker: 200 100% 30%; /* Azul mais escuro */
-  --primary-foreground: 0 0% 100%; /* Branco para texto sobre primary */
-  --secondary: 122 39% 50%; /* Verde Secundário */
-  --secondary-foreground: 0 0% 100%; /* Branco para texto sobre secondary */
-  --border: 0 0% 90%; /* Cinza claro para bordas */
-  --input: 0 0% 90%; /* Cinza claro para inputs */
-  --ring: 200 100% 40%; /* Azul para ring */
-  --accent: 0 0% 95%; /* Cinza muito claro para accent */
-  --accent-foreground: 0 0% 29%; /* Cinza Escuro para texto sobre accent */
-  --card: 0 0% 100%; /* Branco para card */
-  --card-foreground: 0 0% 29%; /* Cinza Escuro para texto sobre card */
+  --background: 168 70% 83%; /* Verde Menta */
+  --foreground: 180 25% 25%; /* Azul Marinho Escuro */
+  --muted-foreground: 180 25% 40%; /* Azul Marinho Médio para texto muted */
+  --primary: 180 25% 25%; /* Azul Marinho Escuro */
+  --primary-darker: 180 25% 15%; /* Azul Marinho mais escuro */
+  --primary-foreground: 0 0% 100%; /* Branco */
+  --secondary: 30 100% 86%; /* Pêssego Suave */
+  --secondary-foreground: 180 25% 25%; /* Azul Marinho Escuro */
+  --border: 180 25% 35%; /* Azul Marinho Médio para bordas */
+  --input: 180 25% 35%; /* Azul Marinho Médio para inputs */
+  --ring: 180 25% 25%; /* Azul Marinho Escuro para ring */
+  --accent: 30 100% 86%; /* Pêssego Suave para accent */
+  --accent-foreground: 180 25% 25%; /* Azul Marinho Escuro para texto sobre accent */
+  --card: 168 70% 83%; /* Verde Menta para card */
+  --card-foreground: 180 25% 25%; /* Azul Marinho Escuro para texto sobre card */
   --destructive: 0 84.2% 60.2%; /* Vermelho padrão */
   --destructive-foreground: 0 0% 100%; /* Branco para texto sobre destructive */
 }
 
 .dark .theme-neutral-modern {
-  --background: 222.2 84% 4.9%; /* Fundo escuro existente */
-  --foreground: 0 0% 90%; /* Cinza claro para foreground */
-  --muted-foreground: 0 0% 70%; /* Cinza mais claro para texto muted */
-  --primary: 200 100% 50%; /* Azul Principal mais claro para dark mode */
-  --primary-darker: 200 100% 40%; /* Azul original para dark mode darker variant */
-  --primary-foreground: 0 0% 100%; /* Branco para texto sobre primary */
-  --secondary: 122 39% 60%; /* Verde Secundário mais claro para dark mode */
-  --secondary-foreground: 0 0% 100%; /* Branco para texto sobre secondary */
-  --border: 217.2 32.6% 17.5%; /* Borda escura existente */
-  --input: 217.2 32.6% 17.5%; /* Input escuro existente */
-  --ring: 200 100% 50%; /* Azul para ring */
-  --accent: 217.2 32.6% 17.5%; /* Accent escuro existente */
-  --accent-foreground: 210 20% 98%; /* Accent foreground escuro existente */
-  --card: 222.2 84% 4.9%; /* Card escuro existente */
-  --card-foreground: 210 20% 98%; /* Card foreground escuro existente */
-  --destructive: 0 62.8% 30.6%; /* Destructive escuro existente */
-  --destructive-foreground: 210 20% 98%; /* Destructive foreground escuro existente */
+  --background: 180 25% 15%; /* Fundo escuro */
+  --foreground: 168 70% 83%; /* Verde Menta para foreground */
+  --muted-foreground: 168 70% 70%; /* Verde Menta mais escuro para texto muted */
+  --primary: 168 70% 83%; /* Verde Menta para primary em dark mode */
+  --primary-darker: 168 70% 70%; /* Verde Menta mais escuro */
+  --primary-foreground: 180 25% 25%; /* Azul Marinho Escuro */
+  --secondary: 30 100% 70%; /* Pêssego Suave mais escuro */
+  --secondary-foreground: 168 70% 83%; /* Verde Menta */
+  --border: 180 25% 25%; /* Borda escura */
+  --input: 180 25% 25%; /* Input escuro */
+  --ring: 168 70% 83%; /* Verde Menta para ring */
+  --accent: 30 100% 70%; /* Accent escuro */
+  --accent-foreground: 168 70% 83%; /* Accent foreground escuro */
+  --card: 180 25% 15%; /* Card escuro */
+  --card-foreground: 168 70% 83%; /* Card foreground escuro */
+  --destructive: 0 62.8% 30.6%; /* Destructive escuro */
+  --destructive-foreground: 0 0% 100%; /* Destructive foreground escuro */
 }
 
 
