@@ -23,11 +23,28 @@ import SignUp from "./pages/SignUp";
 import { SessionContextProvider } from "./context/SessionContext";
 import ScrollToTop from "./components/ScrollToTop";
 import { PageTitleProvider } from "./context/PageTitleContext";
+import React, { useState, useEffect } from "react"; // Importar useState e useEffect
+import GiftOpeningAnimation from "./components/GiftOpeningAnimation"; // Importar o novo componente
 
 // Removido: const queryClient = new QueryClient();
 
-const App = () => (
-  // Removido: <QueryClientProvider client={queryClient}>
+const App = () => {
+  const [showLandingPage, setShowLandingPage] = useState(false);
+
+  useEffect(() => {
+    // Verifica se a animação já foi vista na sessão atual
+    const hasSeenAnimation = sessionStorage.getItem('hasSeenGiftAnimation');
+    if (hasSeenAnimation === 'true') {
+      setShowLandingPage(true);
+    }
+  }, []);
+
+  const handleAnimationComplete = () => {
+    setShowLandingPage(true);
+    sessionStorage.setItem('hasSeenGiftAnimation', 'true'); // Marca como vista
+  };
+
+  return (
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -36,7 +53,16 @@ const App = () => (
           <PageTitleProvider>
             <ScrollToTop />
             <Routes>
-              <Route path="/" element={<LandingPage />} />
+              <Route
+                path="/"
+                element={
+                  showLandingPage ? (
+                    <LandingPage />
+                  ) : (
+                    <GiftOpeningAnimation onAnimationComplete={handleAnimationComplete} />
+                  )
+                }
+              />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />
               
@@ -145,7 +171,7 @@ const App = () => (
         </SessionContextProvider>
       </BrowserRouter>
     </TooltipProvider>
-  // Removido: </QueryClientProvider>
-);
+  );
+};
 
 export default App;
