@@ -16,7 +16,7 @@ import {
   ReceiptText,
   Package,
   Tag, // NEW: Import Tag icon for Products
-  Settings as SettingsIcon, // Renamed to avoid conflict with Settings page
+  // Settings as SettingsIcon, // Renamed to avoid conflict with Settings page - REMOVIDO
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -76,11 +76,12 @@ const allNavItems: NavItem[] = [
     icon: DollarSign,
     path: "/financeiro",
   },
-  {
-    name: "Configurações", // Add settings to sidebar
-    icon: SettingsIcon,
-    path: "/settings",
-  },
+  // REMOVIDO: O item "Configurações" foi movido para o menu de perfil do usuário.
+  // {
+  //   name: "Configurações", // Add settings to sidebar
+  //   icon: SettingsIcon,
+  //   path: "/settings",
+  // },
   // Removido o item "Caixa"
 ];
 
