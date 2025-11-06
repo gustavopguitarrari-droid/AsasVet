@@ -454,7 +454,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, rgba(var(--verde-bambu), 0.8), rgba(var(--verde-folha-seca-lighter), 0.8));
+  background: linear-gradient(to bottom, hsl(var(--verde-folha-seca) / 0.8), hsl(var(--verde-folha-seca-darker) / 0.8));
   z-index: 1;
 }
 
