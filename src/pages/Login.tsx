@@ -119,7 +119,7 @@ const Login = () => {
         {authView === 'sign_in' && (
           <p className="text-center text-sm text-marrom-avela">
             Não tem uma conta?{' '}
-            <Button variant="link" className="p-0 h-auto text-verde-folha-seca hover:text-verde-folha-seca/80" onClick={() => navigate('/signup')}>
+            <Button variant="link" className="p-0 h-auto font-bold text-marrom-avela hover:text-marrom-avela/80" onClick={() => navigate('/signup')}>
               Cadastre-se
             </Button>
           </p>
