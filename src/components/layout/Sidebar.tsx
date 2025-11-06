@@ -103,10 +103,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
     )}>
       <Link to="/painel" className={cn(
         "flex items-center text-sidebar-foreground cursor-pointer",
-        isVerticalLayout ? "text-3xl font-bold flex-shrink-0 mr-4" : "mb-6 justify-center text-4xl font-bold"
+        isVerticalLayout ? "flex-shrink-0 mr-4" : "mb-6 justify-center"
       )}>
-        {!isCollapsed && "AsasVet"}{" "}
-        <PawPrint className={cn("h-10 w-10 text-sidebar-foreground", !isCollapsed && "ml-2")} strokeWidth={2.5} />
+        <img src="/images/logooficial.png" alt="AsasVet Logo" className={cn(
+          isVerticalLayout ? "h-8 w-auto" : (isCollapsed ? "h-10 w-auto" : "h-12 w-auto")
+        )} />
       </Link>
       <nav className={cn(
         "flex-1",
