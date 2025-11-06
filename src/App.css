@@ -1,12 +1,13 @@
 /* Original #root and other styles */
-/*
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+  /* max-width: 1280px; */
+  /* margin: 0 auto; */
+  /* padding: 2rem; */
+  width: 100%; /* Garante que ocupe a largura total */
+  height: 100%; /* Garante que ocupe a altura total */
   text-align: center;
 }
-*/
+
 
 .logo {
   height: 6em;
