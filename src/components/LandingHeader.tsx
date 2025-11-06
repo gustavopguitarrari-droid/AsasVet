@@ -13,10 +13,10 @@ const LandingHeader: React.FC = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border p-4 flex items-center justify-between shadow-sm theme-neutral-modern"> {/* Fundo semi-transparente */}
-      {/* Left side: Logo */}
+      {/* Left side: Logo (REMOVIDO) */}
       <div className="flex-shrink-0">
         <Link to="/" className="flex items-center" onClick={handleScrollToTop}>
-          <img src="/images/logooficial.png" alt="AsasVet Logo" className="h-20 w-auto" /> {/* Tamanho do logo ajustado */}
+          {/* <img src="/images/logooficial.png" alt="AsasVet Logo" className="h-20 w-auto" /> REMOVIDO */}
         </Link>
       </div>
 
