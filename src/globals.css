@@ -481,15 +481,44 @@
 
 /* Classe para a Landing Page com a nova imagem */
 .landing-page-hero-bg {
-  /* Removido background-image e overlay */
+  background-image: url('/images/vet-landing-bg.png'); /* Adicionado background-image */
+  background-size: cover;
+  background-position: center;
   position: relative;
   transition: background-image 0.3s ease-in-out;
 }
 
+/* Adiciona um overlay escuro para melhorar a legibilidade do texto na Landing Page */
+.landing-page-hero-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4); /* Overlay escuro */
+  z-index: 0;
+}
+
 /* Ajustado para a página de Login - sem imagem de fundo, apenas o tema */
 .login-art-bg {
+  background-image: url('/images/vet-landing-bg.png'); /* Adicionado background-image */
+  background-size: cover;
+  background-position: center;
   position: relative; /* Mantém a posição relativa para o conteúdo interno */
   transition: background-image 0.3s ease-in-out; /* Mantém a transição, mesmo sem imagem */
+}
+
+/* Adiciona um overlay escuro para melhorar a legibilidade do texto na página de Login */
+.login-art-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4); /* Overlay escuro */
+  z-index: 0;
 }
 
 /* Original #root and other styles */
