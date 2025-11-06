@@ -99,6 +99,9 @@ export default {
         red: {
           500: "hsl(0 80% 45%)", // Vermelho Rubi
         },
+        "teal-blue": { // NOVO: Azul-Esverdeado Principal
+          500: "hsl(188 39% 38%)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -122,10 +125,32 @@ export default {
             height: "0",
           },
         },
+        "fade-in-down": { // NOVO: Keyframe para fade-in-down
+          "0%": {
+            opacity: "0",
+            transform: "translateY(-20px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "fade-in-up": { // NOVO: Keyframe para fade-in-up
+          "0%": {
+            opacity: "0",
+            transform: "translateY(20px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in-down": "fade-in-down 1s ease-out forwards", // NOVO: Animação
+        "fade-in-up": "fade-in-up 1s ease-out forwards",     // NOVO: Animação
       },
     },
   },

@@ -3,8 +3,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { buttonVariants } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card'; // Removido CardHeader, CardTitle
-import { PawPrint, ShieldCheck, CalendarCheck, Users, MessageSquareText, PlayCircle } from 'lucide-react'; // Ícones simplificados, adicionado PlayCircle
+import { Card, CardContent } from '@/components/ui/card';
+import { PawPrint, ShieldCheck, CalendarCheck, Users, MessageSquareText, PlayCircle, Quote } from 'lucide-react'; // Adicionado Quote para depoimentos
 import { cn } from '@/lib/utils';
 import LandingHeader from '@/components/LandingHeader';
 
@@ -13,22 +13,41 @@ const coreFeatures = [
   {
     icon: CalendarCheck,
     title: "Agenda Inteligente",
-    description: "Gerencie consultas e procedimentos com facilidade, otimizando seu tempo.",
+    description: "Gerencie consultas e procedimentos com facilidade, otimizando seu tempo e evitando conflitos.",
   },
   {
     icon: Users,
-    title: "Gestão de Clientes e Pets",
-    description: "Mantenha todos os dados de tutores e animais organizados em um só lugar.",
+    title: "Gestão Completa de Clientes e Pets",
+    description: "Mantenha todos os dados de tutores e animais organizados, com histórico e informações essenciais.",
   },
   {
     icon: ShieldCheck,
-    title: "Segurança de Dados",
-    description: "Suas informações protegidas com a melhor tecnologia e políticas de segurança.",
+    title: "Segurança e Privacidade de Dados",
+    description: "Suas informações protegidas com criptografia de ponta e políticas de segurança rigorosas.",
   },
   {
     icon: MessageSquareText,
-    title: "Suporte Dedicado",
-    description: "Conte com nossa equipe de suporte pronta para ajudar sempre que precisar.",
+    title: "Suporte Dedicado e Rápido",
+    description: "Conte com nossa equipe de suporte especializada, pronta para ajudar sempre que precisar.",
+  },
+];
+
+// Dados de depoimentos (exemplo)
+const testimonials = [
+  {
+    quote: "O AsasVet transformou a forma como gerenciamos nossa clínica. A organização e a facilidade de uso são incríveis!",
+    author: "Dra. Juliana Santos",
+    title: "Veterinária Chefe - Clínica Animal Feliz",
+  },
+  {
+    quote: "Nunca foi tão fácil acompanhar o histórico dos meus pacientes. Recomendo a todos os colegas!",
+    author: "Dr. Carlos Mendes",
+    title: "Proprietário - Pet Saúde",
+  },
+  {
+    quote: "A interface é intuitiva e o suporte é excelente. Uma ferramenta indispensável para qualquer clínica moderna.",
+    author: "Ana Paula Oliveira",
+    title: "Recepcionista - Hospital Veterinário Central",
   },
 ];
 
@@ -37,37 +56,36 @@ const LandingPage: React.FC = () => {
     <div className="min-h-screen bg-background text-foreground theme-neutral-modern">
       <LandingHeader />
 
-      {/* Hero Section - Modern & Minimalist */}
+      {/* Hero Section - Modern & Engaging */}
       <section 
-        className="relative h-screen flex items-center justify-center text-center p-8 pt-20 bg-cover bg-center"
+        className="relative h-screen flex items-center justify-center text-center p-8 pt-20 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/images/vet-landing-bg.png')" }}
       >
-        <div className="absolute inset-0 bg-black opacity-10"></div>
-        <div className="relative z-10 max-w-4xl mx-auto text-white space-y-6">
-          {/* <PawPrint className="h-24 w-24 mx-auto text-white animate-pulse" /> */} {/* Ícone removido */}
-          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight drop-shadow-lg text-white">
-            Simplifique a Gestão da Sua Clínica Veterinária
+        <div className="absolute inset-0 bg-black opacity-40"></div> {/* Overlay mais escuro */}
+        <div className="relative z-10 max-w-5xl mx-auto text-white space-y-8">
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight drop-shadow-lg text-white animate-fade-in-down">
+            A Gestão Veterinária que Você Sempre Sonhou
           </h1>
-          <p className="text-lg md:text-xl text-white max-w-2xl mx-auto">
-            Foco total no cuidado animal, nós cuidamos da burocracia.
+          <p className="text-lg md:text-2xl text-white max-w-3xl mx-auto opacity-90 animate-fade-in-up">
+            Otimize seu tempo, organize sua clínica e foque no que realmente importa: o bem-estar dos animais.
           </p>
-          <div className="flex justify-center space-x-4 mt-8">
-            <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-primary hover:bg-primary/90 text-primary-foreground text-lg px-8 py-4 shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}>
-              Comece Grátis
+          <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 mt-10 animate-fade-in-up">
+            <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-primary hover:bg-primary/90 text-primary-foreground text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
+              Comece Grátis Agora
             </Link>
-            <Link to="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-white border-white hover:bg-white hover:text-primary text-lg px-8 py-4 shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}>
-              Entrar
+            <Link to="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-white border-white hover:bg-white hover:text-primary text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
+              Já sou Cliente
             </Link>
           </div>
         </div>
       </section>
 
       {/* Video Showcase Section */}
-      <section id="video" className="py-20 px-8 bg-background text-center">
-        <h2 className="text-4xl font-bold mb-12 text-primary flex items-center justify-center">
-          <PlayCircle className="h-10 w-10 mr-4" /> Veja o AsasVet em Ação
+      <section id="video" className="py-24 px-8 bg-background text-center">
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-primary flex items-center justify-center">
+          <PlayCircle className="h-12 w-12 mr-4 text-primary" /> Veja o AsasVet em Ação
         </h2>
-        <div className="relative w-full max-w-4xl mx-auto aspect-video rounded-lg shadow-xl overflow-hidden border-2 border-primary">
+        <div className="relative w-full max-w-5xl mx-auto aspect-video rounded-xl shadow-2xl overflow-hidden border-4 border-primary">
           {/* Placeholder for a real system video. Replace 'YOUR_SYSTEM_VIDEO_EMBED_URL' with your actual video URL. */}
           <iframe
             className="absolute top-0 left-0 w-full h-full"
@@ -79,40 +97,60 @@ const LandingPage: React.FC = () => {
             allowFullScreen
           ></iframe>
         </div>
-        <p className="text-sm text-muted-foreground mt-4">
+        <p className="text-sm text-muted-foreground mt-6">
           (Este é um vídeo de demonstração. Substitua o 'VIDEO_ID_DO_SEU_SISTEMA' no código pelo ID do seu vídeo real no YouTube!)
         </p>
       </section>
 
       {/* Core Features Section */}
-      <section id="features" className="py-20 px-8 bg-muted text-center">
-        <h2 className="text-4xl font-bold mb-12 text-primary">Soluções Essenciais para Sua Clínica</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+      <section id="features" className="py-24 px-8 bg-muted text-center">
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-primary">Recursos Essenciais para o Seu Sucesso</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 max-w-7xl mx-auto">
           {coreFeatures.map((feature, index) => (
-            <Card key={index} className="flex flex-col items-center p-6 space-y-4 bg-card shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:-translate-y-1 border-t-2 border-primary">
-              <feature.icon className="h-16 w-16 text-primary" strokeWidth={1.5} />
-              <h3 className="text-xl font-semibold text-foreground">{feature.title}</h3>
-              <p className="text-md text-muted-foreground">{feature.description}</p>
+            <Card key={index} className="flex flex-col items-center p-8 space-y-5 bg-card shadow-xl hover:shadow-2xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 border-t-4 border-primary rounded-xl">
+              <feature.icon className="h-20 w-20 text-primary" strokeWidth={1.5} />
+              <h3 className="text-2xl font-semibold text-foreground">{feature.title}</h3>
+              <p className="text-lg text-muted-foreground">{feature.description}</p>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      {/* Testimonials Section (New!) */}
+      <section id="testimonials" className="py-24 px-8 bg-background text-center">
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-primary flex items-center justify-center">
+          <Quote className="h-12 w-12 mr-4 text-primary" /> O que Nossos Clientes Dizem
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto">
+          {testimonials.map((testimonial, index) => (
+            <Card key={index} className="flex flex-col p-8 space-y-6 bg-card shadow-xl rounded-xl border-l-4 border-secondary hover:shadow-2xl transition-shadow duration-300">
+              <CardContent className="p-0 text-left flex-1">
+                <p className="text-lg italic text-foreground leading-relaxed">"{testimonial.quote}"</p>
+              </CardContent>
+              <div className="text-left">
+                <p className="font-bold text-primary text-xl mt-4">{testimonial.author}</p>
+                <p className="text-sm text-muted-foreground">{testimonial.title}</p>
+              </div>
             </Card>
           ))}
         </div>
       </section>
 
       {/* Simple Call to Action */}
-      <section className="py-20 px-8 bg-primary text-primary-foreground text-center">
-        <div className="max-w-3xl mx-auto space-y-6">
-          <h2 className="text-4xl font-bold leading-tight">Pronto para Otimizar sua Gestão?</h2>
-          <p className="text-lg text-primary-foreground/90">
-            Experimente o AsasVet e descubra como é fácil gerenciar sua clínica.
+      <section className="py-24 px-8 bg-primary text-primary-foreground text-center">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <h2 className="text-4xl md:text-5xl font-bold leading-tight">Transforme a Gestão da Sua Clínica Hoje!</h2>
+          <p className="text-xl text-primary-foreground/90">
+            Junte-se a centenas de veterinários que já estão otimizando seus processos com o AsasVet.
           </p>
-          <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-white text-primary hover:bg-gray-100 text-xl px-8 py-5 shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}>
-            Comece Agora
+          <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-white text-primary hover:bg-gray-100 text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
+            Comece Sua Jornada Gratuita
           </Link>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-8 bg-card text-center text-muted-foreground border-t border-border">
+      <footer className="py-10 px-8 bg-card text-center text-muted-foreground border-t border-border">
         <p className="text-sm">&copy; {new Date().getFullYear()} AsasVet. Todos os direitos reservados.</p>
         <p className="mt-2 text-xs">Um desenvolvimento Agronegócios Guitarrari®</p>
       </footer>
