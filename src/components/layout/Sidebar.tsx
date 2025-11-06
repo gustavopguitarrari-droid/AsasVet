@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -105,12 +103,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse, layout
     )}>
       <Link to="/painel" className={cn(
         "flex items-center text-sidebar-foreground cursor-pointer",
-        isVerticalLayout ? "flex-shrink-0 mr-4" : "mb-6 justify-center"
+        isVerticalLayout ? "text-3xl font-bold flex-shrink-0 mr-4" : "mb-6 justify-center text-4xl font-bold"
       )}>
-        <img src="/images/logo.png" alt="AsasVet Logo" className={cn(
-          "h-10 w-auto", // Ajuste o tamanho conforme necessário
-          isCollapsed ? "h-10" : "h-12" // Tamanho maior quando não colapsado
-        )} />
+        {!isCollapsed && "AsasVet"}{" "}
+        <PawPrint className={cn("h-10 w-10 text-sidebar-foreground", !isCollapsed && "ml-2")} strokeWidth={2.5} />
       </Link>
       <nav className={cn(
         "flex-1",

@@ -44,7 +44,7 @@ const LandingPage: React.FC = () => {
       >
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative z-10 max-w-4xl mx-auto text-white space-y-6">
-          <img src="/images/logo.png" alt="AsasVet Logo" className="h-24 w-auto mx-auto mb-4" /> {/* Novo logo */}
+          {/* <PawPrint className="h-24 w-24 mx-auto text-white animate-pulse" /> */} {/* Ícone removido */}
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight drop-shadow-lg text-white">
             Simplifique a Gestão da Sua Clínica Veterinária
           </h1>
