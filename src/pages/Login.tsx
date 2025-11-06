@@ -8,7 +8,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useSession } from '@/context/SessionContext';
-import { cn } from '@/lib/utils'; // Import cn for conditional classes
+import { cn } from '@/lib/utils';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -30,19 +30,19 @@ const Login = () => {
   if (isLoading) {
     console.log('Login Page - Currently loading session...');
     return (
-      <div className="min-h-screen flex items-center justify-center login-art-bg">
-        <p className="text-lg text-gray-600 dark:text-gray-300">Carregando...</p>
+      <div className="min-h-screen flex items-center justify-center bg-verde-bambu">
+        <p className="text-lg text-marrom-avela">Carregando...</p>
       </div>
     );
   }
 
   return (
     <div className={cn(
-      "min-h-screen flex items-center justify-center p-4 theme-nature-vet", // Adicionado theme-nature-vet aqui
-      "login-art-bg" // Mantém a classe original
+      "min-h-screen flex items-center justify-center p-4 theme-nature-vet",
+      "bg-verde-bambu" // Usa a cor de fundo do tema Nature Vet
     )}>
-      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative bg-white dark:bg-gray-800 bg-opacity-30">
-        <Button asChild variant="ghost" className="absolute top-4 left-4 text-white font-bold">
+      <div className="w-full max-w-md p-8 space-y-6 rounded-lg shadow-md relative bg-creme-terra/90 backdrop-blur-sm border border-marrom-avela/20">
+        <Button asChild variant="ghost" className="absolute top-4 left-4 text-marrom-avela font-bold hover:bg-verde-folha-seca/20">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Link>
@@ -57,8 +57,8 @@ const Login = () => {
                 colors: {
                   brand: 'hsl(var(--primary))', // Adapta-se ao tema
                   brandAccent: 'hsl(var(--primary-darker))', // Adapta-se ao tema
-                  inputBackground: 'rgba(255, 255, 255, 0.1)',
-                  inputBorder: 'rgba(255, 255, 255, 0.3)',
+                  inputBackground: 'hsl(var(--input))',
+                  inputBorder: 'hsl(var(--border))',
                   inputLabel: 'hsl(var(--foreground))',
                   inputText: 'hsl(var(--foreground))',
                   anchorText: 'hsl(var(--primary))',
@@ -111,17 +111,17 @@ const Login = () => {
           className="custom-auth-form"
         />
         {authView === 'sign_in' && (
-          <p className="text-center text-sm text-white">
+          <p className="text-center text-sm text-marrom-avela">
             Não tem uma conta?{' '}
-            <Button variant="link" className="p-0 h-auto text-white hover:text-gray-200" onClick={() => navigate('/signup')}>
+            <Button variant="link" className="p-0 h-auto text-verde-folha-seca hover:text-verde-folha-seca/80" onClick={() => navigate('/signup')}>
               Cadastre-se
             </Button>
           </p>
         )}
         {authView === 'forgotten_password' && (
-          <p className="text-center text-sm text-white">
+          <p className="text-center text-sm text-marrom-avela">
             Lembrou da senha?{' '}
-            <Button variant="link" className="p-0 h-auto text-white hover:text-gray-200" onClick={() => setAuthView('sign_in')}>
+            <Button variant="link" className="p-0 h-auto text-verde-folha-seca hover:text-verde-folha-seca/80" onClick={() => setAuthView('sign_in')}>
               Entrar
             </Button>
           </p>

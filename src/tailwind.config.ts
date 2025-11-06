@@ -102,6 +102,28 @@ export default {
         "teal-blue": { // NOVO: Azul-Esverdeado Principal
           500: "hsl(188 39% 38%)",
         },
+        // Nova paleta de cores para o tema Nature Vet
+        "verde-bambu": {
+          DEFAULT: "hsl(80 40% 76%)", // #C5E1A5
+          darker: "hsl(80 30% 20%)", // Dark mode equivalent
+        },
+        "verde-folha-seca": {
+          DEFAULT: "hsl(80 40% 70%)", // #AED581
+          darker: "hsl(80 40% 60%)", // For gradients
+          lighter: "hsl(80 50% 60%)", // Dark mode equivalent
+        },
+        "creme-terra": {
+          DEFAULT: "hsl(50 100% 99%)", // #FFFDE7
+          darker: "hsl(30 10% 15%)", // Dark mode equivalent
+        },
+        "marrom-avela": {
+          DEFAULT: "hsl(20 18% 47%)", // #8D6E63
+          lighter: "hsl(30 10% 90%)", // Dark mode equivalent
+        },
+        "bege-areia": {
+          DEFAULT: "hsl(40 100% 85%)", // #FFECB3
+          darker: "hsl(40 50% 30%)", // Dark mode equivalent
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -125,10 +147,47 @@ export default {
             height: "0",
           },
         },
+        blob: {
+          "0%": {
+            transform: "translate(0px, 0px) scale(1)",
+          },
+          "33%": {
+            transform: "translate(30px, -50px) scale(1.1)",
+          },
+          "66%": {
+            transform: "translate(-20px, 20px) scale(0.9)",
+          },
+          "100%": {
+            transform: "translate(0px, 0px) scale(1)",
+          },
+        },
+        "fade-in-down": {
+          from: {
+            opacity: "0",
+            transform: "translateY(-20px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "fade-in-up": {
+          from: {
+            opacity: "0",
+            transform: "translateY(20px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        blob: "blob 7s infinite cubic-bezier(0.6, 0.01, 0.3, 0.9)",
+        "fade-in-down": "fade-in-down 1s ease-out forwards",
+        "fade-in-up": "fade-in-up 1s ease-out forwards",
       },
     },
   },

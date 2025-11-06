@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { buttonVariants } from '@/components/ui/button'; // Importar buttonVariants
+import { buttonVariants } from '@/components/ui/button';
 import { PawPrint } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -12,11 +12,12 @@ const LandingHeader: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-creme-terra/80 backdrop-blur-sm border-b border-marrom-avela/20 p-4 flex items-center justify-between shadow-sm theme-nature-vet">
-      {/* Left side: Logo (REMOVIDO) */}
+    <header className="fixed top-0 left-0 right-0 z-50 bg-creme-terra/90 backdrop-blur-sm border-b border-marrom-avela/20 p-4 flex items-center justify-between shadow-sm theme-nature-vet">
+      {/* Left side: Logo */}
       <div className="flex-shrink-0">
         <Link to="/" className="flex items-center" onClick={handleScrollToTop}>
-          {/* <img src="/images/logooficial.png" alt="AsasVet Logo" className="h-20 w-auto" /> REMOVIDO */}
+          <PawPrint className="h-8 w-8 text-verde-folha-seca mr-2" />
+          <span className="text-2xl font-bold text-marrom-avela">AsasVet</span>
         </Link>
       </div>
 

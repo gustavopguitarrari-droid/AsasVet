@@ -307,47 +307,6 @@
     --ring: 188 39% 58%;
   }
 
-  /* Landing Page specific theme (neutral-modern) */
-  .theme-neutral-modern {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-darker: 222.2 47.4% 8%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 222.2 84% 4.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-  }
-
-  .dark .theme-neutral-modern {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --primary: 210 40% 98%;
-    --primary-darker: 210 40% 80%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 100%;
-  }
-
   /* NOVO TEMA: Nature Vet */
   .theme-nature-vet {
     --background: 80 40% 76%; /* Verde Bambu #C5E1A5 */
@@ -479,47 +438,8 @@
   background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
 }
 
-/* Classe para a Landing Page com a nova imagem */
-.landing-page-hero-bg {
-  background-image: url('/images/vet-landing-bg.png'); /* Adicionado background-image */
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  transition: background-image 0.3s ease-in-out;
-}
-
-/* Adiciona um overlay escuro para melhorar a legibilidade do texto na Landing Page */
-.landing-page-hero-bg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: hsla(20, 18%, 47%, 0.6); /* Overlay marrom-avelã semi-transparente */
-  z-index: 0;
-}
-
-/* Ajustado para a página de Login - sem imagem de fundo, apenas o tema */
-.login-art-bg {
-  background-image: url('/images/vet-landing-bg.png'); /* Adicionado background-image */
-  background-size: cover;
-  background-position: center;
-  position: relative; /* Mantém a posição relativa para o conteúdo interno */
-  transition: background-image 0.3s ease-in-out; /* Mantém a transição, mesmo sem imagem */
-}
-
-/* Adiciona um overlay escuro para melhorar a legibilidade do texto na página de Login */
-.login-art-bg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: hsla(20, 18%, 47%, 0.6); /* Overlay marrom-avelã semi-transparente */
-  z-index: 0;
-}
+/* REMOVIDO: Classes de background da Landing Page e Login */
+/* .landing-page-hero-bg, .login-art-bg, .landing-page-hero-bg::before, .login-art-bg::before */
 
 /* Original #root and other styles */
 /*
@@ -580,4 +500,64 @@
 /* Ajusta o espaçamento do botão de submit */
 .custom-auth-form button[type="submit"] {
   margin-top: 1rem !important; /* Adiciona um pouco de margem superior ao botão */
+}
+
+/* Keyframes para animação de blob */
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite cubic-bezier(0.6, 0.01, 0.3, 0.9);
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Keyframes para animações de entrada */
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-down {
+  animation: fade-in-down 1s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 1s ease-out forwards;
+  animation-delay: 0.5s; /* Atraso para aparecer depois do título */
 }

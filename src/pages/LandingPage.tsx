@@ -4,7 +4,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ShieldCheck, CalendarCheck, Users, MessageSquareText, PlayCircle } from 'lucide-react';
+import { ShieldCheck, CalendarCheck, Users, MessageSquareText, PlayCircle, Leaf, Heart, Briefcase } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LandingHeader from '@/components/LandingHeader';
 
@@ -38,17 +38,23 @@ const LandingPage: React.FC = () => {
       <LandingHeader />
 
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center text-center p-8 pt-20 bg-verde-bambu text-marrom-avela">
-        <div className="relative z-10 max-w-5xl mx-auto space-y-6">
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight drop-shadow-lg animate-fade-in-down">
-            A Gestão Veterinária que Você Sempre Sonhou
+      <section className="relative min-h-screen flex items-center justify-center text-center p-8 pt-20 bg-gradient-to-br from-verde-bambu to-verde-folha-seca-lighter overflow-hidden">
+        <div className="absolute inset-0 z-0 opacity-20">
+          {/* Adiciona um padrão sutil de folhas ou formas orgânicas */}
+          <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-verde-folha-seca rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+          <div className="absolute -top-20 -right-20 w-72 h-72 bg-bege-areia rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-40 right-1/4 w-80 h-80 bg-creme-terra rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        </div>
+        <div className="relative z-10 max-w-5xl mx-auto space-y-8">
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-marrom-avela drop-shadow-lg animate-fade-in-down">
+            Cuidado Veterinário Simplificado
           </h1>
-          <p className="text-lg md:text-2xl max-w-3xl mx-auto opacity-90 animate-fade-in-up">
+          <p className="text-lg md:text-2xl max-w-3xl mx-auto text-marrom-avela/90 animate-fade-in-up">
             Otimize seu tempo, organize sua clínica e foque no que realmente importa: o bem-estar dos animais.
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 mt-10 animate-fade-in-up">
-            <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-verde-folha-seca hover:bg-verde-folha-seca/90 text-marrom-avela text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
-              Teste Grátis Agora
+            <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-marrom-avela hover:bg-marrom-avela/90 text-creme-terra text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
+              Comece Sua Jornada Gratuita
             </Link>
             <Link to="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-marrom-avela border-marrom-avela hover:bg-verde-folha-seca hover:text-marrom-avela text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
               Já sou Cliente
@@ -57,20 +63,24 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Video Section (Placeholder) */}
-      <section className="py-24 px-8 bg-creme-terra text-center">
-        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-verde-folha-seca">Veja o AsasVet em Ação</h2>
-        <div className="max-w-4xl mx-auto bg-bege-areia rounded-lg shadow-xl overflow-hidden relative aspect-video flex items-center justify-center">
-          <PlayCircle className="h-24 w-24 text-verde-folha-seca opacity-70 hover:opacity-100 transition-opacity cursor-pointer" />
-          <p className="absolute bottom-4 text-sm text-marrom-avela/80">
-            (Placeholder de vídeo - clique para simular a reprodução)
+      {/* About Section */}
+      <section id="about" className="py-24 px-8 bg-creme-terra text-center">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <h2 className="text-4xl md:text-5xl font-bold text-verde-folha-seca">Quem Somos</h2>
+          <p className="text-lg md:text-xl text-marrom-avela/90 leading-relaxed">
+            Na AsasVet, acreditamos que a paixão por animais deve ser acompanhada por uma gestão eficiente e descomplicada. Desenvolvemos uma plataforma intuitiva e completa, pensada para veterinários que buscam excelência no atendimento e otimização de suas rotinas. Nossa missão é empoderar clínicas e profissionais, liberando tempo para o que realmente importa: cuidar da saúde e felicidade dos pets.
           </p>
+          <div className="flex justify-center mt-8">
+            <Link to="/signup" className={cn(buttonVariants({ variant: "link" }), "text-verde-folha-seca hover:text-verde-folha-seca/80 text-lg font-semibold flex items-center")}>
+              Saiba Mais <Leaf className="ml-2 h-5 w-5" />
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Core Features Section */}
       <section id="features" className="py-24 px-8 bg-verde-bambu text-center">
-        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-verde-folha-seca">Recursos Essenciais para o Seu Sucesso</h2>
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-marrom-avela">Recursos Essenciais para o Seu Sucesso</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 max-w-7xl mx-auto">
           {coreFeatures.map((feature, index) => (
             <Card key={index} className="flex flex-col items-center p-8 space-y-5 bg-creme-terra shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 border-t-4 border-verde-folha-seca rounded-xl">
@@ -82,23 +92,46 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section className="py-24 px-8 bg-bege-areia text-center">
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-marrom-avela">O Que Nossos Clientes Dizem</h2>
+        <div className="max-w-3xl mx-auto">
+          <Card className="p-8 bg-creme-terra shadow-xl border-l-8 border-verde-folha-seca">
+            <CardContent className="space-y-6">
+              <p className="text-xl md:text-2xl italic text-marrom-avela leading-relaxed">
+                "O AsasVet revolucionou a forma como gerencio minha clínica. A agenda é intuitiva, o cadastro de pacientes é completo e o suporte é impecável. Recomendo a todos os colegas!"
+              </p>
+              <p className="text-lg font-semibold text-verde-folha-seca flex items-center justify-center">
+                <Heart className="h-6 w-6 mr-2" /> Dra. Sofia Mendes, Veterinária
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       {/* Call to Action */}
       <section className="py-24 px-8 bg-verde-folha-seca text-marrom-avela text-center">
         <div className="max-w-4xl mx-auto space-y-8">
-          <h2 className="text-4xl md:text-5xl font-bold leading-tight">Transforme a Gestão da Sua Clínica Hoje!</h2>
+          <h2 className="text-4xl md:text-5xl font-bold leading-tight">Pronto para Transformar Sua Clínica?</h2>
           <p className="text-xl text-marrom-avela/90">
-            Junte-se a centenas de veterinários que já estão otimizando seus processos com o AsasVet.
+            Experimente o AsasVet e descubra uma nova era na gestão veterinária.
           </p>
           <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-marrom-avela text-creme-terra hover:bg-marrom-avela/90 text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
-            Teste Sua Jornada Gratuita
+            Comece Seu Teste Gratuito
           </Link>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="py-10 px-8 bg-creme-terra text-marrom-avela/80 border-t border-marrom-avela/20">
-        <p className="text-sm">&copy; {new Date().getFullYear()} AsasVet. Todos os direitos reservados.</p>
-        <p className="mt-2 text-xs">Um desenvolvimento Agronegócios Guitarrari®</p>
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+          <div className="flex items-center">
+            <PawPrint className="h-6 w-6 text-verde-folha-seca mr-2" />
+            <span className="text-lg font-bold text-marrom-avela">AsasVet</span>
+          </div>
+          <p className="text-sm">&copy; {new Date().getFullYear()} AsasVet. Todos os direitos reservados.</p>
+          <p className="text-xs">Um desenvolvimento Agronegócios Guitarrari®</p>
+        </div>
       </footer>
     </div>
   );
