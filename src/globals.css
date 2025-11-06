@@ -239,7 +239,7 @@
 }
 
 .login-art-bg {
-  background-image: url('/images/vet-login-bg.png'); /* Nova imagem de fundo */
+  background-image: url('/images/vet-landing-bg.png'); /* Nova imagem de fundo */
   background-size: cover;
   background-position: center;
   position: relative;
@@ -253,7 +253,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5); /* Overlay escuro */
+  background: hsl(var(--primary) / 0.5); /* Overlay semi-transparente com a cor primária */
   z-index: 0;
   transition: background 0.3s ease-in-out; /* Adiciona transição suave ao overlay */
 }
@@ -309,28 +309,45 @@
 
 /* Landing Page specific theme */
 .theme-neutral-modern {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --muted-foreground: 215.4 16.3% 46.9%;
-  --primary: 188 39% 38%; /* Usando o teal-blue como primary para a landing page */
-  --primary-darker: 188 39% 30%;
-  --primary-foreground: 0 0% 100%;
-  --border: 214.3 31.8% 91.4%;
-  --card: 0 0% 100%;
-  --card-foreground: 222.2 84% 4.9%;
+  --background: 0 0% 100%; /* Branco */
+  --foreground: 0 0% 29%; /* Cinza Escuro */
+  --muted-foreground: 0 0% 40%; /* Cinza Médio para texto muted */
+  --primary: 200 100% 40%; /* Azul Principal */
+  --primary-darker: 200 100% 30%; /* Azul mais escuro */
+  --primary-foreground: 0 0% 100%; /* Branco para texto sobre primary */
+  --secondary: 122 39% 50%; /* Verde Secundário */
+  --secondary-foreground: 0 0% 100%; /* Branco para texto sobre secondary */
+  --border: 0 0% 90%; /* Cinza claro para bordas */
+  --input: 0 0% 90%; /* Cinza claro para inputs */
+  --ring: 200 100% 40%; /* Azul para ring */
+  --accent: 0 0% 95%; /* Cinza muito claro para accent */
+  --accent-foreground: 0 0% 29%; /* Cinza Escuro para texto sobre accent */
+  --card: 0 0% 100%; /* Branco para card */
+  --card-foreground: 0 0% 29%; /* Cinza Escuro para texto sobre card */
+  --destructive: 0 84.2% 60.2%; /* Vermelho padrão */
+  --destructive-foreground: 0 0% 100%; /* Branco para texto sobre destructive */
 }
 
 .dark .theme-neutral-modern {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 20% 98%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --primary: 188 39% 48%; /* teal-blue mais claro para dark mode */
-  --primary-darker: 188 39% 38%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --border: 217.2 32.6% 17.5%;
-  --card: 222.2 84% 4.9%;
-  --card-foreground: 210 20% 98%;
+  --background: 222.2 84% 4.9%; /* Fundo escuro existente */
+  --foreground: 0 0% 90%; /* Cinza claro para foreground */
+  --muted-foreground: 0 0% 70%; /* Cinza mais claro para texto muted */
+  --primary: 200 100% 50%; /* Azul Principal mais claro para dark mode */
+  --primary-darker: 200 100% 40%; /* Azul original para dark mode darker variant */
+  --primary-foreground: 0 0% 100%; /* Branco para texto sobre primary */
+  --secondary: 122 39% 60%; /* Verde Secundário mais claro para dark mode */
+  --secondary-foreground: 0 0% 100%; /* Branco para texto sobre secondary */
+  --border: 217.2 32.6% 17.5%; /* Borda escura existente */
+  --input: 217.2 32.6% 17.5%; /* Input escuro existente */
+  --ring: 200 100% 50%; /* Azul para ring */
+  --accent: 217.2 32.6% 17.5%; /* Accent escuro existente */
+  --accent-foreground: 210 20% 98%; /* Accent foreground escuro existente */
+  --card: 222.2 84% 4.9%; /* Card escuro existente */
+  --card-foreground: 210 20% 98%; /* Card foreground escuro existente */
+  --destructive: 0 62.8% 30.6%; /* Destructive escuro existente */
+  --destructive-foreground: 210 20% 98%; /* Destructive foreground escuro existente */
 }
+
 
 /* Custom CSS for Auth labels */
 .custom-auth-form label {

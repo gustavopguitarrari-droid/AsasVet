@@ -55,22 +55,24 @@ const Login = () => {
             variables: {
               default: {
                 colors: {
-                  brand: 'hsl(188 39% 38%)', // Azul-esverdeado principal
-                  brandAccent: 'hsl(188 39% 48%)', // Azul-esverdeado mais claro para hover
+                  brand: 'hsl(200 100% 40%)', // Novo Azul Principal
+                  brandAccent: 'hsl(200 100% 50%)', // Azul mais claro para hover
                   inputBackground: 'rgba(255, 255, 255, 0.1)',
                   inputBorder: 'rgba(255, 255, 255, 0.3)',
-                  inputLabel: 'hsl(0 0% 100%)',
-                  inputText: 'hsl(var(--primary-foreground))',
-                  anchorText: 'hsl(var(--primary-foreground))',
-                  messageText: 'hsl(var(--primary-foreground))',
+                  inputLabel: 'hsl(var(--foreground))', // Usar foreground para se adaptar ao tema
+                  inputText: 'hsl(var(--foreground))', // Usar foreground para se adaptar ao tema
+                  anchorText: 'hsl(var(--primary))', // Usar primary para links
+                  messageText: 'hsl(var(--foreground))', // Usar foreground para se adaptar ao tema
                 },
               },
               dark: {
                 colors: {
-                  inputLabel: 'hsl(0 0% 100%)',
-                  inputText: 'hsl(0 0% 100%)',
-                  anchorText: 'hsl(0 0% 100%)',
-                  messageText: 'hsl(0 0% 100%)',
+                  brand: 'hsl(200 100% 50%)', // Azul Principal mais claro para dark mode
+                  brandAccent: 'hsl(200 100% 60%)', // Azul ainda mais claro para hover
+                  inputLabel: 'hsl(var(--foreground))',
+                  inputText: 'hsl(var(--foreground))',
+                  anchorText: 'hsl(var(--primary))',
+                  messageText: 'hsl(var(--foreground))',
                 },
               },
             },
