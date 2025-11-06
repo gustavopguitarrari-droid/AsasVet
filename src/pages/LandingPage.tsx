@@ -4,7 +4,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ShieldCheck, CalendarCheck, Users, MessageSquareText, PlayCircle, Quote } from 'lucide-react';
+import { ShieldCheck, CalendarCheck, Users, MessageSquareText, PlayCircle } from 'lucide-react'; // Removido Quote
 import { cn } from '@/lib/utils';
 import LandingHeader from '@/components/LandingHeader';
 
@@ -32,24 +32,7 @@ const coreFeatures = [
   },
 ];
 
-// Dados de depoimentos (exemplo)
-const testimonials = [
-  {
-    quote: "O AsasVet transformou a forma como gerenciamos nossa clínica. A organização e a facilidade de uso são incríveis!",
-    author: "Dra. Juliana Santos",
-    title: "Veterinária Chefe - Clínica Animal Feliz",
-  },
-  {
-    quote: "Nunca foi tão fácil acompanhar o histórico dos meus pacientes. Recomendo a todos os colegas!",
-    author: "Dr. Carlos Mendes",
-    title: "Proprietário - Pet Saúde",
-  },
-  {
-    quote: "A interface é intuitiva e o suporte é excelente. Uma ferramenta indispensável para qualquer clínica moderna.",
-    author: "Ana Paula Oliveira",
-    title: "Recepcionista - Hospital Veterinário Central",
-  },
-];
+// Dados de depoimentos (exemplo) - REMOVIDO
 
 const LandingPage: React.FC = () => {
   return (
@@ -101,25 +84,7 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section id="testimonials" className="py-24 px-8 bg-muted text-center">
-        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-primary flex items-center justify-center">
-          <Quote className="h-12 w-12 mr-4 text-primary" /> O que Nossos Clientes Dizem
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto">
-          {testimonials.map((testimonial, index) => (
-            <Card key={index} className="flex flex-col p-8 space-y-6 bg-card shadow-lg rounded-xl border-l-4 border-primary hover:shadow-xl transition-shadow duration-300">
-              <CardContent className="p-0 text-left flex-1">
-                <p className="text-lg italic text-foreground leading-relaxed">"{testimonial.quote}"</p>
-              </CardContent>
-              <div className="text-left">
-                <p className="font-bold text-primary text-xl mt-4">{testimonial.author}</p>
-                <p className="text-sm text-muted-foreground">{testimonial.title}</p>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
+      {/* Testimonials Section - REMOVIDO */}
 
       {/* Call to Action */}
       <section className="py-24 px-8 bg-primary text-primary-foreground text-center">
