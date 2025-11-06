@@ -32,9 +32,7 @@ const GiftOpeningAnimation: React.FC<GiftOpeningAnimationProps> = ({ onAnimation
         <h1 className="text-4xl md:text-5xl font-extrabold leading-tight drop-shadow-lg">
           Você acaba de encontrar o melhor presente para o médico veterinário!
         </h1>
-        <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90">
-          Um sistema completo para otimizar sua clínica e cuidar melhor dos seus pacientes.
-        </p>
+        {/* Frase removida */}
         <Button
           onClick={handleOpenGift}
           size="lg"
