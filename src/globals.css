@@ -481,23 +481,9 @@
 
 /* Classe para a Landing Page com a nova imagem */
 .landing-page-hero-bg {
-  background-image: url('/images/landing-page-hero-bg.png');
-  background-size: cover;
-  background-position: center;
+  /* Removido background-image e overlay */
   position: relative;
   transition: background-image 0.3s ease-in-out;
-}
-
-.landing-page-hero-bg::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: hsl(var(--primary) / 0.5); /* Overlay semi-transparente com a cor primária */
-  z-index: 0;
-  transition: background 0.3s ease-in-out;
 }
 
 /* Ajustado para a página de Login - sem imagem de fundo, apenas o tema */
