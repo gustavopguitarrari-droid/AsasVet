@@ -19,8 +19,8 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   const { user, setUser } = useUser(); // Obter o usuário e a função setUser do UserContext
   const queryClient = useQueryClient();
 
-  // O tema de cor agora vem do perfil do usuário. Se não houver usuário ou tema, usa 'nature-vet'.
-  const currentColorTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'nature-vet';
+  // O tema de cor agora vem do perfil do usuário. Se não houver usuário ou tema, usa 'default'.
+  const currentColorTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'default';
 
   // Mutação para atualizar o tema de cor no perfil do usuário
   const updateColorThemeMutation = useMutation({
