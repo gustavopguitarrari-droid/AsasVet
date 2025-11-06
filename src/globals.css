@@ -496,7 +496,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.4); /* Overlay escuro */
+  background: hsla(20, 18%, 47%, 0.6); /* Overlay marrom-avelã semi-transparente */
   z-index: 0;
 }
 
@@ -517,7 +517,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.4); /* Overlay escuro */
+  background: hsla(20, 18%, 47%, 0.6); /* Overlay marrom-avelã semi-transparente */
   z-index: 0;
 }
 
