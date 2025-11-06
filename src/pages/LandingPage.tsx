@@ -4,7 +4,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ShieldCheck, CalendarCheck, Users, MessageSquareText, PlayCircle, Leaf, Heart, Briefcase } from 'lucide-react';
+import { ShieldCheck, CalendarCheck, Users, MessageSquareText, PlayCircle, Leaf, Heart, Briefcase, PawPrint } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LandingHeader from '@/components/LandingHeader';
 
