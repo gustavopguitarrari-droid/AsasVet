@@ -52,7 +52,7 @@ const LandingPage: React.FC = () => {
             <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-white hover:bg-gray-100 text-primary text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
               Comece Grátis Agora
             </Link>
-            <Link to="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-white border-white hover:bg-white hover:text-primary text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
+            <Link to="/login" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-primary border-primary hover:bg-primary hover:text-primary-foreground text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
               Já sou Cliente
             </Link>
           </div>
@@ -83,8 +83,6 @@ const LandingPage: React.FC = () => {
           ))}
         </div>
       </section>
-
-      {/* Testimonials Section - REMOVIDO */}
 
       {/* Call to Action */}
       <section className="py-24 px-8 bg-primary text-primary-foreground text-center">

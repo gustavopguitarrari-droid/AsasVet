@@ -32,11 +32,10 @@ const GiftOpeningAnimation: React.FC<GiftOpeningAnimationProps> = ({ onAnimation
         <h1 className="text-4xl md:text-5xl font-extrabold leading-tight drop-shadow-lg">
           Você acaba de encontrar o melhor presente para o médico veterinário!
         </h1>
-        {/* Frase removida */}
         <Button
           onClick={handleOpenGift}
           size="lg"
-          className="bg-white hover:bg-gray-100 text-primary text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105"
+          className="bg-white hover:bg-gray-100 text-primary text-2xl px-12 py-7 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105"
           disabled={isOpening}
         >
           Abrir Presente
