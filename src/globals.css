@@ -468,7 +468,7 @@
 
 .login-art-bg {
   background-image: url('/public/images/Gemini_Generated_Image_cl0abacl0abacl0a-2.png'); /* Nova imagem de fundo */
-  background-size: cover; /* Garante que a imagem cubra toda a área */
+  background-size: contain; /* Garante que a imagem cubra toda a área */
   background-position: center;
   background-repeat: no-repeat; /* Evita a repetição da imagem */
   position: relative;
