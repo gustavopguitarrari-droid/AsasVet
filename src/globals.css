@@ -448,13 +448,14 @@
 }
 
 .landing-page-hero-bg::before {
+  /* Removido o overlay de cor para mostrar a imagem como está */
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(to bottom, hsl(var(--verde-folha-seca) / 0.8), hsl(var(--verde-folha-seca-darker) / 0.8));
+  background: transparent; /* Torna o overlay transparente */
   z-index: 1;
 }
 
