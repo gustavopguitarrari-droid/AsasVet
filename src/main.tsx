@@ -5,12 +5,12 @@ import { ThemeProvider } from "./components/ThemeProvider.tsx";
 import { UserProvider } from "./context/UserContext.tsx";
 import { ColorThemeProvider } from "./context/ColorThemeContext.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import ErrorBoundary from "./components/ErrorBoundary.tsx"; // Importar ErrorBoundary
+// Removido: import ErrorBoundary from "./components/ErrorBoundary.tsx"; // Importar ErrorBoundary
 
 const queryClient = new QueryClient();
 
 createRoot(document.getElementById("root")!).render(
-  <ErrorBoundary> {/* Adicionado ErrorBoundary aqui */}
+  // Removido: <ErrorBoundary> {/* Adicionado ErrorBoundary aqui */}
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" attribute="class" enableSystem>
         <UserProvider>
@@ -20,5 +20,5 @@ createRoot(document.getElementById("root")!).render(
         </UserProvider>
       </ThemeProvider>
     </QueryClientProvider>
-  </ErrorBoundary>
+  // Removido: </ErrorBoundary>
 );
