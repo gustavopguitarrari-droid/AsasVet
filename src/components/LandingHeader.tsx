@@ -12,7 +12,7 @@ const LandingHeader: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-b border-border p-4 flex items-center justify-between shadow-sm theme-neutral-modern"> {/* Fundo semi-transparente */}
+    <header className="fixed top-0 left-0 right-0 z-50 bg-creme-terra/80 backdrop-blur-sm border-b border-marrom-avela/20 p-4 flex items-center justify-between shadow-sm theme-nature-vet">
       {/* Left side: Logo (REMOVIDO) */}
       <div className="flex-shrink-0">
         <Link to="/" className="flex items-center" onClick={handleScrollToTop}>
@@ -22,10 +22,10 @@ const LandingHeader: React.FC = () => {
 
       {/* Right side: Auth Buttons */}
       <div className="flex items-center space-x-4">
-        <Link to="/login" className={cn(buttonVariants({ variant: "ghost", size: "default" }), "text-foreground hover:text-primary transition-colors text-lg font-medium")}>
+        <Link to="/login" className={cn(buttonVariants({ variant: "ghost", size: "default" }), "text-marrom-avela hover:text-verde-folha-seca transition-colors text-lg font-medium")}>
           Login
         </Link>
-        <Link to="/signup" className={cn(buttonVariants({ variant: "default", size: "default" }), "bg-primary hover:bg-primary/90 text-primary-foreground text-lg font-medium")}>
+        <Link to="/signup" className={cn(buttonVariants({ variant: "default", size: "default" }), "bg-verde-folha-seca hover:bg-verde-folha-seca/90 text-marrom-avela text-lg font-medium")}>
           Cadastre-se
         </Link>
       </div>

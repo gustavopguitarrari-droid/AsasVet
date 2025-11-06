@@ -347,6 +347,127 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
   }
+
+  /* NOVO TEMA: Nature Vet */
+  .theme-nature-vet {
+    --background: 80 40% 76%; /* Verde Bambu #C5E1A5 */
+    --foreground: 20 18% 47%; /* Marrom Avelã #8D6E63 */
+
+    --card: 50 100% 99%; /* Creme Terra #FFFDE7 */
+    --card-foreground: 20 18% 47%; /* Marrom Avelã #8D6E63 */
+
+    --popover: 50 100% 99%; /* Creme Terra #FFFDE7 */
+    --popover-foreground: 20 18% 47%; /* Marrom Avelã #8D6E63 */
+
+    --primary: 80 40% 70%; /* Verde Folha Seca #AED581 */
+    --primary-darker: 80 40% 60%; /* Darker Verde Folha Seca for gradient */
+    --primary-foreground: 20 18% 47%; /* Marrom Avelã #8D6E63 */
+
+    --secondary: 40 100% 85%; /* Bege Areia #FFECB3 */
+    --secondary-foreground: 20 18% 47%; /* Marrom Avelã #8D6E63 */
+
+    --muted: 40 100% 85%; /* Bege Areia #FFECB3 */
+    --muted-foreground: 20 18% 47%; /* Marrom Avelã #8D6E63 */
+
+    --accent: 40 100% 85%; /* Bege Areia #FFECB3 */
+    --accent-foreground: 20 18% 47%; /* Marrom Avelã #8D6E63 */
+
+    --destructive: 0 84.2% 60.2%; /* Standard red */
+    --destructive-foreground: 0 0% 100%; /* White */
+
+    --border: 20 18% 60%; /* Lighter Marrom Avelã for borders */
+    --input: 50 100% 99%; /* Creme Terra #FFFDE7 */
+    --ring: 80 40% 70%; /* Verde Folha Seca #AED581 */
+
+    /* Sidebar colors (adaptam-se ao tema principal) */
+    --sidebar-background: var(--primary);
+    --sidebar-foreground: var(--primary-foreground);
+    --sidebar-primary: var(--primary-foreground);
+    --sidebar-primary-foreground: var(--primary);
+    --sidebar-accent: var(--primary-foreground);
+    --sidebar-accent-foreground: var(--primary);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+
+    /* Sidebar Item Backgrounds (cores distintas para itens) */
+    --sidebar-item-bg-1: 220 80% 60%; /* Blue */
+    --sidebar-item-bg-2: 10 80% 60%; /* Reddish-orange */
+    --sidebar-item-bg-3: 140 70% 40%; /* Green */
+    --sidebar-item-bg-4: 260 70% 60%; /* Purple */
+    --sidebar-item-bg-5: 40 90% 60%; /* Orange */
+    --sidebar-item-bg-6: 180 70% 40%; /* Cyan */
+    --sidebar-item-bg-7: 300 70% 60%; /* Magenta */
+    --sidebar-item-bg-8: 60 90% 60%; /* Yellow */
+    --sidebar-item-bg-9: 0 0% 50%; /* Gray */
+
+    /* Cores para Categorias de Eventos */
+    --event-consulta: 220 80% 60%;
+    --event-cirurgia: 10 80% 60%;
+    --event-vacina: 140 70% 40%;
+    --event-exame: 260 70% 60%;
+    --event-retorno: 40 90% 60%;
+    --event-outros: 0 0% 50%;
+  }
+
+  .dark .theme-nature-vet {
+    --background: 80 30% 20%; /* Darker Verde Bambu */
+    --foreground: 30 10% 90%; /* Light cream/white */
+
+    --card: 30 10% 15%; /* Dark warm grey/brown */
+    --card-foreground: 30 10% 90%; /* Light cream/white */
+
+    --popover: 30 10% 15%; /* Dark warm grey/brown */
+    --popover-foreground: 30 10% 90%; /* Light cream/white */
+
+    --primary: 80 50% 60%; /* Lighter Verde Folha Seca */
+    --primary-darker: 80 50% 50%;
+    --primary-foreground: 30 10% 15%; /* Dark warm grey/brown */
+
+    --secondary: 40 50% 30%; /* Darker Bege Areia */
+    --secondary-foreground: 30 10% 90%; /* Light cream/white */
+
+    --muted: 40 50% 30%; /* Darker Bege Areia */
+    --muted-foreground: 30 10% 70%; /* Slightly darker light cream */
+
+    --accent: 40 50% 30%; /* Darker Bege Areia */
+    --accent-foreground: 30 10% 90%; /* Light cream/white */
+
+    --destructive: 0 62.8% 30.6%; /* Standard dark red */
+    --destructive-foreground: 0 0% 100%; /* White */
+
+    --border: 30 10% 25%; /* Darker warm grey/brown for borders */
+    --input: 30 10% 15%; /* Dark warm grey/brown */
+    --ring: 80 50% 60%; /* Lighter Verde Folha Seca */
+
+    /* Sidebar colors para dark mode (adaptam-se ao tema principal) */
+    --sidebar-background: var(--primary);
+    --sidebar-foreground: var(--primary-foreground);
+    --sidebar-primary: var(--primary-foreground);
+    --sidebar-primary-foreground: var(--primary);
+    --sidebar-accent: var(--primary-foreground);
+    --sidebar-accent-foreground: var(--primary);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+
+    /* Sidebar Item Backgrounds (cores distintas para itens em dark mode) */
+    --sidebar-item-bg-1: 220 80% 40%;
+    --sidebar-item-bg-2: 10 80% 40%;
+    --sidebar-item-bg-3: 140 70% 20%;
+    --sidebar-item-bg-4: 260 70% 40%;
+    --sidebar-item-bg-5: 40 90% 40%;
+    --sidebar-item-bg-6: 180 70% 20%;
+    --sidebar-item-bg-7: 300 70% 40%;
+    --sidebar-item-bg-8: 60 90% 40%;
+    --sidebar-item-bg-9: 0 0% 30%;
+
+    /* Cores para Categorias de Eventos em dark mode */
+    --event-consulta: 220 80% 40%;
+    --event-cirurgia: 10 80% 40%;
+    --event-vacina: 140 70% 20%;
+    --event-exame: 260 70% 40%;
+    --event-retorno: 40 90% 40%;
+    --event-outros: 0 0% 30%;
+  }
 }
 
 /* Custom Background Gradients */
