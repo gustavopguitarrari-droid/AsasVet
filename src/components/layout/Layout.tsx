@@ -53,25 +53,25 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return 8; // Tamanho fixo para o menu superior (8% da altura)
   }, [isSidebarCollapsed, layoutDirection]);
 
-  // Lida com o redimensionamento manual do sidebar pelo usuário
-  const handleSidebarResize = (newSize: number) => {
-    if (layoutDirection === "horizontal") {
-      // Se o usuário redimensionar manualmente, atualiza o estado de recolhimento
-      if (newSize <= 6) { // Considera "recolhido" se o tamanho for 6% ou menos
-        setIsSidebarCollapsed(true);
-      } else {
-        setIsSidebarCollapsed(false);
-      }
-    }
-    // Para layout vertical, o redimensionamento é de altura e não afeta o estado de "recolhimento"
-  };
+  // Removido: Lida com o redimensionamento manual do sidebar pelo usuário
+  // const handleSidebarResize = (newSize: number) => {
+  //   if (layoutDirection === "horizontal") {
+  //     // Se o usuário redimensionar manualmente, atualiza o estado de recolhimento
+  //     if (newSize <= 6) { // Considera "recolhido" se o tamanho for 6% ou menos
+  //       setIsSidebarCollapsed(true);
+  //     } else {
+  //       setIsSidebarCollapsed(false);
+  //     }
+  //   }
+  //   // Para layout vertical, o redimensionamento é de altura e não afeta o estado de "recolhimento"
+  // };
 
   return (
     <div className="flex h-screen w-screen overflow-hidden">
       <ResizablePanelGroup direction={layoutDirection}>
         <ResizablePanel
           size={currentSidebarSize} // Usar 'size' para controlar o tamanho dinamicamente
-          onResize={handleSidebarResize} // Adicionar handler para redimensionamento manual
+          // Removido: onResize={handleSidebarResize} // Removido handler para redimensionamento manual
           minSize={layoutDirection === "horizontal" ? 6 : 8}
           maxSize={layoutDirection === "horizontal" ? 25 : 10}
           className={cn(
