@@ -473,7 +473,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(var(--verde-bambu), 0.8); /* Uma cor sólida com transparência */
+  background: rgba(var(--verde-folha-seca), 0.8); /* Uma cor sólida com transparência */
   z-index: 1;
 }
 
