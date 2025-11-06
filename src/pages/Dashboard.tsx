@@ -375,13 +375,11 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          {user?.logoUrl && (
-            <img
-              src={user.logoUrl}
-              alt="Logo da Clínica"
-              className="h-24 w-auto max-w-[150px] object-contain"
-            />
-          )}
+          <img
+            src="/images/logo.png" // Novo logo
+            alt="AsasVet Logo"
+            className="h-24 w-auto max-w-[150px] object-contain"
+          />
           <div>
             <h2 className="text-3xl font-bold">{getGreeting()}</h2>
             <p className="text-muted-foreground">
