@@ -117,12 +117,12 @@ const MyPlanSettings: React.FC = () => {
           Visualize os detalhes do seu plano atual e explore opções de upgrade.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {availablePlans.map((plan) => (
             <Card
               key={plan.id}
               className={cn(
-                "flex flex-col justify-between p-6",
+                "flex flex-col justify-between p-6 h-[480px]", // Altura fixa adicionada
                 plan.name === currentPlanName ? "border-2 border-primary shadow-lg" : "border"
               )}
             >
@@ -136,11 +136,11 @@ const MyPlanSettings: React.FC = () => {
                 {/* O valor do plano agora está acima da imagem */}
                 <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
                 {plan.imageUrl && (
-                  <div className="mb-0 flex justify-center"> {/* Alterado mb-2 para mb-0 */}
-                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-72 w-auto object-contain" />
+                  <div className="mb-0 flex justify-center">
+                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-56 w-auto object-contain" /> {/* Altura da imagem ajustada */}
                   </div>
                 )}
-                <ul className="space-y-2 text-sm text-muted-foreground mb-4"> {/* Alterado mb-6 para mb-4 */}
+                <ul className="space-y-2 text-sm text-muted-foreground mb-4">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-center">
                       <CheckCircle className="h-4 w-4 mr-2 text-green-500" /> {feature}
