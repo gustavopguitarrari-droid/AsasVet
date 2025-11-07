@@ -77,10 +77,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
           
           // Conteúdo do Link, garantindo que seja sempre um único elemento ou um Fragment
           const linkChildren = isCollapsed ? (
-            <item.icon className="h-12 w-12" strokeWidth={2} />
+            <item.icon className="h-14 w-14" strokeWidth={2} />
           ) : (
             <>
-              <item.icon className="h-12 w-12 mr-3" strokeWidth={2} />
+              <item.icon className="h-14 w-14 mr-4" strokeWidth={2} />
               <span className="whitespace-nowrap">{item.name}</span>
             </>
           );
