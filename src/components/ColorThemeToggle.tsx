@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 
 const colorThemes = [
   { name: "Nature Vet", value: "nature-vet", colorClass: "bg-landingPage-lp-verde-folha-seca" },
+  { name: "Azul Escuro", value: "azul-escuro", colorClass: "bg-blue-800" }, // NOVO: Adicionado tema Azul Escuro
   { name: "Céu Sereno", value: "ceu-sereno", colorClass: "bg-blue-400" },
   { name: "Jardim de Lavanda", value: "jardim-lavanda", colorClass: "bg-purple-400" },
   { name: "Areia Dourada", value: "areia-dourada", colorClass: "bg-yellow-400" },

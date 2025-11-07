@@ -85,8 +85,8 @@
     --lp-bege-areia: 40 100% 85%;
   }
 
-  .theme-default {
-    /* Cores do tema padrão (Azul Escuro/Cinza) */
+  /* NOVO TEMA: Azul Escuro (antigo .theme-default) */
+  .theme-azul-escuro {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
 
