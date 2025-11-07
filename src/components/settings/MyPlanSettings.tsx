@@ -134,9 +134,9 @@ const MyPlanSettings: React.FC = () => {
                     {plan.name === currentPlanName ? "Ativo" : "Disponível"}
                   </Badge>
                 </div>
-                <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
+                <p className="text-3xl font-extrabold">R$ {plan.price}</p> {/* Removido mb-4 */}
                 {plan.imageUrl && (
-                  <div className="mb-2 flex justify-center"> {/* Alterado de mb-4 para mb-2 */}
+                  <div className="flex justify-center"> {/* Removido mb-2 */}
                     <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-[500px] w-auto object-contain" />
                   </div>
                 )}
