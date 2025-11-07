@@ -78,8 +78,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
               asChild
               variant="ghost"
               className={cn(
-                "w-full justify-start h-10 rounded-lg", // Adicionado rounded-lg
-                "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                "w-full justify-start h-12 rounded-lg", // Aumentado h-10 para h-12
+                "text-base text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground", // Aumentado text-sm para text-base
                 isActive && "bg-sidebar-primary text-sidebar-primary-foreground",
                 isCollapsed ? "px-0 justify-center" : "px-3"
               )}
