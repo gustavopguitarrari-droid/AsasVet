@@ -88,6 +88,7 @@
 
     /* NOVO: Definir um verde escuro para o sidebar */
     --nv-dark-green: 90 40% 20%;
+    --nv-dark-green-darker: 90 40% 15%; /* Um tom um pouco mais escuro para hover */
 
     /* Mapeamento para as variáveis do shadcn/ui */
     --background: var(--nv-lp-creme-terra); /* Fundo da página mais claro */
@@ -99,8 +100,8 @@
     --popover: var(--nv-lp-creme-terra);
     --popover-foreground: var(--nv-lp-marrom-avela);
 
-    --primary: var(--nv-lp-verde-folha-seca); /* Botões primários em verde */
-    --primary-darker: 90 40% 57%; /* Verde um pouco mais escuro */
+    --primary: var(--nv-dark-green); /* Botões primários e abas ativas em verde escuro */
+    --primary-darker: var(--nv-dark-green-darker); /* Hover dos botões primários em verde mais escuro */
     --primary-foreground: var(--nv-lp-creme-terra); /* Texto claro nos botões primários */
 
     --secondary: var(--nv-lp-bege-areia);
