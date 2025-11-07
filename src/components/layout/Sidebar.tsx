@@ -65,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       )}>
         <Link to="/painel" className="flex items-center">
           {/* Removido: <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-8 w-auto" /> */}
-          <PawPrint className={cn("h-10 w-10 text-sidebar-primary", !isCollapsed && "mr-2")} strokeWidth={2} /> {/* Ícone sempre visível, ajusta margem */}
+          <PawPrint className={cn("h-10 w-10 text-sidebar-primary", !isCollapsed && "mr-2")} strokeWidth={3} /> {/* Ícone sempre visível, ajusta margem */}
           {!isCollapsed && <span className="text-2xl font-bold text-sidebar-primary whitespace-nowrap">AsasVet</span>}
         </Link>
       </div>
@@ -77,10 +77,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
           
           // Conteúdo do Link, garantindo que seja sempre um único elemento ou um Fragment
           const linkChildren = isCollapsed ? (
-            <item.icon className="h-14 w-14" strokeWidth={2} />
+            <item.icon className="h-14 w-14" strokeWidth={3} />
           ) : (
             <>
-              <item.icon className="h-14 w-14 mr-4" strokeWidth={2} />
+              <item.icon className="h-14 w-14 mr-4" strokeWidth={3} />
               <span className="whitespace-nowrap">{item.name}</span>
             </>
           );
@@ -124,9 +124,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
               className="w-full h-10 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" // Adicionado rounded-lg
             >
               {isCollapsed ? (
-                <ArrowRightToLine className="h-5 w-5" />
+                <ArrowRightToLine className="h-5 w-5" strokeWidth={3} />
               ) : (
-                <ArrowLeftToLine className="h-5 w-5" />
+                <ArrowLeftToLine className="h-5 w-5" strokeWidth={3} />
               )}
               <span className="sr-only">{isCollapsed ? "Expandir Sidebar" : "Recolher Sidebar"}</span>
             </Button>
