@@ -939,10 +939,10 @@ const Appointments = () => {
 
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "em-espera" | "em-andamento" | "finalizadas")} className="w-full md:w-auto flex-1"> {/* Adicionado flex-1 */}
-            <TabsList className="grid w-full grid-cols-3 bg-muted/50">
-              <TabsTrigger value="em-espera" className="data-[state=active]:bg-gray-500 data-[state=active]:text-white">Em Espera</TabsTrigger>
-              <TabsTrigger value="em-andamento" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white">Em Andamento</TabsTrigger>
-              <TabsTrigger value="finalizadas" className="data-[state=active]:bg-green-500 data-[state=active]:text-white">Finalizadas</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="em-espera" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Em Espera</TabsTrigger>
+              <TabsTrigger value="em-andamento" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Em Andamento</TabsTrigger>
+              <TabsTrigger value="finalizadas" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Finalizadas</TabsTrigger>
             </TabsList>
           </Tabs>
           <div className="relative flex-1 w-full md:w-auto">
