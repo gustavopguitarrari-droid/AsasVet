@@ -146,7 +146,7 @@
     --bege-areia: 40 100% 85%; /* #FFECB3 */
 
     /* Mapeamento para as variáveis do shadcn/ui */
-    --background: var(--verde-bambu);
+    --background: var(--creme-terra); /* Fundo principal da página */
     --foreground: var(--marrom-avela);
 
     --card: var(--creme-terra);
@@ -176,8 +176,8 @@
     --ring: var(--verde-folha-seca);
 
     /* Sidebar colors (adaptam-se ao tema principal) */
-    --sidebar-background: var(--creme-terra); /* Alterado para Creme Terra */
-    --sidebar-foreground: var(--marrom-avela); /* Alterado para Marrom Avelã */
+    --sidebar-background: var(--verde-bambu); /* Fundo do menu lateral */
+    --sidebar-foreground: var(--marrom-avela); /* Texto geral no menu lateral */
     --sidebar-primary: var(--verde-folha-seca); /* Cor de destaque para item ativo */
     --sidebar-primary-foreground: var(--creme-terra); /* Texto do item ativo */
     --sidebar-accent: var(--bege-areia); /* Cor de hover */
