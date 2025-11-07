@@ -16,7 +16,7 @@ import {
   ReceiptText,
   Package,
   Tag,
-  Settings,
+  // Settings, // Removido o ícone Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -39,7 +39,7 @@ export const allNavItems: NavItem[] = [
   { name: "Produtos", icon: Tag, path: "/products" },
   { name: "Estoque", icon: Package, path: "/estoque" },
   { name: "Financeiro", icon: DollarSign, path: "/financeiro" },
-  { name: "Configurações", icon: Settings, path: "/settings" }, // Adicionado item de configurações
+  // { name: "Configurações", icon: Settings, path: "/settings" }, // Removido o item de configurações
 ];
 
 interface SidebarProps {
