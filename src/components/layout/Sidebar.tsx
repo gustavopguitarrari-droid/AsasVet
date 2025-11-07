@@ -66,7 +66,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         <Link to="/painel" className="flex items-center">
           {/* Removido: <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-8 w-auto" /> */}
           {!isCollapsed && <PawPrint className="h-10 w-10 mr-2 text-sidebar-primary" />} {/* Aumentado de h-8 w-8 para h-10 w-10 */}
-          {!isCollapsed && <span className="text-xl font-bold text-sidebar-primary whitespace-nowrap">AsasVet</span>}
+          {!isCollapsed && <span className="text-2xl font-bold text-sidebar-primary whitespace-nowrap">AsasVet</span>}
         </Link>
       </div>
 
