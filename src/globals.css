@@ -146,12 +146,184 @@
     --event-outros: 0 0% 50%;
   }
 
+  /* NOVO TEMA: Céu Sereno */
+  .theme-ceu-sereno {
+    --background: 210 60% 98%; /* Very Light Blue */
+    --foreground: 210 20% 20%; /* Dark Blue-Grey */
+
+    --card: 210 60% 98%;
+    --card-foreground: 210 20% 20%;
+
+    --popover: 210 60% 98%;
+    --popover-foreground: 210 20% 20%;
+
+    --primary: 210 50% 60%; /* Light Blue */
+    --primary-darker: 210 50% 45%; /* Darker Light Blue */
+    --primary-foreground: 210 20% 20%;
+
+    --secondary: 210 15% 85%; /* Soft Grey */
+    --secondary-foreground: 210 20% 20%;
+
+    --muted: 210 15% 85%;
+    --muted-foreground: 210 10% 40%;
+
+    --accent: 40 80% 75%; /* Muted Yellow */
+    --accent-foreground: 210 20% 20%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 15% 70%;
+    --input: 210 60% 98%;
+    --ring: 210 50% 60%;
+
+    --sidebar-background: var(--primary);
+    --sidebar-foreground: var(--primary-foreground);
+    --sidebar-primary: var(--primary-foreground);
+    --sidebar-primary-foreground: var(--primary);
+    --sidebar-accent: var(--secondary);
+    --sidebar-accent-foreground: var(--secondary-foreground);
+    --sidebar-border: 210 50% 50%;
+    --sidebar-ring: var(--primary-foreground);
+
+    --sidebar-item-bg-1: 210 50% 70%;
+    --sidebar-item-bg-2: 210 40% 60%;
+    --sidebar-item-bg-3: 210 30% 50%;
+    --sidebar-item-bg-4: 210 20% 40%;
+    --sidebar-item-bg-5: 210 10% 30%;
+    --sidebar-item-bg-6: 210 5% 20%;
+    --sidebar-item-bg-7: 210 0% 10%;
+    --sidebar-item-bg-8: 210 70% 80%;
+    --sidebar-item-bg-9: 210 60% 70%;
+
+    --event-consulta: 210 50% 70%;
+    --event-cirurgia: 210 40% 60%;
+    --event-vacina: 210 30% 50%;
+    --event-exame: 210 20% 40%;
+    --event-retorno: 210 10% 30%;
+    --event-outros: 210 0% 10%;
+  }
+
+  /* NOVO TEMA: Jardim de Lavanda */
+  .theme-jardim-lavanda {
+    --background: 270 60% 98%; /* Very Light Purple */
+    --foreground: 270 20% 20%; /* Dark Purple-Grey */
+
+    --card: 270 60% 98%;
+    --card-foreground: 270 20% 20%;
+
+    --popover: 270 60% 98%;
+    --popover-foreground: 270 20% 20%;
+
+    --primary: 270 50% 60%; /* Lavender Purple */
+    --primary-darker: 270 50% 45%; /* Darker Lavender Purple */
+    --primary-foreground: 270 20% 20%;
+
+    --secondary: 120 30% 70%; /* Light Green */
+    --secondary-foreground: 270 20% 20%;
+
+    --muted: 120 30% 70%;
+    --muted-foreground: 270 10% 40%;
+
+    --accent: 340 80% 80%; /* Soft Pink */
+    --accent-foreground: 270 20% 20%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 270 15% 70%;
+    --input: 270 60% 98%;
+    --ring: 270 50% 60%;
+
+    --sidebar-background: var(--primary);
+    --sidebar-foreground: var(--primary-foreground);
+    --sidebar-primary: var(--primary-foreground);
+    --sidebar-primary-foreground: var(--primary);
+    --sidebar-accent: var(--secondary);
+    --sidebar-accent-foreground: var(--secondary-foreground);
+    --sidebar-border: 270 50% 50%;
+    --sidebar-ring: var(--primary-foreground);
+
+    --sidebar-item-bg-1: 270 50% 70%;
+    --sidebar-item-bg-2: 270 40% 60%;
+    --sidebar-item-bg-3: 270 30% 50%;
+    --sidebar-item-bg-4: 270 20% 40%;
+    --sidebar-item-bg-5: 270 10% 30%;
+    --sidebar-item-bg-6: 270 5% 20%;
+    --sidebar-item-bg-7: 270 0% 10%;
+    --sidebar-item-bg-8: 270 70% 80%;
+    --sidebar-item-bg-9: 270 60% 70%;
+
+    --event-consulta: 270 50% 70%;
+    --event-cirurgia: 270 40% 60%;
+    --event-vacina: 270 30% 50%;
+    --event-exame: 270 20% 40%;
+    --event-retorno: 270 10% 30%;
+    --event-outros: 270 0% 10%;
+  }
+
+  /* NOVO TEMA: Areia Dourada */
+  .theme-areia-dourada {
+    --background: 40 60% 98%; /* Very Light Yellow-Beige */
+    --foreground: 30 20% 20%; /* Dark Brown */
+
+    --card: 40 60% 98%;
+    --card-foreground: 30 20% 20%;
+
+    --popover: 40 60% 98%;
+    --popover-foreground: 30 20% 20%;
+
+    --primary: 40 50% 60%; /* Muted Gold/Orange */
+    --primary-darker: 40 50% 45%; /* Darker Muted Gold/Orange */
+    --primary-foreground: 30 20% 20%;
+
+    --secondary: 30 60% 85%; /* Light Peach */
+    --secondary-foreground: 30 20% 20%;
+
+    --muted: 30 60% 85%;
+    --muted-foreground: 30 10% 40%;
+
+    --accent: 60 100% 95%; /* Creamy White */
+    --accent-foreground: 30 20% 20%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 40 15% 70%;
+    --input: 40 60% 98%;
+    --ring: 40 50% 60%;
+
+    --sidebar-background: var(--primary);
+    --sidebar-foreground: var(--primary-foreground);
+    --sidebar-primary: var(--primary-foreground);
+    --sidebar-primary-foreground: var(--primary);
+    --sidebar-accent: var(--secondary);
+    --sidebar-accent-foreground: var(--secondary-foreground);
+    --sidebar-border: 40 50% 50%;
+    --sidebar-ring: var(--primary-foreground);
+
+    --sidebar-item-bg-1: 40 50% 70%;
+    --sidebar-item-bg-2: 40 40% 60%;
+    --sidebar-item-bg-3: 40 30% 50%;
+    --sidebar-item-bg-4: 40 20% 40%;
+    --sidebar-item-bg-5: 40 10% 30%;
+    --sidebar-item-bg-6: 40 5% 20%;
+    --sidebar-item-bg-7: 40 0% 10%;
+    --sidebar-item-bg-8: 40 70% 80%;
+    --sidebar-item-bg-9: 40 60% 70%;
+
+    --event-consulta: 40 50% 70%;
+    --event-cirurgia: 40 40% 60%;
+    --event-vacina: 40 30% 50%;
+    --event-exame: 40 20% 40%;
+    --event-retorno: 40 10% 30%;
+    --event-outros: 40 0% 10%;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
 
-  /* --- Temas de Cores Personalizados --- */
-  /* REMOVIDO: .theme-nature-vet { ... } */
 }
 
 /* Custom Background Gradients */
