@@ -3,7 +3,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { buttonVariants } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   ShieldCheck,
   CalendarCheck,
@@ -20,9 +20,12 @@ import {
   Hospital, // Para Internação
   DollarSign, // Para Financeiro
   Stethoscope, // Para Equipe
+  Crown, // NOVO: Para os planos
+  CheckCircle, // NOVO: Para os recursos dos planos
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LandingHeader from '@/components/LandingHeader';
+import { Badge } from '@/components/ui/badge'; // NOVO: Importar Badge
 
 // Definindo as características principais para a seção de recursos
 const coreFeatures = [
@@ -79,6 +82,47 @@ const whyChooseUs = [
     icon: Heart,
     title: "Foco no Bem-Estar Animal",
     description: "Ferramentas que facilitam o acompanhamento e o cuidado com cada pet.",
+  },
+];
+
+// NOVO: Definição dos planos para a Landing Page
+interface Plan {
+  id: string;
+  name: string;
+  price: string;
+  features: string[];
+  badgeText: string;
+  badgeColorClass: string;
+  imageUrl?: string;
+}
+
+const availablePlans: Plan[] = [
+  {
+    id: "vet-domiciliar",
+    name: "ASAS VERDES",
+    price: "R$ 119,90/mês",
+    features: ["1 Subusuário", "Gerenciamento de Clientes e Pets", "Agenda Básica"],
+    badgeText: "Básico",
+    badgeColorClass: "bg-green-500",
+    imageUrl: "/public/images/Plano Verde.png",
+  },
+  {
+    id: "clinica-vet",
+    name: "ASAS ROXAS",
+    price: "R$ 200,00/mês",
+    features: ["3 Subusuários", "Gerenciamento Completo", "Internação", "Caixa e Financeiro", "Suporte Prioritário"],
+    badgeText: "Premium",
+    badgeColorClass: "bg-purple-500",
+    imageUrl: "/public/images/planoroxo.png",
+  },
+  {
+    id: "hospital-vet",
+    name: "ASAS DOURADAS",
+    price: "R$ 299,90/mês",
+    features: ["10 Subusuários", "Todos os recursos Premium", "Relatórios Avançados", "Integrações Personalizadas", "Suporte Dedicado 24/7"],
+    badgeText: "Empresarial",
+    badgeColorClass: "bg-blue-500",
+    imageUrl: "/public/images/planodourado.png",
   },
 ];
 
@@ -152,8 +196,55 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* NOVO: Seção de Planos */}
+      <section id="plans" className="py-24 px-8 bg-landingPage-lp-bege-areia text-center">
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-verde-folha-seca">Escolha o Plano Ideal para Sua Clínica</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {availablePlans.map((plan) => (
+            <Card
+              key={plan.id}
+              className="flex flex-col justify-between p-6 space-y-4 bg-landingPage-lp-creme-terra shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 border-b-4 border-landingPage-lp-verde-folha-seca rounded-xl"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-2xl font-bold text-landingPage-lp-marrom-avela">{plan.name}</h3>
+                  <Badge className={cn("text-white", plan.badgeColorClass, "text-base px-3 py-1")}>
+                    {plan.badgeText}
+                  </Badge>
+                </div>
+                <p className="text-4xl font-extrabold text-landingPage-lp-verde-folha-seca mb-4">{plan.price}</p>
+                {plan.imageUrl && (
+                  <div className="flex justify-center mb-4">
+                    <img 
+                      src={plan.imageUrl} 
+                      alt={`Capa do plano ${plan.name}`} 
+                      className={cn(
+                        "w-auto object-contain",
+                        plan.id === "hospital-vet" ? "h-[280px]" : 
+                        plan.id === "vet-domiciliar" ? "h-[220px]" : 
+                        "h-[250px]" 
+                      )} 
+                    />
+                  </div>
+                )}
+                <ul className="space-y-2 text-lg text-landingPage-lp-marrom-avela/90 mb-6 text-left">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-center">
+                      <CheckCircle className="h-5 w-5 mr-3 text-landingPage-lp-verde-folha-seca" /> {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "w-full bg-landingPage-lp-verde-folha-seca hover:bg-landingPage-lp-verde-folha-seca/90 text-landingPage-lp-marrom-avela text-xl px-10 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}>
+                Comece Agora
+              </Link>
+            </Card>
+          ))}
+        </div>
+      </section>
+
       {/* Why Choose Us Section */}
-      <section id="why-choose-us" className="py-24 px-8 bg-landingPage-lp-bege-areia text-center">
+      <section id="why-choose-us" className="py-24 px-8 bg-landingPage-lp-verde-bambu text-center">
         <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-verde-folha-seca">Por Que Escolher AsasVet?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {whyChooseUs.map((item, index) => (
@@ -169,10 +260,10 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-24 px-8 bg-landingPage-lp-verde-bambu text-center">
-        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-creme-terra">O Que Nossos Clientes Dizem</h2>
+      <section className="py-24 px-8 bg-landingPage-lp-creme-terra text-center">
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-verde-folha-seca">O Que Nossos Clientes Dizem</h2>
         <div className="max-w-4xl mx-auto">
-          <Card className="p-10 bg-landingPage-lp-creme-terra shadow-xl border-l-8 border-landingPage-lp-verde-folha-seca relative rounded-xl"> {/* Adicionado rounded-xl */}
+          <Card className="p-10 bg-landingPage-lp-verde-bambu shadow-xl border-l-8 border-landingPage-lp-verde-folha-seca relative rounded-xl"> {/* Adicionado rounded-xl */}
             <CardContent className="space-y-6">
               <p className="text-xl md:text-2xl italic text-landingPage-lp-marrom-avela leading-relaxed">
                 "O AsasVet revolucionou a forma como gerencio minha clínica. A agenda é intuitiva, o cadastro de pacientes é completo e o suporte é impecável. Recomendo a todos os colegas!"
