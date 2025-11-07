@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -371,12 +372,25 @@ const Dashboard = () => {
     return `Bem-vindo(a) ${prefix} ${user.name}!`;
   };
 
+  // Calcular as iniciais de forma mais robusta para o fallback do logo
+  const firstNameInitial = user?.name ? user.name.charAt(0) : '';
+  const lastNameInitial = user?.lastName ? user.lastName.charAt(0) : '';
+  const initials = `${firstNameInitial}${lastNameInitial}`.toUpperCase();
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          {/* Substituído o logo dinâmico por uma imagem estática */}
-          <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-16 w-auto" />
+          {/* Substituído o logo estático por um Avatar dinâmico */}
+          <Avatar className="h-16 w-16 border-2 border-primary shadow-md">
+            {user?.logoUrl ? (
+              <AvatarImage src={user.logoUrl} alt={user.companyName || "Logo da Clínica"} />
+            ) : (
+              <AvatarFallback className="bg-muted text-muted-foreground text-xl font-bold">
+                {initials || <PawPrint className="h-8 w-8" />}
+              </AvatarFallback>
+            )}
+          </Avatar>
           
           <div>
             <h2 className="text-3xl font-bold">{getGreeting()}</h2>
