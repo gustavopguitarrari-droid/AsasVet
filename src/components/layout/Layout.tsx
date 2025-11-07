@@ -23,16 +23,17 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  // Removido: const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
+  const [isNavCollapsed, setIsNavCollapsed] = React.useState(false); // Novo estado para recolher a navegação
   const [isChatDialogOpen, setIsChatDialogOpen] = React.useState(false);
   const [isCashierDialogOpen, setIsCashierDialogOpen] = React.useState(false);
   const { user } = useUser();
   const { pageTitle } = usePageTitle();
 
-  // A direção do layout agora é sempre "vertical" (menu superior)
   const layoutDirection: "horizontal" | "vertical" = "vertical";
 
-  // Removido: const toggleSidebar = () => { ... };
+  const toggleNav = () => {
+    setIsNavCollapsed(prev => !prev);
+  };
 
   const handleChatButtonClick = () => {
     setIsChatDialogOpen(true);
@@ -44,10 +45,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden">
-      {/* O Header agora sempre inclui a navegação horizontal */}
-      <Header layoutDirection={layoutDirection} />
+      <Header 
+        layoutDirection={layoutDirection} 
+        isNavCollapsed={isNavCollapsed} 
+        onToggleNav={toggleNav} 
+      />
 
-      {/* Conteúdo principal */}
       <div className="flex flex-1 flex-col overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6">
           <main>{children}</main>

@@ -1,20 +1,25 @@
 "use client";
 
 import React from "react";
-import { useLocation, Link } from "react-router-dom"; // Import Link
+import { useLocation, Link } from "react-router-dom";
 import UserProfile from "@/components/UserProfile";
 import ThemeToggle from "@/components/ThemeToggle";
 import ColorThemeToggle from "@/components/ColorThemeToggle";
 import LiveClockCalendar from "@/components/LiveClockCalendar";
 import { usePageTitle } from "@/context/PageTitleContext";
 import { cn } from "@/lib/utils";
-import { allNavItems } from "./Sidebar"; // Import allNavItems
-import { Button } from "@/components/ui/button"; // Import Button
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"; // Import Tooltip
+import { allNavItems } from "./Sidebar";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { ArrowLeftToLine, ArrowRightToLine } from "lucide-react"; // Importar os ícones de seta
 
-// Removido: interface HeaderProps { layoutDirection?: "horizontal" | "vertical"; }
+interface HeaderProps { 
+  layoutDirection?: "horizontal" | "vertical";
+  isNavCollapsed: boolean; // Nova prop
+  onToggleNav: () => void; // Nova prop
+}
 
-const Header: React.FC = () => { // Removido layoutDirection das props
+const Header: React.FC<HeaderProps> = ({ isNavCollapsed, onToggleNav }) => {
   const location = useLocation();
   const { pageTitle } = usePageTitle();
 
@@ -56,7 +61,7 @@ const Header: React.FC = () => { // Removido layoutDirection das props
   return (
     <header className={cn(
       "flex flex-col border-b bg-background p-4 shadow-sm",
-      "h-auto" // Ajusta o cabeçalho para layout vertical
+      "h-auto"
     )}>
       <div className={cn(
         "flex items-center justify-between w-full",
@@ -71,33 +76,59 @@ const Header: React.FC = () => { // Removido layoutDirection das props
         </div>
       </div>
 
-      {/* Navegação horizontal sempre visível */}
-      <nav className="flex flex-row space-x-2 overflow-x-auto overflow-y-hidden whitespace-nowrap w-full px-2 py-1 border-t pt-2 mt-2 border-muted-foreground/20">
-        {allNavItems.map((item) => {
-          const isActive = location.pathname === item.path;
-          return (
-            <Tooltip key={item.name} delayDuration={0}>
-              <TooltipTrigger asChild>
-                <Button
-                  asChild
-                  variant="ghost"
-                  className={cn(
-                    "h-10 px-3 text-base text-foreground flex-shrink-0",
-                    "hover:bg-accent hover:text-accent-foreground",
-                    isActive && "bg-primary text-primary-foreground"
-                  )}
-                >
-                  <Link to={item.path} className="flex items-center">
-                    <item.icon className="h-5 w-5 mr-2" strokeWidth={2} />
-                    <span className="uppercase">{item.name}</span>
-                  </Link>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">{item.name}</TooltipContent>
-            </Tooltip>
-          );
-        })}
-      </nav>
+      {/* Navegação horizontal */}
+      <div className="flex items-center border-t pt-2 mt-2 border-muted-foreground/20">
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggleNav}
+              className="h-10 w-10 flex-shrink-0 mr-2"
+            >
+              {isNavCollapsed ? (
+                <ArrowRightToLine className="h-5 w-5" />
+              ) : (
+                <ArrowLeftToLine className="h-5 w-5" />
+              )}
+              <span className="sr-only">{isNavCollapsed ? "Expandir Navegação" : "Recolher Navegação"}</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            {isNavCollapsed ? "Expandir Navegação" : "Recolher Navegação"}
+          </TooltipContent>
+        </Tooltip>
+
+        <nav className={cn(
+          "flex flex-row space-x-2 overflow-x-auto overflow-y-hidden whitespace-nowrap w-full px-2 py-1 transition-all duration-300 ease-in-out",
+          isNavCollapsed ? "max-h-0 opacity-0 pointer-events-none" : "max-h-screen opacity-100 pointer-events-auto"
+        )}>
+          {allNavItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            return (
+              <Tooltip key={item.name} delayDuration={0}>
+                <TooltipTrigger asChild>
+                  <Button
+                    asChild
+                    variant="ghost"
+                    className={cn(
+                      "h-10 px-3 text-base text-foreground flex-shrink-0",
+                      "hover:bg-accent hover:text-accent-foreground",
+                      isActive && "bg-primary text-primary-foreground"
+                    )}
+                  >
+                    <Link to={item.path} className="flex items-center">
+                      <item.icon className="h-5 w-5 mr-2" strokeWidth={2} />
+                      <span className="uppercase">{item.name}</span>
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">{item.name}</TooltipContent>
+              </Tooltip>
+            );
+          })}
+        </nav>
+      </div>
     </header>
   );
 };
