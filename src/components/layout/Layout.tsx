@@ -74,7 +74,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="flex flex-1 flex-col overflow-hidden">
           <Header />
           <div className="flex-1 overflow-y-auto p-6"> {/* Mantido p-6 para o conteúdo principal */}
-            <main>{children}</main>
+            <main className="flex flex-col min-h-full">{children}</main>
           </div>
           <MadeWithDyad />
         </div>
