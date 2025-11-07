@@ -4,7 +4,6 @@ import React from "react";
 import {
   ResizablePanel,
   ResizablePanelGroup,
-  // Removido: ResizableHandle,
 } from "@/components/ui/resizable";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -34,6 +33,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setIsNavCollapsed(prev => !prev);
   };
 
+  // Funções re-adicionadas
+  const handleChatButtonClick = () => {
+    setIsChatDialogOpen(true);
+  };
+
+  const handleCashierButtonClick = () => {
+    setIsCashierDialogOpen(true);
+  };
+
   return (
     <ResizablePanelGroup
       direction="horizontal"
@@ -51,7 +59,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       >
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
       </ResizablePanel>
-      {/* ResizableHandle continua removido */}
       <ResizablePanel
         // O segundo painel se ajusta automaticamente ao espaço restante
         // Removido: className="w-full"
