@@ -195,15 +195,14 @@
 }
 
 .login-art-bg::before {
-  /* Adicionado um overlay de cor para o tema nature-vet */
+  /* Removido o overlay de cor para o tema nature-vet */
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: hsl(var(--lp-verde-folha-seca)); /* Usa a cor do tema nature-vet */
-  opacity: 0.7; /* Ajuste a opacidade conforme necessário */
+  background: transparent; /* Torna o overlay transparente */
   z-index: 1;
 }
 
