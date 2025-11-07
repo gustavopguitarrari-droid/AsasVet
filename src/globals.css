@@ -80,10 +80,10 @@
 
   /* TEMA: Nature Vet */
   .theme-nature-vet {
-    --nv-primary-green: 120 20% 25%; /* Deep Forest Green */
-    --nv-light-green: 90 30% 70%;   /* Soft Natural Green */
-    --nv-beige: 40 20% 95%;         /* Warm Light Beige */
-    --nv-dark-brown: 30 15% 20%;    /* Rich Dark Brown */
+    --nv-primary-green: 120 80% 30%; /* Deep Forest Green (more saturated) */
+    --nv-light-green: 60 100% 90%;   /* Light Yellow-Green (distinct) */
+    --nv-beige: 60 100% 90%;         /* Warm Light Beige (distinct) */
+    --nv-dark-brown: 30 80% 15%;    /* Rich Dark Brown (more saturated) */
     --nv-accent-orange: 30 60% 50%; /* Subtle Orange Accent */
 
     /* Mapeamento para as variáveis do shadcn/ui */
@@ -97,7 +97,7 @@
     --popover-foreground: var(--nv-dark-brown);
 
     --primary: var(--nv-primary-green);
-    --primary-darker: 120 20% 18%; /* Darker shade of primary green */
+    --primary-darker: 120 80% 20%; /* Darker shade of primary green */
     --primary-foreground: var(--nv-beige);
 
     --secondary: var(--nv-light-green);
@@ -148,9 +148,9 @@
 
   /* TEMA: Céu Sereno */
   .theme-ceu-sereno {
-    --cs-light-blue: 210 80% 95%;   /* Very light blue */
-    --cs-medium-blue: 210 70% 60%;  /* Sky blue */
-    --cs-dark-blue: 210 80% 25%;    /* Deep blue */
+    --cs-light-blue: 200 100% 90%;   /* Very light, bright blue (distinct) */
+    --cs-medium-blue: 200 80% 50%;  /* Bright blue (distinct) */
+    --cs-dark-blue: 200 90% 20%;    /* Darker, more saturated blue (distinct) */
     --cs-white: 0 0% 100%;          /* White */
     --cs-gray: 210 10% 50%;         /* Muted gray */
     --cs-accent-cyan: 180 70% 50%;  /* Cyan accent */
@@ -213,9 +213,9 @@
 
   /* TEMA: Jardim de Lavanda */
   .theme-jardim-lavanda {
-    --jl-light-purple: 270 60% 95%;  /* Very light lavender */
-    --jl-medium-purple: 270 50% 70%; /* Medium lavender */
-    --jl-dark-purple: 270 60% 30%;   /* Deep purple */
+    --jl-light-purple: 270 100% 90%;  /* Very light, bright lavender (distinct) */
+    --jl-medium-purple: 270 70% 60%; /* Medium lavender (distinct) */
+    --jl-dark-purple: 270 80% 25%;   /* Deep purple (more saturated) (distinct) */
     --jl-white: 0 0% 100%;           /* White */
     --jl-gray: 270 10% 50%;          /* Muted gray */
     --jl-accent-pink: 330 70% 60%;   /* Pink accent */
@@ -278,9 +278,9 @@
 
   /* TEMA: Areia Dourada */
   .theme-areia-dourada {
-    --ad-light-sand: 40 60% 95%;    /* Very light sand */
-    --ad-golden-yellow: 40 80% 70%; /* Golden yellow */
-    --ad-dark-brown: 30 30% 20%;    /* Dark earthy brown */
+    --ad-light-sand: 40 100% 90%;    /* Very light, bright yellow (distinct) */
+    --ad-golden-yellow: 40 90% 70%; /* Bright golden yellow (distinct) */
+    --ad-dark-brown: 30 80% 20%;    /* Darker, more saturated brown (distinct) */
     --ad-white: 0 0% 100%;          /* White */
     --ad-gray: 40 10% 50%;          /* Muted gray */
     --ad-accent-orange: 30 80% 60%; /* Orange accent */

@@ -74,6 +74,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
     });
     // Sempre adiciona a classe do tema atual
     root.classList.add(`theme-${internalColorTheme}`);
+    console.log(`ColorThemeContext: Applied theme class: theme-${internalColorTheme}. Current classes:`, root.classList.value); // ADDED LOG
   }, [internalColorTheme]); // Depende do estado interno do tema
 
   const setColorTheme = (theme: ColorTheme) => {
