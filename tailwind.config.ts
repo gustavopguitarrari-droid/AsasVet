@@ -83,6 +83,11 @@ export default {
           "lp-marrom-avela": "hsl(var(--lp-marrom-avela))",
           "lp-bege-areia": "hsl(var(--lp-bege-areia))",
         },
+        // NOVO: Adicionado para o tema Nature Vet
+        "primary-unselected": {
+          DEFAULT: "hsl(var(--primary-unselected))",
+          foreground: "hsl(var(--primary-unselected-foreground))",
+        },
       },
       borderRadius: {
         lg: "0.75rem", // Aumentado de var(--radius)

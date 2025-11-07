@@ -216,8 +216,7 @@ const Appointments = () => {
             medical_record_pdf_url
           )
         `)
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
-        .in('status', ['Realizada', 'Cancelada']);
+        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
       if (error) throw error;
       console.log("Appointments.tsx: Raw data from Supabase for historyAppointments query:", data);
       return data.map(app => {

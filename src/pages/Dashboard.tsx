@@ -419,10 +419,10 @@ const Dashboard = () => {
 
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "recentActivity")} className="w-full"> {/* 'animalHealth' removido do tipo */}
         <TabsList className="grid w-full grid-cols-3 h-auto p-1"> {/* Alterado para grid-cols-3 */}
-          <TabsTrigger value="recentActivity" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Atividade Recente</TabsTrigger>
+          <TabsTrigger value="recentActivity" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Atividade Recente</TabsTrigger>
           {/* TabsTrigger para 'animalHealth' removido */}
-          <TabsTrigger value="overview" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Visão Geral</TabsTrigger>
-          <TabsTrigger value="financial" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Financeiro</TabsTrigger>
+          <TabsTrigger value="overview" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Visão Geral</TabsTrigger>
+          <TabsTrigger value="financial" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Financeiro</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
