@@ -135,7 +135,7 @@ const MyPlanSettings: React.FC = () => {
                 </div>
                 {plan.imageUrl && (
                   <div className="mb-4 flex justify-center">
-                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-24 w-auto object-contain" />
+                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-48 w-auto object-contain" />
                   </div>
                 )}
                 <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
