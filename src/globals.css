@@ -87,8 +87,8 @@
     --nv-lp-bege-areia: var(--lp-bege-areia);
 
     /* Mapeamento para as variáveis do shadcn/ui */
-    --background: var(--nv-lp-verde-bambu);
-    --foreground: var(--nv-lp-marrom-avela);
+    --background: var(--nv-lp-creme-terra); /* Fundo da página mais claro */
+    --foreground: var(--nv-lp-marrom-avela); /* Texto escuro no fundo claro */
 
     --card: var(--nv-lp-creme-terra);
     --card-foreground: var(--nv-lp-marrom-avela);
@@ -96,37 +96,37 @@
     --popover: var(--nv-lp-creme-terra);
     --popover-foreground: var(--nv-lp-marrom-avela);
 
-    --primary: var(--nv-lp-verde-folha-seca);
-    --primary-darker: 90 40% 57%; /* Slightly darker verde-folha-seca */
-    --primary-foreground: var(--nv-lp-marrom-avela); /* Text on primary buttons */
+    --primary: var(--nv-lp-verde-folha-seca); /* Botões primários em verde */
+    --primary-darker: 90 40% 57%; /* Verde um pouco mais escuro */
+    --primary-foreground: var(--nv-lp-creme-terra); /* Texto claro nos botões primários */
 
     --secondary: var(--nv-lp-bege-areia);
     --secondary-foreground: var(--nv-lp-marrom-avela);
 
     --muted: var(--nv-lp-bege-areia);
-    --muted-foreground: 20 15% 35%; /* Slightly darker marrom-avela for muted text */
+    --muted-foreground: 20 15% 35%; /* Marrom mais escuro para texto muted */
 
     --accent: var(--nv-lp-verde-folha-seca);
     --accent-foreground: var(--nv-lp-marrom-avela);
 
-    --destructive: 0 84.2% 60.2%; /* Keep red for destructive actions */
+    --destructive: 0 84.2% 60.2%; /* Mantém vermelho para ações destrutivas */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 20 15% 35%; /* Dark brown for borders */
+    --border: 20 15% 35%; /* Marrom escuro para bordas */
     --input: var(--nv-lp-creme-terra);
     --ring: var(--nv-lp-verde-folha-seca);
 
-    /* Sidebar colors - ADJUSTED FOR CONTRAST */
-    --sidebar-background: var(--nv-lp-verde-bambu); /* Usar verde-bambu para o fundo */
-    --sidebar-foreground: var(--nv-lp-marrom-avela); /* Texto escuro no fundo claro */
-    --sidebar-primary: var(--nv-lp-marrom-avela); /* Item ativo com fundo escuro */
+    /* Sidebar colors - AJUSTADO PARA CONTRASTE */
+    --sidebar-background: var(--nv-lp-marrom-avela); /* Menu lateral mais escuro */
+    --sidebar-foreground: var(--nv-lp-creme-terra); /* Texto claro no menu lateral */
+    --sidebar-primary: var(--nv-lp-verde-folha-seca); /* Item ativo com fundo verde */
     --sidebar-primary-foreground: var(--nv-lp-creme-terra); /* Texto claro no item ativo */
-    --sidebar-accent: var(--nv-lp-verde-folha-seca); /* Hover com verde-folha-seca */
+    --sidebar-accent: var(--nv-lp-verde-folha-seca); /* Hover com verde */
     --sidebar-accent-foreground: var(--nv-lp-marrom-avela); /* Texto escuro no hover */
-    --sidebar-border: var(--nv-lp-verde-folha-seca); /* Borda com verde-folha-seca */
-    --sidebar-ring: var(--nv-lp-marrom-avela);
+    --sidebar-border: var(--nv-lp-verde-folha-seca); /* Borda com verde */
+    --sidebar-ring: var(--nv-lp-creme-terra);
 
-    /* Sidebar Item Backgrounds (adjusting to new palette) */
+    /* Sidebar Item Backgrounds (ajustando para a nova paleta) */
     --sidebar-item-bg-1: 220 80% 60%; /* Blue */
     --sidebar-item-bg-2: 10 80% 60%; /* Reddish-orange */
     --sidebar-item-bg-3: 140 70% 40%; /* Green */
