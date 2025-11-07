@@ -70,7 +70,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       >
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
       </ResizablePanel>
-      <ResizablePanel>
+      <ResizablePanel className="bg-background"> {/* Adicionado bg-background aqui */}
         <div className="flex flex-1 flex-col h-full overflow-hidden"> {/* Adicionado h-full aqui */}
           <Header />
           <div className="flex-1 overflow-y-auto p-4"> {/* Restaurado p-4 */}
