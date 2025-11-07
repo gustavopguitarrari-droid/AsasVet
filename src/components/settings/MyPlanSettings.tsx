@@ -38,7 +38,7 @@ const availablePlans: Plan[] = [
     features: ["3 Subusuários", "Gerenciamento Completo", "Internação", "Caixa e Financeiro", "Suporte Prioritário"],
     stripePriceId: "price_YOUR_CLINICA_VET_PRICE_ID", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
     badgeColorClass: "bg-purple-500", // Cor do badge alterada para roxo
-    imageUrl: "/public/images/Plano Roxo.png", // Adicionada a nova imagem
+    imageUrl: "/public/images/planoroxo.png", // Adicionada a nova imagem
   },
   {
     id: "hospital-vet",
@@ -134,9 +134,9 @@ const MyPlanSettings: React.FC = () => {
                     {plan.name === currentPlanName ? "Ativo" : "Disponível"}
                   </Badge>
                 </div>
-                <p className="text-3xl font-extrabold">R$ {plan.price}</p> {/* Removido mb-4 */}
+                <p className="text-3xl font-extrabold">R$ {plan.price}</p>
                 {plan.imageUrl && (
-                  <div className="flex justify-center"> {/* Removido mb-2 */}
+                  <div className="flex justify-center">
                     <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-[500px] w-auto object-contain" />
                   </div>
                 )}
