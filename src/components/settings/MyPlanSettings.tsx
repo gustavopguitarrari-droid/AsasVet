@@ -118,13 +118,13 @@ const MyPlanSettings: React.FC = () => {
           Visualize os detalhes do seu plano atual e explore opções de upgrade.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6"> {/* Alterado de md:grid-cols-2 para md:grid-cols-3 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {availablePlans.map((plan) => (
             <Card
               key={plan.id}
               className={cn(
-                "flex flex-col justify-between p-6",
-                plan.name === currentPlanName ? "border-2 border-primary shadow-lg" : "border"
+                "flex flex-col justify-between p-6 transition-all duration-200",
+                plan.name === currentPlanName ? "border-2 border-primary shadow-lg" : "border hover:border-primary hover:shadow-md" // Adicionado hover:border-primary
               )}
             >
               <div>
@@ -137,7 +137,7 @@ const MyPlanSettings: React.FC = () => {
                 <p className="text-3xl font-extrabold">R$ {plan.price}</p>
                 {plan.imageUrl && (
                   <div className="flex justify-center">
-                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-[300px] w-auto object-contain" /> {/* Alterado para h-[300px] */}
+                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-[300px] w-auto object-contain" />
                   </div>
                 )}
                 <ul className="space-y-2 text-sm text-muted-foreground">
