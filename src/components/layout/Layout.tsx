@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react"; // Importar useRef
+import React, { useRef } from "react";
 import {
   ResizablePanel,
   ResizablePanelGroup,
@@ -19,7 +19,9 @@ import { useUser } from "@/context/UserContext";
 import { usePageTitle } from "@/context/PageTitleContext";
 
 interface LayoutProps {
-  children: React.ReactNode;
+  // Removido: layoutDirection?: "horizontal" | "vertical";
+  // Removido: isNavCollapsed: boolean; // Nova prop
+  // Removido: onToggleNav: () => void; // Nova prop
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
@@ -29,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user } = useUser();
   const { pageTitle } = usePageTitle();
 
-  const sidebarPanelRef = useRef<ResizablePanel>(null); // Criar a ref para o painel da sidebar
+  const sidebarPanelRef = useRef<React.ElementRef<typeof ResizablePanel>>(null); // Criar a ref para o painel da sidebar
 
   const toggleNav = () => {
     if (sidebarPanelRef.current) {

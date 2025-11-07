@@ -65,7 +65,7 @@ const Login = () => {
                   inputBorder: 'hsl(var(--border))',
                   // Removido: inputLabel: 'hsl(var(--foreground))',
                   inputText: 'hsl(var(--foreground))',
-                  anchorText: 'hsl(var(--primary))',
+                  // anchorText: 'hsl(var(--primary))', // REMOVIDO
                   messageText: 'hsl(var(--foreground))',
                 },
               },
@@ -77,7 +77,7 @@ const Login = () => {
                   inputBorder: 'hsl(var(--border))',
                   // Removido: inputLabel: 'hsl(var(--foreground))',
                   inputText: 'hsl(var(--foreground))',
-                  anchorText: 'hsl(var(--primary))',
+                  // anchorText: 'hsl(var(--primary))', // REMOVIDO
                   messageText: 'hsl(var(--foreground))',
                 },
               },
