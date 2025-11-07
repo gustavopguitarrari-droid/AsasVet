@@ -13,8 +13,8 @@ import { useColorTheme } from "@/context/ColorThemeContext";
 import { cn } from "@/lib/utils";
 
 const colorThemes = [
-  { name: "Nature Vet", value: "nature-vet", colorClass: "bg-landingPage-lp-verde-folha-seca" }, // CORRIGIDO AQUI
-  { name: "Padrão (Azul Escuro)", value: "default", colorClass: "bg-blue-500" },
+  { name: "Nature Vet", value: "nature-vet", colorClass: "bg-landingPage-lp-verde-folha-seca" },
+  // { name: "Padrão (Azul Escuro)", value: "default", colorClass: "bg-blue-500" }, // Removido
 ];
 
 const ColorThemeToggle = () => {
