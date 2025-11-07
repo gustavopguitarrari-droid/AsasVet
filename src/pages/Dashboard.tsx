@@ -203,15 +203,16 @@ const Dashboard = () => {
   };
 
   const getCardComponent = (item: DashboardItemConfig) => {
-    const baseCardClasses = "text-white shadow-md";
-    const iconClasses = "h-4 w-4 text-white";
-    const textMutedClasses = "text-white/80";
+    // Usando as novas variáveis CSS para cores pastel
+    const baseCardClasses = "shadow-md text-landingPage-lp-marrom-avela"; // Texto marrom escuro para contraste
+    const iconClasses = "h-4 w-4 text-landingPage-lp-marrom-avela"; // Ícones marrom escuro
+    const textMutedClasses = "text-landingPage-lp-marrom-avela/80"; // Texto muted marrom escuro
 
     switch (item.id) {
       case "totalClients":
         return (
           <Link to="/cadastro" key={item.id} className="block">
-            <Card className={cn("bg-blue-600", baseCardClasses)}>
+            <Card className={cn("bg-nv-pastel-blue", baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total de Tutores</CardTitle>
                 <Users className={iconClasses} />
@@ -228,7 +229,7 @@ const Dashboard = () => {
       case "totalPets":
         return (
           <Link to="/cadastro" state={{ activeTab: "animais" }} key={item.id} className="block">
-            <Card className={cn("bg-indigo-600", baseCardClasses)}>
+            <Card className={cn("bg-nv-pastel-green", baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total de Animais</CardTitle>
                 <PawPrint className={iconClasses} />
@@ -245,7 +246,7 @@ const Dashboard = () => {
       case "scheduledAppointments":
         return (
           <Link to="/medical-records" key={item.id} className="block">
-            <Card className={cn("bg-pink-600", baseCardClasses)}>
+            <Card className={cn("bg-nv-pastel-pink", baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Consultas Agendadas</CardTitle>
                 <CalendarDays className={iconClasses} />
@@ -277,7 +278,7 @@ const Dashboard = () => {
         return <UpcomingEventsCard key={item.id} />;
       case "financialSummary":
         return (
-          <Card key={item.id} className={cn("bg-green-600", baseCardClasses)}>
+          <Card key={item.id} className={cn("bg-nv-pastel-yellow", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Resumo Financeiro</CardTitle>
               <DollarSign className={iconClasses} />
@@ -290,7 +291,7 @@ const Dashboard = () => {
         );
       case "cashFlow":
         return (
-          <Card key={item.id} className={cn("bg-teal-600", baseCardClasses)}>
+          <Card key={item.id} className={cn("bg-nv-pastel-orange", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Fluxo de Caixa</CardTitle>
               <DollarSign className={iconClasses} />
@@ -304,7 +305,7 @@ const Dashboard = () => {
       case "internmentStatus":
         return (
           <Link to="/internacao" key={item.id} className="block">
-            <Card className={cn("bg-purple-600", baseCardClasses)}>
+            <Card className={cn("bg-nv-pastel-purple", baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Status de Internação</CardTitle>
                 <Bed className={iconClasses} />
@@ -328,7 +329,7 @@ const Dashboard = () => {
       case "veterinariansOnDuty":
         return (
           <Link to="/veterinarios" state={{ activeTab: "escala" }} key={item.id} className="block">
-            <Card className={cn("bg-orange-600", baseCardClasses)}>
+            <Card className={cn("bg-nv-pastel-gray", baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Veterinários de Plantão</CardTitle>
                 <Stethoscope className={iconClasses} />
@@ -342,7 +343,7 @@ const Dashboard = () => {
         );
       case "medicalRecordsSummary":
         return (
-          <Card key={item.id} className={cn("bg-cyan-600", baseCardClasses)}>
+          <Card key={item.id} className={cn("bg-nv-pastel-blue", baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Resumo da Agenda</CardTitle>
               <FileText className={iconClasses} />

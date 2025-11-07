@@ -152,6 +152,15 @@
     /* NOVO: Cores para botões/abas não selecionados no tema Nature Vet */
     --primary-unselected: var(--nv-lp-bege-areia); /* Bege claro para o fundo */
     --primary-unselected-foreground: var(--nv-lp-marrom-avela); /* Marrom escuro para o texto */
+
+    /* NOVO: Cores pastel para os cards do Dashboard no tema Nature Vet */
+    --nv-pastel-blue: 200 60% 85%;    /* Um azul claro e suave */
+    --nv-pastel-green: 140 50% 85%;   /* Um verde menta suave */
+    --nv-pastel-yellow: 50 80% 90%;   /* Um amarelo cremoso pálido */
+    --nv-pastel-pink: 340 60% 90%;    /* Um rosa claro e suave */
+    --nv-pastel-purple: 270 40% 88%;  /* Uma lavanda suave */
+    --nv-pastel-orange: 30 70% 88%;   /* Um pêssego claro */
+    --nv-pastel-gray: 30 10% 90%;     /* Um cinza quente muito claro */
   }
 
   /* TEMA: Céu Sereno */
@@ -478,7 +487,7 @@
     transform: translate(30px, -50px) scale(1.1);
   }
   66% {
-    transform: translate(-20px, 20px) scale(0.9);
+    transform: "translate(-20px, 20px) scale(0.9)";
   }
   100% {
     transform: translate(0px, 0px) scale(1);
