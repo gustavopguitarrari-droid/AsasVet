@@ -81,12 +81,12 @@ const AverageConsultationTimeCard: React.FC<AverageConsultationTimeCardProps> = 
 
   return (
     <Card className={cn("col-span-1 shadow-md", className)}> {/* Aplicando className aqui */}
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 px-3 pt-3"> {/* Reduzido pb e adicionado px, pt */}
         <CardTitle className="text-sm font-medium">Média de Tempo da Consulta</CardTitle>
         <Timer className="h-4 w-4 text-current" /> {/* Usando text-current para herdar a cor */}
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">
+      <CardContent className="p-3"> {/* Reduzido o padding */}
+        <div className="text-xl font-bold"> {/* Reduzido de text-2xl para text-xl */}
           {isLoading ? "..." : formatTime(averageSeconds)}
         </div>
         <p className="text-current/80 text-xs">Duração média das consultas finalizadas</p> {/* Usando text-current/80 */}
