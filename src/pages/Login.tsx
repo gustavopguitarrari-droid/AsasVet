@@ -36,7 +36,7 @@ const Login = () => {
       "min-h-screen flex items-center justify-center p-4",
       "login-art-bg"
     )}>
-      <div className="w-full max-w-sm p-6 space-y-4 rounded-xl shadow-lg relative bg-creme-terra border border-marrom-avela/20 z-10 max-h-[80vh] overflow-y-auto"> {/* Alterado para bg-creme-terra e removido backdrop-blur-sm */}
+      <div className="w-full max-w-sm p-6 space-y-4 rounded-xl shadow-lg relative bg-white backdrop-blur-sm border border-marrom-avela/20 z-10 max-h-[80vh] overflow-y-auto"> {/* Alterado para bg-white e adicionado backdrop-blur-sm */}
         <Button asChild variant="ghost" className="absolute top-4 left-4 text-marrom-avela font-bold hover:bg-verde-folha-seca/20">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
