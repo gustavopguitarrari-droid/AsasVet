@@ -63,8 +63,8 @@ const Login = () => {
                   defaultButtonBorder: 'hsl(var(--nv-primary-green))',
                   defaultButtonText: 'hsl(var(--nv-beige))',
                   dividerBackground: 'hsl(30 15% 35%)',
-                  anchorText: 'hsl(var(--nv-primary-green))',
-                  anchorTextHover: 'hsl(120 20% 18%)',
+                  anchorTextColor: 'hsl(var(--nv-primary-green))', // Corrigido
+                  anchorTextHoverColor: 'hsl(120 20% 18%)', // Corrigido
                 },
               },
             },
