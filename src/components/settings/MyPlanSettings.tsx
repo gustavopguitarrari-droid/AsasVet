@@ -138,7 +138,7 @@ const MyPlanSettings: React.FC = () => {
                 <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
                 {plan.imageUrl && (
                   <div className="mb-0 flex justify-center">
-                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-72 w-auto object-contain" />
+                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-96 w-auto object-contain" />
                   </div>
                 )}
                 <ul className="space-y-2 text-sm text-muted-foreground mb-4">
