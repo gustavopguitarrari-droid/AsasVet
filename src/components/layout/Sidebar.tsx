@@ -39,6 +39,7 @@ export const allNavItems: NavItem[] = [
   { name: "Produtos", icon: Tag, path: "/products" },
   { name: "Estoque", icon: Package, path: "/estoque" },
   { name: "Financeiro", icon: DollarSign, path: "/financeiro" },
+  { name: "Configurações", icon: Settings, path: "/settings" }, // Adicionado item de configurações
 ];
 
 interface SidebarProps {
@@ -46,9 +47,85 @@ interface SidebarProps {
   onToggleCollapse: () => void;
 }
 
-// O componente Sidebar agora é um componente vazio, pois a navegação é apenas superior.
-const Sidebar: React.FC<SidebarProps> = () => {
-  return null;
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
+  const location = useLocation();
+  const { user } = useUser();
+
+  return (
+    <div className={cn(
+      "flex flex-col h-full bg-sidebar text-sidebar-foreground border-r",
+      "transition-all duration-300 ease-in-out",
+      isCollapsed ? "w-[50px]" : "w-full"
+    )}>
+      {/* Logo e Título (visível apenas quando expandido) */}
+      {!isCollapsed && (
+        <div className="flex items-center justify-center h-16 px-4 border-b">
+          <Link to="/painel" className="flex items-center space-x-2">
+            <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-8 w-auto" />
+            <span className="text-xl font-bold text-sidebar-primary">AsasVet</span>
+          </Link>
+        </div>
+      )}
+      {isCollapsed && (
+        <div className="flex items-center justify-center h-16 border-b">
+          <Link to="/painel" className="flex items-center">
+            <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-8 w-auto" />
+          </Link>
+        </div>
+      )}
+
+      {/* Itens de Navegação */}
+      <nav className="flex-1 flex flex-col p-2 space-y-1 overflow-y-auto">
+        {allNavItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <Tooltip key={item.name} delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Button
+                  asChild
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start h-10",
+                    "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    isActive && "bg-sidebar-primary text-sidebar-primary-foreground",
+                    isCollapsed ? "px-0 justify-center" : "px-3"
+                  )}
+                >
+                  <Link to={item.path} className="flex items-center w-full">
+                    <item.icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} strokeWidth={2} />
+                    {!isCollapsed && <span className="whitespace-nowrap">{item.name}</span>}
+                  </Link>
+                </Button>
+              </TooltipTrigger>
+              {isCollapsed && <TooltipContent side="right">{item.name}</TooltipContent>}
+            </Tooltip>
+          );
+        })}
+      </nav>
+
+      {/* Botão de Colapso */}
+      <div className="p-2 border-t">
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onToggleCollapse}
+              className="w-full h-10 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            >
+              {isCollapsed ? (
+                <ArrowRightToLine className="h-5 w-5" />
+              ) : (
+                <ArrowLeftToLine className="h-5 w-5" />
+              )}
+              <span className="sr-only">{isCollapsed ? "Expandir Sidebar" : "Recolher Sidebar"}</span>
+            </Button>
+          </TooltipTrigger>
+          {isCollapsed && <TooltipContent side="right">{isCollapsed ? "Expandir Sidebar" : "Recolher Sidebar"}</TooltipContent>}
+        </Tooltip>
+      </div>
+    </div>
+  );
 };
 
 export default Sidebar;

@@ -4,6 +4,7 @@ import React from "react";
 import {
   ResizablePanel,
   ResizablePanelGroup,
+  ResizableHandle,
 } from "@/components/ui/resizable";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -23,13 +24,11 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const [isNavCollapsed, setIsNavCollapsed] = React.useState(false); // Novo estado para recolher a navegação
+  const [isNavCollapsed, setIsNavCollapsed] = React.useState(false);
   const [isChatDialogOpen, setIsChatDialogOpen] = React.useState(false);
   const [isCashierDialogOpen, setIsCashierDialogOpen] = React.useState(false);
   const { user } = useUser();
   const { pageTitle } = usePageTitle();
-
-  const layoutDirection: "horizontal" | "vertical" = "vertical";
 
   const toggleNav = () => {
     setIsNavCollapsed(prev => !prev);
@@ -45,18 +44,37 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden">
-      <Header 
-        layoutDirection={layoutDirection} 
-        isNavCollapsed={isNavCollapsed} 
-        onToggleNav={toggleNav} 
-      />
-
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto p-6">
-          <main>{children}</main>
-        </div>
-        <MadeWithDyad />
-      </div>
+      <Header /> {/* Header now only contains title, clock, theme toggles, and user profile */}
+      
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="flex-1"
+      >
+        <ResizablePanel
+          defaultSize={18}
+          collapsedSize={4}
+          collapsible={true}
+          minSize={15}
+          maxSize={20}
+          onCollapse={() => setIsNavCollapsed(true)}
+          onExpand={() => setIsNavCollapsed(false)}
+          className={cn(
+            "flex flex-col transition-all duration-300 ease-in-out",
+            isNavCollapsed && "min-w-[50px]"
+          )}
+        >
+          <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={82}>
+          <div className="flex flex-1 flex-col overflow-hidden">
+            <div className="flex-1 overflow-y-auto p-6">
+              <main>{children}</main>
+            </div>
+            <MadeWithDyad />
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
 
       <FloatingCashierButton onClick={handleCashierButtonClick} />
       <FloatingChatButton onClick={handleChatButtonClick} onClose={() => setIsChatDialogOpen(false)} />
