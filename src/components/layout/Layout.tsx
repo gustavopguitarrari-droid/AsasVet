@@ -71,10 +71,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
       </ResizablePanel>
       <ResizablePanel>
-        <div className="flex flex-1 flex-col overflow-hidden">
+        <div className="flex flex-1 flex-col h-full overflow-hidden"> {/* Adicionado h-full aqui */}
           <Header />
-          <div className="flex-1 overflow-y-auto p-6"> {/* Mantido p-6 para o conteúdo principal */}
-            <main className="flex flex-col min-h-full">{children}</main>
+          <div className="flex-1 overflow-y-auto p-6">
+            <main className="flex flex-col">{children}</main> {/* Removido min-h-full */}
           </div>
           <MadeWithDyad />
         </div>
