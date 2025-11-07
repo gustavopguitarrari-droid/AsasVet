@@ -176,12 +176,12 @@
     --ring: var(--verde-folha-seca);
 
     /* Sidebar colors (adaptam-se ao tema principal) */
-    --sidebar-background: var(--primary);
-    --sidebar-foreground: var(--primary-foreground);
-    --sidebar-primary: var(--primary-foreground);
-    --sidebar-primary-foreground: var(--primary);
-    --sidebar-accent: var(--primary-foreground);
-    --sidebar-accent-foreground: var(--primary);
+    --sidebar-background: var(--creme-terra); /* Alterado para Creme Terra */
+    --sidebar-foreground: var(--marrom-avela); /* Alterado para Marrom Avelã */
+    --sidebar-primary: var(--verde-folha-seca); /* Cor de destaque para item ativo */
+    --sidebar-primary-foreground: var(--creme-terra); /* Texto do item ativo */
+    --sidebar-accent: var(--bege-areia); /* Cor de hover */
+    --sidebar-accent-foreground: var(--marrom-avela); /* Texto do hover */
     --sidebar-border: var(--border);
     --sidebar-ring: var(--ring);
 
