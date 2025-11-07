@@ -86,6 +86,9 @@
     --nv-lp-marrom-avela: var(--lp-marrom-avela);
     --nv-lp-bege-areia: var(--lp-bege-areia);
 
+    /* NOVO: Definir um verde escuro para o sidebar */
+    --nv-dark-green: 90 40% 20%;
+
     /* Mapeamento para as variáveis do shadcn/ui */
     --background: var(--nv-lp-creme-terra); /* Fundo da página mais claro */
     --foreground: var(--nv-lp-marrom-avela); /* Texto escuro no fundo claro */
@@ -117,7 +120,7 @@
     --ring: var(--nv-lp-verde-folha-seca);
 
     /* Sidebar colors - AJUSTADO PARA CONTRASTE */
-    --sidebar-background: var(--nv-lp-marrom-avela); /* Menu lateral mais escuro */
+    --sidebar-background: var(--nv-dark-green); /* Menu lateral verde escuro */
     --sidebar-foreground: var(--nv-lp-creme-terra); /* Texto claro no menu lateral */
     --sidebar-primary: var(--nv-lp-verde-folha-seca); /* Item ativo com fundo verde */
     --sidebar-primary-foreground: var(--nv-lp-creme-terra); /* Texto claro no item ativo */
