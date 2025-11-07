@@ -135,7 +135,7 @@ const MyPlanSettings: React.FC = () => {
                   </Badge>
                 </div>
                 {/* O valor do plano agora está acima da imagem */}
-                <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
+                <p className="text-3xl font-extrabold mb-0">{plan.price}</p>
                 {plan.imageUrl && (
                   <div className="mb-0 flex justify-center">
                     <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-[500px] w-auto object-contain" />
