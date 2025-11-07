@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 import defaultTheme from "tailwindcss/defaultTheme"; // Importar defaultTheme
 
 export default {
-  darkMode: ["class"],
+  // darkMode: ["class"], // Removido
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",

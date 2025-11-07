@@ -71,66 +71,7 @@
     --event-outros: 0 0% 50%;
   }
 
-  .dark {
-    /* Cores do tema padrão (Dark) */
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-darker: 210 40% 80%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-
-    /* Sidebar colors para dark mode (adaptam-se ao tema principal) */
-    --sidebar-background: var(--primary);
-    --sidebar-foreground: var(--primary-foreground);
-    --sidebar-primary: var(--primary-foreground);
-    --sidebar-primary-foreground: var(--primary);
-    --sidebar-accent: var(--primary-foreground);
-    --sidebar-accent-foreground: var(--primary);
-    --sidebar-border: var(--border);
-    --sidebar-ring: var(--ring);
-
-    /* Sidebar Item Backgrounds (cores distintas para itens em dark mode) */
-    --sidebar-item-bg-1: 220 80% 40%;
-    --sidebar-item-bg-2: 10 80% 40%;
-    --sidebar-item-bg-3: 140 70% 20%;
-    --sidebar-item-bg-4: 260 70% 40%;
-    --sidebar-item-bg-5: 40 90% 40%;
-    --sidebar-item-bg-6: 180 70% 20%;
-    --sidebar-item-bg-7: 300 70% 40%;
-    --sidebar-item-bg-8: 60 90% 40%;
-    --sidebar-item-bg-9: 0 0% 30%;
-
-    /* Cores para Categorias de Eventos em dark mode */
-    --event-consulta: 220 80% 40%;
-    --event-cirurgia: 10 80% 40%;
-    --event-vacina: 140 70% 20%;
-    --event-exame: 260 70% 40%;
-    --event-retorno: 40 90% 40%;
-    --event-outros: 0 0% 30%;
-  }
+  /* REMOVIDO: .dark { ... } */
 
   body {
     @apply bg-background text-foreground;

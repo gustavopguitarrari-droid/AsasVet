@@ -9,13 +9,13 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useSession } from '@/context/SessionContext';
 import { cn } from '@/lib/utils';
-import { useTheme } from 'next-themes'; // Importar useTheme
+// import { useTheme } from 'next-themes'; // Removido
 
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useSession();
   const location = useLocation();
-  const { resolvedTheme } = useTheme(); // Obter o tema resolvido (light ou dark)
+  // const { resolvedTheme } = useTheme(); // Removido
   const [authView, setAuthView] = useState<'sign_in' | 'forgotten_password' | 'update_password'>(() => {
     const state = location.state as { view?: 'forgotten_password' | 'update_password' };
     return state?.view || 'sign_in';
@@ -29,7 +29,7 @@ const Login = () => {
     }
   }, [session, isLoading, navigate]);
 
-  console.log('Login Page - Resolved Theme:', resolvedTheme); // Log para depuração
+  // console.log('Login Page - Resolved Theme:', resolvedTheme); // Removido
 
   if (isLoading) {
     console.log('Login Page - Currently loading session...');
@@ -67,19 +67,10 @@ const Login = () => {
                   messageText: 'hsl(var(--foreground))',
                 },
               },
-              dark: { // Variáveis para o tema escuro
-                colors: {
-                  brand: 'hsl(var(--primary))',
-                  brandAccent: 'hsl(var(--primary-darker))',
-                  inputBackground: 'hsl(var(--input))',
-                  inputBorder: 'hsl(var(--border))',
-                  inputText: 'hsl(var(--foreground))',
-                  messageText: 'hsl(var(--foreground))',
-                },
-              },
+              // dark: { ... } // Removido
             },
           }}
-          theme="dark"
+          theme="light" {/* Alterado para tema claro */}
           redirectTo={window.location.origin + '/painel'}
           view={authView}
           localization={{

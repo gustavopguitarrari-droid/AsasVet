@@ -3,7 +3,6 @@
 import React from "react";
 import { useLocation, Link } from "react-router-dom";
 import UserProfile from "@/components/UserProfile";
-import ThemeToggle from "@/components/ThemeToggle";
 import ColorThemeToggle from "@/components/ColorThemeToggle";
 import LiveClockCalendar from "@/components/LiveClockCalendar";
 import { usePageTitle } from "@/context/PageTitleContext";
@@ -63,7 +62,6 @@ const Header: React.FC<HeaderProps> = () => { // Props removidas
       <div className="flex items-center space-x-2">
         <LiveClockCalendar />
         <ColorThemeToggle />
-        <ThemeToggle />
         <UserProfile />
       </div>
     </header>
