@@ -137,7 +137,72 @@
   }
 
   /* --- Temas de Cores Personalizados --- */
-  /* Todos os temas personalizados foram removidos */
+  .theme-nature-vet {
+    --background: 40 20% 95%; /* creme-terra */
+    --foreground: 30 20% 30%; /* marrom-avela */
+
+    --card: 40 20% 95%; /* creme-terra */
+    --card-foreground: 30 20% 30%; /* marrom-avela */
+
+    --popover: 40 20% 95%; /* creme-terra */
+    --popover-foreground: 30 20% 30%; /* marrom-avela */
+
+    --primary: 80 40% 40%; /* verde-folha-seca */
+    --primary-darker: 80 40% 30%;
+    --primary-foreground: 40 20% 95%; /* creme-terra */
+
+    --secondary: 100 30% 80%; /* verde-bambu */
+    --secondary-foreground: 30 20% 30%; /* marrom-avela */
+
+    --muted: 40 30% 90%; /* bege-areia */
+    --muted-foreground: 30 20% 50%;
+
+    --accent: 100 30% 80%; /* verde-bambu */
+    --accent-foreground: 30 20% 30%; /* marrom-avela */
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 30 20% 50%;
+    --input: 40 20% 95%;
+    --ring: 80 40% 40%;
+
+    /* Sidebar colors (adaptam-se ao tema principal) */
+    --sidebar-background: var(--primary);
+    --sidebar-foreground: var(--primary-foreground);
+    --sidebar-primary: var(--primary-foreground);
+    --sidebar-primary-foreground: var(--primary);
+    --sidebar-accent: var(--primary-foreground);
+    --sidebar-accent-foreground: var(--primary);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+
+    /* Sidebar Item Backgrounds (cores distintas para itens) */
+    --sidebar-item-bg-1: 100 30% 70%;
+    --sidebar-item-bg-2: 10 80% 50%;
+    --sidebar-item-bg-3: 140 70% 30%;
+    --sidebar-item-bg-4: 260 70% 50%;
+    --sidebar-item-bg-5: 40 90% 50%;
+    --sidebar-item-bg-6: 180 70% 30%;
+    --sidebar-item-bg-7: 300 70% 30%;
+    --sidebar-item-bg-8: 60 90% 50%;
+    --sidebar-item-bg-9: 0 0% 40%;
+
+    /* Cores para Categorias de Eventos */
+    --event-consulta: 100 30% 70%;
+    --event-cirurgia: 10 80% 50%;
+    --event-vacina: 140 70% 30%;
+    --event-exame: 260 70% 50%;
+    --event-retorno: 40 90% 50%;
+    --event-outros: 0 0% 40%;
+
+    /* Specific colors for LandingPage/Login */
+    --verde-bambu: 100 30% 80%;
+    --marrom-avela: 30 20% 30%;
+    --creme-terra: 40 20% 95%;
+    --verde-folha-seca: 80 40% 40%;
+    --bege-areia: 40 30% 90%;
+  }
 }
 
 /* Custom Background Gradients */

@@ -157,7 +157,7 @@ const LandingPage: React.FC = () => {
         <h2 className="text-4xl md:text-5xl font-bold mb-16 text-verde-folha-seca">Por Que Escolher AsasVet?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {whyChooseUs.map((item, index) => (
-            <Card key={index} className="flex flex-col items-center p-8 space-y-5 bg-creme-terra shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:scale-105 border-l-4 border-verde-folha-seca rounded-xl">
+            <Card key={index} className="flex flex-col items-center p-8 space-y-5 bg-creme-terra shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 border-l-4 border-verde-folha-seca rounded-xl">
               <div className="p-4 rounded-full bg-verde-folha-seca text-creme-terra shadow-md">
                 <item.icon className="h-10 w-10" strokeWidth={1.5} />
               </div>

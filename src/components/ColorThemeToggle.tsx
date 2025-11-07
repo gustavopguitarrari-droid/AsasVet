@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 
 const colorThemes = [
   { name: "Padrão (Azul Escuro)", value: "default", colorClass: "bg-blue-500" },
+  { name: "Nature Vet", value: "nature-vet", colorClass: "bg-verde-folha-seca" }, // Adicionado o tema Nature Vet
 ];
 
 const ColorThemeToggle = () => {
