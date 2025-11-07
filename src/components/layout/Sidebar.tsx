@@ -65,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       )}>
         <Link to="/painel" className="flex items-center">
           {/* Removido: <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-8 w-auto" /> */}
-          {!isCollapsed && <PawPrint className="h-8 w-8 mr-2 text-sidebar-primary" />} {/* Aumentado de h-6 w-6 para h-8 w-8 */}
+          {!isCollapsed && <PawPrint className="h-10 w-10 mr-2 text-sidebar-primary" />} {/* Aumentado de h-8 w-8 para h-10 w-10 */}
           {!isCollapsed && <span className="text-xl font-bold text-sidebar-primary whitespace-nowrap">AsasVet</span>}
         </Link>
       </div>
@@ -86,7 +86,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
               )}
             >
               <Link to={item.path} className="flex items-center w-full">
-                <item.icon className={cn("h-10 w-10", !isCollapsed && "mr-3")} strokeWidth={2} /> {/* Aumentado de h-7 w-7 para h-10 w-10 */}
+                <item.icon className={cn("h-12 w-12", !isCollapsed && "mr-3")} strokeWidth={2} /> {/* Aumentado de h-10 w-10 para h-12 w-12 */}
                 {!isCollapsed && <span className="whitespace-nowrap">{item.name}</span>}
               </Link>
             </Button>
