@@ -117,33 +117,33 @@
     --ring: var(--nv-lp-verde-folha-seca);
 
     /* Sidebar colors - ADJUSTED FOR CONTRAST */
-    --sidebar-background: var(--nv-lp-marrom-avela); /* Usar marrom-avela para o fundo */
-    --sidebar-foreground: var(--nv-lp-creme-terra); /* Texto claro no fundo escuro */
-    --sidebar-primary: var(--nv-lp-creme-terra); /* Item ativo com fundo claro */
-    --sidebar-primary-foreground: var(--nv-lp-marrom-avela); /* Texto escuro no item ativo */
+    --sidebar-background: var(--nv-lp-verde-bambu); /* Usar verde-bambu para o fundo */
+    --sidebar-foreground: var(--nv-lp-marrom-avela); /* Texto escuro no fundo claro */
+    --sidebar-primary: var(--nv-lp-marrom-avela); /* Item ativo com fundo escuro */
+    --sidebar-primary-foreground: var(--nv-lp-creme-terra); /* Texto claro no item ativo */
     --sidebar-accent: var(--nv-lp-verde-folha-seca); /* Hover com verde-folha-seca */
-    --sidebar-accent-foreground: var(--nv-lp-creme-terra); /* Texto claro no hover */
-    --sidebar-border: var(--nv-lp-verde-bambu); /* Borda com verde-bambu */
-    --sidebar-ring: var(--nv-lp-creme-terra);
+    --sidebar-accent-foreground: var(--nv-lp-marrom-avela); /* Texto escuro no hover */
+    --sidebar-border: var(--nv-lp-verde-folha-seca); /* Borda com verde-folha-seca */
+    --sidebar-ring: var(--nv-lp-marrom-avela);
 
     /* Sidebar Item Backgrounds (adjusting to new palette) */
-    --sidebar-item-bg-1: var(--nv-lp-verde-folha-seca); /* Green */
-    --sidebar-item-bg-2: var(--nv-lp-marrom-avela); /* Brown */
-    --sidebar-item-bg-3: var(--nv-lp-bege-areia); /* Beige */
-    --sidebar-item-bg-4: var(--nv-lp-verde-bambu); /* Lighter Green */
-    --sidebar-item-bg-5: 50 100% 80%; /* Lighter Creme-Terra */
-    --sidebar-item-bg-6: 20 20% 60%; /* Lighter Marrom-Avela */
-    --sidebar-item-bg-7: 90 40% 50%; /* Darker Verde-Bambu */
-    --sidebar-item-bg-8: 40 100% 70%; /* Darker Bege-Areia */
-    --sidebar-item-bg-9: 0 0% 40%; /* Dark Grey (fallback) */
+    --sidebar-item-bg-1: 220 80% 60%; /* Blue */
+    --sidebar-item-bg-2: 10 80% 60%; /* Reddish-orange */
+    --sidebar-item-bg-3: 140 70% 40%; /* Green */
+    --sidebar-item-bg-4: 260 70% 60%; /* Purple */
+    --sidebar-item-bg-5: 40 90% 60%; /* Orange */
+    --sidebar-item-bg-6: 180 70% 40%; /* Cyan */
+    --sidebar-item-bg-7: 300 70% 40%; /* Magenta */
+    --sidebar-item-bg-8: 60 90% 60%; /* Yellow */
+    --sidebar-item-bg-9: 0 0% 50%; /* Gray */
 
     /* Cores para Categorias de Eventos */
-    --event-consulta: var(--nv-lp-verde-folha-seca);
-    --event-cirurgia: var(--nv-lp-marrom-avela);
-    --event-vacina: var(--nv-lp-bege-areia);
-    --event-exame: var(--nv-lp-verde-bambu);
-    --event-retorno: 50 100% 80%;
-    --event-outros: 0 0% 40%;
+    --event-consulta: 220 80% 60%;
+    --event-cirurgia: 10 80% 60%;
+    --event-vacina: 140 70% 40%;
+    --event-exame: 260 70% 60%;
+    --event-retorno: 40 90% 60%;
+    --event-outros: 0 0% 50%;
   }
 
   /* TEMA: Céu Sereno */
