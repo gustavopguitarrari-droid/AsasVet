@@ -63,8 +63,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
         "flex items-center h-16 px-4 border-b border-sidebar-border", // Adicionado border-sidebar-border
         isCollapsed ? "justify-center" : "justify-start"
       )}>
-        <Link to="/painel" className="flex items-center space-x-2">
-          <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-8 w-auto" />
+        <Link to="/painel" className="flex items-center">
+          {/* Removido: <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-8 w-auto" /> */}
           {!isCollapsed && <span className="text-xl font-bold text-sidebar-primary whitespace-nowrap">AsasVet</span>}
         </Link>
       </div>
