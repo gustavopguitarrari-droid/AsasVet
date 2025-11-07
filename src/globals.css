@@ -610,12 +610,15 @@
   animation-delay: 0.5s; /* Atraso para aparecer depois do título */
 }
 
-/* NOVO: Esconde o divisor de redimensionamento */
-.PanelResizeHandle {
-  width: 0 !important;
-  min-width: 0 !important;
+/* Esconde o divisor de redimensionamento */
+.PanelResizeHandle[data-panel-group-direction="horizontal"] {
+  width: 0px !important;
+  min-width: 0px !important;
+  max-width: 0px !important;
   border: none !important;
   background-color: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 /* Estilo para o spinner de carregamento */
