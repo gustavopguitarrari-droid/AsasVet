@@ -170,6 +170,7 @@
 
   /* TEMA: Pastel Blue */
   .theme-pastel-blue {
+    /* Cores base para o tema Pastel Blue */
     --background: 210 30% 98%; /* Azul muito claro */
     --foreground: 210 50% 20%; /* Azul escuro para texto */
 
@@ -227,13 +228,6 @@
     --event-exame: 270 70% 75%;
     --event-retorno: 300 70% 75%;
     --event-outros: 0 0% 85%;
-
-    /* Landing Page colors - Mantém as cores da Landing Page */
-    --lp-verde-bambu: 90 40% 70%;
-    --lp-verde-folha-seca: 90 40% 67%;
-    --lp-creme-terra: 50 100% 99%;
-    --lp-marrom-avela: 20 20% 47%;
-    --lp-bege-areia: 40 100% 85%;
 
     /* NOVO: Cores para botões/abas não selecionados no tema Pastel Blue */
     --primary-unselected: 210 30% 90%; /* Azul pastel mais claro */
@@ -296,14 +290,15 @@
 }
 
 .login-art-bg::before {
-  /* Removido o overlay de cor para o tema nature-vet */
+  /* NOVO: Overlay para o tema Pastel Blue */
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: transparent; /* Torna o overlay transparente */
+  background: hsl(var(--background)); /* Usa a cor de fundo do tema atual */
+  opacity: 0.7; /* Ajuste a opacidade conforme necessário */
   z-index: 1;
 }
 
