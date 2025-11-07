@@ -198,7 +198,7 @@ const LandingPage: React.FC = () => {
 
       {/* NOVO: Seção de Planos */}
       <section id="plans" className="py-24 px-8 bg-landingPage-lp-bege-areia text-center">
-        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-verde-folha-seca">Escolha o Plano Ideal para Sua Clínica</h2>
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-marrom-avela">Escolha o Plano Ideal para Sua Clínica</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {availablePlans.map((plan) => (
             <Card
