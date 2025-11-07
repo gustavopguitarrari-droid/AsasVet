@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { showError, showSuccess } from '@/utils/toast';
 
-type ColorTheme = 'nature-vet' | 'ceu-sereno' | 'jardim-lavanda' | 'areia-dourada';
+type ColorTheme = 'nature-vet'; // Tipo atualizado para apenas 'nature-vet'
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -19,17 +19,14 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   const { user, setUser } = useUser();
   const queryClient = useQueryClient();
 
-  // Default to 'nature-vet' if user?.colorTheme is not set or is an invalid value
-  const initialTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'nature-vet';
+  // Default to 'nature-vet'
+  const initialTheme: ColorTheme = 'nature-vet';
   const [internalColorTheme, setInternalColorTheme] = useState<ColorTheme>(initialTheme);
 
   // Update internal state when user.colorTheme changes from outside (e.g., on login/profile fetch)
   useEffect(() => {
-    const userTheme = (user?.colorTheme as ColorTheme);
-    if (userTheme && userTheme !== internalColorTheme) {
-      setInternalColorTheme(userTheme);
-    } else if (!userTheme && internalColorTheme !== 'nature-vet') {
-      // If user logs out or has no theme, revert to default 'nature-vet'
+    // Always set to 'nature-vet' as it's the only available theme
+    if (internalColorTheme !== 'nature-vet') {
       setInternalColorTheme('nature-vet');
     }
   }, [user?.colorTheme, internalColorTheme]);

@@ -9,13 +9,13 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useSession } from '@/context/SessionContext';
 import { cn } from '@/lib/utils';
-import { useColorTheme } from '@/context/ColorThemeContext'; // Importar useColorTheme
+// Removido: import { useColorTheme } from '@/context/ColorThemeContext'; // Importar useColorTheme
 
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useSession();
   const location = useLocation();
-  const { colorTheme } = useColorTheme(); // Obter o tema de cor atual
+  // Removido: const { colorTheme } = useColorTheme(); // Obter o tema de cor atual
   const [authView, setAuthView] = useState<'sign_in' | 'forgotten_password' | 'update_password'>(() => {
     const state = location.state as { view?: 'forgotten_password' | 'update_password' };
     return state?.view || 'sign_in';
@@ -29,8 +29,8 @@ const Login = () => {
     }
   }, [session, isLoading, navigate]);
 
-  // Determina se o tema atual é considerado "escuro" para o componente Auth
-  const isDarkTheme = colorTheme === 'ceu-sereno' || colorTheme === 'jardim-lavanda'; // Exemplo: defina quais temas são "escuros"
+  // Removido: Determina se o tema atual é considerado "escuro" para o componente Auth
+  // Removido: const isDarkTheme = colorTheme === 'ceu-sereno' || colorTheme === 'jardim-lavanda'; // Exemplo: defina quais temas são "escuros"
 
   return (
     <div className={cn(
@@ -86,7 +86,7 @@ const Login = () => {
             },
           }}
           // Define o tema do Auth component com base no tema de cor atual do aplicativo
-          theme={isDarkTheme ? "dark" : "light"} 
+          theme={"light"} // Agora fixo como "light" ou "dark" dependendo do tema padrão
           redirectTo={window.location.origin + '/painel'}
           view={authView}
           localization={{

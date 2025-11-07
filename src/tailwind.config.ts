@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 import defaultTheme from "tailwindcss/defaultTheme"; // Importar defaultTheme
 
 export default {
-  darkMode: ["class"],
+  darkMode: ["class"], // Habilitado para que o Tailwind possa aplicar os temas de cor dinamicamente
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -75,6 +75,33 @@ export default {
           "item-bg-7": "hsl(var(--sidebar-item-bg-7))",
           "item-bg-8": "hsl(var(--sidebar-item-bg-8))",
           "item-bg-9": "hsl(var(--sidebar-item-bg-9))",
+        },
+        landingPage: { // NOVO: Cores específicas para a Landing Page
+          "lp-verde-bambu": "hsl(var(--lp-verde-bambu))",
+          "lp-verde-folha-seca": "hsl(var(--lp-verde-folha-seca))",
+          "lp-creme-terra": "hsl(var(--lp-creme-terra))",
+          "lp-marrom-avela": "hsl(var(--lp-marrom-avela))",
+          "lp-bege-areia": "hsl(var(--lp-bege-areia))",
+        },
+        // NOVO: Adicionado para o tema Nature Vet
+        "primary-unselected": {
+          DEFAULT: "hsl(var(--primary-unselected))",
+          foreground: "hsl(var(--primary-unselected-foreground))",
+        },
+        // NOVO: Cores pastel para os cards do Dashboard no tema Nature Vet
+        "nv-pastel": {
+          "blue": "hsl(var(--nv-pastel-blue))",
+          "green": "hsl(var(--nv-pastel-green))",
+          "yellow": "hsl(var(--nv-pastel-yellow))",
+          "pink": "hsl(var(--nv-pastel-pink))",
+          "purple": "hsl(var(--nv-pastel-purple))",
+          "orange": "hsl(var(--nv-pastel-orange))",
+          "gray": "hsl(var(--nv-pastel-gray))",
+        },
+        // NOVO: Cor dourada para o botão do plano
+        golden: {
+          DEFAULT: "hsl(var(--golden-button))",
+          foreground: "hsl(var(--golden-button-foreground))",
         },
       },
       borderRadius: {
