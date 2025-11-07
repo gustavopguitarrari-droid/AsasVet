@@ -88,6 +88,16 @@ export default {
           DEFAULT: "hsl(var(--primary-unselected))",
           foreground: "hsl(var(--primary-unselected-foreground))",
         },
+        // NOVO: Cores pastel para os cards do Dashboard no tema Nature Vet
+        "nv-pastel": {
+          "blue": "hsl(var(--nv-pastel-blue))",
+          "green": "hsl(var(--nv-pastel-green))",
+          "yellow": "hsl(var(--nv-pastel-yellow))",
+          "pink": "hsl(var(--nv-pastel-pink))",
+          "purple": "hsl(var(--nv-pastel-purple))",
+          "orange": "hsl(var(--nv-pastel-orange))",
+          "gray": "hsl(var(--nv-pastel-gray))",
+        },
       },
       borderRadius: {
         lg: "0.75rem", // Aumentado de var(--radius)

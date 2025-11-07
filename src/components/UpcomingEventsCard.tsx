@@ -24,7 +24,11 @@ const categoryColorMap: Record<CalendarEvent["category"], string> = {
   Outros: "bg-event-outros",
 };
 
-const UpcomingEventsCard: React.FC = () => {
+interface UpcomingEventsCardProps {
+  className?: string; // Adicionado prop className
+}
+
+const UpcomingEventsCard: React.FC<UpcomingEventsCardProps> = ({ className }) => {
   const { user: appUser } = useUser();
   const organizationId = appUser?.organizationId; // Usar organizationId
   const queryClient = useQueryClient(); // Inicializar queryClient
@@ -153,10 +157,10 @@ const UpcomingEventsCard: React.FC = () => {
   };
 
   return (
-    <Card className="col-span-full">
+    <Card className={cn("col-span-full", className)}> {/* Aplicando className aqui */}
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg font-semibold">Próximos Eventos</CardTitle>
-        <CalendarDays className="h-5 w-5 text-muted-foreground" />
+        <CalendarDays className="h-5 w-5 text-current" /> {/* Usando text-current */}
       </CardHeader>
       <CardContent className="pt-4">
         <h3 className="text-md font-semibold mb-3">Eventos de Hoje ({eventsToday.length})</h3>

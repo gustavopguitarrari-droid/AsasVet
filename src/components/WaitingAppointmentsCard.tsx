@@ -9,7 +9,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { Link } from "react-router-dom";
 
-const WaitingAppointmentsCard: React.FC = () => {
+interface WaitingAppointmentsCardProps {
+  className?: string; // Adicionado prop className
+}
+
+const WaitingAppointmentsCard: React.FC<WaitingAppointmentsCardProps> = ({ className }) => {
   const { user: appUser } = useUser();
   const organizationId = appUser?.organizationId; // Usar organizationId
 
@@ -33,16 +37,16 @@ const WaitingAppointmentsCard: React.FC = () => {
 
   return (
     <Link to="/consultas" state={{ activeTab: "em-espera" }} className="block">
-      <Card className={cn("col-span-1 bg-gray-700 text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full")}>
+      <Card className={cn("col-span-1 shadow-md hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full", className)}> {/* Aplicando className aqui */}
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Consultas Em Espera</CardTitle>
-          <CalendarClock className="h-4 w-4 text-white" />
+          <CalendarClock className="h-4 w-4 text-current" /> {/* Usando text-current para herdar a cor */}
         </CardHeader>
         <CardContent className="flex-1">
           <div className="text-2xl font-bold">
             {isLoading ? "..." : waitingAppointmentsCount.toLocaleString('pt-BR')}
           </div>
-          <p className="text-white/80 text-xs">aguardando atendimento</p>
+          <p className="text-current/80 text-xs">aguardando atendimento</p> {/* Usando text-current/80 */}
         </CardContent>
       </Card>
     </Link>

@@ -53,6 +53,26 @@ const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "petsBySpeciesChart", name: "Animais por Espécie (Gráfico)", isVisible: true, category: "overview", order: 11 },
 ];
 
+const cardColorMap: { [key: string]: string } = {
+  totalClients: "bg-nv-pastel-blue",
+  totalPets: "bg-nv-pastel-green",
+  scheduledAppointments: "bg-nv-pastel-pink",
+  waitingAppointments: "bg-nv-pastel-gray",
+  averageWaitingTime: "bg-nv-pastel-yellow",
+  averageConsultationTime: "bg-nv-pastel-purple",
+  recentPets: "bg-nv-pastel-orange",
+  upcomingEvents: "bg-nv-pastel-blue", // This is a full-width card, will use a pastel color
+  financialSummary: "bg-nv-pastel-yellow",
+  cashFlow: "bg-nv-pastel-orange",
+  internmentStatus: "bg-nv-pastel-purple",
+  veterinariansOnDuty: "bg-nv-pastel-gray",
+  medicalRecordsSummary: "bg-nv-pastel-blue",
+  appointmentsMonthlyChart: "bg-nv-pastel-green", // Chart card
+  appointmentsWeeklyChart: "bg-nv-pastel-pink", // Chart card
+  revenueMonthlyChart: "bg-nv-pastel-yellow", // Chart card
+  petsBySpeciesChart: "bg-nv-pastel-purple", // Chart card
+};
+
 const Dashboard = () => {
   const [isConfiguratorOpen, setIsConfiguratorOpen] = React.useState(false);
   const [dashboardConfig, setDashboardConfig] = React.useState<DashboardItemConfig[]>(
@@ -207,12 +227,13 @@ const Dashboard = () => {
     const baseCardClasses = "shadow-md text-landingPage-lp-marrom-avela"; // Texto marrom escuro para contraste
     const iconClasses = "h-4 w-4 text-landingPage-lp-marrom-avela"; // Ícones marrom escuro
     const textMutedClasses = "text-landingPage-lp-marrom-avela/80"; // Texto muted marrom escuro
+    const cardBgClass = cardColorMap[item.id] || "bg-card"; // Fallback to default bg-card
 
     switch (item.id) {
       case "totalClients":
         return (
           <Link to="/cadastro" key={item.id} className="block">
-            <Card className={cn("bg-nv-pastel-blue", baseCardClasses)}>
+            <Card className={cn(cardBgClass, baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total de Tutores</CardTitle>
                 <Users className={iconClasses} />
@@ -229,7 +250,7 @@ const Dashboard = () => {
       case "totalPets":
         return (
           <Link to="/cadastro" state={{ activeTab: "animais" }} key={item.id} className="block">
-            <Card className={cn("bg-nv-pastel-green", baseCardClasses)}>
+            <Card className={cn(cardBgClass, baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total de Animais</CardTitle>
                 <PawPrint className={iconClasses} />
@@ -246,7 +267,7 @@ const Dashboard = () => {
       case "scheduledAppointments":
         return (
           <Link to="/medical-records" key={item.id} className="block">
-            <Card className={cn("bg-nv-pastel-pink", baseCardClasses)}>
+            <Card className={cn(cardBgClass, baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Consultas Agendadas</CardTitle>
                 <CalendarDays className={iconClasses} />
@@ -267,18 +288,18 @@ const Dashboard = () => {
           </Link>
         );
       case "waitingAppointments": // NOVO: Renderiza o WaitingAppointmentsCard
-        return <WaitingAppointmentsCard key={item.id} />;
+        return <WaitingAppointmentsCard key={item.id} className={cardBgClass} />; // Pass class to component
       case "averageWaitingTime":
-        return <AverageWaitingTimeCard key={item.id} />;
+        return <AverageWaitingTimeCard key={item.id} className={cardBgClass} />; // Pass class to component
       case "averageConsultationTime":
-        return <AverageConsultationTimeCard key={item.id} />;
+        return <AverageConsultationTimeCard key={item.id} className={cardBgClass} />; // Pass class to component
       case "recentPets":
-        return <RecentPetsCard key={item.id} />;
+        return <RecentPetsCard key={item.id} className={cardBgClass} />; // Pass class to component
       case "upcomingEvents":
-        return <UpcomingEventsCard key={item.id} />;
+        return <UpcomingEventsCard key={item.id} className={cardBgClass} />; // Pass class to component
       case "financialSummary":
         return (
-          <Card key={item.id} className={cn("bg-nv-pastel-yellow", baseCardClasses)}>
+          <Card key={item.id} className={cn(cardBgClass, baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Resumo Financeiro</CardTitle>
               <DollarSign className={iconClasses} />
@@ -291,7 +312,7 @@ const Dashboard = () => {
         );
       case "cashFlow":
         return (
-          <Card key={item.id} className={cn("bg-nv-pastel-orange", baseCardClasses)}>
+          <Card key={item.id} className={cn(cardBgClass, baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Fluxo de Caixa</CardTitle>
               <DollarSign className={iconClasses} />
@@ -305,7 +326,7 @@ const Dashboard = () => {
       case "internmentStatus":
         return (
           <Link to="/internacao" key={item.id} className="block">
-            <Card className={cn("bg-nv-pastel-purple", baseCardClasses)}>
+            <Card className={cn(cardBgClass, baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Status de Internação</CardTitle>
                 <Bed className={iconClasses} />
@@ -329,7 +350,7 @@ const Dashboard = () => {
       case "veterinariansOnDuty":
         return (
           <Link to="/veterinarios" state={{ activeTab: "escala" }} key={item.id} className="block">
-            <Card className={cn("bg-nv-pastel-gray", baseCardClasses)}>
+            <Card className={cn(cardBgClass, baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Veterinários de Plantão</CardTitle>
                 <Stethoscope className={iconClasses} />
@@ -343,7 +364,7 @@ const Dashboard = () => {
         );
       case "medicalRecordsSummary":
         return (
-          <Card key={item.id} className={cn("bg-nv-pastel-blue", baseCardClasses)}>
+          <Card key={item.id} className={cn(cardBgClass, baseCardClasses)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Resumo da Agenda</CardTitle>
               <FileText className={iconClasses} />
@@ -355,13 +376,13 @@ const Dashboard = () => {
           </Card>
         );
       case "appointmentsMonthlyChart":
-        return <AppointmentsMonthlyChart key={item.id} />;
+        return <AppointmentsMonthlyChart key={item.id} className={cardBgClass} />; // Pass class to component
       case "appointmentsWeeklyChart":
-        return <AppointmentsWeeklyChart key={item.id} />;
+        return <AppointmentsWeeklyChart key={item.id} className={cardBgClass} />; // Pass class to component
       case "revenueMonthlyChart":
-        return <RevenueMonthlyChart key={item.id} />;
+        return <RevenueMonthlyChart key={item.id} className={cardBgClass} />; // Pass class to component
       case "petsBySpeciesChart":
-        return <PetsBySpeciesChart key={item.id} />;
+        return <PetsBySpeciesChart key={item.id} className={cardBgClass} />; // Pass class to component
       default:
         return null;
     }

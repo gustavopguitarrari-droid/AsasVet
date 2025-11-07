@@ -19,8 +19,13 @@ import { useUser } from "@/context/UserContext";
 import { Appointment } from "@/pages/Appointments";
 import { format, subWeeks, startOfWeek, endOfWeek, eachWeekOfInterval, isSameWeek, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils"; // Importar cn
 
-const AppointmentsWeeklyChart: React.FC = () => {
+interface AppointmentsWeeklyChartProps {
+  className?: string; // Adicionado prop className
+}
+
+const AppointmentsWeeklyChart: React.FC<AppointmentsWeeklyChartProps> = ({ className }) => {
   const { colorTheme } = useColorTheme(); // Obter o tema atual
   // As cores do eixo e da grade agora se adaptam automaticamente via CSS,
   // pois as variáveis CSS são definidas no globals.css para cada tema.
@@ -109,7 +114,7 @@ const AppointmentsWeeklyChart: React.FC = () => {
   const averageConsultas = chartData.length > 0 ? totalConsultas / chartData.length : 0;
 
   return (
-    <Card>
+    <Card className={cn("", className)}> {/* Aplicando className aqui */}
       <CardHeader>
         <CardTitle>Consultas por Semana</CardTitle>
       </CardHeader>

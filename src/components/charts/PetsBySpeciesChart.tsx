@@ -14,6 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { Pet } from "@/types/cadastro"; // Importar a interface Pet
+import { cn } from "@/lib/utils"; // Importar cn
 
 const COLORS = [
   "#3b82f6", // blue-500
@@ -26,7 +27,11 @@ const COLORS = [
   "#6b7280", // gray-500
 ];
 
-const PetsBySpeciesChart: React.FC = () => {
+interface PetsBySpeciesChartProps {
+  className?: string; // Adicionado prop className
+}
+
+const PetsBySpeciesChart: React.FC<PetsBySpeciesChartProps> = ({ className }) => {
   const { user: appUser } = useUser();
   const organizationId = appUser?.organizationId; // Usar organizationId
 
@@ -74,7 +79,7 @@ const PetsBySpeciesChart: React.FC = () => {
   }, [pets]);
 
   return (
-    <Card>
+    <Card className={cn("", className)}> {/* Aplicando className aqui */}
       <CardHeader>
         <CardTitle>Animais por Espécie</CardTitle>
       </CardHeader>

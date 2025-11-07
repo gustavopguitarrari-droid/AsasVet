@@ -21,7 +21,11 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Outros: MoreHorizontal,
 };
 
-const RecentPetsCard: React.FC = () => {
+interface RecentPetsCardProps {
+  className?: string; // Adicionado prop className
+}
+
+const RecentPetsCard: React.FC<RecentPetsCardProps> = ({ className }) => {
   const { user: appUser } = useUser();
   const organizationId = appUser?.organizationId; // Usar organizationId
 
@@ -81,13 +85,13 @@ const RecentPetsCard: React.FC = () => {
 
   if (isLoadingPets || isLoadingClients) {
     return (
-      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md flex flex-col h-full")}>
+      <Card className={cn("col-span-1 shadow-md flex flex-col h-full", className)}> {/* Aplicando className aqui */}
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Últimos Animais Cadastrados</CardTitle>
-          <PawPrint className="h-4 w-4 text-white" />
+          <PawPrint className="h-4 w-4 text-current" /> {/* Usando text-current */}
         </CardHeader>
         <CardContent className="flex-1">
-          <p className="text-white/80">Carregando...</p>
+          <p className="text-current/80">Carregando...</p> {/* Usando text-current/80 */}
         </CardContent>
       </Card>
     );
@@ -95,13 +99,13 @@ const RecentPetsCard: React.FC = () => {
 
   if (petsError || clientsError) {
     return (
-      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md flex flex-col h-full")}>
+      <Card className={cn("col-span-1 shadow-md flex flex-col h-full", className)}> {/* Aplicando className aqui */}
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Últimos Animais Cadastrados</CardTitle>
-          <PawPrint className="h-4 w-4 text-white" />
+          <PawPrint className="h-4 w-4 text-current" /> {/* Usando text-current */}
         </CardHeader>
         <CardContent className="flex-1">
-          <p className="text-white/80">Erro ao carregar dados.</p>
+          <p className="text-current/80">Erro ao carregar dados.</p> {/* Usando text-current/80 */}
         </CardContent>
       </Card>
     );
@@ -109,14 +113,14 @@ const RecentPetsCard: React.FC = () => {
 
   return (
     <Link to="/cadastro" state={{ activeTab: "animais" }} className="block">
-      <Card className={cn("col-span-1 bg-yellow-600 text-white shadow-md hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full")}>
+      <Card className={cn("col-span-1 shadow-md hover:shadow-lg transition-shadow cursor-pointer flex flex-col h-full", className)}> {/* Aplicando className aqui */}
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Últimos Animais Cadastrados</CardTitle>
-          <PawPrint className="h-4 w-4 text-white" />
+          <PawPrint className="h-4 w-4 text-current" /> {/* Usando text-current */}
         </CardHeader>
         <CardContent className="flex-1">
           {recentPets.length === 0 ? (
-            <p className="text-white/80 text-sm">Nenhum animal cadastrado recentemente.</p>
+            <p className="text-current/80 text-sm">Nenhum animal cadastrado recentemente.</p> {/* Usando text-current/80 */}
           ) : (
             <ul className="space-y-2">
               {recentPets.map((pet) => {
@@ -124,10 +128,10 @@ const RecentPetsCard: React.FC = () => {
                 const ownerName = clientMap.get(pet.ownerId) || "Tutor Desconhecido";
                 return (
                   <li key={pet.id} className="flex items-center space-x-2">
-                    <IconComponent className="h-4 w-4 text-white/80" />
+                    <IconComponent className="h-4 w-4 text-current/80" /> {/* Usando text-current/80 */}
                     <div className="flex-1">
                       <p className="text-sm font-medium">{pet.name}</p>
-                      <p className="text-xs text-white/80">Tutor: {ownerName}</p>
+                      <p className="text-xs text-current/80">Tutor: {ownerName}</p> {/* Usando text-current/80 */}
                     </div>
                   </li>
                 );

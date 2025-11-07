@@ -19,8 +19,13 @@ import { useUser } from "@/context/UserContext";
 import { format, subMonths, startOfMonth, endOfMonth, eachMonthOfInterval, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Appointment } from "@/pages/Appointments"; // Importar a interface Appointment
+import { cn } from "@/lib/utils"; // Importar cn
 
-const AppointmentsMonthlyChart: React.FC = () => {
+interface AppointmentsMonthlyChartProps {
+  className?: string; // Adicionado prop className
+}
+
+const AppointmentsMonthlyChart: React.FC<AppointmentsMonthlyChartProps> = ({ className }) => {
   const { colorTheme } = useColorTheme(); // Obter o tema atual
   // As cores do eixo e da grade agora se adaptam automaticamente via CSS,
   // pois as variáveis CSS são definidas no globals.css para cada tema.
@@ -89,7 +94,7 @@ const AppointmentsMonthlyChart: React.FC = () => {
   const averageConsultas = chartData.length > 0 ? totalConsultas / chartData.length : 0;
 
   return (
-    <Card>
+    <Card className={cn("", className)}> {/* Aplicando className aqui */}
       <CardHeader>
         <CardTitle>Consultas por Mês</CardTitle>
       </CardHeader>

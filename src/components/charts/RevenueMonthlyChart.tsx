@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useColorTheme } from "@/context/ColorThemeContext"; // Importar useColorTheme
+import { cn } from "@/lib/utils"; // Importar cn
 
 const data = [
   { name: "Jan", receita: 4000 },
@@ -20,7 +21,11 @@ const data = [
   { name: "Jun", receita: 5500 },
 ];
 
-const RevenueMonthlyChart: React.FC = () => {
+interface RevenueMonthlyChartProps {
+  className?: string; // Adicionado prop className
+}
+
+const RevenueMonthlyChart: React.FC<RevenueMonthlyChartProps> = ({ className }) => {
   const { colorTheme } = useColorTheme(); // Obter o tema atual
   // As cores do eixo e da grade agora se adaptam automaticamente via CSS,
   // pois as variáveis CSS são definidas no globals.css para cada tema.
@@ -28,7 +33,7 @@ const RevenueMonthlyChart: React.FC = () => {
   const gridLineColor = "hsl(var(--border))";
 
   return (
-    <Card className="rounded-xl">
+    <Card className={cn("rounded-xl", className)}> {/* Aplicando className aqui */}
       <CardHeader>
         <CardTitle>Receita por Mês</CardTitle>
       </CardHeader>
