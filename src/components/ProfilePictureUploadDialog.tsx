@@ -94,7 +94,7 @@ const ProfilePictureUploadDialog: React.FC<ProfilePictureUploadDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] rounded-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <ImageIcon className="h-5 w-5 mr-2" /> Editar Foto de Perfil
@@ -123,12 +123,13 @@ const ProfilePictureUploadDialog: React.FC<ProfilePictureUploadDialogProps> = ({
               accept="image/*"
               onChange={handleFileChange}
               ref={fileInputRef}
+              className="rounded-lg"
             />
           </div>
           {previewUrl && (
             <Button
               variant="outline"
-              className="w-full mt-2 text-destructive hover:bg-destructive/10"
+              className="w-full mt-2 text-destructive hover:bg-destructive/10 rounded-lg"
               onClick={handleRemovePhoto}
             >
               <XCircle className="h-4 w-4 mr-2" /> Remover Foto Atual
@@ -136,10 +137,10 @@ const ProfilePictureUploadDialog: React.FC<ProfilePictureUploadDialogProps> = ({
           )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="rounded-lg">
             Cancelar
           </Button>
-          <Button onClick={handleSave}>
+          <Button onClick={handleSave} className="rounded-lg">
             <Upload className="h-4 w-4 mr-2" /> Salvar Foto
           </Button>
         </DialogFooter>

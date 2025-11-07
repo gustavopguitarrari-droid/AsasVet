@@ -47,7 +47,7 @@ const RiskSelector: React.FC<RiskSelectorProps> = ({ value, onValueChange }) => 
               <span className="sr-only">{option.label}</span>
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">{option.label}</TooltipContent>
+          <TooltipContent side="bottom" className="rounded-lg shadow-md">{option.label}</TooltipContent>
         </Tooltip>
       ))}
     </div>

@@ -50,7 +50,7 @@ const RoleFilter: React.FC<RoleFilterProps> = ({ selectedRole, onSelectRole }) =
               <span className="sr-only">{role.name}</span>
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">{role.name}</TooltipContent>
+          <TooltipContent side="bottom" className="rounded-lg shadow-md">{role.name}</TooltipContent>
         </Tooltip>
       ))}
     </div>

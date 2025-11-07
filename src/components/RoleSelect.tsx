@@ -29,10 +29,10 @@ const RoleSelect: React.FC<RoleSelectProps> = ({ value, onValueChange }) => {
   return (
     <Select onValueChange={onValueChange} defaultValue={value}>
       {/* FormControl removido daqui */}
-      <SelectTrigger>
+      <SelectTrigger className="rounded-lg">
         <SelectValue placeholder="Selecione o cargo" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="rounded-lg shadow-md">
         {mockRoles.map((role) => (
           <SelectItem key={role} value={role}>
             {role}

@@ -52,7 +52,7 @@ const PetDetailsDialog: React.FC<PetDetailsDialogProps> = ({ pet, isOpen, onClos
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] rounded-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <IconComponent className="h-6 w-6 mr-2 text-muted-foreground" />
@@ -152,10 +152,10 @@ const PetDetailsDialog: React.FC<PetDetailsDialogProps> = ({ pet, isOpen, onClos
           )}
         </div>
         <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-          <Button variant="outline" onClick={() => onEdit(pet)} className="w-full sm:w-auto mb-2 sm:mb-0">
+          <Button variant="outline" onClick={() => onEdit(pet)} className="w-full sm:w-auto mb-2 sm:mb-0 rounded-lg">
             <Edit className="mr-2 h-4 w-4" /> Editar
           </Button>
-          <Button variant="destructive" onClick={handleDeleteClick} className="w-full sm:w-auto">
+          <Button variant="destructive" onClick={handleDeleteClick} className="w-full sm:w-auto rounded-lg">
             <Trash2 className="mr-2 h-4 w-4" /> Excluir
           </Button>
         </DialogFooter>

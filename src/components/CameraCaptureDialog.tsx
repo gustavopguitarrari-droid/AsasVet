@@ -94,7 +94,7 @@ const CameraCaptureDialog: React.FC<CameraCaptureDialogProps> = ({ isOpen, onClo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] flex flex-col items-center">
+      <DialogContent className="sm:max-w-[500px] flex flex-col items-center rounded-xl">
         <DialogHeader className="w-full text-center">
           <DialogTitle className="flex items-center justify-center">
             <Camera className="h-5 w-5 mr-2" /> Capturar Foto
@@ -104,7 +104,7 @@ const CameraCaptureDialog: React.FC<CameraCaptureDialogProps> = ({ isOpen, onClo
           </DialogDescription>
         </DialogHeader>
 
-        <div className="relative w-full max-w-md aspect-video bg-black rounded-md overflow-hidden flex items-center justify-center">
+        <div className="relative w-full max-w-md aspect-video bg-black rounded-lg overflow-hidden flex items-center justify-center">
           {!isCameraReady && !photoTaken && isOpen && (
             <p className="text-muted-foreground">Iniciando câmera...</p>
           )}
@@ -119,15 +119,15 @@ const CameraCaptureDialog: React.FC<CameraCaptureDialogProps> = ({ isOpen, onClo
         <DialogFooter className="flex-col sm:flex-row sm:justify-center sm:space-x-2 w-full mt-4">
           {photoTaken ? (
             <>
-              <Button variant="outline" onClick={handleRetake} className="w-full sm:w-auto">
+              <Button variant="outline" onClick={handleRetake} className="w-full sm:w-auto rounded-lg">
                 <X className="h-4 w-4 mr-2" /> Tirar Outra
               </Button>
-              <Button onClick={handleConfirm} className="w-full sm:w-auto">
+              <Button onClick={handleConfirm} className="w-full sm:w-auto rounded-lg">
                 <CheckCircle className="h-4 w-4 mr-2" /> Confirmar Foto
               </Button>
             </>
           ) : (
-            <Button onClick={takePhoto} disabled={!isCameraReady} className="w-full sm:w-auto">
+            <Button onClick={takePhoto} disabled={!isCameraReady} className="w-full sm:w-auto rounded-lg">
               <Camera className="h-4 w-4 mr-2" /> Capturar
             </Button>
           )}

@@ -75,7 +75,7 @@ const VeterinarianDetailsDialog: React.FC<VeterinarianDetailsDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] rounded-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <IconComponent className="h-6 w-6 mr-2 text-muted-foreground" />
@@ -128,16 +128,16 @@ const VeterinarianDetailsDialog: React.FC<VeterinarianDetailsDialogProps> = ({
         <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
           {canEditOrDelete && (
             <>
-              <Button variant="outline" onClick={() => onEdit(teamMemberData)} className="w-full sm:w-auto mb-2 sm:mb-0">
+              <Button variant="outline" onClick={() => onEdit(teamMemberData)} className="w-full sm:w-auto mb-2 sm:mb-0 rounded-lg">
                 <Edit className="mr-2 h-4 w-4" /> Editar
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
-                  <Button variant="destructive" className="w-full sm:w-auto">
+                  <Button variant="destructive" className="w-full sm:w-auto rounded-lg">
                     <Trash2 className="mr-2 h-4 w-4" /> Excluir
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="rounded-xl">
                   <AlertDialogHeader>
                     <AlertDialogTitleComponent>Tem certeza?</AlertDialogTitleComponent>
                     <AlertDialogDescription>
@@ -146,8 +146,8 @@ const VeterinarianDetailsDialog: React.FC<VeterinarianDetailsDialogProps> = ({
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooterComponent>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => onDelete(veterinarian.id, veterinarian.name)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    <AlertDialogCancel className="rounded-lg">Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onDelete(veterinarian.id, veterinarian.name)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-lg">
                       Excluir
                     </AlertDialogAction>
                   </AlertDialogFooterComponent>
@@ -155,7 +155,7 @@ const VeterinarianDetailsDialog: React.FC<VeterinarianDetailsDialogProps> = ({
               </AlertDialog>
             </>
           )}
-          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto rounded-lg">
             Fechar
           </Button>
         </DialogFooter>

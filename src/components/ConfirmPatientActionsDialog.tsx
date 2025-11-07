@@ -79,7 +79,7 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] flex flex-col rounded-xl">
         <DialogHeader className="relative">
           <DialogTitle className="flex items-center">
             <CheckCircle className="h-5 w-5 mr-2 text-green-600" /> Confirmar Ações para {patientName}
@@ -90,7 +90,7 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
           <Button
             variant="outline"
             size="icon"
-            className="absolute top-4 right-4 h-8 w-8"
+            className="absolute top-4 right-4 h-8 w-8 rounded-lg"
             onClick={handleEditClick}
           >
             <Edit className="h-4 w-4" />
@@ -98,7 +98,7 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
           </Button>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 p-4 border rounded-md bg-muted/20 mb-4">
+        <ScrollArea className="flex-1 p-4 border rounded-lg bg-muted/20 mb-4 shadow-inner">
           {currentActionsStatus.length === 0 ? (
             <p className="text-center text-muted-foreground text-sm">Nenhuma ação agendada para este horário.</p>
           ) : (
@@ -109,7 +109,7 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
                   <div
                     key={action.id}
                     className={cn(
-                      "flex items-center justify-between p-3 rounded-md border",
+                      "flex items-center justify-between p-3 rounded-lg border shadow-sm",
                       action.is_completed ? "bg-green-50 text-green-800 border-green-200" : "bg-card"
                     )}
                   >
@@ -118,7 +118,7 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
                         id={`action-${action.id}`}
                         checked={action.is_completed}
                         onCheckedChange={(checked) => handleCheckboxChange(action.id, checked as boolean)}
-                        className="mr-3"
+                        className="mr-3 rounded"
                       />
                       <ActionIcon className="h-5 w-5 mr-2 text-muted-foreground" />
                       <label
@@ -138,9 +138,9 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
                     </div>
                     <div className="flex items-center space-x-2">
                       {action.frequency && (
-                        <Badge variant="secondary" className="text-xs">{action.frequency}</Badge>
+                        <Badge variant="secondary" className="text-xs rounded-full">{action.frequency}</Badge>
                       )}
-                      <Badge variant="secondary" className="ml-4">{action.type}</Badge>
+                      <Badge variant="secondary" className="ml-4 rounded-full">{action.type}</Badge>
                     </div>
                   </div>
                 );
@@ -150,10 +150,10 @@ const ConfirmPatientActionsDialog: React.FC<ConfirmPatientActionsDialogProps> = 
         </ScrollArea>
 
         <DialogFooter className="flex-col sm:flex-row sm:justify-end sm:space-x-2 pt-4">
-          <Button variant="outline" onClick={onClose} type="button">
+          <Button variant="outline" onClick={onClose} type="button" className="rounded-lg">
             Cancelar
           </Button>
-          <Button type="button" onClick={handleConfirm} disabled={currentActionsStatus.length === 0}>
+          <Button type="button" onClick={handleConfirm} disabled={currentActionsStatus.length === 0} className="rounded-lg">
             <CheckCircle className="mr-2 h-4 w-4" /> Confirmar Selecionados
           </Button>
         </DialogFooter>

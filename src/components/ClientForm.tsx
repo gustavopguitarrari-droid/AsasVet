@@ -219,9 +219,9 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
                 accept="image/*"
                 onChange={handleFileChange}
                 ref={fileInputRef}
-                className="flex-1"
+                className="flex-1 rounded-lg"
               />
-              <Button type="button" variant="outline" size="icon" onClick={() => setIsCameraDialogOpen(true)}>
+              <Button type="button" variant="outline" size="icon" onClick={() => setIsCameraDialogOpen(true)} className="rounded-lg">
                 <Camera className="h-4 w-4" />
                 <span className="sr-only">Tirar foto com câmera</span>
               </Button>
@@ -229,7 +229,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
             {previewUrl && (
               <Button
                 variant="outline"
-                className="w-full mt-2 text-destructive hover:bg-destructive/10"
+                className="w-full mt-2 text-destructive hover:bg-destructive/10 rounded-lg"
                 onClick={handleRemovePhoto}
               >
                 <XCircle className="h-4 w-4 mr-2" /> Remover Foto
@@ -245,7 +245,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
             <FormItem>
               <FormLabel>Nome Completo</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: João Silva" {...field} />
+                <Input placeholder="Ex: João Silva" {...field} className="rounded-lg" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -258,7 +258,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
             <FormItem>
               <FormLabel>CPF</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: 123.456.789-00" {...field} />
+                <Input placeholder="Ex: 123.456.789-00" {...field} className="rounded-lg" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -287,7 +287,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
             <FormItem>
               <FormLabel>E-mail</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="Ex: joao.silva@example.com" {...field} />
+                <Input type="email" placeholder="Ex: joao.silva@example.com" {...field} className="rounded-lg" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -300,7 +300,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
             <FormItem>
               <FormLabel>Telefone</FormLabel>
               <FormControl>
-                <Input type="tel" placeholder="Ex: (XX) XXXXX-XXXX" {...field} />
+                <Input type="tel" placeholder="Ex: (XX) XXXXX-XXXX" {...field} className="rounded-lg" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -317,7 +317,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
             <FormItem>
               <FormLabel>CEP</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: 12345-678" {...field} onChange={handleCepChange} />
+                <Input placeholder="Ex: 12345-678" {...field} onChange={handleCepChange} className="rounded-lg" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -330,7 +330,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
             <FormItem>
               <FormLabel>Rua</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: Rua das Flores" {...field} />
+                <Input placeholder="Ex: Rua das Flores" {...field} className="rounded-lg" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -344,7 +344,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
               <FormItem>
                 <FormLabel>Número</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: 123" {...field} />
+                  <Input placeholder="Ex: 123" {...field} className="rounded-lg" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -357,7 +357,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
               <FormItem>
                 <FormLabel>Complemento (Opcional)</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: Apt 101" {...field} />
+                  <Input placeholder="Ex: Apt 101" {...field} className="rounded-lg" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -371,7 +371,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
             <FormItem>
               <FormLabel>Bairro</FormLabel>
               <FormControl>
-                <Input placeholder="Ex: Centro" {...field} />
+                <Input placeholder="Ex: Centro" {...field} className="rounded-lg" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -385,7 +385,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
               <FormItem>
                 <FormLabel>Cidade</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: São Paulo" {...field} />
+                  <Input placeholder="Ex: São Paulo" {...field} className="rounded-lg" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -398,7 +398,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
               <FormItem>
                 <FormLabel>Estado (UF)</FormLabel>
                 <FormControl>
-                  <Input placeholder="Ex: SP" {...field} />
+                  <Input placeholder="Ex: SP" {...field} className="rounded-lg" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -413,7 +413,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
             <FormItem>
               <FormLabel>Observações (Opcional)</FormLabel>
               <FormControl>
-                <Textarea placeholder="Informações adicionais sobre o tutor..." {...field} />
+                <Textarea placeholder="Informações adicionais sobre o tutor..." {...field} className="rounded-lg" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -421,10 +421,10 @@ const ClientForm: React.FC<ClientFormProps> = ({ onSubmit, onCancel, initialData
         />
 
         <DialogFooter className="mt-6">
-          <Button variant="outline" onClick={onCancel} type="button" disabled={isFormSubmitting}>
+          <Button variant="outline" onClick={onCancel} type="button" disabled={isFormSubmitting} className="rounded-lg">
             Cancelar
           </Button>
-          <Button type="submit" disabled={isFormSubmitting}>
+          <Button type="submit" disabled={isFormSubmitting} className="rounded-lg">
             <PlusCircle className="mr-2 h-4 w-4" /> {initialData ? "Salvar Alterações" : "Adicionar Tutor"}
           </Button>
         </DialogFooter>

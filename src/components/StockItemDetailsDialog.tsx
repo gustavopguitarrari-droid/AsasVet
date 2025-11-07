@@ -42,7 +42,7 @@ const StockItemDetailsDialog: React.FC<StockItemDetailsDialogProps> = ({ item, i
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] rounded-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <IconComponent className="h-6 w-6 mr-2 text-muted-foreground" />

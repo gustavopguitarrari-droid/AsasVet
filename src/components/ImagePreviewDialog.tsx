@@ -37,7 +37,7 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col rounded-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <ImageIcon className="h-5 w-5 mr-2" /> Pré-visualizar Imagem
@@ -51,7 +51,7 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({
             <img
               src={imageUrl}
               alt={imageAlt}
-              className="max-w-full max-h-full object-contain rounded-md shadow-lg"
+              className="max-w-full max-h-full object-contain rounded-lg shadow-lg"
             />
           ) : (
             <p className="text-muted-foreground">Nenhuma imagem para exibir.</p>
@@ -59,7 +59,7 @@ const ImagePreviewDialog: React.FC<ImagePreviewDialogProps> = ({
         </div>
         {imageUrl && (
           <div className="flex justify-end p-4 border-t">
-            <Button onClick={handleDownload} variant="outline">
+            <Button onClick={handleDownload} variant="outline" className="rounded-lg">
               <Download className="h-4 w-4 mr-2" /> Baixar Imagem
             </Button>
           </div>

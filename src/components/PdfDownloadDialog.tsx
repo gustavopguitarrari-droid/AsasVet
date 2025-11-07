@@ -44,7 +44,7 @@ const PdfDownloadDialog: React.FC<PdfDownloadDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] rounded-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <FileText className="h-5 w-5 mr-2" /> Baixar Prontuário PDF
@@ -65,14 +65,15 @@ const PdfDownloadDialog: React.FC<PdfDownloadDialogProps> = ({
                   handleConfirm();
                 }
               }}
+              className="rounded-lg"
             />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} className="rounded-lg">
             <X className="h-4 w-4 mr-2" /> Cancelar
           </Button>
-          <Button onClick={handleConfirm} disabled={!filename.trim()}>
+          <Button onClick={handleConfirm} disabled={!filename.trim()} className="rounded-lg">
             <Download className="h-4 w-4 mr-2" /> Baixar
           </Button>
         </DialogFooter>

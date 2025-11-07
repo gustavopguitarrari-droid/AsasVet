@@ -126,9 +126,11 @@ export default {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "0.75rem", // Aumentado de var(--radius)
+        md: "calc(0.75rem - 2px)", // Baseado no novo lg
+        sm: "calc(0.75rem - 4px)", // Baseado no novo lg
+        xl: "1rem", // Novo tamanho
+        "2xl": "1.5rem", // Novo tamanho
       },
       keyframes: {
         "accordion-down": {

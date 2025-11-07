@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 
 const ExecutionMapLegend: React.FC = () => {
   return (
-    <div className="flex flex-wrap gap-2 p-2 bg-card shadow-sm"> {/* Reduzido gap e padding */}
+    <div className="flex flex-wrap gap-2 p-2 bg-card shadow-md rounded-lg"> {/* Reduzido gap e padding, adicionado shadow-md e rounded-lg */}
       <div className="flex items-center space-x-1"> {/* Reduzido space-x */}
         <Badge className={cn("h-6 w-6 p-0 flex items-center justify-center rounded-full bg-primary text-primary-foreground")}> {/* Reduzido h e w */}
           2

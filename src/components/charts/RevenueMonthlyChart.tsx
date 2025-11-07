@@ -26,7 +26,7 @@ const RevenueMonthlyChart: React.FC = () => {
   const gridLineColor = "hsl(var(--border))"; // A cor da borda já se adapta ao tema
 
   return (
-    <Card>
+    <Card className="rounded-xl">
       <CardHeader>
         <CardTitle>Receita por Mês</CardTitle>
       </CardHeader>

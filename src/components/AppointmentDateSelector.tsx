@@ -46,13 +46,13 @@ const AppointmentDateSelector: React.FC = () => {
         >
           <FormItem className="flex items-center space-x-3 space-y-0">
             <FormControl>
-              <RadioGroupItem value="today" />
+              <RadioGroupItem value="today" className="rounded-full" />
             </FormControl>
             <label htmlFor="today" className="font-normal cursor-pointer">Hoje (Em espera)</label> {/* CORREÇÃO AQUI */}
           </FormItem>
           <FormItem className="flex items-center space-x-3 space-y-0">
             <FormControl>
-              <RadioGroupItem value="specific" />
+              <RadioGroupItem value="specific" className="rounded-full" />
             </FormControl>
             <label htmlFor="specific" className="font-normal cursor-pointer">Agendar para outra data específica</label> {/* CORREÇÃO AQUI */}
           </FormItem>
@@ -73,7 +73,7 @@ const AppointmentDateSelector: React.FC = () => {
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-full pl-3 text-left font-normal",
+                        "w-full pl-3 text-left font-normal rounded-lg",
                         !field.value && "text-muted-foreground"
                       )}
                     >
@@ -86,13 +86,14 @@ const AppointmentDateSelector: React.FC = () => {
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 rounded-lg shadow-md" align="start">
                   <Calendar
                     mode="single"
                     selected={field.value}
                     onSelect={field.onChange}
                     initialFocus
                     locale={ptBR}
+                    className="rounded-lg"
                   />
                 </PopoverContent>
               </Popover>

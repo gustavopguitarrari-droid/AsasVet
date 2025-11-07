@@ -39,7 +39,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
   };
 
   return (
-    <div className={cn("group flex items-center justify-between p-3 border rounded-md transition-colors", className)}>
+    <div className={cn("group flex items-center justify-between p-3 border rounded-lg transition-colors shadow-sm", className)}>
       <div className="flex items-center space-x-4">
         <Icon className="h-5 w-5 text-primary" />
         <Label className="text-base font-medium text-muted-foreground">{label}:</Label>
@@ -50,7 +50,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
             type={type}
             value={tempValue}
             onChange={(e) => setTempValue(e.target.value)}
-            className="max-w-[150px] h-8"
+            className="max-w-[150px] h-8 rounded-lg"
             onKeyPress={(e) => {
               if (e.key === 'Enter') handleSave();
               if (e.key === 'Escape') handleCancel();
@@ -58,21 +58,21 @@ const EditableField: React.FC<EditableFieldProps> = ({
           />
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={handleSave} className="h-8 w-8 text-green-600 hover:bg-green-100">
+              <Button variant="ghost" size="icon" onClick={handleSave} className="h-8 w-8 text-green-600 hover:bg-green-100 rounded-lg">
                 <Check className="h-4 w-4" />
                 <span className="sr-only">Salvar</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="top">Salvar</TooltipContent>
+            <TooltipContent side="top" className="rounded-lg shadow-md">Salvar</TooltipContent>
           </Tooltip>
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={handleCancel} className="h-8 w-8 text-destructive hover:bg-destructive-100">
+              <Button variant="ghost" size="icon" onClick={handleCancel} className="h-8 w-8 text-destructive hover:bg-destructive-100 rounded-lg">
                 <X className="h-4 w-4" />
                 <span className="sr-only">Cancelar</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="top">Cancelar</TooltipContent>
+            <TooltipContent side="top" className="rounded-lg shadow-md">Cancelar</TooltipContent>
           </Tooltip>
         </div>
       ) : (
@@ -80,12 +80,12 @@ const EditableField: React.FC<EditableFieldProps> = ({
           <p className="text-base font-semibold">{value}</p>
           <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)} className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+              <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)} className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
                 <Edit className="h-4 w-4" />
                 <span className="sr-only">Editar</span>
               </Button>
             </TooltipTrigger>
-            <TooltipContent side="top">Editar</TooltipContent>
+            <TooltipContent side="top" className="rounded-lg shadow-md">Editar</TooltipContent>
           </Tooltip>
         </div>
       )}
