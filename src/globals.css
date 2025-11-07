@@ -150,7 +150,7 @@
     --event-outros: 0 0% 50%;
 
     /* NOVO: Cores para botões/abas não selecionados no tema Nature Vet */
-    --primary-unselected: var(--nv-lp-verde-folha-seca); /* Verde médio */
+    --primary-unselected: var(--nv-lp-bege-areia); /* Bege claro para o fundo */
     --primary-unselected-foreground: var(--nv-lp-marrom-avela); /* Marrom escuro para o texto */
   }
 
