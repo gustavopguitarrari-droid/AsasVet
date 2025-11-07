@@ -165,7 +165,7 @@
     --popover-foreground: var(--cs-dark-blue);
 
     --primary: var(--cs-medium-blue);
-    --primary-darker: 210 70% 40%;
+    --primary-darker: 210 70% 40%; /* Darker shade of medium blue */
     --primary-foreground: var(--cs-white);
 
     --secondary: var(--cs-light-blue);
@@ -230,7 +230,7 @@
     --popover-foreground: var(--jl-dark-purple);
 
     --primary: var(--jl-medium-purple);
-    --primary-darker: 270 50% 50%;
+    --primary-darker: 270 50% 50%; /* Darker shade of medium purple */
     --primary-foreground: var(--jl-white);
 
     --secondary: var(--jl-light-purple);
@@ -295,7 +295,7 @@
     --popover-foreground: var(--ad-dark-brown);
 
     --primary: var(--ad-golden-yellow);
-    --primary-darker: 40 80% 50%;
+    --primary-darker: 40 80% 50%; /* Darker shade of golden yellow */
     --primary-foreground: var(--ad-dark-brown);
 
     --secondary: var(--ad-light-sand);

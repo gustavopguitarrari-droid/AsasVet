@@ -9,13 +9,13 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useSession } from '@/context/SessionContext';
 import { cn } from '@/lib/utils';
-// import { useTheme } from 'next-themes'; // Removido
+import { useColorTheme } from '@/context/ColorThemeContext'; // Importar useColorTheme
 
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useSession();
   const location = useLocation();
-  // const { resolvedTheme } = useTheme(); // Removido
+  const { colorTheme } = useColorTheme(); // Obter o tema de cor atual
   const [authView, setAuthView] = useState<'sign_in' | 'forgotten_password' | 'update_password'>(() => {
     const state = location.state as { view?: 'forgotten_password' | 'update_password' };
     return state?.view || 'sign_in';
@@ -29,14 +29,15 @@ const Login = () => {
     }
   }, [session, isLoading, navigate]);
 
-  // console.log('Login Page - Resolved Theme:', resolvedTheme); // Removido
+  // Determina se o tema atual é considerado "escuro" para o componente Auth
+  const isDarkTheme = colorTheme === 'ceu-sereno' || colorTheme === 'jardim-lavanda'; // Exemplo: defina quais temas são "escuros"
 
   return (
     <div className={cn(
       "min-h-screen flex items-center justify-center p-4",
       "login-art-bg"
     )}>
-      <div className="w-full max-w-sm p-6 space-y-4 rounded-xl shadow-lg relative bg-white/60 backdrop-blur-sm border border-marrom-avela/20 z-10 max-h-[80vh] overflow-y-auto"> {/* Alterado para bg-white/60 */}
+      <div className="w-full max-w-sm p-6 space-y-4 rounded-xl shadow-lg relative bg-white/60 backdrop-blur-sm border border-marrom-avela/20 z-10 max-h-[80vh] overflow-y-auto">
         <Button asChild variant="ghost" className="absolute top-4 left-4 text-marrom-avela font-bold hover:bg-verde-folha-seca/20">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
@@ -48,29 +49,44 @@ const Login = () => {
           appearance={{
             theme: ThemeSupa,
             variables: {
-              default: { // Variáveis para o tema claro (nature-vet)
+              default: { // Variáveis para o tema claro (ThemeSupa default)
                 colors: {
-                  brand: 'hsl(var(--nv-primary-green))',
-                  brandAccent: 'hsl(120 20% 18%)', /* Darker shade of primary green */
-                  inputBackground: 'hsl(var(--nv-beige))',
-                  inputBorder: 'hsl(30 15% 35%)', /* Dark brown for borders */
-                  inputText: 'hsl(var(--nv-dark-brown))',
-                  messageText: 'hsl(var(--nv-dark-brown))',
-                  // Adicione outras variáveis de cor conforme necessário para o tema dark
-                  // Por exemplo, para o fundo do Auth component, que ThemeSupa usa 'default'
-                  defaultButtonBackground: 'hsl(var(--nv-primary-green))',
-                  defaultButtonBackgroundHover: 'hsl(120 20% 18%)',
-                  defaultButtonBorder: 'hsl(var(--nv-primary-green))',
-                  defaultButtonText: 'hsl(var(--nv-beige))',
-                  dividerBackground: 'hsl(30 15% 35%)',
-                  anchorTextColor: 'hsl(var(--nv-primary-green))', // Corrigido
-                  anchorTextHoverColor: 'hsl(120 20% 18%)', // Corrigido
+                  brand: 'hsl(var(--primary))',
+                  brandAccent: 'hsl(var(--primary-darker))',
+                  inputBackground: 'hsl(var(--input))',
+                  inputBorder: 'hsl(var(--border))',
+                  inputText: 'hsl(var(--foreground))',
+                  messageText: 'hsl(var(--foreground))',
+                  defaultButtonBackground: 'hsl(var(--primary))',
+                  defaultButtonBackgroundHover: 'hsl(var(--primary-darker))',
+                  defaultButtonBorder: 'hsl(var(--primary))',
+                  defaultButtonText: 'hsl(var(--primary-foreground))',
+                  dividerBackground: 'hsl(var(--border))',
+                  anchorTextColor: 'hsl(var(--primary))',
+                  anchorTextHoverColor: 'hsl(var(--primary-darker))',
+                },
+              },
+              dark: { // Variáveis para o tema escuro (ThemeSupa dark)
+                colors: {
+                  brand: 'hsl(var(--primary))',
+                  brandAccent: 'hsl(var(--primary-darker))',
+                  inputBackground: 'hsl(var(--input))',
+                  inputBorder: 'hsl(var(--border))',
+                  inputText: 'hsl(var(--foreground))',
+                  messageText: 'hsl(var(--foreground))',
+                  defaultButtonBackground: 'hsl(var(--primary))',
+                  defaultButtonBackgroundHover: 'hsl(var(--primary-darker))',
+                  defaultButtonBorder: 'hsl(var(--primary))',
+                  defaultButtonText: 'hsl(var(--primary-foreground))',
+                  dividerBackground: 'hsl(var(--border))',
+                  anchorTextColor: 'hsl(var(--primary))',
+                  anchorTextHoverColor: 'hsl(var(--primary-darker))',
                 },
               },
             },
           }}
-          // Alterado para tema dark para melhor contraste com nature-vet
-          theme="dark" 
+          // Define o tema do Auth component com base no tema de cor atual do aplicativo
+          theme={isDarkTheme ? "dark" : "light"} 
           redirectTo={window.location.origin + '/painel'}
           view={authView}
           localization={{
