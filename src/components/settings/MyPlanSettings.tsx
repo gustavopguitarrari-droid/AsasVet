@@ -143,7 +143,9 @@ const MyPlanSettings: React.FC = () => {
                       alt={`Capa do plano ${plan.name}`} 
                       className={cn(
                         "w-auto object-contain",
-                        plan.id === "hospital-vet" ? "h-[280px]" : "h-[250px]" // Aumenta a altura para o plano "ASAS DOURADAS"
+                        plan.id === "hospital-vet" ? "h-[280px]" : 
+                        plan.id === "vet-domiciliar" ? "h-[220px]" : // Diminuído para 220px
+                        "h-[250px]" 
                       )} 
                     />
                   </div>
