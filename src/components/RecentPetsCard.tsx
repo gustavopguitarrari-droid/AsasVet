@@ -120,7 +120,7 @@ const RecentPetsCard: React.FC<RecentPetsCardProps> = ({ className }) => {
         </CardHeader>
         <CardContent className="flex-1">
           {recentPets.length === 0 ? (
-            <p className="text-current/80 text-sm">Nenhum animal cadastrado recentemente.</p> {/* Usando text-current/80 */}
+            <p className="text-current/80 text-sm">Nenhum animal cadastrado recentemente.</p>
           ) : (
             <ul className="space-y-2">
               {recentPets.map((pet) => {
