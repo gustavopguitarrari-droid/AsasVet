@@ -19,9 +19,7 @@ import { useUser } from "@/context/UserContext";
 import { usePageTitle } from "@/context/PageTitleContext";
 
 interface LayoutProps {
-  // Removido: layoutDirection?: "horizontal" | "vertical";
-  // Removido: isNavCollapsed: boolean; // Nova prop
-  // Removido: onToggleNav: () => void; // Nova prop
+  children: React.ReactNode; // Added children prop
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {

@@ -110,7 +110,6 @@ const Login = () => {
               },
             },
           }}
-          className="custom-auth-form"
         />
         {authView === 'sign_in' && (
           <p className="text-center text-sm text-marrom-avela">
