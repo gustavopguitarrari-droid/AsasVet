@@ -8,10 +8,6 @@ import ColorThemeToggle from "@/components/ColorThemeToggle";
 import LiveClockCalendar from "@/components/LiveClockCalendar";
 import { usePageTitle } from "@/context/PageTitleContext";
 import { cn } from "@/lib/utils";
-// Removido: import { allNavItems } from "./Sidebar";
-// Removido: import { Button } from "@/components/ui/button";
-// Removido: import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-// Removido: import { ArrowUpToLine, ArrowDownToLine } from "lucide-react"; // Importar os ícones de seta para cima/baixo
 
 interface HeaderProps { 
   // Removido: layoutDirection?: "horizontal" | "vertical";

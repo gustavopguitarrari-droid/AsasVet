@@ -24,7 +24,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const [isNavCollapsed, setIsNavCollapsed] = React.useState(false);
+  const [isNavCollapsed, setIsNavCollapsed] = React.useState(true); // Inicia recolhido
   const [isChatDialogOpen, setIsChatDialogOpen] = React.useState(false);
   const [isCashierDialogOpen, setIsCashierDialogOpen] = React.useState(false);
   const { user } = useUser();
@@ -48,7 +48,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       className="flex h-screen w-screen overflow-hidden"
     >
       <ResizablePanel
-        defaultSize={18} // Tamanho padrão quando expandido
+        defaultSize={4} // Tamanho padrão quando recolhido
         collapsedSize={4} // Tamanho quando recolhido
         collapsible={true}
         onCollapse={() => setIsNavCollapsed(true)}

@@ -53,52 +53,50 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
 
   return (
     <div className={cn(
-      "flex flex-col h-full w-full bg-sidebar text-sidebar-foreground border-r", // Adicionado w-full aqui
+      "flex flex-col h-full bg-sidebar text-sidebar-foreground border-r",
       "transition-all duration-300 ease-in-out",
-      // Removido: isCollapsed ? "w-[50px]" : "w-full"
+      isCollapsed ? "w-[60px]" : "w-[200px]" // Ajusta a largura com base no estado
     )}>
-      {/* Logo e Título (visível apenas quando expandido) */}
-      {!isCollapsed && (
-        <div className="flex items-center justify-center h-16 px-4 border-b">
-          <Link to="/painel" className="flex items-center space-x-2">
-            <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-8 w-auto" />
-            <span className="text-xl font-bold text-sidebar-primary">AsasVet</span>
-          </Link>
-        </div>
-      )}
-      {isCollapsed && (
-        <div className="flex items-center justify-center h-16 border-b">
-          <Link to="/painel" className="flex items-center">
-            <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-8 w-auto" />
-          </Link>
-        </div>
-      )}
+      {/* Logo e Título */}
+      <div className={cn(
+        "flex items-center h-16 px-2 border-b",
+        isCollapsed ? "justify-center" : "justify-start"
+      )}>
+        <Link to="/painel" className="flex items-center space-x-2">
+          <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-8 w-auto" />
+          {!isCollapsed && <span className="text-xl font-bold text-sidebar-primary whitespace-nowrap">AsasVet</span>}
+        </Link>
+      </div>
 
       {/* Itens de Navegação */}
       <nav className="flex-1 flex flex-col p-2 space-y-1 overflow-y-auto">
         {allNavItems.map((item) => {
           const isActive = location.pathname === item.path;
-          return (
+          const content = (
+            <Button
+              asChild
+              variant="ghost"
+              className={cn(
+                "w-full justify-start h-10",
+                "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                isActive && "bg-sidebar-primary text-sidebar-primary-foreground",
+                isCollapsed ? "px-0 justify-center" : "px-3"
+              )}
+            >
+              <Link to={item.path} className="flex items-center w-full">
+                <item.icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} strokeWidth={2} />
+                {!isCollapsed && <span className="whitespace-nowrap">{item.name}</span>}
+              </Link>
+            </Button>
+          );
+
+          return isCollapsed ? (
             <Tooltip key={item.name} delayDuration={0}>
-              <TooltipTrigger asChild>
-                <Button
-                  asChild
-                  variant="ghost"
-                  className={cn(
-                    "w-full justify-start h-10",
-                    "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    isActive && "bg-sidebar-primary text-sidebar-primary-foreground",
-                    isCollapsed ? "px-0 justify-center" : "px-3"
-                  )}
-                >
-                  <Link to={item.path} className="flex items-center w-full">
-                    <item.icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} strokeWidth={2} />
-                    {!isCollapsed && <span className="whitespace-nowrap">{item.name}</span>}
-                  </Link>
-                </Button>
-              </TooltipTrigger>
-              {isCollapsed && <TooltipContent side="right">{item.name}</TooltipContent>}
+              <TooltipTrigger asChild>{content}</TooltipTrigger>
+              <TooltipContent side="right">{item.name}</TooltipContent>
             </Tooltip>
+          ) : (
+            <React.Fragment key={item.name}>{content}</React.Fragment>
           );
         })}
       </nav>
