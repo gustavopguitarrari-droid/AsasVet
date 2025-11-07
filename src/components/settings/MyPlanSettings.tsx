@@ -118,7 +118,7 @@ const MyPlanSettings: React.FC = () => {
           Visualize os detalhes do seu plano atual e explore opções de upgrade.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Alterado para md:grid-cols-2 */}
           {availablePlans.map((plan) => (
             <Card
               key={plan.id}
@@ -137,7 +137,7 @@ const MyPlanSettings: React.FC = () => {
                 <p className="text-3xl font-extrabold">R$ {plan.price}</p>
                 {plan.imageUrl && (
                   <div className="flex justify-center">
-                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-[500px] w-auto object-contain" />
+                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-[300px] w-auto object-contain" /> {/* Alterado para h-[300px] */}
                   </div>
                 )}
                 <ul className="space-y-2 text-sm text-muted-foreground">
