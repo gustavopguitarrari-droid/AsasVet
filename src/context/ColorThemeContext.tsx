@@ -1,12 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useUser } from './UserContext'; // Importar useUser
-import { useMutation, useQueryClient } from '@tanstack/react-query'; // Importar useMutation e useQueryClient
-import { supabase } from '@/integrations/supabase/client'; // Importar supabase
-import { showError, showSuccess } from '@/utils/toast'; // Importar toasts
+import { useUser } from './UserContext';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { showError, showSuccess } from '@/utils/toast';
 
-type ColorTheme = 'default' | 'nature-vet' | 'ceu-sereno' | 'jardim-lavanda' | 'areia-dourada'; // Adicionado os novos temas
+type ColorTheme = 'nature-vet' | 'ceu-sereno' | 'jardim-lavanda' | 'areia-dourada';
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -16,11 +16,24 @@ interface ColorThemeContextType {
 const ColorThemeContext = createContext<ColorThemeContextType | undefined>(undefined);
 
 export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
-  const { user, setUser } = useUser(); // Obter o usuário e a função setUser do UserContext
+  const { user, setUser } = useUser();
   const queryClient = useQueryClient();
 
-  // O tema de cor agora vem do perfil do usuário. Se não houver usuário ou tema, usa 'nature-vet' como padrão.
-  const currentColorTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'nature-vet';
+  // Default to 'nature-vet' if user?.colorTheme is not set or is an invalid value
+  const initialTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'nature-vet';
+  const [internalColorTheme, setInternalColorTheme] = useState<ColorTheme>(initialTheme);
+
+  // Update internal state when user.colorTheme changes from outside (e.g., on login/profile fetch)
+  useEffect(() => {
+    const userTheme = (user?.colorTheme as ColorTheme);
+    if (userTheme && userTheme !== internalColorTheme) {
+      setInternalColorTheme(userTheme);
+    } else if (!userTheme && internalColorTheme !== 'nature-vet') {
+      // If user logs out or has no theme, revert to default 'nature-vet'
+      setInternalColorTheme('nature-vet');
+    }
+  }, [user?.colorTheme, internalColorTheme]);
+
 
   // Mutação para atualizar o tema de cor no perfil do usuário
   const updateColorThemeMutation = useMutation({
@@ -43,7 +56,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
         ...prevUser!,
         colorTheme: data.color_theme || undefined,
       }));
-      queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] }); // Invalida o cache para rebuscar se necessário
+      queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] });
       showSuccess("Tema de cor atualizado com sucesso!");
     },
     onError: (error) => {
@@ -59,33 +72,21 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
         root.classList.remove(cls);
       }
     });
-    // Adiciona a classe do tema atual do usuário
-    // Se o tema for 'nature-vet', não adiciona uma classe específica, pois é o padrão no :root
-    if (currentColorTheme !== 'nature-vet') {
-      root.classList.add(`theme-${currentColorTheme}`);
-    }
-  }, [currentColorTheme]); // Depende do tema de cor do usuário
+    // Sempre adiciona a classe do tema atual
+    root.classList.add(`theme-${internalColorTheme}`);
+  }, [internalColorTheme]); // Depende do estado interno do tema
 
   const setColorTheme = (theme: ColorTheme) => {
+    setInternalColorTheme(theme); // Update internal state immediately for UI responsiveness
     if (user?.id) {
       updateColorThemeMutation.mutate(theme);
     } else {
       showError("Faça login para salvar seu tema de cor.");
-      // Fallback para aplicar o tema visualmente mesmo sem salvar se não houver usuário
-      const root = window.document.documentElement;
-      root.classList.forEach(cls => {
-        if (cls.startsWith('theme-')) {
-          root.classList.remove(cls);
-        }
-      });
-      if (theme !== 'nature-vet') {
-        root.classList.add(`theme-${theme}`);
-      }
     }
   };
 
   return (
-    <ColorThemeContext.Provider value={{ colorTheme: currentColorTheme, setColorTheme }}>
+    <ColorThemeContext.Provider value={{ colorTheme: internalColorTheme, setColorTheme }}>
       {children}
     </ColorThemeContext.Provider>
   );
