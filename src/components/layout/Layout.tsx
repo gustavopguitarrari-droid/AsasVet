@@ -4,7 +4,7 @@ import React from "react";
 import {
   ResizablePanel,
   ResizablePanelGroup,
-  // Removido: ResizableHandle, // Removido para desativar o arrastar
+  ResizableHandle, // Re-adicionado
 } from "@/components/ui/resizable";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -48,19 +48,24 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       className="flex h-screen w-screen overflow-hidden"
     >
       <ResizablePanel
-        defaultSize={18}
-        collapsedSize={4}
+        // Removido defaultSize e collapsedSize, pois o tamanho será controlado pelo 'size'
         collapsible={true}
         onCollapse={() => setIsNavCollapsed(true)}
         onExpand={() => setIsNavCollapsed(false)}
+        size={isNavCollapsed ? 4 : 18} // Tamanho dinâmico baseado no estado
+        minSize={4} // Adicionado minSize para evitar que o painel seja menor que o collapsedSize
+        maxSize={18} // Adicionado maxSize para evitar que o painel seja maior que o defaultSize
         className={cn(
           "flex flex-col transition-all duration-300 ease-in-out",
         )}
       >
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
       </ResizablePanel>
-      {/* Removido: <ResizableHandle withHandle /> */}
-      <ResizablePanel defaultSize={82} className="w-full">
+      <ResizableHandle withHandle /> {/* Re-adicionado o handle */}
+      <ResizablePanel
+        size={isNavCollapsed ? 96 : 82} // Tamanho dinâmico para o conteúdo principal
+        className="w-full"
+      >
         <div className="flex flex-1 flex-col overflow-hidden">
           <Header />
           <div className="flex-1 overflow-y-auto p-6">
