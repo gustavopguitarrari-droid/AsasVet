@@ -31,15 +31,6 @@ const Login = () => {
 
   // console.log('Login Page - Resolved Theme:', resolvedTheme); // Removido
 
-  if (isLoading) {
-    console.log('Login Page - Currently loading session...');
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-verde-bambu">
-        <p className="text-lg text-marrom-avela">Carregando...</p>
-      </div>
-    );
-  }
-
   return (
     <div className={cn(
       "min-h-screen flex items-center justify-center p-4",
@@ -78,7 +69,8 @@ const Login = () => {
               },
             },
           }}
-          theme="dark" {/* Alterado para tema dark para melhor contraste com nature-vet */}
+          // Alterado para tema dark para melhor contraste com nature-vet
+          theme="dark" 
           redirectTo={window.location.origin + '/painel'}
           view={authView}
           localization={{
