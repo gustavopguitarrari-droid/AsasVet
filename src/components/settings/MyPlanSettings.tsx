@@ -133,12 +133,13 @@ const MyPlanSettings: React.FC = () => {
                     {plan.name === currentPlanName ? "Ativo" : "Disponível"}
                   </Badge>
                 </div>
+                {/* O valor do plano agora está acima da imagem */}
+                <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
                 {plan.imageUrl && (
                   <div className="mb-2 flex justify-center">
                     <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-72 w-auto object-contain" />
                   </div>
                 )}
-                <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
                 <ul className="space-y-2 text-sm text-muted-foreground mb-6">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-center">
