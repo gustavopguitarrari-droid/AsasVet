@@ -85,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
               )}
             >
               <Link to={item.path} className="flex items-center w-full">
-                <item.icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} strokeWidth={2} />
+                <item.icon className={cn("h-6 w-6", !isCollapsed && "mr-3")} strokeWidth={2} /> {/* Aumentado de h-5 w-5 para h-6 w-6 */}
                 {!isCollapsed && <span className="whitespace-nowrap">{item.name}</span>}
               </Link>
             </Button>
