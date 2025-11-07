@@ -163,7 +163,7 @@ const MyPlanSettings: React.FC = () => {
                 className={cn(
                   "w-full mt-6",
                   plan.name === currentPlanName && "bg-primary text-primary-foreground hover:bg-primary/90",
-                  plan.name !== currentPlanName && "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                  plan.name !== currentPlanName && plan.id === "hospital-vet" ? "bg-golden text-golden-foreground hover:bg-golden/90" : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                 )}
                 onClick={() => handlePlanAction(plan)}
                 disabled={createStripeCheckoutSessionMutation.isPending}

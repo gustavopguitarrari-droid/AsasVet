@@ -98,6 +98,11 @@ export default {
           "orange": "hsl(var(--nv-pastel-orange))",
           "gray": "hsl(var(--nv-pastel-gray))",
         },
+        // NOVO: Cor dourada para o botão do plano
+        golden: {
+          DEFAULT: "hsl(var(--golden-button))",
+          foreground: "hsl(var(--golden-button-foreground))",
+        },
       },
       borderRadius: {
         lg: "0.75rem", // Aumentado de var(--radius)
