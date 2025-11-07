@@ -33,7 +33,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setIsNavCollapsed(prev => !prev);
   };
 
-  // Funções re-adicionadas
   const handleChatButtonClick = () => {
     setIsChatDialogOpen(true);
   };
@@ -48,21 +47,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       className="flex h-screen w-screen overflow-hidden"
     >
       <ResizablePanel
-        defaultSize={4} // Tamanho padrão quando recolhido
-        collapsedSize={4} // Tamanho quando recolhido
-        collapsible={true} // Re-adicionado
-        onCollapse={() => setIsNavCollapsed(true)} // Re-adicionado
-        onExpand={() => setIsNavCollapsed(false)} // Re-adicionado
+        defaultSize={20} // Ajustado para 20% quando expandido
+        collapsedSize={4} // Mantido em 4% quando recolhido
+        collapsible={true}
+        onCollapse={() => setIsNavCollapsed(true)}
+        onExpand={() => setIsNavCollapsed(false)}
         className={cn(
           "flex flex-col transition-all duration-300 ease-in-out",
         )}
       >
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
       </ResizablePanel>
-      <ResizablePanel
-        // O segundo painel se ajusta automaticamente ao espaço restante
-        // Removido: className="w-full"
-      >
+      <ResizablePanel>
         <div className="flex flex-1 flex-col overflow-hidden">
           <Header />
           <div className="flex-1 overflow-y-auto p-6">
