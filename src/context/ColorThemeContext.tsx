@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { showError, showSuccess } from '@/utils/toast';
 
-type ColorTheme = 'nature-vet'; // Tipo atualizado para apenas 'nature-vet'
+type ColorTheme = 'nature-vet' | 'pastel-blue'; // Tipo atualizado para incluir 'pastel-blue'
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -26,10 +26,12 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   // Update internal state when user.colorTheme changes from outside (e.g., on login/profile fetch)
   useEffect(() => {
     // Always set to 'nature-vet' as it's the only available theme
-    if (internalColorTheme !== 'nature-vet') {
-      setInternalColorTheme('nature-vet');
+    if (user?.colorTheme && user.colorTheme !== internalColorTheme) {
+      setInternalColorTheme(user.colorTheme as ColorTheme);
+    } else if (!user?.colorTheme && internalColorTheme !== initialTheme) {
+      setInternalColorTheme(initialTheme);
     }
-  }, [user?.colorTheme, internalColorTheme]);
+  }, [user?.colorTheme, internalColorTheme, initialTheme]);
 
 
   // Mutação para atualizar o tema de cor no perfil do usuário

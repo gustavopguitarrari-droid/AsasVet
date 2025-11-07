@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 
 const colorThemes = [
   { name: "Nature Vet", value: "nature-vet", colorClass: "bg-landingPage-lp-verde-folha-seca" },
+  { name: "Pastel Blue", value: "pastel-blue", colorClass: "bg-blue-400" }, // NOVO: Tema Pastel Blue
 ];
 
 const ColorThemeToggle = () => {

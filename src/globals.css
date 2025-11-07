@@ -167,6 +167,87 @@
     --nv-pastel-gray: 30 10% 90%;     /* Um cinza quente muito claro */
   }
 
+  /* TEMA: Pastel Blue */
+  .theme-pastel-blue {
+    --background: 210 30% 98%; /* Azul muito claro */
+    --foreground: 210 50% 20%; /* Azul escuro para texto */
+
+    --card: 210 30% 100%;
+    --card-foreground: 210 50% 20%;
+
+    --popover: 210 30% 100%;
+    --popover-foreground: 210 50% 20%;
+
+    --primary: 210 60% 70%; /* Azul pastel médio */
+    --primary-darker: 210 60% 60%; /* Um pouco mais escuro para hover */
+    --primary-foreground: 210 50% 10%; /* Azul escuro para texto em primary */
+
+    --secondary: 210 30% 90%; /* Azul pastel mais claro */
+    --secondary-foreground: 210 50% 20%;
+
+    --muted: 210 30% 90%;
+    --muted-foreground: 210 20% 50%; /* Cinza azulado para muted */
+
+    --accent: 210 30% 85%;
+    --accent-foreground: 210 50% 20%;
+
+    --destructive: 0 84.2% 60.2%; /* Mantém vermelho */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 20% 80%; /* Borda azul clara */
+    --input: 210 30% 95%;
+    --ring: 210 60% 70%;
+
+    /* Sidebar colors para Pastel Blue */
+    --sidebar-background: 210 60% 70%; /* Azul pastel médio */
+    --sidebar-foreground: 210 50% 10%; /* Azul escuro para texto */
+    --sidebar-primary: 210 30% 98%; /* Fundo claro para item ativo */
+    --sidebar-primary-foreground: 210 50% 10%; /* Texto escuro para item ativo */
+    --sidebar-accent: 210 30% 90%; /* Fundo mais claro para hover */
+    --sidebar-accent-foreground: 210 50% 10%; /* Texto escuro para hover */
+    --sidebar-border: 210 20% 80%;
+    --sidebar-ring: 210 60% 70%;
+
+    /* Sidebar Item Backgrounds (ajustando para a nova paleta) */
+    --sidebar-item-bg-1: 210 70% 75%; /* Light Blue */
+    --sidebar-item-bg-2: 240 70% 75%; /* Light Indigo */
+    --sidebar-item-bg-3: 180 70% 75%; /* Light Cyan */
+    --sidebar-item-bg-4: 270 70% 75%; /* Light Purple */
+    --sidebar-item-bg-5: 300 70% 75%; /* Light Magenta */
+    --sidebar-item-bg-6: 150 70% 75%; /* Light Green */
+    --sidebar-item-bg-7: 30 70% 75%; /* Light Orange */
+    --sidebar-item-bg-8: 60 70% 75%; /* Light Yellow */
+    --sidebar-item-bg-9: 0 0% 85%; /* Light Gray */
+
+    /* Event Categories Colors (ajustando para a nova paleta) */
+    --event-consulta: 210 70% 75%;
+    --event-cirurgia: 240 70% 75%;
+    --event-vacina: 180 70% 75%;
+    --event-exame: 270 70% 75%;
+    --event-retorno: 300 70% 75%;
+    --event-outros: 0 0% 85%;
+
+    /* Landing Page colors - Mantém as cores da Landing Page */
+    --lp-verde-bambu: 90 40% 70%;
+    --lp-verde-folha-seca: 90 40% 67%;
+    --lp-creme-terra: 50 100% 99%;
+    --lp-marrom-avela: 20 20% 47%;
+    --lp-bege-areia: 40 100% 85%;
+
+    /* NOVO: Cores para botões/abas não selecionados no tema Pastel Blue */
+    --primary-unselected: 210 30% 90%; /* Azul pastel mais claro */
+    --primary-unselected-foreground: 210 50% 20%; /* Azul escuro para o texto */
+
+    /* NOVO: Cores pastel para os cards do Dashboard no tema Pastel Blue */
+    --nv-pastel-blue: 210 60% 85%;    /* Um azul claro e suave */
+    --nv-pastel-green: 150 50% 85%;   /* Um verde menta suave */
+    --nv-pastel-yellow: 60 80% 90%;   /* Um amarelo cremoso pálido */
+    --nv-pastel-pink: 330 60% 90%;    /* Um rosa claro e suave */
+    --nv-pastel-purple: 270 40% 88%;  /* Uma lavanda suave */
+    --nv-pastel-orange: 30 70% 88%;   /* Um pêssego claro */
+    --nv-pastel-gray: 210 10% 90%;     /* Um cinza azulado muito claro */
+  }
+
   body {
     @apply bg-background text-foreground;
   }
