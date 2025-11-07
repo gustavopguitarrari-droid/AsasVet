@@ -382,7 +382,7 @@ const Dashboard = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           {/* Substituído o logo estático por um Avatar dinâmico */}
-          <Avatar className="h-16 w-16 border-2 border-primary shadow-md">
+          <Avatar className="h-24 w-24 shadow-md"> {/* Aumentado o tamanho para h-24 w-24 e removido a borda */}
             {user?.logoUrl ? (
               <AvatarImage src={user.logoUrl} alt={user.companyName || "Logo da Clínica"} />
             ) : (
