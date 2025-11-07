@@ -24,11 +24,11 @@ interface Plan {
 const availablePlans: Plan[] = [
   {
     id: "vet-domiciliar",
-    name: "Asas Verde", // Nome atualizado
+    name: "ASAS VERDES", // Nome atualizado para ASAS VERDES
     price: "R$ 119,90/mês",
     features: ["1 Subusuário", "Gerenciamento de Clientes e Pets", "Agenda Básica"],
     stripePriceId: "price_1SPttkF1WTKnJRQoScNCQLjp", // ID do plano Vet Domiciliar
-    badgeColorClass: "bg-gray-500",
+    badgeColorClass: "bg-green-500", // Cor do badge alterada para verde
     imageUrl: "/public/images/Plano Verde.png", // Adicionada a nova imagem
   },
   {
@@ -58,7 +58,7 @@ interface PlanSelectionDialogProps {
 
 const MyPlanSettings: React.FC = () => {
   const { user: appUser } = useUser();
-  const currentPlanName = appUser?.planName || "Asas Verde"; // Assume "Asas Verde" como padrão se não houver plano
+  const currentPlanName = appUser?.planName || "ASAS VERDES"; // Assume "ASAS VERDES" como padrão se não houver plano
 
   const createStripeCheckoutSessionMutation = useMutation({
     mutationFn: async ({ priceId, userId }: { priceId: string; userId: string }) => {
