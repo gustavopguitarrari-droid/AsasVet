@@ -116,14 +116,14 @@
     --input: var(--nv-lp-creme-terra);
     --ring: var(--nv-lp-verde-folha-seca);
 
-    /* Sidebar colors */
-    --sidebar-background: var(--nv-lp-verde-folha-seca);
-    --sidebar-foreground: var(--nv-lp-creme-terra);
-    --sidebar-primary: var(--nv-lp-creme-terra);
-    --sidebar-primary-foreground: var(--nv-lp-verde-folha-seca);
-    --sidebar-accent: var(--nv-lp-bege-areia);
-    --sidebar-accent-foreground: var(--nv-lp-marrom-avela);
-    --sidebar-border: 90 20% 50%; /* A shade of green for sidebar border */
+    /* Sidebar colors - ADJUSTED FOR CONTRAST */
+    --sidebar-background: var(--nv-lp-marrom-avela); /* Usar marrom-avela para o fundo */
+    --sidebar-foreground: var(--nv-lp-creme-terra); /* Texto claro no fundo escuro */
+    --sidebar-primary: var(--nv-lp-creme-terra); /* Item ativo com fundo claro */
+    --sidebar-primary-foreground: var(--nv-lp-marrom-avela); /* Texto escuro no item ativo */
+    --sidebar-accent: var(--nv-lp-verde-folha-seca); /* Hover com verde-folha-seca */
+    --sidebar-accent-foreground: var(--nv-lp-creme-terra); /* Texto claro no hover */
+    --sidebar-border: var(--nv-lp-verde-bambu); /* Borda com verde-bambu */
     --sidebar-ring: var(--nv-lp-creme-terra);
 
     /* Sidebar Item Backgrounds (adjusting to new palette) */
