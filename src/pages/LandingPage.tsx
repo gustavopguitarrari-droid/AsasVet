@@ -140,7 +140,7 @@ const LandingPage: React.FC = () => {
         
         <div className="relative z-10 max-w-5xl mx-auto space-y-8">
           <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-landingPage-lp-creme-terra drop-shadow-lg animate-fade-in-down">
-            Gestão Veterinária Intuitiva e Completa
+            Mais que simples, com nosso sistema você ganha Asas
           </h1>
           <p className="text-lg md:text-2xl max-w-3xl mx-auto text-landingPage-lp-creme-terra/90 animate-fade-in-up">
             Simplifique sua clínica, maximize seu tempo e eleve o cuidado com os animais.
