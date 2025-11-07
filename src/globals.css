@@ -77,6 +77,53 @@
     --lp-marrom-avela: 20 20% 47%;
     --lp-bege-areia: 40 100% 85%;
 
+    /* NOVO: Cores para botões/abas não selecionados */
+    --primary-unselected: 210 40% 96.1%;
+    --primary-unselected-foreground: 222.2 47.4% 11.2%;
+
+    /* Generic Dashboard Card Colors */
+    --dashboard-card-1: 0 0% 95%; /* Light Gray */
+    --dashboard-card-2: 0 0% 95%;
+    --dashboard-card-3: 0 0% 95%;
+    --dashboard-card-4: 0 0% 95%;
+    --dashboard-card-5: 0 0% 95%;
+    --dashboard-card-6: 0 0% 95%;
+    --dashboard-card-7: 0 0% 95%;
+    --dashboard-card-8: 0 0% 95%;
+    --dashboard-card-9: 0 0% 95%;
+    --dashboard-card-10: 0 0% 95%;
+    --dashboard-card-11: 0 0% 95%;
+    --dashboard-card-12: 0 0% 95%;
+
+    /* Appointments Status Card Colors */
+    --appointments-status-waiting-bg: 0 0% 50%; /* Gray */
+    --appointments-status-waiting-fg: 0 0% 100%;
+    --appointments-status-in-progress-bg: 30 90% 50%; /* Orange */
+    --appointments-status-in-progress-fg: 0 0% 100%;
+    --appointments-status-completed-bg: 140 70% 40%; /* Green */
+    --appointments-status-completed-fg: 0 0% 100%;
+    --appointments-status-cancelled-bg: 0 84.2% 60.2%; /* Destructive */
+    --appointments-status-cancelled-fg: 0 0% 100%;
+
+    /* Risk Level Colors */
+    --risk-no-risk-bg: 220 80% 60%; /* Blue */
+    --risk-low-bg: 140 70% 40%; /* Green */
+    --risk-medium-bg: 40 90% 60%; /* Yellow */
+    --risk-high-bg: 30 90% 50%; /* Orange */
+    --risk-emergency-bg: 0 84.2% 60.2%; /* Red */
+
+    /* Internment Status Badge Colors */
+    --internment-status-observacao-bg: 220 80% 60%; /* Blue */
+    --internment-status-estavel-bg: 140 70% 40%; /* Green */
+    --internment-status-critico-bg: 0 84.2% 60.2%; /* Red */
+    --internment-status-alta-bg: 0 0% 50%; /* Gray */
+    --internment-status-obito-bg: 0 0% 10%; /* Black */
+
+    /* Plan Badge Colors */
+    --plan-badge-basic-bg: 0 0% 50%; /* Gray */
+    --plan-badge-premium-bg: 140 70% 40%; /* Green */
+    --plan-badge-enterprise-bg: 220 80% 60%; /* Blue */
+
     /* NOVO: Cor dourada para o botão do plano */
     --golden-button: 40 90% 70%; /* Um dourado vibrante */
     --golden-button-foreground: 30 80% 20%; /* Um marrom escuro para o texto */
@@ -159,13 +206,47 @@
     --primary-unselected-foreground: var(--nv-lp-marrom-avela); /* Marrom escuro para o texto */
 
     /* NOVO: Cores pastel para os cards do Dashboard no tema Nature Vet */
-    --nv-pastel-blue: 200 60% 85%;    /* Um azul claro e suave */
-    --nv-pastel-green: 140 50% 85%;   /* Um verde menta suave */
-    --nv-pastel-yellow: 50 80% 90%;   /* Um amarelo cremoso pálido */
-    --nv-pastel-pink: 340 60% 90%;    /* Um rosa claro e suave */
-    --nv-pastel-purple: 270 40% 88%;  /* Uma lavanda suave */
-    --nv-pastel-orange: 30 70% 88%;   /* Um pêssego claro */
-    --nv-pastel-gray: 30 10% 90%;     /* Um cinza quente muito claro */
+    --dashboard-card-1: 200 60% 85%;    /* Um azul claro e suave */
+    --dashboard-card-2: 140 50% 85%;   /* Um verde menta suave */
+    --dashboard-card-3: 50 80% 90%;   /* Um amarelo cremoso pálido */
+    --dashboard-card-4: 340 60% 90%;    /* Um rosa claro e suave */
+    --dashboard-card-5: 270 40% 88%;  /* Uma lavanda suave */
+    --dashboard-card-6: 30 70% 88%;   /* Um pêssego claro */
+    --dashboard-card-7: 30 10% 90%;     /* Um cinza quente muito claro */
+    --dashboard-card-8: 200 60% 80%;    /* Slightly darker blue */
+    --dashboard-card-9: 140 50% 80%;   /* Slightly darker green */
+    --dashboard-card-10: 50 80% 85%;   /* Slightly darker yellow */
+    --dashboard-card-11: 340 60% 85%;    /* Slightly darker pink */
+    --dashboard-card-12: 270 40% 83%;  /* Slightly darker purple */
+
+    /* Appointments Status Card Colors for Nature Vet */
+    --appointments-status-waiting-bg: 20 20% 47%; /* lp-marrom-avela */
+    --appointments-status-waiting-fg: 50 100% 99%; /* lp-creme-terra */
+    --appointments-status-in-progress-bg: 30 70% 50%; /* A warm orange */
+    --appointments-status-in-progress-fg: 0 0% 100%;
+    --appointments-status-completed-bg: 90 40% 67%; /* lp-verde-folha-seca */
+    --appointments-status-completed-fg: 50 100% 99%; /* lp-creme-terra */
+    --appointments-status-cancelled-bg: 0 84.2% 60.2%;
+    --appointments-status-cancelled-fg: 0 0% 100%;
+
+    /* Risk Level Colors for Nature Vet */
+    --risk-no-risk-bg: 220 80% 60%; /* Blue */
+    --risk-low-bg: 140 70% 40%; /* Green */
+    --risk-medium-bg: 40 90% 60%; /* Yellow */
+    --risk-high-bg: 30 90% 50%; /* Orange */
+    --risk-emergency-bg: 0 84.2% 60.2%; /* Red */
+
+    /* Internment Status Badge Colors for Nature Vet */
+    --internment-status-observacao-bg: 220 80% 60%; /* Blue */
+    --internment-status-estavel-bg: 140 70% 40%; /* Green */
+    --internment-status-critico-bg: 0 84.2% 60.2%; /* Red */
+    --internment-status-alta-bg: 90 40% 67%; /* lp-verde-folha-seca */
+    --internment-status-obito-bg: 20 20% 47%; /* lp-marrom-avela */
+
+    /* Plan Badge Colors for Nature Vet */
+    --plan-badge-basic-bg: 90 40% 67%; /* lp-verde-folha-seca */
+    --plan-badge-premium-bg: 270 40% 60%; /* A purple */
+    --plan-badge-enterprise-bg: 40 90% 70%; /* Golden */
   }
 
   /* TEMA: Pastel Blue */
@@ -234,13 +315,47 @@
     --primary-unselected-foreground: 210 50% 20%; /* Azul escuro para o texto */
 
     /* NOVO: Cores pastel para os cards do Dashboard no tema Pastel Blue */
-    --nv-pastel-blue: 210 60% 85%;    /* Um azul claro e suave */
-    --nv-pastel-green: 150 50% 85%;   /* Um verde menta suave */
-    --nv-pastel-yellow: 60 80% 90%;   /* Um amarelo cremoso pálido */
-    --nv-pastel-pink: 330 60% 90%;    /* Um rosa claro e suave */
-    --nv-pastel-purple: 270 40% 88%;  /* Uma lavanda suave */
-    --nv-pastel-orange: 30 70% 88%;   /* Um pêssego claro */
-    --nv-pastel-gray: 210 10% 90%;     /* Um cinza azulado muito claro */
+    --dashboard-card-1: 210 60% 85%;    /* Um azul claro e suave */
+    --dashboard-card-2: 150 50% 85%;   /* Um verde menta suave */
+    --dashboard-card-3: 60 80% 90%;   /* Um amarelo cremoso pálido */
+    --dashboard-card-4: 330 60% 90%;    /* Um rosa claro e suave */
+    --dashboard-card-5: 270 40% 88%;  /* Uma lavanda suave */
+    --dashboard-card-6: 30 70% 88%;   /* Um pêssego claro */
+    --dashboard-card-7: 210 10% 90%;     /* Um cinza azulado muito claro */
+    --dashboard-card-8: 210 60% 80%;    /* Slightly darker blue */
+    --dashboard-card-9: 150 50% 80%;   /* Slightly darker green */
+    --dashboard-card-10: 60 80% 85%;   /* Slightly darker yellow */
+    --dashboard-card-11: 330 60% 85%;    /* Slightly darker pink */
+    --dashboard-card-12: 270 40% 83%;  /* Slightly darker purple */
+
+    /* Appointments Status Card Colors for Pastel Blue */
+    --appointments-status-waiting-bg: 210 20% 50%; /* Muted blue-gray */
+    --appointments-status-waiting-fg: 210 30% 100%;
+    --appointments-status-in-progress-bg: 30 70% 50%; /* A warm orange */
+    --appointments-status-in-progress-fg: 0 0% 100%;
+    --appointments-status-completed-bg: 150 50% 60%; /* Muted green */
+    --appointments-status-completed-fg: 210 30% 100%;
+    --appointments-status-cancelled-bg: 0 84.2% 60.2%;
+    --appointments-status-cancelled-fg: 0 0% 100%;
+
+    /* Risk Level Colors for Pastel Blue */
+    --risk-no-risk-bg: 210 70% 75%; /* Light Blue */
+    --risk-low-bg: 150 50% 60%; /* Muted Green */
+    --risk-medium-bg: 60 80% 70%; /* Muted Yellow */
+    --risk-high-bg: 30 70% 60%; /* Muted Orange */
+    --risk-emergency-bg: 0 84.2% 60.2%; /* Red */
+
+    /* Internment Status Badge Colors for Pastel Blue */
+    --internment-status-observacao-bg: 210 70% 75%; /* Light Blue */
+    --internment-status-estavel-bg: 150 50% 60%; /* Muted Green */
+    --internment-status-critico-bg: 0 84.2% 60.2%; /* Red */
+    --internment-status-alta-bg: 210 20% 50%; /* Muted blue-gray */
+    --internment-status-obito-bg: 210 50% 20%; /* Dark blue */
+
+    /* Plan Badge Colors for Pastel Blue */
+    --plan-badge-basic-bg: 210 20% 50%; /* Muted blue-gray */
+    --plan-badge-premium-bg: 150 50% 60%; /* Muted Green */
+    --plan-badge-enterprise-bg: 210 60% 70%; /* Pastel Blue */
   }
 
   body {

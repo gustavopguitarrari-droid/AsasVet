@@ -88,15 +88,53 @@ export default {
           DEFAULT: "hsl(var(--primary-unselected))",
           foreground: "hsl(var(--primary-unselected-foreground))",
         },
-        // NOVO: Cores pastel para os cards do Dashboard no tema Nature Vet
-        "nv-pastel": {
-          "blue": "hsl(var(--nv-pastel-blue))",
-          "green": "hsl(var(--nv-pastel-green))",
-          "yellow": "hsl(var(--nv-pastel-yellow))",
-          "pink": "hsl(var(--nv-pastel-pink))",
-          "purple": "hsl(var(--nv-pastel-purple))",
-          "orange": "hsl(var(--nv-pastel-orange))",
-          "gray": "hsl(var(--nv-pastel-gray))",
+        // NOVO: Cores para os cards do Dashboard
+        "dashboard-card": {
+          "1": "hsl(var(--dashboard-card-1))",
+          "2": "hsl(var(--dashboard-card-2))",
+          "3": "hsl(var(--dashboard-card-3))",
+          "4": "hsl(var(--dashboard-card-4))",
+          "5": "hsl(var(--dashboard-card-5))",
+          "6": "hsl(var(--dashboard-card-6))",
+          "7": "hsl(var(--dashboard-card-7))",
+          "8": "hsl(var(--dashboard-card-8))",
+          "9": "hsl(var(--dashboard-card-9))",
+          "10": "hsl(var(--dashboard-card-10))",
+          "11": "hsl(var(--dashboard-card-11))",
+          "12": "hsl(var(--dashboard-card-12))",
+        },
+        // NOVO: Cores para os cards de status de consultas
+        "appointments-status": {
+          "waiting-bg": "hsl(var(--appointments-status-waiting-bg))",
+          "waiting-fg": "hsl(var(--appointments-status-waiting-fg))",
+          "in-progress-bg": "hsl(var(--appointments-status-in-progress-bg))",
+          "in-progress-fg": "hsl(var(--appointments-status-in-progress-fg))",
+          "completed-bg": "hsl(var(--appointments-status-completed-bg))",
+          "completed-fg": "hsl(var(--appointments-status-completed-fg))",
+          "cancelled-bg": "hsl(var(--appointments-status-cancelled-bg))",
+          "cancelled-fg": "hsl(var(--appointments-status-cancelled-fg))",
+        },
+        // NOVO: Cores para os badges de risco de internação
+        "risk": {
+          "no-risk-bg": "hsl(var(--risk-no-risk-bg))",
+          "low-bg": "hsl(var(--risk-low-bg))",
+          "medium-bg": "hsl(var(--risk-medium-bg))",
+          "high-bg": "hsl(var(--risk-high-bg))",
+          "emergency-bg": "hsl(var(--risk-emergency-bg))",
+        },
+        // NOVO: Cores para os badges de status de internação
+        "internment-status": {
+          "observacao-bg": "hsl(var(--internment-status-observacao-bg))",
+          "estavel-bg": "hsl(var(--internment-status-estavel-bg))",
+          "critico-bg": "hsl(var(--internment-status-critico-bg))",
+          "alta-bg": "hsl(var(--internment-status-alta-bg))",
+          "obito-bg": "hsl(var(--internment-status-obito-bg))",
+        },
+        // NOVO: Cores para os badges de plano
+        "plan-badge": {
+          "basic-bg": "hsl(var(--plan-badge-basic-bg))",
+          "premium-bg": "hsl(var(--plan-badge-premium-bg))",
+          "enterprise-bg": "hsl(var(--plan-badge-enterprise-bg))",
         },
         // NOVO: Cor dourada para o botão do plano
         golden: {

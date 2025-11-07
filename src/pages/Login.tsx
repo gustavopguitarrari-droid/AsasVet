@@ -38,8 +38,8 @@ const Login = () => {
       "min-h-screen flex items-center justify-center p-4",
       "login-art-bg"
     )}>
-      <div className="w-full max-w-sm p-6 space-y-4 rounded-xl shadow-lg relative bg-white/60 backdrop-blur-sm border border-marrom-avela/20 z-10 max-h-[80vh] overflow-y-auto">
-        <Button asChild variant="ghost" className="absolute top-4 left-4 text-marrom-avela font-bold hover:bg-verde-folha-seca/20">
+      <div className="w-full max-w-sm p-6 space-y-4 rounded-xl shadow-lg relative bg-card/60 backdrop-blur-sm border border-border/20 z-10 max-h-[80vh] overflow-y-auto">
+        <Button asChild variant="ghost" className="absolute top-4 left-4 text-foreground font-bold hover:bg-accent/20">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Link>
@@ -120,17 +120,17 @@ const Login = () => {
           }}
         />
         {authView === 'sign_in' && (
-          <p className="text-center text-sm text-marrom-avela">
+          <p className="text-center text-sm text-foreground">
             Não tem uma conta?{' '}
-            <Button variant="link" className="p-0 h-auto font-bold text-marrom-avela hover:text-marrom-avela/80" onClick={() => navigate('/signup')}>
+            <Button variant="link" className="p-0 h-auto font-bold text-primary hover:text-primary/80" onClick={() => navigate('/signup')}>
               Cadastre-se
             </Button>
           </p>
         )}
         {authView === 'forgotten_password' && (
-          <p className="text-center text-sm text-marrom-avela">
+          <p className="text-center text-sm text-foreground">
             Lembrou da senha?{' '}
-            <Button variant="link" className="p-0 h-auto text-verde-folha-seca hover:text-verde-folha-seca/80" onClick={() => setAuthView('sign_in')}>
+            <Button variant="link" className="p-0 h-auto text-primary hover:text-primary/80" onClick={() => setAuthView('sign_in')}>
               Entrar
             </Button>
           </p>

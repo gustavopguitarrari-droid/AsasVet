@@ -53,25 +53,20 @@ const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "petsBySpeciesChart", name: "Animais por Espécie (Gráfico)", isVisible: true, category: "overview", order: 11 },
 ];
 
-const cardColorMap: { [key: string]: string } = {
-  totalClients: "bg-nv-pastel-blue",
-  totalPets: "bg-nv-pastel-green",
-  scheduledAppointments: "bg-nv-pastel-pink",
-  waitingAppointments: "bg-nv-pastel-gray",
-  averageWaitingTime: "bg-nv-pastel-yellow",
-  averageConsultationTime: "bg-nv-pastel-purple",
-  recentPets: "bg-nv-pastel-orange",
-  upcomingEvents: "bg-nv-pastel-blue", // This is a full-width card, will use a pastel color
-  financialSummary: "bg-nv-pastel-yellow",
-  cashFlow: "bg-nv-pastel-orange",
-  internmentStatus: "bg-nv-pastel-purple",
-  veterinariansOnDuty: "bg-nv-pastel-gray",
-  medicalRecordsSummary: "bg-nv-pastel-blue",
-  appointmentsMonthlyChart: "bg-nv-pastel-green", // Chart card
-  appointmentsWeeklyChart: "bg-nv-pastel-pink", // Chart card
-  revenueMonthlyChart: "bg-nv-pastel-yellow", // Chart card
-  petsBySpeciesChart: "bg-nv-pastel-purple", // Chart card
-};
+const dashboardCardClasses = [
+  "bg-dashboard-card-1",
+  "bg-dashboard-card-2",
+  "bg-dashboard-card-3",
+  "bg-dashboard-card-4",
+  "bg-dashboard-card-5",
+  "bg-dashboard-card-6",
+  "bg-dashboard-card-7",
+  "bg-dashboard-card-8",
+  "bg-dashboard-card-9",
+  "bg-dashboard-card-10",
+  "bg-dashboard-card-11",
+  "bg-dashboard-card-12",
+];
 
 const Dashboard = () => {
   const [isConfiguratorOpen, setIsConfiguratorOpen] = React.useState(false);
@@ -224,10 +219,10 @@ const Dashboard = () => {
 
   const getCardComponent = (item: DashboardItemConfig) => {
     // Usando as novas variáveis CSS para cores pastel
-    const baseCardClasses = "shadow-md text-landingPage-lp-marrom-avela"; // Texto marrom escuro para contraste
-    const iconClasses = "h-4 w-4 text-landingPage-lp-marrom-avela"; // Ícones marrom escuro
-    const textMutedClasses = "text-landingPage-lp-marrom-avela/80"; // Texto muted marrom escuro
-    const cardBgClass = cardColorMap[item.id] || "bg-card"; // Fallback to default bg-card
+    const baseCardClasses = "shadow-md text-foreground"; // Texto marrom escuro para contraste
+    const iconClasses = "h-4 w-4 text-foreground"; // Ícones marrom escuro
+    const textMutedClasses = "text-muted-foreground"; // Texto muted marrom escuro
+    const cardBgClass = dashboardCardClasses[item.order % dashboardCardClasses.length]; // Fallback to default bg-card
 
     switch (item.id) {
       case "totalClients":
