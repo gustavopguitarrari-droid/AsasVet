@@ -60,22 +60,58 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
   return (
     <div className={cn(
       "relative flex flex-col h-full p-4 border-r shadow-sm transition-all duration-300 ease-in-out",
-      "w-full sidebar-gradient-bg text-sidebar-foreground" // Adicionado aqui
+      "w-full sidebar-gradient-bg text-sidebar-foreground"
     )}>
-      {/* Logo e Título */}
-      <Link to="/painel" className={cn(
-        "flex items-center text-sidebar-foreground cursor-pointer mb-6",
-        isCollapsed ? "justify-center" : "justify-start"
+      {/* Header do Sidebar: Logo/Título e Botão de Recolher */}
+      <div className={cn(
+        "flex items-center mb-6",
+        isCollapsed ? "justify-center" : "justify-between"
       )}>
-        <img src="/public/images/logooficial.png" alt="AsasVet Logo" className={cn(
-          "transition-all duration-300 ease-in-out",
-          isCollapsed ? "h-12 w-auto" : "h-16 w-auto",
-          !isCollapsed && "mr-3"
-        )} />
-        {!isCollapsed && (
-          <span className="text-2xl font-bold opacity-100 transition-opacity duration-300 ease-in-out">AsasVet</span>
-        )}
-      </Link>
+        <Link to="/painel" className={cn(
+          "flex items-center text-sidebar-foreground cursor-pointer",
+          isCollapsed ? "justify-center" : "justify-start"
+        )}>
+          <img src="/public/images/logooficial.png" alt="AsasVet Logo" className={cn(
+            "transition-all duration-300 ease-in-out",
+            isCollapsed ? "h-12 w-auto" : "h-16 w-auto",
+            !isCollapsed && "mr-3"
+          )} />
+          {!isCollapsed && (
+            <span className="text-2xl font-bold opacity-100 transition-opacity duration-300 ease-in-out">AsasVet</span>
+          )}
+        </Link>
+        <Button
+          variant="default"
+          size="icon"
+          onClick={onToggleCollapse}
+          className={cn(
+            "rounded-full",
+            "border border-sidebar-border shadow-md",
+            "transition-all duration-300 ease-in-out",
+            isCollapsed ? "hidden" : "block" // Esconde o botão quando recolhido
+          )}
+        >
+          <ArrowLeftToLine className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {/* Botão de Recolher/Expandir (visível apenas quando recolhido) */}
+      {isCollapsed && (
+        <div className="flex justify-center mb-6">
+          <Button
+            variant="default"
+            size="icon"
+            onClick={onToggleCollapse}
+            className={cn(
+              "rounded-full",
+              "border border-sidebar-border shadow-md",
+              "transition-all duration-300 ease-in-out"
+            )}
+          >
+            <ArrowRightToLine className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
 
       {/* Itens de Navegação */}
       <nav className="flex-1 space-y-2 overflow-y-auto pr-2">
@@ -90,16 +126,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
                   className={cn(
                     "w-full text-sidebar-foreground",
                     "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                    isCollapsed ? "h-14 w-14 rounded-full flex items-center justify-center p-0" : "justify-start text-xl py-6 px-4",
+                    isCollapsed ? "h-12 w-12 rounded-full flex items-center justify-center p-0" : "justify-start text-base py-2 px-3", // Ajustado tamanho e padding
                     isActive && "bg-sidebar-primary text-sidebar-primary-foreground"
                   )}
                 >
                   <Link to={item.path} className="flex items-center w-full">
                     <div className={cn(
                       "flex items-center justify-center flex-shrink-0",
-                      isCollapsed ? "h-8 w-8" : "h-8 w-8 mr-3"
+                      isCollapsed ? "h-6 w-6" : "h-6 w-6 mr-3" // Ícone um pouco menor
                     )}>
-                      <item.icon className="h-6 w-6" strokeWidth={2} />
+                      <item.icon className="h-full w-full" strokeWidth={2} />
                     </div>
                     {!isCollapsed && (
                       <span className={cn(
@@ -117,32 +153,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
           );
         })}
       </nav>
-
-      {/* Seção do Rodapé (apenas o botão de recolher permanece aqui) */}
-      <div className={cn(
-        "mt-auto pt-4 border-t border-sidebar-border flex flex-col",
-        isCollapsed ? "items-center" : "items-stretch"
-      )}>
-        <div className={cn(
-          "flex items-center",
-          isCollapsed ? "justify-center" : "justify-end", // Alinhado à direita quando expandido
-          "mb-4"
-        )}>
-          <Button
-            variant="default"
-            size="icon"
-            onClick={onToggleCollapse}
-            className={cn(
-              "rounded-full",
-              "border border-sidebar-border shadow-md",
-              "transition-all duration-300 ease-in-out",
-              isCollapsed ? "ml-0" : "ml-auto" // Ajusta a margem para centralizar/alinhar
-            )}
-          >
-            {isCollapsed ? <ArrowRightToLine className="h-4 w-4" /> : <ArrowLeftToLine className="h-4 w-4" />}
-          </Button>
-        </div>
-      </div>
     </div>
   );
 };
