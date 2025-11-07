@@ -18,6 +18,7 @@ interface Plan {
   features: string[];
   stripePriceId: string; // NOVO: ID do preço do Stripe
   badgeColorClass: string;
+  imageUrl?: string; // NOVO: URL da imagem de capa
 }
 
 const availablePlans: Plan[] = [
@@ -28,6 +29,7 @@ const availablePlans: Plan[] = [
     features: ["1 Subusuário", "Gerenciamento de Clientes e Pets", "Agenda Básica"],
     stripePriceId: "price_1SPttkF1WTKnJRQoScNCQLjp", // ID do plano Vet Domiciliar
     badgeColorClass: "bg-gray-500",
+    imageUrl: "/public/images/vet-domiciliar-plan-cover.png", // Adicionada a imagem
   },
   {
     id: "clinica-vet",
@@ -131,6 +133,11 @@ const MyPlanSettings: React.FC = () => {
                     {plan.name === currentPlanName ? "Ativo" : "Disponível"}
                   </Badge>
                 </div>
+                {plan.imageUrl && (
+                  <div className="mb-4 flex justify-center">
+                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-24 w-auto object-contain" />
+                  </div>
+                )}
                 <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
                 <ul className="space-y-2 text-sm text-muted-foreground mb-6">
                   {plan.features.map((feature, index) => (
