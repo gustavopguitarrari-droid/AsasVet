@@ -79,69 +79,70 @@
 
   /* TEMA: Nature Vet */
   .theme-nature-vet {
-    --nv-primary-green: 120 80% 30%; /* Deep Forest Green (more saturated) */
-    --nv-light-green: 60 100% 90%;   /* Light Yellow-Green (distinct) */
-    --nv-beige: 60 100% 90%;         /* Warm Light Beige (distinct) */
-    --nv-dark-brown: 30 80% 15%;    /* Rich Dark Brown (more saturated) */
-    --nv-accent-orange: 30 60% 50%; /* Subtle Orange Accent */
+    /* Mapeamento direto para as cores da Landing Page */
+    --nv-lp-verde-bambu: var(--lp-verde-bambu);
+    --nv-lp-verde-folha-seca: var(--lp-verde-folha-seca);
+    --nv-lp-creme-terra: var(--lp-creme-terra);
+    --nv-lp-marrom-avela: var(--lp-marrom-avela);
+    --nv-lp-bege-areia: var(--lp-bege-areia);
 
     /* Mapeamento para as variáveis do shadcn/ui */
-    --background: var(--nv-beige);
-    --foreground: var(--nv-dark-brown);
+    --background: var(--nv-lp-verde-bambu);
+    --foreground: var(--nv-lp-marrom-avela);
 
-    --card: var(--nv-beige);
-    --card-foreground: var(--nv-dark-brown);
+    --card: var(--nv-lp-creme-terra);
+    --card-foreground: var(--nv-lp-marrom-avela);
 
-    --popover: var(--nv-beige);
-    --popover-foreground: var(--nv-dark-brown);
+    --popover: var(--nv-lp-creme-terra);
+    --popover-foreground: var(--nv-lp-marrom-avela);
 
-    --primary: var(--nv-primary-green);
-    --primary-darker: 120 80% 20%; /* Darker shade of primary green */
-    --primary-foreground: var(--nv-beige);
+    --primary: var(--nv-lp-verde-folha-seca);
+    --primary-darker: 90 40% 57%; /* Slightly darker verde-folha-seca */
+    --primary-foreground: var(--nv-lp-marrom-avela); /* Text on primary buttons */
 
-    --secondary: var(--nv-light-green);
-    --secondary-foreground: var(--nv-dark-brown);
+    --secondary: var(--nv-lp-bege-areia);
+    --secondary-foreground: var(--nv-lp-marrom-avela);
 
-    --muted: var(--nv-light-green);
-    --muted-foreground: 30 15% 35%; /* Lighter dark brown for muted text */
+    --muted: var(--nv-lp-bege-areia);
+    --muted-foreground: 20 15% 35%; /* Slightly darker marrom-avela for muted text */
 
-    --accent: var(--nv-accent-orange);
-    --accent-foreground: var(--nv-beige);
+    --accent: var(--nv-lp-verde-folha-seca);
+    --accent-foreground: var(--nv-lp-marrom-avela);
 
     --destructive: 0 84.2% 60.2%; /* Keep red for destructive actions */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 30 15% 35%; /* Dark brown for borders */
-    --input: var(--nv-beige);
-    --ring: var(--nv-primary-green);
+    --border: 20 15% 35%; /* Dark brown for borders */
+    --input: var(--nv-lp-creme-terra);
+    --ring: var(--nv-lp-verde-folha-seca);
 
     /* Sidebar colors */
-    --sidebar-background: var(--nv-primary-green);
-    --sidebar-foreground: var(--nv-beige);
-    --sidebar-primary: var(--nv-beige);
-    --sidebar-primary-foreground: var(--nv-primary-green);
-    --sidebar-accent: var(--nv-light-green);
-    --sidebar-accent-foreground: var(--nv-dark-brown);
-    --sidebar-border: 120 20% 30%; /* Slightly lighter border for sidebar */
-    --sidebar-ring: var(--nv-beige);
+    --sidebar-background: var(--nv-lp-verde-folha-seca);
+    --sidebar-foreground: var(--nv-lp-creme-terra);
+    --sidebar-primary: var(--nv-lp-creme-terra);
+    --sidebar-primary-foreground: var(--nv-lp-verde-folha-seca);
+    --sidebar-accent: var(--nv-lp-bege-areia);
+    --sidebar-accent-foreground: var(--nv-lp-marrom-avela);
+    --sidebar-border: 90 20% 50%; /* A shade of green for sidebar border */
+    --sidebar-ring: var(--nv-lp-creme-terra);
 
     /* Sidebar Item Backgrounds (adjusting to new palette) */
-    --sidebar-item-bg-1: 90 25% 50%; /* Medium Green */
-    --sidebar-item-bg-2: 90 20% 40%; /* Darker Green */
-    --sidebar-item-bg-3: 40 30% 60%; /* Earthy Yellow */
-    --sidebar-item-bg-4: 15 25% 55%; /* Muted Orange-Brown */
-    --sidebar-item-bg-5: 180 15% 45%; /* Muted Teal */
-    --sidebar-item-bg-6: 240 10% 50%; /* Muted Blue-Grey */
-    --sidebar-item-bg-7: 0 0% 40%; /* Dark Grey */
-    --sidebar-item-bg-8: 60 20% 70%; /* Light Yellow-Green */
-    --sidebar-item-bg-9: 30 10% 60%; /* Light Brown */
+    --sidebar-item-bg-1: var(--nv-lp-verde-folha-seca); /* Green */
+    --sidebar-item-bg-2: var(--nv-lp-marrom-avela); /* Brown */
+    --sidebar-item-bg-3: var(--nv-lp-bege-areia); /* Beige */
+    --sidebar-item-bg-4: var(--nv-lp-verde-bambu); /* Lighter Green */
+    --sidebar-item-bg-5: 50 100% 80%; /* Lighter Creme-Terra */
+    --sidebar-item-bg-6: 20 20% 60%; /* Lighter Marrom-Avela */
+    --sidebar-item-bg-7: 90 40% 50%; /* Darker Verde-Bambu */
+    --sidebar-item-bg-8: 40 100% 70%; /* Darker Bege-Areia */
+    --sidebar-item-bg-9: 0 0% 40%; /* Dark Grey (fallback) */
 
     /* Cores para Categorias de Eventos */
-    --event-consulta: 90 25% 50%;
-    --event-cirurgia: 15 25% 55%;
-    --event-vacina: 40 30% 60%;
-    --event-exame: 180 15% 45%;
-    --event-retorno: 90 20% 40%;
+    --event-consulta: var(--nv-lp-verde-folha-seca);
+    --event-cirurgia: var(--nv-lp-marrom-avela);
+    --event-vacina: var(--nv-lp-bege-areia);
+    --event-exame: var(--nv-lp-verde-bambu);
+    --event-retorno: 50 100% 80%;
     --event-outros: 0 0% 40%;
   }
 
