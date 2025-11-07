@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react"; // Importar useRef
 import {
   ResizablePanel,
   ResizablePanelGroup,
@@ -29,8 +29,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user } = useUser();
   const { pageTitle } = usePageTitle();
 
+  const sidebarPanelRef = useRef<ResizablePanel>(null); // Criar a ref para o painel da sidebar
+
   const toggleNav = () => {
-    setIsNavCollapsed(prev => !prev);
+    if (sidebarPanelRef.current) {
+      if (isNavCollapsed) {
+        sidebarPanelRef.current.expand(); // Expande o painel
+      } else {
+        sidebarPanelRef.current.collapse(); // Recolhe o painel
+      }
+      // O estado `isNavCollapsed` será atualizado pelos callbacks `onCollapse` e `onExpand` do ResizablePanel
+      // Não precisamos mais alterná-lo manualmente aqui.
+    }
   };
 
   const handleChatButtonClick = () => {
@@ -47,11 +57,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       className="flex h-screen w-screen overflow-hidden"
     >
       <ResizablePanel
+        ref={sidebarPanelRef} // Atribuir a ref ao ResizablePanel
         defaultSize={20} // Ajustado para 20% quando expandido
         collapsedSize={4} // Mantido em 4% quando recolhido
         collapsible={true}
-        onCollapse={() => setIsNavCollapsed(true)}
-        onExpand={() => setIsNavCollapsed(false)}
+        onCollapse={() => setIsNavCollapsed(true)} // Atualiza o estado quando o painel recolhe
+        onExpand={() => setIsNavCollapsed(false)}   // Atualiza o estado quando o painel expande
         className={cn(
           "flex flex-col transition-all duration-300 ease-in-out",
         )}
