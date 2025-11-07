@@ -134,7 +134,7 @@ const MyPlanSettings: React.FC = () => {
                   </Badge>
                 </div>
                 {plan.imageUrl && (
-                  <div className="mb-4 flex justify-center">
+                  <div className="mb-2 flex justify-center"> {/* Alterado mb-4 para mb-2 */}
                     <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-72 w-auto object-contain" />
                   </div>
                 )}
