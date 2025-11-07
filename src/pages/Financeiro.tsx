@@ -78,6 +78,11 @@ const Financeiro = () => {
     },
   });
 
+  // Função para lidar com a submissão do formulário de adição de transação
+  const handleAddTransaction = (data: TransactionFormValues) => {
+    addTransactionMutation.mutate(data);
+  };
+
   const filteredTransactions = transactions.filter((transaction) =>
     transaction.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     transaction.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
