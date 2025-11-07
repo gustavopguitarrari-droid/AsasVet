@@ -42,11 +42,12 @@ const availablePlans: Plan[] = [
   },
   {
     id: "hospital-vet",
-    name: "Hospital Vet",
+    name: "ASAS DOURADAS", // Nome atualizado para ASAS DOURADAS
     price: "R$ 299,00/mês",
     features: ["10 Subusuários", "Todos os recursos Premium", "Relatórios Avançados", "Integrações Personalizadas", "Suporte Dedicado 24/7"],
     stripePriceId: "price_YOUR_HOSPITAL_VET_PRICE_ID", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
     badgeColorClass: "bg-blue-500",
+    imageUrl: "/public/images/planodourado.png", // Adicionada a nova imagem
   },
 ];
 
