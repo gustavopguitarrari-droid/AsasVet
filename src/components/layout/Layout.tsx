@@ -73,7 +73,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <ResizablePanel>
         <div className="flex flex-1 flex-col h-full overflow-hidden"> {/* Adicionado h-full aqui */}
           <Header />
-          <div className="flex-1 overflow-y-auto p-4"> {/* p-4 agora */}
+          <div className="flex-1 overflow-y-auto py-4 pr-4"> {/* Alterado p-4 para py-4 pr-4 */}
             <main className="flex flex-col">{children}</main> {/* Removido min-h-full */}
           </div>
           <MadeWithDyad />
