@@ -186,6 +186,7 @@
     --sidebar-border: 210 50% 50%;
     --sidebar-ring: var(--primary-foreground);
 
+    /* Sidebar Item Backgrounds (adjusting to new palette) */
     --sidebar-item-bg-1: 210 50% 70%;
     --sidebar-item-bg-2: 210 40% 60%;
     --sidebar-item-bg-3: 210 30% 50%;
@@ -244,6 +245,7 @@
     --sidebar-border: 270 50% 50%;
     --sidebar-ring: var(--primary-foreground);
 
+    /* Sidebar Item Backgrounds (adjusting to new palette) */
     --sidebar-item-bg-1: 270 50% 70%;
     --sidebar-item-bg-2: 270 40% 60%;
     --sidebar-item-bg-3: 270 30% 50%;
