@@ -42,7 +42,7 @@ const Login = () => {
 
   return (
     <div className={cn(
-      "min-h-screen flex items-center justify-center p-4 theme-nature-vet",
+      "min-h-screen flex items-center justify-center p-4",
       "login-art-bg"
     )}>
       <div className="w-full max-w-sm p-6 space-y-4 rounded-xl shadow-lg relative bg-creme-terra/70 backdrop-blur-sm border border-marrom-avela/20 z-10 max-h-[80vh] overflow-y-auto"> {/* Alterado para rounded-xl e shadow-lg */}
@@ -57,20 +57,28 @@ const Login = () => {
           appearance={{
             theme: ThemeSupa,
             variables: {
-              default: { // Variáveis para o tema claro
+              default: { // Variáveis para o tema claro (nature-vet)
                 colors: {
-                  brand: 'hsl(var(--primary))',
-                  brandAccent: 'hsl(var(--primary-darker))',
-                  inputBackground: 'hsl(var(--input))',
-                  inputBorder: 'hsl(var(--border))',
-                  inputText: 'hsl(var(--foreground))',
-                  messageText: 'hsl(var(--foreground))',
+                  brand: 'hsl(var(--nv-primary-green))',
+                  brandAccent: 'hsl(120 20% 18%)', /* Darker shade of primary green */
+                  inputBackground: 'hsl(var(--nv-beige))',
+                  inputBorder: 'hsl(30 15% 35%)', /* Dark brown for borders */
+                  inputText: 'hsl(var(--nv-dark-brown))',
+                  messageText: 'hsl(var(--nv-dark-brown))',
+                  // Adicione outras variáveis de cor conforme necessário para o tema dark
+                  // Por exemplo, para o fundo do Auth component, que ThemeSupa usa 'default'
+                  defaultButtonBackground: 'hsl(var(--nv-primary-green))',
+                  defaultButtonBackgroundHover: 'hsl(120 20% 18%)',
+                  defaultButtonBorder: 'hsl(var(--nv-primary-green))',
+                  defaultButtonText: 'hsl(var(--nv-beige))',
+                  dividerBackground: 'hsl(30 15% 35%)',
+                  anchorText: 'hsl(var(--nv-primary-green))',
+                  anchorTextHover: 'hsl(120 20% 18%)',
                 },
               },
-              // dark: { ... } // Removido
             },
           }}
-          theme="light"
+          theme="dark" {/* Alterado para tema dark para melhor contraste com nature-vet */}
           redirectTo={window.location.origin + '/painel'}
           view={authView}
           localization={{

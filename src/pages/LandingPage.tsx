@@ -84,7 +84,7 @@ const whyChooseUs = [
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-landingPage-lp-verde-bambu text-landingPage-lp-marrom-avela theme-nature-vet">
+    <div className="min-h-screen bg-landingPage-lp-verde-bambu text-landingPage-lp-marrom-avela">
       <LandingHeader />
 
       {/* Hero Section */}

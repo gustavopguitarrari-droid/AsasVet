@@ -19,8 +19,8 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   const { user, setUser } = useUser(); // Obter o usuário e a função setUser do UserContext
   const queryClient = useQueryClient();
 
-  // O tema de cor agora vem do perfil do usuário. Se não houver usuário ou tema, usa 'default'.
-  const currentColorTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'default';
+  // O tema de cor agora vem do perfil do usuário. Se não houver usuário ou tema, usa 'nature-vet' como padrão.
+  const currentColorTheme: ColorTheme = (user?.colorTheme as ColorTheme) || 'nature-vet';
 
   // Mutação para atualizar o tema de cor no perfil do usuário
   const updateColorThemeMutation = useMutation({
@@ -60,7 +60,10 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
       }
     });
     // Adiciona a classe do tema atual do usuário
-    root.classList.add(`theme-${currentColorTheme}`);
+    // Se o tema for 'nature-vet', não adiciona uma classe específica, pois é o padrão no :root
+    if (currentColorTheme !== 'nature-vet') {
+      root.classList.add(`theme-${currentColorTheme}`);
+    }
   }, [currentColorTheme]); // Depende do tema de cor do usuário
 
   const setColorTheme = (theme: ColorTheme) => {
@@ -75,7 +78,9 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
           root.classList.remove(cls);
         }
       });
-      root.classList.add(`theme-${theme}`);
+      if (theme !== 'nature-vet') {
+        root.classList.add(`theme-${theme}`);
+      }
     }
   };
 
