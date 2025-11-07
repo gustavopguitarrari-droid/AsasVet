@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 import { allNavItems } from "./Sidebar";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { ArrowLeftToLine, ArrowRightToLine } from "lucide-react"; // Importar os ícones de seta
+import { ArrowUpToLine, ArrowDownToLine } from "lucide-react"; // Importar os ícones de seta para cima/baixo
 
 interface HeaderProps { 
   layoutDirection?: "horizontal" | "vertical";
@@ -77,7 +77,11 @@ const Header: React.FC<HeaderProps> = ({ isNavCollapsed, onToggleNav }) => {
       </div>
 
       {/* Navegação horizontal */}
-      <div className="flex items-center border-t pt-2 mt-2 border-muted-foreground/20">
+      <div className={cn(
+        "flex items-center border-t pt-2 mt-2 border-muted-foreground/20 transition-all duration-300 ease-in-out",
+        isNavCollapsed ? "h-14" : "h-auto", // Ajusta a altura do contêiner quando recolhido
+        "bg-secondary" // Adiciona o fundo ao contêiner da navegação
+      )}>
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <Button
@@ -87,9 +91,9 @@ const Header: React.FC<HeaderProps> = ({ isNavCollapsed, onToggleNav }) => {
               className="h-10 w-10 flex-shrink-0 mr-2"
             >
               {isNavCollapsed ? (
-                <ArrowRightToLine className="h-5 w-5" />
+                <ArrowDownToLine className="h-5 w-5" /> // Ícone para expandir
               ) : (
-                <ArrowLeftToLine className="h-5 w-5" />
+                <ArrowUpToLine className="h-5 w-5" /> // Ícone para recolher
               )}
               <span className="sr-only">{isNavCollapsed ? "Expandir Navegação" : "Recolher Navegação"}</span>
             </Button>
