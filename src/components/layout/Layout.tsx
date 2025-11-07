@@ -4,7 +4,7 @@ import React from "react";
 import {
   ResizablePanel,
   ResizablePanelGroup,
-  // Removido: ResizableHandle,
+  ResizableHandle,
 } from "@/components/ui/resizable";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -43,45 +43,42 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden">
-      <Header /> {/* Header now only contains title, clock, theme toggles, and user profile */}
-      
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="flex-1"
+    <ResizablePanelGroup
+      direction="horizontal"
+      className="flex h-screen w-screen overflow-hidden" // ResizablePanelGroup agora é o elemento raiz e ocupa a tela inteira
+    >
+      <ResizablePanel
+        defaultSize={18}
+        collapsedSize={4}
+        collapsible={true}
+        minSize={15}
+        maxSize={20}
+        onCollapse={() => setIsNavCollapsed(true)}
+        onExpand={() => setIsNavCollapsed(false)}
+        className={cn(
+          "flex flex-col transition-all duration-300 ease-in-out",
+          isNavCollapsed && "min-w-[50px]"
+        )}
       >
-        <ResizablePanel
-          defaultSize={18}
-          collapsedSize={4}
-          collapsible={true}
-          minSize={15}
-          maxSize={20}
-          onCollapse={() => setIsNavCollapsed(true)}
-          onExpand={() => setIsNavCollapsed(false)}
-          className={cn(
-            "flex flex-col transition-all duration-300 ease-in-out",
-            isNavCollapsed && "min-w-[50px]"
-          )}
-        >
-          <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
-        </ResizablePanel>
-        {/* Removido: <ResizableHandle withHandle /> */}
-        <ResizablePanel defaultSize={82}>
-          <div className="flex flex-1 flex-col overflow-hidden">
-            <div className="flex-1 overflow-y-auto p-6">
-              <main>{children}</main>
-            </div>
-            <MadeWithDyad />
+        <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
+      </ResizablePanel>
+      <ResizableHandle withHandle />
+      <ResizablePanel defaultSize={82}>
+        <div className="flex flex-1 flex-col overflow-hidden">
+          <Header /> {/* Header movido para dentro do painel de conteúdo principal */}
+          <div className="flex-1 overflow-y-auto p-6">
+            <main>{children}</main>
           </div>
-        </ResizablePanel>
-      </ResizablePanelGroup>
+          <MadeWithDyad />
+        </div>
+      </ResizablePanel>
 
       <FloatingCashierButton onClick={handleCashierButtonClick} />
       <FloatingChatButton onClick={handleChatButtonClick} onClose={() => setIsChatDialogOpen(false)} />
       <ChatDialog isOpen={isChatDialogOpen} onClose={() => setIsChatDialogOpen(false)} />
       <CashierDialog isOpen={isCashierDialogOpen} onClose={() => setIsCashierDialogOpen(false)} />
       {user?.isDemoMode && <DemoModeBanner />}
-    </div>
+    </ResizablePanelGroup>
   );
 };
 
