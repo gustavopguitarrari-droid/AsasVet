@@ -118,7 +118,7 @@ const MyPlanSettings: React.FC = () => {
           Visualize os detalhes do seu plano atual e explore opções de upgrade.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> {/* Alterado para md:grid-cols-2 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6"> {/* Alterado de md:grid-cols-2 para md:grid-cols-3 */}
           {availablePlans.map((plan) => (
             <Card
               key={plan.id}
