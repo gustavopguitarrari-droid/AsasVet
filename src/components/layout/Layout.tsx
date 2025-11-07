@@ -56,7 +56,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </div>
 
       <FloatingCashierButton onClick={handleCashierButtonClick} />
-      <FloatingChatButton onClick={handleChatDialogOpen} onClose={() => setIsChatDialogOpen(false)} />
+      <FloatingChatButton onClick={handleChatButtonClick} onClose={() => setIsChatDialogOpen(false)} />
       <ChatDialog isOpen={isChatDialogOpen} onClose={() => setIsChatDialogOpen(false)} />
       <CashierDialog isOpen={isCashierDialogOpen} onClose={() => setIsCashierDialogOpen(false)} />
       {user?.isDemoMode && <DemoModeBanner />}
