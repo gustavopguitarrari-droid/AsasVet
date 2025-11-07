@@ -55,7 +55,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
     <div className={cn(
       "flex flex-col h-full bg-sidebar text-sidebar-foreground border-r",
       "transition-all duration-300 ease-in-out",
-      isCollapsed ? "w-[50px]" : "w-full"
+      // Removido: isCollapsed ? "w-[50px]" : "w-full"
     )}>
       {/* Logo e Título (visível apenas quando expandido) */}
       {!isCollapsed && (

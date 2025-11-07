@@ -57,7 +57,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         onExpand={() => setIsNavCollapsed(false)}
         className={cn(
           "flex flex-col transition-all duration-300 ease-in-out",
-          isNavCollapsed && "min-w-[50px]"
+          // Removido: isNavCollapsed && "min-w-[50px]"
         )}
       >
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
