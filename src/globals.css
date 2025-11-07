@@ -146,181 +146,199 @@
     --event-outros: 0 0% 40%;
   }
 
-  /* NOVO TEMA: Céu Sereno (cores de teste) */
+  /* TEMA: Céu Sereno */
   .theme-ceu-sereno {
-    --background: 240 100% 50%; /* Bright Blue */
-    --foreground: 0 0% 100%; /* White */
+    --cs-light-blue: 210 80% 95%;   /* Very light blue */
+    --cs-medium-blue: 210 70% 60%;  /* Sky blue */
+    --cs-dark-blue: 210 80% 25%;    /* Deep blue */
+    --cs-white: 0 0% 100%;          /* White */
+    --cs-gray: 210 10% 50%;         /* Muted gray */
+    --cs-accent-cyan: 180 70% 50%;  /* Cyan accent */
 
-    --card: 240 100% 50%;
-    --card-foreground: 0 0% 100%;
+    --background: var(--cs-light-blue);
+    --foreground: var(--cs-dark-blue);
 
-    --popover: 240 100% 50%;
-    --popover-foreground: 0 0% 100%;
+    --card: var(--cs-white);
+    --card-foreground: var(--cs-dark-blue);
 
-    --primary: 0 100% 50%; /* Bright Red */
-    --primary-darker: 0 100% 30%;
-    --primary-foreground: 60 100% 50%; /* Bright Yellow */
+    --popover: var(--cs-white);
+    --popover-foreground: var(--cs-dark-blue);
 
-    --secondary: 180 100% 50%; /* Bright Cyan */
-    --secondary-foreground: 0 0% 0%; /* Black */
+    --primary: var(--cs-medium-blue);
+    --primary-darker: 210 70% 40%;
+    --primary-foreground: var(--cs-white);
 
-    --muted: 180 100% 50%;
-    --muted-foreground: 0 0% 0%;
+    --secondary: var(--cs-light-blue);
+    --secondary-foreground: var(--cs-dark-blue);
 
-    --accent: 300 100% 50%; /* Bright Magenta */
-    --accent-foreground: 0 0% 100%;
+    --muted: var(--cs-light-blue);
+    --muted-foreground: var(--cs-gray);
+
+    --accent: var(--cs-accent-cyan);
+    --accent-foreground: var(--cs-white);
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 0%;
-    --input: 240 100% 50%;
-    --ring: 0 100% 50%;
+    --border: 210 20% 80%;
+    --input: var(--cs-white);
+    --ring: var(--cs-medium-blue);
 
-    --sidebar-background: var(--primary);
-    --sidebar-foreground: var(--primary-foreground);
-    --sidebar-primary: var(--primary-foreground);
-    --sidebar-primary-foreground: var(--primary);
-    --sidebar-accent: var(--secondary);
-    --sidebar-accent-foreground: var(--secondary-foreground);
-    --sidebar-border: 0 0% 0%;
-    --sidebar-ring: var(--primary-foreground);
+    --sidebar-background: var(--cs-dark-blue);
+    --sidebar-foreground: var(--cs-white);
+    --sidebar-primary: var(--cs-white);
+    --sidebar-primary-foreground: var(--cs-dark-blue);
+    --sidebar-accent: var(--cs-medium-blue);
+    --sidebar-accent-foreground: var(--cs-white);
+    --sidebar-border: 210 20% 30%;
+    --sidebar-ring: var(--cs-white);
 
-    /* Sidebar Item Backgrounds (adjusting to new palette) */
-    --sidebar-item-bg-1: 240 80% 60%;
-    --sidebar-item-bg-2: 240 70% 50%;
-    --sidebar-item-bg-3: 240 60% 40%;
-    --sidebar-item-bg-4: 240 50% 30%;
-    --sidebar-item-bg-5: 240 40% 20%;
-    --sidebar-item-bg-6: 240 30% 15%;
-    --sidebar-item-bg-7: 240 20% 10%;
-    --sidebar-item-bg-8: 240 90% 70%;
-    --sidebar-item-bg-9: 240 80% 60%;
+    --sidebar-item-bg-1: 210 70% 70%;
+    --sidebar-item-bg-2: 210 60% 50%;
+    --sidebar-item-bg-3: 180 60% 60%;
+    --sidebar-item-bg-4: 240 50% 70%;
+    --sidebar-item-bg-5: 200 70% 80%;
+    --sidebar-item-bg-6: 220 50% 40%;
+    --sidebar-item-bg-7: 230 40% 30%;
+    --sidebar-item-bg-8: 190 80% 70%;
+    --sidebar-item-bg-9: 200 30% 50%;
 
-    --event-consulta: 240 80% 60%;
-    --event-cirurgia: 240 70% 50%;
-    --event-vacina: 240 60% 40%;
-    --event-exame: 240 50% 30%;
-    --event-retorno: 240 40% 20%;
-    --event-outros: 240 20% 10%;
+    --event-consulta: 210 70% 70%;
+    --event-cirurgia: 210 60% 50%;
+    --event-vacina: 180 60% 60%;
+    --event-exame: 240 50% 70%;
+    --event-retorno: 200 70% 80%;
+    --event-outros: 200 30% 50%;
   }
 
-  /* NOVO TEMA: Jardim de Lavanda (cores de teste) */
+  /* TEMA: Jardim de Lavanda */
   .theme-jardim-lavanda {
-    --background: 300 100% 50%; /* Bright Magenta */
-    --foreground: 0 0% 100%; /* White */
+    --jl-light-purple: 270 60% 95%;  /* Very light lavender */
+    --jl-medium-purple: 270 50% 70%; /* Medium lavender */
+    --jl-dark-purple: 270 60% 30%;   /* Deep purple */
+    --jl-white: 0 0% 100%;           /* White */
+    --jl-gray: 270 10% 50%;          /* Muted gray */
+    --jl-accent-pink: 330 70% 60%;   /* Pink accent */
 
-    --card: 300 100% 50%;
-    --card-foreground: 0 0% 100%;
+    --background: var(--jl-light-purple);
+    --foreground: var(--jl-dark-purple);
 
-    --popover: 300 100% 50%;
-    --popover-foreground: 0 0% 100%;
+    --card: var(--jl-white);
+    --card-foreground: var(--jl-dark-purple);
 
-    --primary: 120 100% 50%; /* Bright Green */
-    --primary-darker: 120 100% 30%;
-    --primary-foreground: 0 0% 100%; /* White */
+    --popover: var(--jl-white);
+    --popover-foreground: var(--jl-dark-purple);
 
-    --secondary: 270 100% 70%; /* Light Purple */
-    --secondary-foreground: 0 0% 0%; /* Black */
+    --primary: var(--jl-medium-purple);
+    --primary-darker: 270 50% 50%;
+    --primary-foreground: var(--jl-white);
 
-    --muted: 270 100% 70%;
-    --muted-foreground: 0 0% 0%;
+    --secondary: var(--jl-light-purple);
+    --secondary-foreground: var(--jl-dark-purple);
 
-    --accent: 0 100% 70%; /* Bright Red */
-    --accent-foreground: 0 0% 100%;
+    --muted: var(--jl-light-purple);
+    --muted-foreground: var(--jl-gray);
+
+    --accent: var(--jl-accent-pink);
+    --accent-foreground: var(--jl-white);
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 0%;
-    --input: 300 100% 50%;
-    --ring: 120 100% 50%;
+    --border: 270 20% 80%;
+    --input: var(--jl-white);
+    --ring: var(--jl-medium-purple);
 
-    --sidebar-background: var(--primary);
-    --sidebar-foreground: var(--primary-foreground);
-    --sidebar-primary: var(--primary-foreground);
-    --sidebar-primary-foreground: var(--primary);
-    --sidebar-accent: var(--secondary);
-    --sidebar-accent-foreground: var(--secondary-foreground);
-    --sidebar-border: 0 0% 0%;
-    --sidebar-ring: var(--primary-foreground);
+    --sidebar-background: var(--jl-dark-purple);
+    --sidebar-foreground: var(--jl-white);
+    --sidebar-primary: var(--jl-white);
+    --sidebar-primary-foreground: var(--jl-dark-purple);
+    --sidebar-accent: var(--jl-medium-purple);
+    --sidebar-accent-foreground: var(--jl-white);
+    --sidebar-border: 270 20% 30%;
+    --sidebar-ring: var(--jl-white);
 
-    /* Sidebar Item Backgrounds (adjusting to new palette) */
-    --sidebar-item-bg-1: 300 70% 60%;
-    --sidebar-item-bg-2: 300 60% 50%;
-    --sidebar-item-bg-3: 300 50% 40%;
-    --sidebar-item-bg-4: 300 40% 30%;
-    --sidebar-item-bg-5: 300 30% 20%;
-    --sidebar-item-bg-6: 300 20% 15%;
-    --sidebar-item-bg-7: 300 10% 10%;
-    --sidebar-item-bg-8: 300 90% 70%;
-    --sidebar-item-bg-9: 300 80% 60%;
+    --sidebar-item-bg-1: 270 50% 80%;
+    --sidebar-item-bg-2: 270 40% 60%;
+    --sidebar-item-bg-3: 300 50% 70%;
+    --sidebar-item-bg-4: 240 40% 50%;
+    --sidebar-item-bg-5: 280 60% 80%;
+    --sidebar-item-bg-6: 260 30% 40%;
+    --sidebar-item-bg-7: 250 20% 30%;
+    --sidebar-item-bg-8: 290 70% 90%;
+    --sidebar-item-bg-9: 270 30% 60%;
 
-    --event-consulta: 300 70% 60%;
-    --event-cirurgia: 300 60% 50%;
-    --event-vacina: 300 50% 40%;
-    --event-exame: 300 40% 30%;
-    --event-retorno: 300 30% 20%;
-    --event-outros: 300 10% 10%;
+    --event-consulta: 270 50% 80%;
+    --event-cirurgia: 270 40% 60%;
+    --event-vacina: 300 50% 70%;
+    --event-exame: 240 40% 50%;
+    --event-retorno: 280 60% 80%;
+    --event-outros: 270 30% 60%;
   }
 
-  /* NOVO TEMA: Areia Dourada (cores de teste) */
+  /* TEMA: Areia Dourada */
   .theme-areia-dourada {
-    --background: 60 100% 50%; /* Bright Yellow */
-    --foreground: 0 0% 0%; /* Black */
+    --ad-light-sand: 40 60% 95%;    /* Very light sand */
+    --ad-golden-yellow: 40 80% 70%; /* Golden yellow */
+    --ad-dark-brown: 30 30% 20%;    /* Dark earthy brown */
+    --ad-white: 0 0% 100%;          /* White */
+    --ad-gray: 40 10% 50%;          /* Muted gray */
+    --ad-accent-orange: 30 80% 60%; /* Orange accent */
 
-    --card: 60 100% 50%;
-    --card-foreground: 0 0% 0%;
+    --background: var(--ad-light-sand);
+    --foreground: var(--ad-dark-brown);
 
-    --popover: 60 100% 50%;
-    --popover-foreground: 0 0% 0%;
+    --card: var(--ad-white);
+    --card-foreground: var(--ad-dark-brown);
 
-    --primary: 240 100% 50%; /* Bright Blue */
-    --primary-darker: 240 100% 30%;
-    --primary-foreground: 0 0% 0%; /* Black */
+    --popover: var(--ad-white);
+    --popover-foreground: var(--ad-dark-brown);
 
-    --secondary: 30 100% 70%; /* Orange */
-    --secondary-foreground: 0 0% 0%; /* Black */
+    --primary: var(--ad-golden-yellow);
+    --primary-darker: 40 80% 50%;
+    --primary-foreground: var(--ad-dark-brown);
 
-    --muted: 30 100% 70%;
-    --muted-foreground: 0 0% 0%;
+    --secondary: var(--ad-light-sand);
+    --secondary-foreground: var(--ad-dark-brown);
 
-    --accent: 120 100% 70%; /* Light Green */
-    --accent-foreground: 0 0% 0%;
+    --muted: var(--ad-light-sand);
+    --muted-foreground: var(--ad-gray);
+
+    --accent: var(--ad-accent-orange);
+    --accent-foreground: var(--ad-white);
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 0%;
-    --input: 60 100% 50%;
-    --ring: 240 100% 50%;
+    --border: 40 20% 80%;
+    --input: var(--ad-white);
+    --ring: var(--ad-golden-yellow);
 
-    --sidebar-background: var(--primary);
-    --sidebar-foreground: var(--primary-foreground);
-    --sidebar-primary: var(--primary-foreground);
-    --sidebar-primary-foreground: var(--primary);
-    --sidebar-accent: var(--secondary);
-    --sidebar-accent-foreground: var(--secondary-foreground);
-    --sidebar-border: 0 0% 0%;
-    --sidebar-ring: var(--primary-foreground);
+    --sidebar-background: var(--ad-dark-brown);
+    --sidebar-foreground: var(--ad-white);
+    --sidebar-primary: var(--ad-white);
+    --sidebar-primary-foreground: var(--ad-dark-brown);
+    --sidebar-accent: var(--ad-golden-yellow);
+    --sidebar-accent-foreground: var(--ad-dark-brown);
+    --sidebar-border: 30 20% 30%;
+    --sidebar-ring: var(--ad-white);
 
-    /* Sidebar Item Backgrounds (adjusting to new palette) */
-    --sidebar-item-bg-1: 60 70% 60%;
-    --sidebar-item-bg-2: 60 60% 50%;
-    --sidebar-item-bg-3: 60 50% 40%;
-    --sidebar-item-bg-4: 60 40% 30%;
-    --sidebar-item-bg-5: 60 30% 20%;
-    --sidebar-item-bg-6: 60 20% 15%;
-    --sidebar-item-bg-7: 60 10% 10%;
-    --sidebar-item-bg-8: 60 90% 70%;
-    --sidebar-item-bg-9: 60 80% 60%;
+    --sidebar-item-bg-1: 40 70% 80%;
+    --sidebar-item-bg-2: 40 60% 60%;
+    --sidebar-item-bg-3: 30 70% 70%;
+    --sidebar-item-bg-4: 50 50% 50%;
+    --sidebar-item-bg-5: 20 80% 80%;
+    --sidebar-item-bg-6: 60 40% 40%;
+    --sidebar-item-bg-7: 70 30% 30%;
+    --sidebar-item-bg-8: 40 90% 90%;
+    --sidebar-item-bg-9: 30 30% 50%;
 
-    --event-consulta: 60 70% 60%;
-    --event-cirurgia: 60 60% 50%;
-    --event-vacina: 60 50% 40%;
-    --event-exame: 60 40% 30%;
-    --event-retorno: 60 30% 20%;
-    --event-outros: 60 10% 10%;
+    --event-consulta: 40 70% 80%;
+    --event-cirurgia: 40 60% 60%;
+    --event-vacina: 30 70% 70%;
+    --event-exame: 50 50% 50%;
+    --event-retorno: 20 80% 80%;
+    --event-outros: 30 30% 50%;
   }
 
   body {
