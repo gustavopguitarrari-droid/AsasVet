@@ -33,11 +33,12 @@ const availablePlans: Plan[] = [
   },
   {
     id: "clinica-vet",
-    name: "Clínica Vet",
+    name: "ASAS ROXAS", // Nome atualizado para ASAS ROXAS
     price: "R$ 200,00/mês",
     features: ["3 Subusuários", "Gerenciamento Completo", "Internação", "Caixa e Financeiro", "Suporte Prioritário"],
     stripePriceId: "price_YOUR_CLINICA_VET_PRICE_ID", // SUBSTITUA PELO SEU ID DE PREÇO REAL DO STRIPE
-    badgeColorClass: "bg-green-500",
+    badgeColorClass: "bg-purple-500", // Cor do badge alterada para roxo
+    imageUrl: "/public/images/Plano Roxo.png", // Adicionada a nova imagem
   },
   {
     id: "hospital-vet",
