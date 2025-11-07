@@ -138,34 +138,34 @@
 
   /* --- Temas de Cores Personalizados --- */
   .theme-nature-vet {
-    --background: 90 40% 70%; /* Verde Bambu: #C5E1A5 */
-    --foreground: 20 20% 47%; /* Marrom Avelã: #8D6E63 */
+    --background: 80 20% 95%; /* Very light green-beige */
+    --foreground: 120 20% 20%; /* Dark forest green */
 
-    --card: 50 100% 99%; /* Creme Terra: #FFFDE7 */
-    --card-foreground: 20 20% 47%; /* Marrom Avelã: #8D6E63 */
+    --card: 60 30% 98%; /* Light cream */
+    --card-foreground: 120 20% 20%;
 
-    --popover: 50 100% 99%; /* Creme Terra: #FFFDE7 */
-    --popover-foreground: 20 20% 47%; /* Marrom Avelã: #8D6E63 */
+    --popover: 60 30% 98%;
+    --popover-foreground: 120 20% 20%;
 
-    --primary: 90 40% 67%; /* Verde Folha Seca: #AED581 */
-    --primary-darker: 90 40% 57%; /* Um pouco mais escuro para contraste */
-    --primary-foreground: 50 100% 99%; /* Creme Terra: #FFFDE7 */
+    --primary: 140 60% 40%; /* Medium vibrant green */
+    --primary-darker: 140 60% 30%; /* Darker vibrant green */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 40 100% 85%; /* Bege Areia: #FFECB3 */
-    --secondary-foreground: 20 20% 47%; /* Marrom Avelã: #8D6E63 */
+    --secondary: 40 30% 85%; /* Light earthy brown/beige */
+    --secondary-foreground: 120 20% 20%;
 
-    --muted: 40 100% 85%; /* Bege Areia: #FFECB3 */
-    --muted-foreground: 20 20% 57%; /* Marrom Avelã um pouco mais claro */
+    --muted: 40 30% 85%;
+    --muted-foreground: 120 10% 40%; /* Muted dark green */
 
-    --accent: 40 100% 85%; /* Bege Areia: #FFECB3 */
-    --accent-foreground: 20 20% 47%; /* Marrom Avelã: #8D6E63 */
+    --accent: 40 30% 85%;
+    --accent-foreground: 120 20% 20%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 60.2%; /* Keep red for destructive actions */
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 20 20% 57%; /* Marrom Avelã um pouco mais claro */
-    --input: 50 100% 99%; /* Creme Terra: #FFFDE7 */
-    --ring: 90 40% 67%; /* Verde Folha Seca: #AED581 */
+    --border: 120 10% 70%; /* Light green-gray border */
+    --input: 60 30% 98%;
+    --ring: 140 60% 40%;
 
     /* Sidebar colors (adaptam-se ao tema principal) */
     --sidebar-background: var(--primary);
@@ -178,30 +178,30 @@
     --sidebar-ring: var(--ring);
 
     /* Sidebar Item Backgrounds (cores distintas para itens) */
-    --sidebar-item-bg-1: 90 40% 70%;
-    --sidebar-item-bg-2: 90 40% 60%;
-    --sidebar-item-bg-3: 90 40% 50%;
-    --sidebar-item-bg-4: 90 40% 40%;
-    --sidebar-item-bg-5: 90 40% 30%;
-    --sidebar-item-bg-6: 90 40% 20%;
-    --sidebar-item-bg-7: 90 40% 10%;
-    --sidebar-item-bg-8: 90 40% 5%;
-    --sidebar-item-bg-9: 0 0% 50%;
+    --sidebar-item-bg-1: 140 60% 50%;
+    --sidebar-item-bg-2: 140 60% 45%;
+    --sidebar-item-bg-3: 140 60% 40%;
+    --sidebar-item-bg-4: 140 60% 35%;
+    --sidebar-item-bg-5: 140 60% 30%;
+    --sidebar-item-bg-6: 140 60% 25%;
+    --sidebar-item-bg-7: 140 60% 20%;
+    --sidebar-item-bg-8: 140 60% 15%;
+    --sidebar-item-bg-9: 120 10% 30%;
 
     /* Cores para Categorias de Eventos */
-    --event-consulta: 90 40% 70%;
-    --event-cirurgia: 90 40% 60%;
-    --event-vacina: 90 40% 50%;
-    --event-exame: 90 40% 40%;
-    --event-retorno: 90 40% 30%;
-    --event-outros: 0 0% 40%;
+    --event-consulta: 140 60% 50%;
+    --event-cirurgia: 10 80% 60%;
+    --event-vacina: 60 80% 50%;
+    --event-exame: 200 60% 50%;
+    --event-retorno: 40 80% 60%;
+    --event-outros: 0 0% 50%;
 
     /* Specific colors for LandingPage/Login */
-    --verde-bambu: 90 40% 70%; /* #C5E1A5 */
-    --marrom-avela: 20 20% 47%; /* #8D6E63 */
-    --creme-terra: 50 100% 99%; /* #FFFDE7 */
-    --verde-folha-seca: 90 40% 67%; /* #AED581 */
-    --bege-areia: 40 100% 85%; /* #FFECB3 */
+    --verde-bambu: 80 20% 95%;
+    --marrom-avela: 120 20% 20%;
+    --creme-terra: 60 30% 98%;
+    --verde-folha-seca: 140 60% 40%;
+    --bege-areia: 40 30% 85%;
   }
 }
 
