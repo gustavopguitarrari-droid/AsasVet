@@ -25,7 +25,7 @@ const ColorThemeToggle = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg">
+        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-lg bg-muted">
           <Palette className="h-[1.2rem] w-[1.2rem]" />
           <span className="sr-only">Selecionar tema de cor</span>
         </Button>
