@@ -439,6 +439,7 @@
 /* Custom Background Gradients */
 .sidebar-gradient-bg {
   background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-darker)) 100%);
+  opacity: 0.9; /* Reduz a opacidade para 90% */
 }
 
 .profile-header-art-bg {
