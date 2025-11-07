@@ -70,7 +70,7 @@ const Login = () => {
               // dark: { ... } // Removido
             },
           }}
-          theme="light" {/* Alterado para tema claro */}
+          theme="light"
           redirectTo={window.location.origin + '/painel'}
           view={authView}
           localization={{
