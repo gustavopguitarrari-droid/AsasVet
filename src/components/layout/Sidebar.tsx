@@ -65,7 +65,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       )}>
         <Link to="/painel" className="flex items-center">
           {/* Removido: <img src="/public/images/logooficial.png" alt="AsasVet Logo" className="h-8 w-auto" /> */}
-          <PawPrint className={cn("h-10 w-10 text-sidebar-primary", !isCollapsed && "mr-2")} /> {/* Ícone sempre visível, ajusta margem */}
+          <PawPrint className={cn("h-10 w-10 text-sidebar-primary", !isCollapsed && "mr-2")} strokeWidth={2} /> {/* Ícone sempre visível, ajusta margem */}
           {!isCollapsed && <span className="text-2xl font-bold text-sidebar-primary whitespace-nowrap">AsasVet</span>}
         </Link>
       </div>
@@ -74,7 +74,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       <nav className="flex-1 flex flex-col p-2 space-y-1 overflow-y-auto">
         {allNavItems.map((item) => {
           const isActive = location.pathname === item.path;
-          const content = (
+          
+          // Conteúdo do Link, garantindo que seja sempre um único elemento ou um Fragment
+          const linkChildren = isCollapsed ? (
+            <item.icon className="h-12 w-12" strokeWidth={2} />
+          ) : (
+            <>
+              <item.icon className="h-12 w-12 mr-3" strokeWidth={2} />
+              <span className="whitespace-nowrap">{item.name}</span>
+            </>
+          );
+
+          const buttonContent = (
             <Button
               asChild
               variant="ghost"
@@ -86,19 +97,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
               )}
             >
               <Link to={item.path} className="flex items-center w-full">
-                <item.icon className={cn("h-12 w-12", !isCollapsed && "mr-3")} strokeWidth={2} /> {/* Aumentado de h-10 w-10 para h-12 w-12 */}
-                {!isCollapsed && <span className="whitespace-nowrap">{item.name}</span>}
+                {linkChildren}
               </Link>
             </Button>
           );
 
           return isCollapsed ? (
             <Tooltip key={item.name} delayDuration={0}>
-              <TooltipTrigger asChild>{content}</TooltipTrigger>
+              <TooltipTrigger asChild>{buttonContent}</TooltipTrigger>
               <TooltipContent side="right">{item.name}</TooltipContent>
             </Tooltip>
           ) : (
-            <React.Fragment key={item.name}>{content}</React.Fragment>
+            <React.Fragment key={item.name}>{buttonContent}</React.Fragment>
           );
         })}
       </nav>
