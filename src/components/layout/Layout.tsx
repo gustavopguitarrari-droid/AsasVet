@@ -58,7 +58,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     >
       <ResizablePanel
         ref={sidebarPanelRef} // Atribuir a ref ao ResizablePanel
-        defaultSize={20} // Ajustado para 20% quando expandido
+        defaultSize={18} // Ajustado de 20 para 18
         collapsedSize={4} // Mantido em 4% quando recolhido
         collapsible={true}
         onCollapse={() => setIsNavCollapsed(true)} // Atualiza o estado quando o painel recolhe
