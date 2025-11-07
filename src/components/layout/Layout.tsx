@@ -4,7 +4,7 @@ import React from "react";
 import {
   ResizablePanel,
   ResizablePanelGroup,
-  ResizableHandle,
+  // Removido: ResizableHandle,
 } from "@/components/ui/resizable";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -65,7 +65,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         >
           <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
         </ResizablePanel>
-        <ResizableHandle withHandle />
+        {/* Removido: <ResizableHandle withHandle /> */}
         <ResizablePanel defaultSize={82}>
           <div className="flex flex-1 flex-col overflow-hidden">
             <div className="flex-1 overflow-y-auto p-6">
