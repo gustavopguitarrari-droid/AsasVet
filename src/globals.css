@@ -470,7 +470,7 @@
 .login-art-bg {
   background-image: url('/public/images/fundologin.png'); /* Nova imagem de fundo */
   background-size: cover; /* Garante que a imagem cubra toda a área */
-  background-position: center 20%; /* Ajustado para mover o background para baixo */
+  background-position: center; /* Ajustado para centralizar o background */
   background-repeat: no-repeat; /* Evita a repetição da imagem */
   position: relative;
   overflow: hidden;
