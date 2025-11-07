@@ -12,8 +12,8 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User as UserIcon, LogOut, Settings, UserCircle } from "lucide-react";
-import { useUser } from "@/context/UserContext"; // Importar useUser
-import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "@/context/UserContext";
+import { useNavigate } from "react-router-dom"; // Removed Link import
 import { supabase } from "@/integrations/supabase/client";
 
 const UserProfile = () => {
@@ -69,18 +69,20 @@ const UserProfile = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild className="rounded-md"> {/* Adicionado rounded-md */}
-          <Link to="/profile" className="flex items-center">
-            <UserCircle className="mr-2 h-4 w-4" />
-            Perfil
-          </Link>
+        <DropdownMenuItem 
+          className="rounded-md"
+          onSelect={() => navigate("/profile")} // Use onSelect for navigation
+        >
+          <UserCircle className="mr-2 h-4 w-4" />
+          Perfil
         </DropdownMenuItem>
         {appUser.role === "Administrador" && ( // Renderiza "Configurações" apenas para Administradores
-          <DropdownMenuItem asChild className="rounded-md"> {/* Adicionado rounded-md */}
-            <Link to="/settings" className="flex items-center">
-              <Settings className="mr-2 h-4 w-4" />
-              Configurações
-            </Link>
+          <DropdownMenuItem 
+            className="rounded-md"
+            onSelect={() => navigate("/settings")} // Use onSelect for navigation
+          >
+            <Settings className="mr-2 h-4 w-4" />
+            Configurações
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
