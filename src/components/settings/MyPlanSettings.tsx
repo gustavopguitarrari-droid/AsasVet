@@ -24,7 +24,7 @@ interface Plan {
 const availablePlans: Plan[] = [
   {
     id: "vet-domiciliar",
-    name: "Plano Asas Verdes", // Nome atualizado
+    name: "Asas Verde", // Nome atualizado
     price: "R$ 119,90/mês",
     features: ["1 Subusuário", "Gerenciamento de Clientes e Pets", "Agenda Básica"],
     stripePriceId: "price_1SPttkF1WTKnJRQoScNCQLjp", // ID do plano Vet Domiciliar
@@ -58,7 +58,7 @@ interface PlanSelectionDialogProps {
 
 const MyPlanSettings: React.FC = () => {
   const { user: appUser } = useUser();
-  const currentPlanName = appUser?.planName || "Plano Asas Verdes"; // Assume "Plano Asas Verdes" como padrão se não houver plano
+  const currentPlanName = appUser?.planName || "Asas Verde"; // Assume "Asas Verde" como padrão se não houver plano
 
   const createStripeCheckoutSessionMutation = useMutation({
     mutationFn: async ({ priceId, userId }: { priceId: string; userId: string }) => {
@@ -134,7 +134,7 @@ const MyPlanSettings: React.FC = () => {
                   </Badge>
                 </div>
                 {plan.imageUrl && (
-                  <div className="mb-2 flex justify-center"> {/* Alterado mb-4 para mb-2 */}
+                  <div className="mb-2 flex justify-center">
                     <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-72 w-auto object-contain" />
                   </div>
                 )}
