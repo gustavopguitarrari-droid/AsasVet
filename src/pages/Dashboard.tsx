@@ -10,7 +10,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
+// Removido: import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -382,15 +382,17 @@ const Dashboard = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           {/* Substituído o logo estático por um Avatar dinâmico */}
-          <Avatar className="h-24 w-24 shadow-md"> {/* Aumentado o tamanho para h-24 w-24 e removido a borda */}
-            {user?.logoUrl ? (
-              <AvatarImage src={user.logoUrl} alt={user.companyName || "Logo da Clínica"} />
-            ) : (
-              <AvatarFallback className="bg-muted text-muted-foreground text-xl font-bold">
-                {initials || <PawPrint className="h-8 w-8" />}
-              </AvatarFallback>
-            )}
-          </Avatar>
+          {user?.logoUrl ? (
+            <img 
+              src={user.logoUrl} 
+              alt={user.companyName || "Logo da Clínica"} 
+              className="h-24 w-auto mr-4 object-contain" // Ajustado para h-24 w-auto, sem borda e com margem
+            />
+          ) : (
+            <div className="h-24 w-24 flex items-center justify-center bg-muted text-muted-foreground mr-4 rounded-lg shadow-sm">
+              <PawPrint className="h-16 w-16" /> {/* Ícone maior para fallback */}
+            </div>
+          )}
           
           <div>
             <h2 className="text-3xl font-bold">{getGreeting()}</h2>
