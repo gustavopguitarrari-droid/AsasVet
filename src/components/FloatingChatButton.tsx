@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 interface FloatingChatButtonProps {
   onClick: () => void;
+  onClose: () => void; // Adicionado onClose
 }
 
 const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ onClick }) => {

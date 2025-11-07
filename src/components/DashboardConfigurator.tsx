@@ -60,12 +60,8 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
 }) => {
   const [tempConfig, setTempConfig] = React.useState<DashboardItemConfig[]>(config);
   const [cardToAddId, setCardToAddId] = React.useState<string | null>(null);
-  const [menuPosition, setMenuPosition] = React.useState<"lateral" | "superior">(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('layoutDirection') === 'vertical' ? 'superior' : 'lateral');
-    }
-    return 'lateral';
-  });
+  // A posição do menu agora é fixa como 'superior'
+  const menuPosition: "lateral" | "superior" = 'superior'; 
 
   React.useEffect(() => {
     const initializedConfig = config.map((item, index) => ({
@@ -75,12 +71,8 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
     setTempConfig(initializedConfig);
   }, [config]);
 
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // Isso agora define o 'layoutDirection' no localStorage, que Layout.tsx lê
-      localStorage.setItem('layoutDirection', menuPosition === 'superior' ? 'vertical' : 'horizontal');
-    }
-  }, [menuPosition]);
+  // Removido o useEffect que salvava a posição do menu no localStorage,
+  // pois agora ela é fixa.
 
   const handleRemoveCardFromPanel = (id: string) => {
     setTempConfig((prevConfig) => {
@@ -185,7 +177,8 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
   const handleSave = () => {
     onSave(tempConfig);
     onOpenChange(false);
-    window.location.reload(); // Recarrega a página para aplicar as mudanças de layout
+    // Não é mais necessário recarregar a página para aplicar as mudanças de layout,
+    // pois o layout agora é fixo.
   };
 
   const availableCards = React.useMemo(() => {
@@ -214,7 +207,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
         <DialogHeader>
           <DialogTitle>Configurar Painel</DialogTitle>
           <DialogDescription>
-            Personalize a exibição dos cards e a posição do menu de navegação.
+            Personalize a exibição dos cards.
           </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 overflow-hidden">
@@ -353,23 +346,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
             </ScrollArea>
           </div>
         </div>
-        <div className="border-t pt-4 mt-4">
-          <h3 className="text-lg font-semibold mb-2">Posição do Menu de Navegação</h3>
-          <RadioGroup
-            value={menuPosition}
-            onValueChange={(value: "lateral" | "superior") => setMenuPosition(value)}
-            className="flex space-x-4"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="lateral" id="menu-lateral" />
-              <Label htmlFor="menu-lateral">Lateral</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="superior" id="menu-superior" />
-              <Label htmlFor="menu-superior">Superior</Label>
-            </div>
-          </RadioGroup>
-        </div>
+        {/* Removido: Seção de Posição do Menu de Navegação */}
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
