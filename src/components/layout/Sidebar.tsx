@@ -55,7 +55,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
     <div className={cn(
       "flex flex-col h-full bg-sidebar text-sidebar-foreground",
       "transition-all duration-300 ease-in-out",
-      isCollapsed ? "w-[60px]" : "w-[180px]", // Alterado de 200px para 180px
+      "w-full", // Alterado para w-full para preencher o ResizablePanel
       "rounded-r-xl" // Adicionado rounded-r-xl para cantos arredondados
     )}>
       {/* Logo e Título */}

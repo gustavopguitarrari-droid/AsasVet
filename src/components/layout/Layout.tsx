@@ -58,8 +58,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     >
       <ResizablePanel
         ref={sidebarPanelRef} // Atribuir a ref ao ResizablePanel
-        defaultSize={18} // Ajustado de 20 para 18
-        collapsedSize={4} // Mantido em 4% quando recolhido
+        defaultSize={15} // Ajustado de 18 para 15
+        collapsedSize={6} // Ajustado de 4 para 6
         collapsible={true}
         onCollapse={() => setIsNavCollapsed(true)} // Atualiza o estado quando o painel recolhe
         onExpand={() => setIsNavCollapsed(false)}   // Atualiza o estado quando o painel expande
@@ -70,11 +70,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       >
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
       </ResizablePanel>
-      <ResizablePanel className="bg-background"> {/* Adicionado bg-background aqui */}
-        <div className="flex flex-1 flex-col h-full overflow-hidden"> {/* Adicionado h-full aqui */}
+      <ResizablePanel className="bg-background">
+        <div className="flex flex-1 flex-col h-full overflow-hidden">
           <Header />
-          <div className="flex-1 overflow-y-auto p-4"> {/* Restaurado p-4 */}
-            <main className="flex flex-col">{children}</main> {/* Removido min-h-full */}
+          <div className="flex-1 overflow-y-auto p-4">
+            <main className="flex flex-col">{children}</main>
           </div>
           <MadeWithDyad />
         </div>
