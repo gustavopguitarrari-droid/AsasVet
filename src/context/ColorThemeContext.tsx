@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'; // Importar
 import { supabase } from '@/integrations/supabase/client'; // Importar supabase
 import { showError, showSuccess } from '@/utils/toast'; // Importar toasts
 
-type ColorTheme = 'default' | 'orange' | 'blue' | 'green' | 'purple' | 'pink' | 'yellow' | 'red' | 'teal-blue' | 'neutral-modern' | 'nature-vet';
+type ColorTheme = 'default'; // Apenas o tema padrão
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -53,8 +53,12 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const root = window.document.documentElement;
-    // Remove todas as classes de tema existentes
-    root.classList.remove('theme-orange', 'theme-blue', 'theme-green', 'theme-purple', 'theme-pink', 'theme-yellow', 'theme-red', 'theme-teal-blue', 'theme-neutral-modern', 'theme-nature-vet');
+    // Remove todas as classes de tema existentes que começam com 'theme-'
+    root.classList.forEach(cls => {
+      if (cls.startsWith('theme-')) {
+        root.classList.remove(cls);
+      }
+    });
     // Adiciona a classe do tema atual do usuário
     root.classList.add(`theme-${currentColorTheme}`);
   }, [currentColorTheme]); // Depende do tema de cor do usuário
@@ -66,7 +70,11 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
       showError("Faça login para salvar seu tema de cor.");
       // Fallback para aplicar o tema visualmente mesmo sem salvar se não houver usuário
       const root = window.document.documentElement;
-      root.classList.remove('theme-orange', 'theme-blue', 'theme-green', 'theme-purple', 'theme-pink', 'theme-yellow', 'theme-red', 'theme-teal-blue', 'theme-neutral-modern', 'theme-nature-vet');
+      root.classList.forEach(cls => {
+        if (cls.startsWith('theme-')) {
+          root.classList.remove(cls);
+        }
+      });
       root.classList.add(`theme-${theme}`);
     }
   };

@@ -76,54 +76,6 @@ export default {
           "item-bg-8": "hsl(var(--sidebar-item-bg-8))",
           "item-bg-9": "hsl(var(--sidebar-item-bg-9))",
         },
-        // Cores para os novos temas
-        orange: {
-          500: "hsl(28 85% 55%)", // Laranja Pôr do Sol
-        },
-        blue: {
-          500: "hsl(210 80% 45%)", // Azul Oceano
-        },
-        green: {
-          500: "hsl(160 70% 35%)", // Verde Esmeralda
-          400: "hsl(120 80% 40%)", // Verde Vivo
-        },
-        purple: {
-          600: "hsl(270 60% 45%)", // Púrpura Real
-        },
-        pink: {
-          500: "hsl(330 80% 65%)", // Rosa Chiclete
-        },
-        yellow: {
-          500: "hsl(45 90% 55%)", // Amarelo Dourado
-        },
-        red: {
-          500: "hsl(0 80% 45%)", // Vermelho Rubi
-        },
-        "teal-blue": { // NOVO: Azul-Esverdeado Principal
-          500: "hsl(188 39% 38%)",
-        },
-        // Nova paleta de cores para o tema Nature Vet
-        "verde-bambu": {
-          DEFAULT: "hsl(80 40% 76%)", // #C5E1A5
-          darker: "hsl(80 30% 20%)", // Dark mode equivalent
-        },
-        "verde-folha-seca": {
-          DEFAULT: "hsl(80 40% 70%)", // #AED581
-          darker: "hsl(80 40% 60%)", // For gradients
-          lighter: "hsl(80 50% 60%)", // Dark mode equivalent
-        },
-        "creme-terra": {
-          DEFAULT: "hsl(50 100% 99%)", // #FFFDE7
-          darker: "hsl(30 10% 15%)", // Dark mode equivalent
-        },
-        "marrom-avela": {
-          DEFAULT: "hsl(20 18% 47%)", // #8D6E63
-          lighter: "hsl(30 10% 90%)", // Dark mode equivalent
-        },
-        "bege-areia": {
-          DEFAULT: "hsl(40 100% 85%)", // #FFECB3
-          darker: "hsl(40 50% 30%)", // Dark mode equivalent
-        },
       },
       borderRadius: {
         lg: "0.75rem", // Aumentado de var(--radius)
