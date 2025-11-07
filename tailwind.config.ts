@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 import defaultTheme from "tailwindcss/defaultTheme"; // Importar defaultTheme
 
 export default {
-  // darkMode: ["class"], // Removido
+  darkMode: ["class"], // Habilitado para que o Tailwind possa aplicar os temas de cor dinamicamente
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
