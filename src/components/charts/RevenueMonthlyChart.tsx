@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTheme } from "next-themes"; // Importar useTheme
+import { useColorTheme } from "@/context/ColorThemeContext"; // Importar useColorTheme
 
 const data = [
   { name: "Jan", receita: 4000 },
@@ -21,9 +21,11 @@ const data = [
 ];
 
 const RevenueMonthlyChart: React.FC = () => {
-  const { theme } = useTheme(); // Obter o tema atual
-  const axisLabelColor = theme === "dark" ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))";
-  const gridLineColor = "hsl(var(--border))"; // A cor da borda já se adapta ao tema
+  const { colorTheme } = useColorTheme(); // Obter o tema atual
+  // As cores do eixo e da grade agora se adaptam automaticamente via CSS,
+  // pois as variáveis CSS são definidas no globals.css para cada tema.
+  const axisLabelColor = "hsl(var(--foreground))";
+  const gridLineColor = "hsl(var(--border))";
 
   return (
     <Card className="rounded-xl">

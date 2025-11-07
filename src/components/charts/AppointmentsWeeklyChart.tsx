@@ -12,7 +12,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useTheme } from "next-themes";
+import { useColorTheme } from "@/context/ColorThemeContext"; // Importar useColorTheme
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
@@ -21,8 +21,10 @@ import { format, subWeeks, startOfWeek, endOfWeek, eachWeekOfInterval, isSameWee
 import { ptBR } from "date-fns/locale";
 
 const AppointmentsWeeklyChart: React.FC = () => {
-  const { theme } = useTheme();
-  const axisLabelColor = theme === "dark" ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))";
+  const { colorTheme } = useColorTheme(); // Obter o tema atual
+  // As cores do eixo e da grade agora se adaptam automaticamente via CSS,
+  // pois as variáveis CSS são definidas no globals.css para cada tema.
+  const axisLabelColor = "hsl(var(--foreground))";
   const gridLineColor = "hsl(var(--border))";
 
   const { user: appUser } = useUser();
