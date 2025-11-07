@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, PawPrint, CalendarDays, Settings, DollarSign, Bed, Stethoscope, FileText } from "lucide-react";
@@ -386,11 +388,11 @@ const Dashboard = () => {
             <img 
               src={user.logoUrl} 
               alt={user.companyName || "Logo da Clínica"} 
-              className="h-24 w-auto mr-4 object-contain" // Ajustado para h-24 w-auto, sem borda e com margem
+              className="h-32 w-auto mr-4 object-contain" // Ajustado para h-32 w-auto
             />
           ) : (
-            <div className="h-24 w-24 flex items-center justify-center bg-muted text-muted-foreground mr-4 rounded-lg shadow-sm">
-              <PawPrint className="h-16 w-16" /> {/* Ícone maior para fallback */}
+            <div className="h-32 w-32 flex items-center justify-center bg-muted text-muted-foreground mr-4 rounded-lg shadow-sm"> {/* Ajustado para h-32 w-32 */}
+              <PawPrint className="h-20 w-20" /> {/* Ícone maior para fallback */}
             </div>
           )}
           
