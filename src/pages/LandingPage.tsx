@@ -149,7 +149,7 @@ const LandingPage: React.FC = () => {
             <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-landingPage-lp-marrom-avela hover:bg-landingPage-lp-marrom-avela/90 text-landingPage-lp-creme-terra text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
               Comece Grátis
             </Link>
-            <a href="#features" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "text-landingPage-lp-creme-terra border-landingPage-lp-creme-terra hover:bg-landingPage-lp-creme-terra/20 hover:text-landingPage-lp-creme-terra text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
+            <a href="#features" className={cn(buttonVariants({ variant: "default", size: "lg" }), "bg-landingPage-lp-verde-bambu hover:bg-landingPage-lp-verde-bambu/90 text-landingPage-lp-marrom-avela text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
               Saiba Mais
             </a>
           </div>
