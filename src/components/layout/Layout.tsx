@@ -34,36 +34,27 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     setIsNavCollapsed(prev => !prev);
   };
 
-  const handleChatButtonClick = () => {
-    setIsChatDialogOpen(true);
-  };
-
-  const handleCashierButtonClick = () => {
-    setIsCashierDialogOpen(true);
-  };
-
   return (
     <ResizablePanelGroup
       direction="horizontal"
       className="flex h-screen w-screen overflow-hidden"
     >
       <ResizablePanel
-        size={isNavCollapsed ? 4 : 15} // Define o tamanho com base no estado
-        minSize={4}
-        maxSize={20}
-        // Removido: collapsible={true}
-        // Removido: onCollapse={() => setIsNavCollapsed(true)}
-        // Removido: onExpand={() => setIsNavCollapsed(false)}
+        defaultSize={4} // Tamanho padrão quando recolhido
+        collapsedSize={4} // Tamanho quando recolhido
+        collapsible={true} // Re-adicionado
+        onCollapse={() => setIsNavCollapsed(true)} // Re-adicionado
+        onExpand={() => setIsNavCollapsed(false)} // Re-adicionado
         className={cn(
           "flex flex-col transition-all duration-300 ease-in-out",
         )}
       >
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
       </ResizablePanel>
-      {/* Removido: <ResizableHandle withHandle /> */}
+      {/* ResizableHandle continua removido */}
       <ResizablePanel
         // O segundo painel se ajusta automaticamente ao espaço restante
-        className="w-full"
+        // Removido: className="w-full"
       >
         <div className="flex flex-1 flex-col overflow-hidden">
           <Header />
