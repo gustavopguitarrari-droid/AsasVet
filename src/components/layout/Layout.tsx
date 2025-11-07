@@ -4,7 +4,7 @@ import React from "react";
 import {
   ResizablePanel,
   ResizablePanelGroup,
-  ResizableHandle,
+  // Removido: ResizableHandle,
 } from "@/components/ui/resizable";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -48,18 +48,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       className="flex h-screen w-screen overflow-hidden"
     >
       <ResizablePanel
-        defaultSize={4} // Tamanho padrão quando recolhido
-        collapsedSize={4} // Tamanho quando recolhido
-        collapsible={true}
-        onCollapse={() => setIsNavCollapsed(true)}
-        onExpand={() => setIsNavCollapsed(false)}
+        size={isNavCollapsed ? 4 : 15} // Define o tamanho com base no estado
+        minSize={4}
+        maxSize={20}
+        // Removido: collapsible={true}
+        // Removido: onCollapse={() => setIsNavCollapsed(true)}
+        // Removido: onExpand={() => setIsNavCollapsed(false)}
         className={cn(
           "flex flex-col transition-all duration-300 ease-in-out",
         )}
       >
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
       </ResizablePanel>
-      <ResizableHandle withHandle />
+      {/* Removido: <ResizableHandle withHandle /> */}
       <ResizablePanel
         // O segundo painel se ajusta automaticamente ao espaço restante
         className="w-full"
