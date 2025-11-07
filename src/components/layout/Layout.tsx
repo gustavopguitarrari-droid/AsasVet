@@ -51,8 +51,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         defaultSize={18}
         collapsedSize={4}
         collapsible={true}
-        minSize={15}
-        maxSize={20}
+        // Removido: minSize={15}
+        // Removido: maxSize={20}
         onCollapse={() => setIsNavCollapsed(true)}
         onExpand={() => setIsNavCollapsed(false)}
         className={cn(

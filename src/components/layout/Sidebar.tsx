@@ -53,7 +53,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
 
   return (
     <div className={cn(
-      "flex flex-col h-full bg-sidebar text-sidebar-foreground border-r",
+      "flex flex-col h-full w-full bg-sidebar text-sidebar-foreground border-r", // Adicionado w-full aqui
       "transition-all duration-300 ease-in-out",
       // Removido: isCollapsed ? "w-[50px]" : "w-full"
     )}>
