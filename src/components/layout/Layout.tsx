@@ -4,7 +4,7 @@ import React from "react";
 import {
   ResizablePanel,
   ResizablePanelGroup,
-  ResizableHandle,
+  // Removido: ResizableHandle,
 } from "@/components/ui/resizable";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -45,7 +45,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <ResizablePanelGroup
       direction="horizontal"
-      className="flex h-screen w-screen overflow-hidden" // ResizablePanelGroup agora é o elemento raiz e ocupa a tela inteira
+      className="flex h-screen w-screen overflow-hidden"
     >
       <ResizablePanel
         defaultSize={18}
@@ -62,10 +62,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       >
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
       </ResizablePanel>
-      <ResizableHandle withHandle />
+      {/* Removido: <ResizableHandle withHandle /> */}
       <ResizablePanel defaultSize={82}>
         <div className="flex flex-1 flex-col overflow-hidden">
-          <Header /> {/* Header movido para dentro do painel de conteúdo principal */}
+          <Header />
           <div className="flex-1 overflow-y-auto p-6">
             <main>{children}</main>
           </div>
