@@ -29,7 +29,7 @@ const availablePlans: Plan[] = [
     features: ["1 Subusuário", "Gerenciamento de Clientes e Pets", "Agenda Básica"],
     stripePriceId: "price_1SPttkF1WTKnJRQoScNCQLjp", // ID do plano Vet Domiciliar
     badgeColorClass: "bg-gray-500",
-    imageUrl: "/public/images/vet-domiciliar-plan-cover.png", // Adicionada a imagem
+    imageUrl: "/public/images/Plano Verde.png", // Adicionada a nova imagem
   },
   {
     id: "clinica-vet",
@@ -135,7 +135,7 @@ const MyPlanSettings: React.FC = () => {
                 </div>
                 {plan.imageUrl && (
                   <div className="mb-4 flex justify-center">
-                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-48 w-auto object-contain" />
+                    <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-72 w-auto object-contain" />
                   </div>
                 )}
                 <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
