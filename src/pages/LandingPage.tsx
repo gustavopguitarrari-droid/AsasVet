@@ -132,7 +132,7 @@ const LandingPage: React.FC = () => {
       <LandingHeader />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center text-center p-8 pt-20 overflow-hidden">
+      <section id="hero" className="relative min-h-screen flex items-center justify-center text-center p-8 pt-20 overflow-hidden">
         {/* Background image with a subtle green overlay */}
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/vet-landing-bg.png')" }}>
           <div className="absolute inset-0 bg-landingPage-lp-verde-folha-seca opacity-70"></div> {/* Green overlay */}
@@ -187,7 +187,7 @@ const LandingPage: React.FC = () => {
               Conheça Nossa História <Leaf className="ml-2 h-5 w-5" />
             </Link>
           </div>
-          <div className="relative h-96 w-full bg-landingPage-lp-verde-bambu rounded-xl shadow-xl overflow-hidden"> {/* Alterado para rounded-xl */}
+          <div className="relative h-96 w-full bg-landingPage-lp-verde-bambu rounded-xl shadow-xl overflow-hidden">
             <img src="/public/images/vet-landing-bg.png" alt="Veterinário cuidando de um animal" className="absolute inset-0 w-full h-full object-cover opacity-70" />
             <div className="absolute inset-0 flex items-center justify-center bg-landingPage-lp-verde-folha-seca/30">
               <PawPrint className="h-24 w-24 text-landingPage-lp-creme-terra opacity-70" />
@@ -263,7 +263,7 @@ const LandingPage: React.FC = () => {
       <section className="py-24 px-8 bg-landingPage-lp-creme-terra text-center">
         <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-verde-folha-seca">O Que Nossos Clientes Dizem</h2>
         <div className="max-w-4xl mx-auto">
-          <Card className="p-10 bg-landingPage-lp-verde-bambu shadow-xl border-l-8 border-landingPage-lp-verde-folha-seca relative rounded-xl"> {/* Adicionado rounded-xl */}
+          <Card className="p-10 bg-landingPage-lp-verde-bambu shadow-xl border-l-8 border-landingPage-lp-verde-folha-seca relative rounded-xl">
             <CardContent className="space-y-6">
               <p className="text-xl md:text-2xl italic text-landingPage-lp-marrom-avela leading-relaxed">
                 "O AsasVet revolucionou a forma como gerencio minha clínica. A agenda é intuitiva, o cadastro de pacientes é completo e o suporte é impecável. Recomendo a todos os colegas!"
