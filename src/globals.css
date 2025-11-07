@@ -609,3 +609,11 @@
   animation: fade-in-up 1s ease-out forwards;
   animation-delay: 0.5s; /* Atraso para aparecer depois do título */
 }
+
+/* NOVO: Esconde o divisor de redimensionamento */
+.PanelResizeHandle {
+  width: 0 !important;
+  min-width: 0 !important;
+  border: none !important;
+  background-color: transparent !important;
+}
