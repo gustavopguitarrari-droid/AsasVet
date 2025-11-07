@@ -24,7 +24,7 @@ interface Plan {
 const availablePlans: Plan[] = [
   {
     id: "vet-domiciliar",
-    name: "Vet Domiciliar",
+    name: "Plano Asas Verdes", // Nome atualizado
     price: "R$ 119,90/mês",
     features: ["1 Subusuário", "Gerenciamento de Clientes e Pets", "Agenda Básica"],
     stripePriceId: "price_1SPttkF1WTKnJRQoScNCQLjp", // ID do plano Vet Domiciliar
@@ -58,7 +58,7 @@ interface PlanSelectionDialogProps {
 
 const MyPlanSettings: React.FC = () => {
   const { user: appUser } = useUser();
-  const currentPlanName = appUser?.planName || "Vet Domiciliar"; // Assume "Vet Domiciliar" como padrão se não houver plano
+  const currentPlanName = appUser?.planName || "Plano Asas Verdes"; // Assume "Plano Asas Verdes" como padrão se não houver plano
 
   const createStripeCheckoutSessionMutation = useMutation({
     mutationFn: async ({ priceId, userId }: { priceId: string; userId: string }) => {
