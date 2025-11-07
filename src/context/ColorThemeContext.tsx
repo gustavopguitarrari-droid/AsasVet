@@ -25,13 +25,12 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
 
   // Update internal state when user.colorTheme changes from outside (e.g., on login/profile fetch)
   useEffect(() => {
-    // Always set to 'nature-vet' as it's the only available theme
-    if (user?.colorTheme && user.colorTheme !== internalColorTheme) {
-      setInternalColorTheme(user.colorTheme as ColorTheme);
-    } else if (!user?.colorTheme && internalColorTheme !== initialTheme) {
-      setInternalColorTheme(initialTheme);
+    // Prioritize user's saved theme, otherwise use the initial default theme
+    const themeToApply = user?.colorTheme || initialTheme;
+    if (themeToApply !== internalColorTheme) {
+      setInternalColorTheme(themeToApply as ColorTheme);
     }
-  }, [user?.colorTheme, internalColorTheme, initialTheme]);
+  }, [user?.colorTheme, initialTheme, internalColorTheme]); // Depend on user.colorTheme and initialTheme
 
 
   // Mutação para atualizar o tema de cor no perfil do usuário
