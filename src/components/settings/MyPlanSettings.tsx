@@ -141,7 +141,7 @@ const MyPlanSettings: React.FC = () => {
                     <img src={plan.imageUrl} alt={`Capa do plano ${plan.name}`} className="h-[500px] w-auto object-contain" />
                   </div>
                 )}
-                <ul className="space-y-2 text-sm text-muted-foreground mb-4">
+                <ul className="space-y-2 text-sm text-muted-foreground mb-0"> {/* Alterado mb-4 para mb-0 */}
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-center">
                       <CheckCircle className="h-4 w-4 mr-2 text-green-500" /> {feature}
