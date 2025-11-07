@@ -24,7 +24,7 @@ const FloatingChatButton: React.FC<FloatingChatButtonProps> = ({ onClick }) => {
             <span className="sr-only">Abrir Chat de Atendimento</span>
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="left">
+        <TooltipContent side="left" className="rounded-lg shadow-md"> {/* Adicionado rounded-lg e shadow-md */}
           Abrir Chat de Atendimento
         </TooltipContent>
       </Tooltip>

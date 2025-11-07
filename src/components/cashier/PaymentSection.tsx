@@ -49,15 +49,15 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
   const change = parseFloat(amountPaid) - totalAmount;
 
   return (
-    <div className="space-y-4 p-4 border rounded-md bg-card">
+    <div className="space-y-4 p-4 border rounded-lg bg-card shadow-md"> {/* Adicionado rounded-lg e shadow-md */}
       <h3 className="text-xl font-semibold">Pagamento</h3>
       <div className="grid gap-2">
         <Label htmlFor="payment-method">Método de Pagamento</Label>
         <Select value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod}>
-          <SelectTrigger id="payment-method">
+          <SelectTrigger id="payment-method" className="rounded-lg"> {/* Adicionado rounded-lg */}
             <SelectValue placeholder="Selecione o método de pagamento" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-lg shadow-md"> {/* Adicionado rounded-lg e shadow-md */}
             {paymentMethods.map((method) => (
               <SelectItem key={method.value} value={method.value}>
                 <div className="flex items-center">
@@ -81,6 +81,7 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
             onChange={(e) => setAmountPaid(e.target.value)}
             min="0"
             step="0.01"
+            className="rounded-lg" // Adicionado rounded-lg
           />
           {totalAmount > 0 && parseFloat(amountPaid) >= totalAmount && (
             <p className="text-sm text-muted-foreground">
@@ -96,10 +97,10 @@ const PaymentSection: React.FC<PaymentSectionProps> = ({
       </div>
 
       <div className="flex space-x-2 mt-4">
-        <Button variant="outline" onClick={onCancelSale} className="flex-1">
+        <Button variant="outline" onClick={onCancelSale} className="flex-1 rounded-lg"> {/* Adicionado rounded-lg */}
           Cancelar Venda
         </Button>
-        <Button onClick={handleFinalize} className="flex-1" disabled={!hasItemsInCart || (selectedPaymentMethod === "Dinheiro" && parseFloat(amountPaid) < totalAmount)}>
+        <Button onClick={handleFinalize} className="flex-1 rounded-lg" disabled={!hasItemsInCart || (selectedPaymentMethod === "Dinheiro" && parseFloat(amountPaid) < totalAmount)}> {/* Adicionado rounded-lg */}
           <CheckCircle className="h-4 w-4 mr-2" /> Finalizar Venda
         </Button>
       </div>

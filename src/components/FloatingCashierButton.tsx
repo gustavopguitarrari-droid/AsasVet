@@ -23,7 +23,7 @@ const FloatingCashierButton: React.FC<FloatingCashierButtonProps> = ({ onClick }
             <span className="sr-only">Abrir Caixa</span>
           </Button>
         </TooltipTrigger>
-        <TooltipContent side="left">
+        <TooltipContent side="left" className="rounded-lg shadow-md"> {/* Adicionado rounded-lg e shadow-md */}
           Abrir Caixa
         </TooltipContent>
       </Tooltip>

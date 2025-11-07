@@ -617,3 +617,16 @@
   border: none !important;
   background-color: transparent !important;
 }
+
+/* Estilo para o spinner de carregamento */
+.loading-spinner {
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

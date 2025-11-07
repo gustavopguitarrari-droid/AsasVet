@@ -33,7 +33,7 @@ const UserProfile = () => {
 
   if (!appUser) { // Usar appUser aqui
     return (
-      <Button variant="ghost" onClick={() => navigate("/login")}>
+      <Button variant="ghost" onClick={() => navigate("/login")} className="rounded-lg"> {/* Adicionado rounded-lg */}
         Login
       </Button>
     );
@@ -59,7 +59,7 @@ const UserProfile = () => {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end">
+      <DropdownMenuContent className="w-56 rounded-lg shadow-md" align="end"> {/* Adicionado rounded-lg e shadow-md */}
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{appUser.name}</p>
@@ -69,14 +69,14 @@ const UserProfile = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild className="rounded-md"> {/* Adicionado rounded-md */}
           <Link to="/profile" className="flex items-center">
             <UserCircle className="mr-2 h-4 w-4" />
             Perfil
           </Link>
         </DropdownMenuItem>
         {appUser.role === "Administrador" && ( // Renderiza "Configurações" apenas para Administradores
-          <DropdownMenuItem asChild>
+          <DropdownMenuItem asChild className="rounded-md"> {/* Adicionado rounded-md */}
             <Link to="/settings" className="flex items-center">
               <Settings className="mr-2 h-4 w-4" />
               Configurações
@@ -84,7 +84,7 @@ const UserProfile = () => {
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className="flex items-center">
+        <DropdownMenuItem onClick={handleLogout} className="flex items-center rounded-md"> {/* Adicionado rounded-md */}
           <LogOut className="mr-2 h-4 w-4" />
           Sair
         </DropdownMenuItem>

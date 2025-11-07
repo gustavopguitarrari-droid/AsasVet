@@ -67,6 +67,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         onExpand={() => setIsNavCollapsed(false)}   // Atualiza o estado quando o painel expande
         className={cn(
           "flex flex-col transition-all duration-300 ease-in-out",
+          "rounded-r-xl shadow-lg" // Adicionado rounded-r-xl e shadow-lg
         )}
       >
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
@@ -74,7 +75,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <ResizablePanel>
         <div className="flex flex-1 flex-col overflow-hidden">
           <Header />
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-6"> {/* Mantido p-6 para o conteúdo principal */}
             <main>{children}</main>
           </div>
           <MadeWithDyad />

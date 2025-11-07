@@ -12,7 +12,7 @@ const LandingHeader: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-creme-terra/90 backdrop-blur-sm border-b border-marrom-avela/20 p-4 flex items-center justify-between shadow-sm theme-nature-vet">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-creme-terra/90 backdrop-blur-sm border-b border-marrom-avela/20 p-4 flex items-center justify-between shadow-lg rounded-b-xl theme-nature-vet"> {/* Adicionado shadow-lg e rounded-b-xl */}
       {/* Left side: Logo */}
       <div className="flex-shrink-0">
         <Link to="/" className="flex items-center" onClick={handleScrollToTop}>

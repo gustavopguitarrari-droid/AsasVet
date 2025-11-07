@@ -25,7 +25,7 @@ const LiveClockCalendar: React.FC = () => {
   return (
     <div className={cn(
       "flex items-center space-x-2 text-sm font-medium text-muted-foreground",
-      "bg-muted/50 px-3 py-1.5 rounded-md shadow-sm"
+      "bg-muted/50 px-3 py-1.5 rounded-lg shadow-sm" // Adicionado rounded-lg
     )}>
       <CalendarDays className="h-4 w-4" />
       <span>{formattedDate}</span>

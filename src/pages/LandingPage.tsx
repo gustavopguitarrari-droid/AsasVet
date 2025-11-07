@@ -143,7 +143,7 @@ const LandingPage: React.FC = () => {
               Conheça Nossa História <Leaf className="ml-2 h-5 w-5" />
             </Link>
           </div>
-          <div className="relative h-96 w-full bg-verde-bambu rounded-lg shadow-xl overflow-hidden">
+          <div className="relative h-96 w-full bg-verde-bambu rounded-xl shadow-xl overflow-hidden"> {/* Alterado para rounded-xl */}
             <img src="/public/images/vet-landing-bg.png" alt="Veterinário cuidando de um animal" className="absolute inset-0 w-full h-full object-cover opacity-70" />
             <div className="absolute inset-0 flex items-center justify-center bg-verde-folha-seca/30">
               <PawPrint className="h-24 w-24 text-creme-terra opacity-70" />
@@ -172,7 +172,7 @@ const LandingPage: React.FC = () => {
       <section className="py-24 px-8 bg-verde-bambu text-center">
         <h2 className="text-4xl md:text-5xl font-bold mb-16 text-creme-terra">O Que Nossos Clientes Dizem</h2>
         <div className="max-w-4xl mx-auto">
-          <Card className="p-10 bg-creme-terra shadow-xl border-l-8 border-verde-folha-seca relative">
+          <Card className="p-10 bg-creme-terra shadow-xl border-l-8 border-verde-folha-seca relative rounded-xl"> {/* Adicionado rounded-xl */}
             <CardContent className="space-y-6">
               <p className="text-xl md:text-2xl italic text-marrom-avela leading-relaxed">
                 "O AsasVet revolucionou a forma como gerencio minha clínica. A agenda é intuitiva, o cadastro de pacientes é completo e o suporte é impecável. Recomendo a todos os colegas!"

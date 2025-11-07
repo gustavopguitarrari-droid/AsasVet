@@ -57,7 +57,7 @@ const Header: React.FC<HeaderProps> = () => { // Props removidas
   return (
     <header className={cn(
       "flex items-center justify-between border-b bg-background p-4 shadow-sm",
-      // Removido: "h-auto"
+      "rounded-bl-xl rounded-tr-xl" // Adicionado rounded-bl-xl e rounded-tr-xl
     )}>
       <h1 className="text-2xl font-semibold">{getTitle()}</h1>
       <div className="flex items-center space-x-2">

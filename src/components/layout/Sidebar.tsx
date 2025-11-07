@@ -53,13 +53,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
 
   return (
     <div className={cn(
-      "flex flex-col h-full bg-sidebar text-sidebar-foreground", // Removido 'border-r' daqui
+      "flex flex-col h-full bg-sidebar text-sidebar-foreground",
       "transition-all duration-300 ease-in-out",
-      isCollapsed ? "w-[60px]" : "w-[200px]" // Ajusta a largura com base no estado
+      isCollapsed ? "w-[60px]" : "w-[200px]",
+      "rounded-r-xl" // Adicionado rounded-r-xl para cantos arredondados
     )}>
       {/* Logo e Título */}
       <div className={cn(
-        "flex items-center h-16 px-2 border-b",
+        "flex items-center h-16 px-4 border-b border-sidebar-border", // Adicionado border-sidebar-border
         isCollapsed ? "justify-center" : "justify-start"
       )}>
         <Link to="/painel" className="flex items-center space-x-2">
@@ -77,7 +78,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
               asChild
               variant="ghost"
               className={cn(
-                "w-full justify-start h-10",
+                "w-full justify-start h-10 rounded-lg", // Adicionado rounded-lg
                 "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 isActive && "bg-sidebar-primary text-sidebar-primary-foreground",
                 isCollapsed ? "px-0 justify-center" : "px-3"
@@ -102,14 +103,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggleCollapse }) => {
       </nav>
 
       {/* Botão de Colapso */}
-      <div className="p-2 border-t">
+      <div className="p-2 border-t border-sidebar-border"> {/* Adicionado border-sidebar-border */}
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
               onClick={onToggleCollapse}
-              className="w-full h-10 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+              className="w-full h-10 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" // Adicionado rounded-lg
             >
               {isCollapsed ? (
                 <ArrowRightToLine className="h-5 w-5" />

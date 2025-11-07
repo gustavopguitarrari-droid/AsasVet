@@ -174,8 +174,8 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-full md:w-[700px] lg:w-[900px] flex flex-col">
-        <SheetHeader>
+      <SheetContent side="right" className="w-full md:w-[700px] lg:w-[900px] flex flex-col rounded-l-xl shadow-lg"> {/* Adicionado rounded-l-xl e shadow-lg */}
+        <SheetHeader className="pb-4"> {/* Adicionado padding inferior */}
           <SheetTitle className="flex items-center">
             <ShoppingCart className="h-5 w-5 mr-2" /> Caixa
           </SheetTitle>
@@ -211,8 +211,8 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <SheetFooter className="pt-4">
-          <Button variant="outline" onClick={onClose}>
+        <SheetFooter className="pt-4"> {/* Adicionado padding superior */}
+          <Button variant="outline" onClick={onClose} className="rounded-lg"> {/* Adicionado rounded-lg */}
             <X className="h-4 w-4 mr-2" /> Fechar
           </Button>
         </SheetFooter>

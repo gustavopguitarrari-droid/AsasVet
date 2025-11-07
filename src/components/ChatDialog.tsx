@@ -66,8 +66,8 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-full md:w-[450px] flex flex-col"> {/* Ajustado para SheetContent e largura */}
-        <SheetHeader>
+      <SheetContent side="right" className="w-full md:w-[450px] flex flex-col rounded-l-xl shadow-lg"> {/* Ajustado para SheetContent, largura e adicionado rounded-l-xl e shadow-lg */}
+        <SheetHeader className="pb-4"> {/* Adicionado padding inferior */}
           <SheetTitle className="flex items-center">
             <MessageSquareText className="h-5 w-5 mr-2" /> Atendimento ao Cliente
           </SheetTitle>
@@ -76,7 +76,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
           </SheetDescription>
         </SheetHeader>
 
-        <ScrollArea className="flex-1 p-4 border rounded-md bg-muted/20 mb-4">
+        <ScrollArea className="flex-1 p-4 border rounded-lg bg-muted/20 mb-4 shadow-inner"> {/* Alterado para rounded-lg e shadow-inner */}
           <div className="flex flex-col space-y-2">
             {messages.length === 0 && (
               <p className="text-center text-muted-foreground text-sm">
@@ -89,7 +89,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
                 className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[70%] p-2 rounded-lg ${
+                  className={`max-w-[70%] p-3 rounded-xl ${ // Alterado para rounded-xl e p-3
                     msg.sender === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-secondary text-secondary-foreground'
@@ -106,7 +106,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
           </div>
         </ScrollArea>
 
-        <SheetFooter className="flex-row items-center space-x-2">
+        <SheetFooter className="flex-row items-center space-x-2 pt-4"> {/* Adicionado padding superior */}
           <Input
             placeholder="Digite sua mensagem..."
             value={inputMessage}
@@ -116,9 +116,9 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
                 handleSendMessage();
               }
             }}
-            className="flex-1"
+            className="flex-1 rounded-lg" // Adicionado rounded-lg
           />
-          <Button type="submit" onClick={handleSendMessage} size="icon">
+          <Button type="submit" onClick={handleSendMessage} size="icon" className="rounded-lg"> {/* Adicionado rounded-lg */}
             <Send className="h-4 w-4" />
             <span className="sr-only">Enviar</span>
           </Button>
