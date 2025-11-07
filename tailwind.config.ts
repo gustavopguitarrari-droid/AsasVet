@@ -76,6 +76,13 @@ export default {
           "item-bg-8": "hsl(var(--sidebar-item-bg-8))",
           "item-bg-9": "hsl(var(--sidebar-item-bg-9))",
         },
+        landingPage: { // NOVO: Cores específicas para a Landing Page
+          "lp-verde-bambu": "hsl(var(--lp-verde-bambu))",
+          "lp-verde-folha-seca": "hsl(var(--lp-verde-folha-seca))",
+          "lp-creme-terra": "hsl(var(--lp-creme-terra))",
+          "lp-marrom-avela": "hsl(var(--lp-marrom-avela))",
+          "lp-bege-areia": "hsl(var(--lp-bege-areia))",
+        },
       },
       borderRadius: {
         lg: "0.75rem", // Aumentado de var(--radius)

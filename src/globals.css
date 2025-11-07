@@ -203,6 +203,13 @@
     --event-exame: 90 40% 40%;
     --event-retorno: 90 40% 30%;
     --event-outros: 0 0% 40%;
+
+    /* NOVO: Cores específicas para a Landing Page */
+    --lp-verde-bambu: 90 40% 70%;
+    --lp-verde-folha-seca: 90 40% 67%;
+    --lp-creme-terra: 50 100% 99%;
+    --lp-marrom-avela: 20 20% 47%;
+    --lp-bege-areia: 40 100% 85%;
   }
 }
 
