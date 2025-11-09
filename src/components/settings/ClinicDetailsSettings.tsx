@@ -215,6 +215,50 @@ const ClinicDetailsSettings: React.FC = () => {
           Gerencie o nome, logo, informações de contato e endereço da sua clínica.
         </p>
 
+        {/* Seção de Logo da Clínica - MOVIDA PARA O INÍCIO */}
+        <div className="flex flex-col items-center space-y-4 mt-6">
+          <Label className="text-lg font-semibold flex items-center">
+            <ImageIcon className="h-5 w-5 mr-2" /> Logo da Clínica
+          </Label>
+          <Avatar className="h-32 w-32 border-4 border-primary shadow-lg">
+            {previewUrl ? (
+              <AvatarImage src={previewUrl} alt="Logo da Clínica" />
+            ) : (
+              <AvatarFallback className="bg-muted text-muted-foreground">
+                <ImageIcon className="h-16 w-16" />
+              </AvatarFallback>
+            )}
+          </Avatar>
+          <div className="grid w-full max-w-sm items-center gap-1.5">
+            <Label htmlFor="logo-upload">Escolher Logo</Label>
+            <Input
+              id="logo-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              disabled={isSubmitting}
+            />
+          </div>
+          <div className="flex space-x-2 mt-4">
+            <Button
+              onClick={handleUploadLogo}
+              disabled={!selectedFile || isSubmitting}
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              {isSubmitting ? "Enviando..." : "Salvar Logo"}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleRemoveLogo}
+              disabled={!user?.logoUrl || isSubmitting}
+              className="text-destructive hover:bg-destructive/10"
+            >
+              <XCircle className="h-4 w-4 mr-2" /> Remover Logo
+            </Button>
+          </div>
+        </div>
+
         {/* Campo para Nome do Empreendimento */}
         <EditableField
           label="Nome do Empreendimento"
@@ -287,49 +331,6 @@ const ClinicDetailsSettings: React.FC = () => {
           icon={MapPin}
           type="text"
         />
-
-        <div className="flex flex-col items-center space-y-4 mt-6">
-          <Label className="text-lg font-semibold flex items-center">
-            <ImageIcon className="h-5 w-5 mr-2" /> Logo da Clínica
-          </Label>
-          <Avatar className="h-32 w-32 border-4 border-primary shadow-lg">
-            {previewUrl ? (
-              <AvatarImage src={previewUrl} alt="Logo da Clínica" />
-            ) : (
-              <AvatarFallback className="bg-muted text-muted-foreground">
-                <ImageIcon className="h-16 w-16" />
-              </AvatarFallback>
-            )}
-          </Avatar>
-          <div className="grid w-full max-w-sm items-center gap-1.5">
-            <Label htmlFor="logo-upload">Escolher Logo</Label>
-            <Input
-              id="logo-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              ref={fileInputRef}
-              disabled={isSubmitting}
-            />
-          </div>
-          <div className="flex space-x-2 mt-4">
-            <Button
-              onClick={handleUploadLogo}
-              disabled={!selectedFile || isSubmitting}
-            >
-              <Upload className="h-4 w-4 mr-2" />
-              {isSubmitting ? "Enviando..." : "Salvar Logo"}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleRemoveLogo}
-              disabled={!user?.logoUrl || isSubmitting}
-              className="text-destructive hover:bg-destructive/10"
-            >
-              <XCircle className="h-4 w-4 mr-2" /> Remover Logo
-            </Button>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
