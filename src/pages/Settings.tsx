@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import MyPlanSettings from "@/components/settings/MyPlanSettings";
-import LogoUploadSettings from "@/components/settings/LogoUploadSettings";
+import ClinicDetailsSettings from "@/components/settings/ClinicDetailsSettings"; // Importar o componente renomeado
 import ImportDataSettings from "@/components/settings/ImportDataSettings";
 
 const Settings = () => {
@@ -67,7 +67,7 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="personalization" className="mt-4">
-          <LogoUploadSettings />
+          <ClinicDetailsSettings /> {/* Usar o componente renomeado */}
         </TabsContent>
       </Tabs>
     </div>

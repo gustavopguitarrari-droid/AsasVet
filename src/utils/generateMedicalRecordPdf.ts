@@ -212,10 +212,18 @@ export const generateMedicalRecordPdf = async ({ appointment, medicalRecord, log
             doc.setTextColor(lightTextColor);
             doc.text(`Página ${i} de ${pageCount}`, margin, 297 - margin + 5);
             
-            const footerText = [
-              clinicDetails.address,
-              `Tel: ${clinicDetails.phone} | Email: ${clinicDetails.email}`
-            ].filter(Boolean).join(' | ');
+            const footerLines = [];
+            if (clinicDetails.address && clinicDetails.address.trim() !== '') {
+              footerLines.push(clinicDetails.address);
+            }
+            if (clinicDetails.phone && clinicDetails.phone.trim() !== '') {
+              footerLines.push(`Tel: ${clinicDetails.phone}`);
+            }
+            if (clinicDetails.email && clinicDetails.email.trim() !== '') {
+              footerLines.push(`Email: ${clinicDetails.email}`);
+            }
+
+            const footerText = footerLines.filter(Boolean).join(' | ');
             doc.text(footerText, 210 - margin, 297 - margin + 5, { align: 'right' });
           }
         };

@@ -5,16 +5,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Image as ImageIcon, Upload, XCircle, Building2, Landmark } from 'lucide-react'; // Adicionado Landmark icon
+import { Image as ImageIcon, Upload, XCircle, Building2, Landmark, Phone, Home, MapPin } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadLogoToSupabase, deleteLogoFromSupabase } from "@/utils/supabaseStorage";
-import EditableField from "@/components/EditableField"; // Importar EditableField
+import EditableField from "@/components/EditableField";
+import { lookupCep } from "@/utils/cepLookup"; // Importar lookupCep
 
-const LogoUploadSettings: React.FC = () => {
+const ClinicDetailsSettings: React.FC = () => {
   const { user, setUser } = useUser();
   const queryClient = useQueryClient();
 
@@ -24,7 +25,6 @@ const LogoUploadSettings: React.FC = () => {
 
   // Atualiza o preview quando o logo do usuário muda no contexto
   useEffect(() => {
-    console.log("LogoUploadSettings: user.logoUrl changed to", user?.logoUrl);
     setPreviewUrl(user?.logoUrl || null);
   }, [user?.logoUrl]);
 
@@ -38,54 +38,14 @@ const LogoUploadSettings: React.FC = () => {
     }
   }, [user]);
 
-
-  const updateProfileLogoMutation = useMutation({
-    mutationFn: async (newLogoUrl: string | null) => {
+  const updateProfileMutation = useMutation({
+    mutationFn: async (updates: { [key: string]: any }) => {
       if (!user?.id) {
-        console.error("updateProfileLogoMutation: User not authenticated.");
         throw new Error("User not authenticated.");
       }
-      console.log("updateProfileLogoMutation: Attempting to update profile with logo_url:", newLogoUrl);
-
       const { data, error } = await supabase
         .from('profiles')
-        .update({ logo_url: newLogoUrl })
-        .eq('id', user.id)
-        .select()
-        .single();
-      if (error) {
-        console.error("updateProfileLogoMutation: Error updating profile in DB:", error);
-        throw error;
-      }
-      console.log("updateProfileLogoMutation: Profile updated successfully in DB:", data);
-      return data;
-    },
-    onSuccess: (data) => {
-      console.log("updateProfileLogoMutation: onSuccess, data:", data);
-      setUser((prevUser) => ({
-        ...prevUser!,
-        logoUrl: data.logo_url || undefined,
-      }));
-      queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] });
-      showSuccess("Logo atualizado com sucesso!");
-      setSelectedFile(null); // Limpa o arquivo selecionado após o upload
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ''; // Limpa o input de arquivo
-      }
-    },
-    onError: (error) => {
-      console.error("updateProfileLogoMutation: onError, error:", error);
-      showError(`Erro ao atualizar logo: ${error.message}`);
-    },
-  });
-
-  // Nova mutação para atualizar o nome da empresa
-  const updateCompanyNameMutation = useMutation({
-    mutationFn: async (newCompanyName: string) => {
-      if (!user?.id) throw new Error("User not authenticated.");
-      const { data, error } = await supabase
-        .from('profiles')
-        .update({ company_name: newCompanyName })
+        .update(updates)
         .eq('id', user.id)
         .select()
         .single();
@@ -96,32 +56,44 @@ const LogoUploadSettings: React.FC = () => {
       setUser((prevUser) => ({
         ...prevUser!,
         companyName: data.company_name || undefined,
+        logoUrl: data.logo_url || undefined,
+        phone: data.phone || undefined,
+        addressCep: data.address_cep || undefined,
+        addressStreet: data.address_street || undefined,
+        addressNumber: data.address_number || undefined,
+        addressComplement: data.address_complement || undefined,
+        addressNeighborhood: data.address_neighborhood || undefined,
+        addressCity: data.address_city || undefined,
+        addressState: data.address_state || undefined,
       }));
       queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] });
-      showSuccess("Nome do empreendimento atualizado com sucesso!");
+      showSuccess("Detalhes da clínica atualizados com sucesso!");
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     },
     onError: (error) => {
-      showError(`Erro ao atualizar nome do empreendimento: ${error.message}`);
+      showError(`Erro ao atualizar detalhes da clínica: ${error.message}`);
     },
   });
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    console.log("handleFileChange: Selected file:", file);
     if (file) {
       if (!file.type.startsWith('image/')) {
         showError("Por favor, selecione um arquivo de imagem válido.");
         setSelectedFile(null);
-        setPreviewUrl(user?.logoUrl || null); // Reverte para o logo atual do usuário
+        setPreviewUrl(user?.logoUrl || null);
         return;
       }
       if (file.size > 5 * 1024 * 1024) { // Limite de 5MB para logos
         showError("A imagem é muito grande. O tamanho máximo permitido é 5MB.");
         setSelectedFile(null);
-        setPreviewUrl(user?.logoUrl || null); // Reverte para o logo atual do usuário
+        setPreviewUrl(user?.logoUrl || null);
         return;
       }
-      setSelectedFile(file); // Set the selected file
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         if (typeof reader.result === 'string') {
@@ -134,120 +106,189 @@ const LogoUploadSettings: React.FC = () => {
       reader.readAsDataURL(file);
     } else {
       setSelectedFile(null);
-      setPreviewUrl(user?.logoUrl || null); // Reverte para o logo atual do usuário
+      setPreviewUrl(user?.logoUrl || null);
     }
   };
 
   const handleUploadLogo = async () => {
-    console.log("handleUploadLogo: Initiating upload process.");
-    if (!user?.id || !user?.organizationId) { // Usar organizationId
+    if (!user?.id || !user?.organizationId) {
       showError("Usuário não autenticado ou ID da organização não disponível.");
-      console.error("handleUploadLogo: User ID or Organization ID is missing.");
       return;
     }
     if (!selectedFile) {
       showError("Nenhum arquivo selecionado para upload.");
-      console.warn("handleUploadLogo: No file selected.");
       return;
     }
 
     const reader = new FileReader();
     reader.onloadend = async () => {
       if (typeof reader.result === 'string') {
-        console.log("handleUploadLogo: FileReader finished, result type string.");
         try {
-          // 1. Delete the old logo from storage if it exists
           if (user.logoUrl) {
-            console.log("handleUploadLogo: Old logo detected, attempting to delete:", user.logoUrl);
-            const deleteSuccess = await deleteLogoFromSupabase(user.logoUrl);
-            if (!deleteSuccess) {
-              console.warn("handleUploadLogo: Failed to delete old logo, proceeding with new upload.");
-              // Optionally, you could throw an error here or show a warning to the user
-            }
+            await deleteLogoFromSupabase(user.logoUrl);
           }
-
-          // 2. Upload the new logo (which will now have a unique filename)
-          const newLogoUrl = await uploadLogoToSupabase(reader.result, user.organizationId); // Pass organizationId
+          const newLogoUrl = await uploadLogoToSupabase(reader.result, user.organizationId);
           
           if (newLogoUrl) {
-            console.log("handleUploadLogo: New logo uploaded to storage, URL:", newLogoUrl);
-            updateProfileLogoMutation.mutate(newLogoUrl);
+            updateProfileMutation.mutate({ logo_url: newLogoUrl });
           } else {
             showError("Falha ao fazer upload do logo para o storage.");
-            console.error("handleUploadLogo: uploadLogoToSupabase returned null.");
           }
         } catch (err: any) {
           showError(`Erro no upload: ${err.message}`);
-          console.error("handleUploadLogo: Error during uploadLogoToSupabase or mutation:", err);
         }
       } else {
-        console.error("handleUploadLogo: FileReader result is not a string.");
         showError("Erro ao ler o arquivo de imagem.");
       }
     };
     reader.onerror = () => {
-      console.error("handleUploadLogo: FileReader error.");
       showError("Erro ao ler o arquivo de imagem.");
     };
     reader.readAsDataURL(selectedFile);
   };
 
   const handleRemoveLogo = async () => {
-    console.log("handleRemoveLogo: Initiating remove process.");
-    if (!user?.id || !user?.organizationId) { // Usar organizationId
+    if (!user?.id || !user?.organizationId) {
       showError("Usuário não autenticado ou ID da organização não disponível.");
-      console.error("handleRemoveLogo: User ID or Organization ID is missing.");
       return;
     }
     if (!user.logoUrl) {
       showSuccess("Nenhum logo para remover.");
-      console.warn("handleRemoveLogo: No logo URL found in user context.");
       return;
     }
 
     try {
       const success = await deleteLogoFromSupabase(user.logoUrl);
       if (success) {
-        console.log("handleRemoveLogo: Logo deleted from storage.");
-        updateProfileLogoMutation.mutate(null); // Remove o URL do logo do perfil
+        updateProfileMutation.mutate({ logo_url: null });
       } else {
         showError("Falha ao remover o logo do storage.");
-        console.error("handleRemoveLogo: deleteLogoFromSupabase returned false.");
       }
     } catch (err: any) {
       showError(`Erro na remoção: ${err.message}`);
-      console.error("handleRemoveLogo: Error during deleteLogoFromSupabase or mutation:", err);
     }
   };
 
-  const handleSaveCompanyName = (newName: string) => {
-    updateCompanyNameMutation.mutate(newName);
+  const handleSaveField = (fieldName: string, newValue: string) => {
+    updateProfileMutation.mutate({ [fieldName]: newValue });
   };
 
-  const isSubmitting = updateProfileLogoMutation.isPending || updateCompanyNameMutation.isPending;
+  const handleSaveCep = async (newCep: string) => {
+    const cleanCep = newCep.replace(/\D/g, '');
+    if (cleanCep.length === 8) {
+      const addressData = await lookupCep(cleanCep);
+      if (addressData) {
+        updateProfileMutation.mutate({
+          address_cep: cleanCep,
+          address_street: addressData.logradouro,
+          address_neighborhood: addressData.bairro,
+          address_city: addressData.localidade,
+          address_state: addressData.uf,
+        });
+        showSuccess("Endereço preenchido automaticamente!");
+      } else {
+        showError("CEP não encontrado ou inválido.");
+        updateProfileMutation.mutate({
+          address_cep: cleanCep,
+          address_street: null,
+          address_neighborhood: null,
+          address_city: null,
+          address_state: null,
+        });
+      }
+    } else {
+      updateProfileMutation.mutate({ address_cep: cleanCep });
+    }
+  };
+
+  const isSubmitting = updateProfileMutation.isPending;
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Building2 className="mr-2 h-5 w-5" /> Personalização da Clínica
+          <Building2 className="mr-2 h-5 w-5" /> Detalhes da Clínica
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <p className="text-muted-foreground">
-          Gerencie o nome e o logo da sua clínica.
+          Gerencie o nome, logo, informações de contato e endereço da sua clínica.
         </p>
 
         {/* Campo para Nome do Empreendimento */}
         <EditableField
           label="Nome do Empreendimento"
           value={user?.companyName || ''}
-          onSave={handleSaveCompanyName}
-          icon={Landmark} // Usando o ícone Landmark
+          onSave={(val) => handleSaveField('company_name', val)}
+          icon={Landmark}
           className="mb-6"
         />
 
-        <div className="flex flex-col items-center space-y-4">
+        {/* Campo para Telefone */}
+        <EditableField
+          label="Telefone"
+          value={user?.phone || ''}
+          onSave={(val) => handleSaveField('phone', val)}
+          icon={Phone}
+          type="text"
+          className="mb-6"
+        />
+
+        {/* Seção de Endereço */}
+        <h3 className="text-lg font-semibold mt-6 mb-4 flex items-center">
+          <Home className="h-5 w-5 mr-2 text-muted-foreground" /> Endereço da Clínica
+        </h3>
+        <EditableField
+          label="CEP"
+          value={user?.addressCep || ''}
+          onSave={handleSaveCep}
+          icon={MapPin}
+          type="text"
+        />
+        <EditableField
+          label="Rua"
+          value={user?.addressStreet || ''}
+          onSave={(val) => handleSaveField('address_street', val)}
+          icon={MapPin}
+          type="text"
+        />
+        <EditableField
+          label="Número"
+          value={user?.addressNumber || ''}
+          onSave={(val) => handleSaveField('address_number', val)}
+          icon={MapPin}
+          type="text"
+        />
+        <EditableField
+          label="Complemento"
+          value={user?.addressComplement || ''}
+          onSave={(val) => handleSaveField('address_complement', val)}
+          icon={MapPin}
+          type="text"
+        />
+        <EditableField
+          label="Bairro"
+          value={user?.addressNeighborhood || ''}
+          onSave={(val) => handleSaveField('address_neighborhood', val)}
+          icon={MapPin}
+          type="text"
+        />
+        <EditableField
+          label="Cidade"
+          value={user?.addressCity || ''}
+          onSave={(val) => handleSaveField('address_city', val)}
+          icon={MapPin}
+          type="text"
+        />
+        <EditableField
+          label="Estado (UF)"
+          value={user?.addressState || ''}
+          onSave={(val) => handleSaveField('address_state', val)}
+          icon={MapPin}
+          type="text"
+        />
+
+        <div className="flex flex-col items-center space-y-4 mt-6">
           <Label className="text-lg font-semibold flex items-center">
             <ImageIcon className="h-5 w-5 mr-2" /> Logo da Clínica
           </Label>
@@ -294,4 +335,4 @@ const LogoUploadSettings: React.FC = () => {
   );
 };
 
-export default LogoUploadSettings;
+export default ClinicDetailsSettings;

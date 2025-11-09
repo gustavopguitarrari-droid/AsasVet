@@ -500,7 +500,15 @@ const Appointments = () => {
         logoUrl: appUser?.logoUrl,
         clinicDetails: {
           companyName: appUser?.companyName || 'AsasVet',
-          address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+          address: [
+            appUser?.addressStreet,
+            appUser?.addressNumber,
+            appUser?.addressComplement,
+            appUser?.addressNeighborhood,
+            appUser?.addressCity,
+            appUser?.addressState,
+            appUser?.addressCep,
+          ].filter(Boolean).join(', '),
           phone: appUser?.phone || '',
           email: appUser?.email || '',
           veterinarianCrmv: appUser?.crmv || '',
@@ -560,7 +568,15 @@ const Appointments = () => {
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: [
+          appUser?.addressStreet,
+          appUser?.addressNumber,
+          appUser?.addressComplement,
+          appUser?.addressNeighborhood,
+          appUser?.addressCity,
+          appUser?.addressState,
+          appUser?.addressCep,
+        ].filter(Boolean).join(', '),
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',

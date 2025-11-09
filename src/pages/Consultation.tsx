@@ -27,14 +27,14 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf';
-import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase, uploadMedicalRecordPdfToSupabase, deleteMedicalRecordPdfFromSupabase } from '@/utils/supabaseStorage';
+import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase, uploadMedicalRecordPdfToSupabase, deleteMedicalRecordPdfToSupabase } from '@/utils/supabaseStorage';
 import PdfPreviewDialog from '@/components/PdfPreviewDialog';
 import { Client, Pet } from '@/types/cadastro';
 import { TeamMember } from '@/pages/Veterinarios';
 import AddAnimalDebitDialog, { AddAnimalDebitFormValues } from '@/components/consultation/AddAnimalDebitDialog';
 import { AnimalDebit, Product } from '@/types/cashier';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from "@/components/ui/badge";
 import { cn } from '@/lib/utils';
 import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf';
 
@@ -293,7 +293,15 @@ const ConsultationPage: React.FC = () => {
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || '', appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: [
+          appUser?.addressStreet,
+          appUser?.addressNumber,
+          appUser?.addressComplement,
+          appUser?.addressNeighborhood,
+          appUser?.addressCity,
+          appUser?.addressState,
+          appUser?.addressCep,
+        ].filter(Boolean).join(', '),
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',
@@ -385,7 +393,15 @@ const ConsultationPage: React.FC = () => {
 
       const clinicDetails = {
         companyName: appUser?.companyName || 'AsasVet',
-        address: `${appUser?.addressStreet || ''}, ${appUser?.addressNumber || ''} ${appUser?.addressComplement || ''} - ${appUser?.addressNeighborhood || ''}, ${appUser?.addressCity || ''} - ${appUser?.addressState || ''} ${appUser?.addressCep || ''}`,
+        address: [
+          appUser?.addressStreet,
+          appUser?.addressNumber,
+          appUser?.addressComplement,
+          appUser?.addressNeighborhood,
+          appUser?.addressCity,
+          appUser?.addressState,
+          appUser?.addressCep,
+        ].filter(Boolean).join(', '),
         phone: appUser?.phone || '',
         email: appUser?.email || '',
         veterinarianCrmv: appUser?.crmv || '',
