@@ -27,6 +27,8 @@ import { usePageTitle } from "@/context/PageTitleContext";
 import CustomCalendarCaption from "@/components/CustomCalendarCaption";
 import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
 import { TeamMember } from "@/pages/Veterinarios"; // Importar TeamMember
+import PdfPreviewDialog from '@/components/PdfPreviewDialog'; // Importar diálogo de pré-visualização
+import { generateDischargeSummaryPdf } from '@/utils/generateDischargeSummaryPdf'; // NOVO: Importar função de PDF de resumo de alta
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -129,6 +131,11 @@ const Internacao = () => {
   const [confirmActionsDate, setConfirmActionsDate] = useState<Date | null>(null);
   const [confirmActionsHour, setConfirmActionsHour] = useState<string | null>(null);
   const [confirmActionsForSlot, setConfirmActionsForSlot] = useState<PatientAction[]>([]);
+
+  // NOVO: Estados para o PDF de resumo de alta
+  const [isDischargePdfPreviewDialogOpen, setIsDischargePdfPreviewDialogOpen] = useState(false);
+  const [dischargePdfBlob, setDischargePdfBlob] = useState<Blob | null>(null);
+  const [dischargePdfFilename, setDischargePdfFilename] = useState("");
 
   // NOVO: Efeito para atualizar o título da página com base na aba ativa
   useEffect(() => {
@@ -399,6 +406,48 @@ const Internacao = () => {
 
       showSuccess("Paciente atualizado com sucesso!");
       setIsDetailsDialogOpen(false); // Close dialog AFTER cache update
+
+      // NOVO: Se o status for "Alta", gerar o PDF de resumo de alta
+      if (data.status === "Alta") {
+        console.log("Internacao.tsx: Patient status is 'Alta', generating discharge summary PDF.");
+        try {
+          const clinicDetails = {
+            companyName: appUser?.companyName || 'AsasVet',
+            address: [
+              appUser?.addressStreet,
+              appUser?.addressNumber,
+              appUser?.addressComplement,
+              appUser?.addressNeighborhood,
+              appUser?.addressCity,
+              appUser?.addressState,
+              appUser?.addressCep,
+            ].filter(Boolean).join(', '),
+            phone: appUser?.phone || '',
+            email: appUser?.email || '',
+            veterinarianCrmv: appUser?.crmv || '',
+            veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
+          };
+
+          // Filtrar as ações de medicação para este paciente
+          const medicationActions = patientActions.filter(
+            (action) => action.patient_id === data.id && action.type === "Medicação"
+          );
+
+          const pdfBlob = await generateDischargeSummaryPdf({
+            patient: data,
+            medicationActions,
+            logoUrl: appUser?.logoUrl,
+            clinicDetails,
+          });
+
+          setDischargePdfBlob(pdfBlob);
+          setDischargePdfFilename(`Resumo_Alta_${data.pet_name}_${format(parseISO(data.admission_date), 'yyyyMMdd')}.pdf`);
+          setIsDischargePdfPreviewDialogOpen(true);
+        } catch (pdfError: any) {
+          console.error("Internacao.tsx: Error generating discharge summary PDF:", pdfError);
+          showError(`Erro ao gerar resumo de alta: ${pdfError.message}`);
+        }
+      }
     },
     onError: (error) => {
       console.error("Internacao.tsx: updatePatientMutation onError:", error);
@@ -627,6 +676,19 @@ const Internacao = () => {
     updateActionsCompletionMutation.mutate(updatedActions);
   };
 
+  const handleConfirmDischargePdfDownload = (filename: string, downloadUrl: string) => {
+    if (downloadUrl) {
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showSuccess("PDF de resumo de alta baixado com sucesso!");
+      setIsDischargePdfPreviewDialogOpen(false);
+    }
+  };
+
   if (isLoadingPatients || isLoadingHistory || isLoadingActions || isLoadingClients || isLoadingPets || isLoadingVeterinarians) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -841,6 +903,15 @@ const Internacao = () => {
           patientId={confirmActionsPatientId}
         />
       )}
+
+      {/* NOVO: Diálogo de pré-visualização para o PDF de resumo de alta */}
+      <PdfPreviewDialog
+        isOpen={isDischargePdfPreviewDialogOpen}
+        onClose={() => setIsDischargePdfPreviewDialogOpen(false)}
+        pdfBlob={dischargePdfBlob}
+        filename={dischargePdfFilename}
+        onConfirmDownload={handleConfirmDischargePdfDownload}
+      />
     </div>
   );
 };

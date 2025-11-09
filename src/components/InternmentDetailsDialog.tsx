@@ -96,7 +96,7 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
     console.log("InternmentDetailsDialog: Submitting form, updatedPatient:", updatedPatient);
     onUpdate(updatedPatient);
     setIsEditing(false);
-    onClose();
+    // onClose(); // onClose will be called by parent after update
   };
 
   const handleRegisterDischarge = () => {
@@ -107,8 +107,8 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
         expected_discharge_date: format(new Date(), "yyyy-MM-dd"),
       };
       console.log("InternmentDetailsDialog: Registering discharge, updatedPatient:", updatedPatient);
-      onUpdate(updatedPatient);
-      onClose();
+      onUpdate(updatedPatient); // Chama onUpdate no pai
+      onClose(); // Fecha o diálogo
     }
   };
 
@@ -120,8 +120,8 @@ const InternmentDetailsDialog: React.FC<InternmentDetailsDialogProps> = ({
         expected_discharge_date: format(new Date(), "yyyy-MM-dd"),
       };
       console.log("InternmentDetailsDialog: Registering obito, updatedPatient:", updatedPatient);
-      onUpdate(updatedPatient);
-      onClose();
+      onUpdate(updatedPatient); // Chama onUpdate no pai
+      onClose(); // Fecha o diálogo
     }
   };
 
