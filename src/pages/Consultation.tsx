@@ -785,7 +785,7 @@ const ConsultationPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <div className="space-y-6 w-full"> {/* Removido max-w-4xl mx-auto */}
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold flex items-center">
           <CalendarCheck className="mr-3 h-7 w-7 text-primary" /> Consulta em Andamento
