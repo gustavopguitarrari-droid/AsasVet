@@ -29,6 +29,7 @@ import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
 import { TeamMember } from "@/pages/Veterinarios"; // Importar TeamMember
 import PdfPreviewDialog from '@/components/PdfPreviewDialog'; // Importar diálogo de pré-visualização
 import { generateDischargeSummaryPdf } from '@/utils/generateDischargeSummaryPdf'; // NOVO: Importar função de PDF de resumo de alta
+import { uploadDischargeSummaryPdfToSupabase, deleteDischargeSummaryPdfFromSupabase } from '@/utils/supabaseStorage'; // NOVO: Funções de storage para resumo de alta
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -48,6 +49,7 @@ export interface InternedPatient {
   species: "Cachorro" | "Gato" | "Pássaro" | "Roedor" | "Peixe" | "Outros" | "Equino" | "Bovino"; // Tipo de enumeração
   risk: RiskLevel;
   created_at: string;
+  discharge_summary_pdf_url?: string | null; // NOVO: URL do PDF de resumo de alta
 }
 
 export interface PatientAction {
@@ -135,6 +137,7 @@ const Internacao = () => {
   // NOVO: Estados para o PDF de resumo de alta
   const [isDischargePdfPreviewDialogOpen, setIsDischargePdfPreviewDialogOpen] = useState(false);
   const [dischargePdfBlob, setDischargePdfBlob] = useState<Blob | null>(null);
+  const [dischargePdfUrl, setDischargePdfUrl] = useState<string | null>(null); // NOVO: Para URL direta do PDF
   const [dischargePdfFilename, setDischargePdfFilename] = useState("");
 
   // NOVO: Efeito para atualizar o título da página com base na aba ativa
@@ -365,6 +368,70 @@ const Internacao = () => {
         throw new Error("Veterinário responsável não encontrado.");
       }
 
+      // NOVO: Se o status for "Alta", gerar o PDF de resumo de alta e fazer upload
+      let dischargeSummaryPdfUrl: string | null | undefined = updatedPatient.discharge_summary_pdf_url;
+      if (updatedPatient.status === "Alta") {
+        console.log("Internacao.tsx: Patient status is 'Alta', generating discharge summary PDF for upload.");
+        try {
+          const clinicDetails = {
+            companyName: appUser?.companyName || 'AsasVet',
+            address: [
+              appUser?.addressStreet,
+              appUser?.addressNumber,
+              appUser?.addressComplement,
+              appUser?.addressNeighborhood,
+              appUser?.addressCity,
+              appUser?.addressState,
+              appUser?.addressCep,
+            ].filter(Boolean).join(', '),
+            phone: appUser?.phone || '',
+            email: appUser?.email || '',
+            veterinarianCrmv: appUser?.crmv || '',
+            veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
+          };
+
+          const medicationActions = patientActions.filter(
+            (action) => action.patient_id === updatedPatient.id && action.type === "Medicação"
+          );
+
+          const pdfBlob = await generateDischargeSummaryPdf({
+            patient: updatedPatient,
+            medicationActions,
+            logoUrl: appUser?.logoUrl,
+            clinicDetails,
+          });
+
+          // Se já existe um PDF, deletar o antigo antes de fazer upload do novo
+          if (updatedPatient.discharge_summary_pdf_url) {
+            await deleteDischargeSummaryPdfFromSupabase(updatedPatient.discharge_summary_pdf_url);
+          }
+
+          const newPdfUrl = await uploadDischargeSummaryPdfToSupabase(pdfBlob, appUser.organizationId, updatedPatient.id);
+          if (!newPdfUrl) {
+            throw new Error("Falha ao fazer upload do PDF de resumo de alta.");
+          }
+          dischargeSummaryPdfUrl = newPdfUrl;
+          console.log("Internacao.tsx: Discharge summary PDF uploaded successfully:", newPdfUrl);
+
+          // Define os estados para abrir o diálogo de pré-visualização
+          setDischargePdfBlob(pdfBlob);
+          setDischargePdfUrl(newPdfUrl); // Define a URL direta
+          setDischargePdfFilename(`Resumo_Alta_${updatedPatient.pet_name}_${format(parseISO(updatedPatient.admission_date), 'yyyyMMdd')}.pdf`);
+          setIsDischargePdfPreviewDialogOpen(true);
+
+        } catch (pdfError: any) {
+          console.error("Internacao.tsx: Error generating or uploading discharge summary PDF:", pdfError);
+          showError(`Erro ao gerar/salvar resumo de alta: ${pdfError.message}`);
+          // Não impede a atualização do status do paciente, mas o PDF pode não ser salvo
+          dischargeSummaryPdfUrl = updatedPatient.discharge_summary_pdf_url; // Mantém a URL antiga ou null
+        }
+      } else if (updatedPatient.status === "Óbito" && updatedPatient.discharge_summary_pdf_url) {
+        // Se o status for Óbito e houver um PDF de alta, deletar o PDF (não faz sentido manter)
+        await deleteDischargeSummaryPdfFromSupabase(updatedPatient.discharge_summary_pdf_url);
+        dischargeSummaryPdfUrl = null;
+      }
+
+
       const { data, error } = await supabase
         .from('interned_patients')
         .update({
@@ -378,6 +445,7 @@ const Internacao = () => {
           status: updatedPatient.status,
           species: updatedPatient.species,
           risk: updatedPatient.risk,
+          discharge_summary_pdf_url: dischargeSummaryPdfUrl, // NOVO: Salva a URL do PDF
           // client_id e pet_id não são atualizáveis via este formulário
         })
         .eq('id', updatedPatient.id)
@@ -406,48 +474,6 @@ const Internacao = () => {
 
       showSuccess("Paciente atualizado com sucesso!");
       setIsDetailsDialogOpen(false); // Close dialog AFTER cache update
-
-      // NOVO: Se o status for "Alta", gerar o PDF de resumo de alta
-      if (data.status === "Alta") {
-        console.log("Internacao.tsx: Patient status is 'Alta', generating discharge summary PDF.");
-        try {
-          const clinicDetails = {
-            companyName: appUser?.companyName || 'AsasVet',
-            address: [
-              appUser?.addressStreet,
-              appUser?.addressNumber,
-              appUser?.addressComplement,
-              appUser?.addressNeighborhood,
-              appUser?.addressCity,
-              appUser?.addressState,
-              appUser?.addressCep,
-            ].filter(Boolean).join(', '),
-            phone: appUser?.phone || '',
-            email: appUser?.email || '',
-            veterinarianCrmv: appUser?.crmv || '',
-            veterinarianName: `${appUser?.name || ''} ${appUser?.lastName || ''}`,
-          };
-
-          // Filtrar as ações de medicação para este paciente
-          const medicationActions = patientActions.filter(
-            (action) => action.patient_id === data.id && action.type === "Medicação"
-          );
-
-          const pdfBlob = await generateDischargeSummaryPdf({
-            patient: data,
-            medicationActions,
-            logoUrl: appUser?.logoUrl,
-            clinicDetails,
-          });
-
-          setDischargePdfBlob(pdfBlob);
-          setDischargePdfFilename(`Resumo_Alta_${data.pet_name}_${format(parseISO(data.admission_date), 'yyyyMMdd')}.pdf`);
-          setIsDischargePdfPreviewDialogOpen(true);
-        } catch (pdfError: any) {
-          console.error("Internacao.tsx: Error generating discharge summary PDF:", pdfError);
-          showError(`Erro ao gerar resumo de alta: ${pdfError.message}`);
-        }
-      }
     },
     onError: (error) => {
       console.error("Internacao.tsx: updatePatientMutation onError:", error);
@@ -565,6 +591,26 @@ const Internacao = () => {
     mutationFn: async () => {
       if (!userId || !appUser?.organizationId) throw new Error("User not authenticated or organization ID not available.");
       console.log("Internacao.tsx: Attempting to clear history patients for organization:", appUser.organizationId);
+      
+      // Fetch all history patients to delete their associated PDFs
+      const { data: patientsToDelete, error: fetchError } = await supabase
+        .from('interned_patients')
+        .select('id, discharge_summary_pdf_url')
+        .eq('organization_id', appUser.organizationId)
+        .in('status', ['Alta', 'Óbito']);
+
+      if (fetchError) {
+        console.error("Internacao.tsx: Error fetching history patients for PDF deletion:", fetchError);
+        throw fetchError;
+      }
+
+      // Delete associated PDFs from storage
+      for (const patient of patientsToDelete || []) {
+        if (patient.discharge_summary_pdf_url) {
+          await deleteDischargeSummaryPdfFromSupabase(patient.discharge_summary_pdf_url);
+        }
+      }
+
       const { error } = await supabase
         .from('interned_patients')
         .delete()
@@ -689,6 +735,17 @@ const Internacao = () => {
     }
   };
 
+  // NOVO: Handler para abrir o PDF de resumo de alta do histórico
+  const handleViewDischargeSummaryPdf = (patient: InternedPatient) => {
+    if (patient.discharge_summary_pdf_url) {
+      setDischargePdfUrl(patient.discharge_summary_pdf_url);
+      setDischargePdfFilename(`Resumo_Alta_${patient.pet_name}_${format(parseISO(patient.admission_date), 'yyyyMMdd')}.pdf`);
+      setIsDischargePdfPreviewDialogOpen(true);
+    } else {
+      showError("Nenhum PDF de resumo de alta disponível para este paciente.");
+    }
+  };
+
   if (isLoadingPatients || isLoadingHistory || isLoadingActions || isLoadingClients || isLoadingPets || isLoadingVeterinarians) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -744,6 +801,7 @@ const Internacao = () => {
                 historyPatients={historyPatients}
                 onClearHistory={() => clearHistoryMutation.mutate()}
                 isClearingHistory={clearHistoryMutation.isPending}
+                onViewDischargeSummaryPdf={handleViewDischargeSummaryPdf} // NOVO: Passa o handler
               />
               <Button className="font-bold" onClick={() => setIsHistoryDialogOpen(true)}>
                 <History className="mr-2 h-4 w-4" /> Ver Histórico
@@ -872,6 +930,7 @@ const Internacao = () => {
         historyPatients={historyPatients}
         onClearHistory={() => clearHistoryMutation.mutate()}
         isClearingHistory={clearHistoryMutation.isPending}
+        onViewDischargeSummaryPdf={handleViewDischargeSummaryPdf} // NOVO: Passa o handler
       />
 
       {isAddActionDialogOpen && actionPatientId && actionPatientName && actionDate && actionHour && (
@@ -909,6 +968,7 @@ const Internacao = () => {
         isOpen={isDischargePdfPreviewDialogOpen}
         onClose={() => setIsDischargePdfPreviewDialogOpen(false)}
         pdfBlob={dischargePdfBlob}
+        pdfUrl={dischargePdfUrl} // Passa a URL direta
         filename={dischargePdfFilename}
         onConfirmDownload={handleConfirmDischargePdfDownload}
       />

@@ -5,6 +5,7 @@ const AVATARS_BUCKET_NAME = 'avatars';
 const LOGOS_BUCKET_NAME = 'logos';
 const PRESCRIPTIONS_BUCKET_NAME = 'prescriptions'; // NOVO: Nome do bucket para prescrições
 const MEDICAL_RECORDS_BUCKET_NAME = 'medical_records_pdfs'; // NOVO: Nome do bucket para prontuários médicos
+const DISCHARGE_SUMMARIES_BUCKET_NAME = 'discharge_summaries_pdfs'; // NOVO: Nome do bucket para resumos de alta
 
 /**
  * Converte uma string Base64 em um Blob.
@@ -333,6 +334,79 @@ export const deleteMedicalRecordPdfFromSupabase = async (publicUrl: string): Pro
     return true;
   } catch (error) {
     console.error("deleteMedicalRecordPdfToSupabase: Erro no processo de exclusão do PDF do prontuário:", error);
+    return false;
+  }
+};
+
+// NOVO: Funções para upload e exclusão de PDFs de resumo de alta
+export const uploadDischargeSummaryPdfToSupabase = async (
+  pdfBlob: Blob,
+  organizationId: string,
+  patientId: string,
+): Promise<string | null> => {
+  console.log("uploadDischargeSummaryPdfToSupabase: Iniciando upload do PDF de resumo de alta.");
+  try {
+    const fileName = `resumo_alta_${patientId}_${uuidv4()}.pdf`;
+    // Caminho: organizationId/patientId/uuid.pdf
+    const filePath = `${organizationId}/${patientId}/${fileName}`; 
+    console.log(`uploadDischargeSummaryPdfToSupabase: Tentando upload para filePath: ${filePath} no bucket: ${DISCHARGE_SUMMARIES_BUCKET_NAME}`);
+
+    const { data, error } = await supabase.storage
+      .from(DISCHARGE_SUMMARIES_BUCKET_NAME)
+      .upload(filePath, pdfBlob, {
+        contentType: 'application/pdf',
+        upsert: false,
+      });
+
+    if (error) {
+      console.error("uploadDischargeSummaryPdfToSupabase: Erro ao fazer upload do PDF de resumo de alta:", error);
+      throw error;
+    }
+    console.log("uploadDischargeSummaryPdfToSupabase: Upload bem-sucedido, data:", data);
+
+    const { data: publicUrlData } = supabase.storage
+      .from(DISCHARGE_SUMMARIES_BUCKET_NAME)
+      .getPublicUrl(filePath);
+
+    console.log("uploadDischargeSummaryPdfToSupabase: URL pública obtida:", publicUrlData.publicUrl);
+    return publicUrlData.publicUrl;
+
+  } catch (error) {
+    console.error("uploadDischargeSummaryPdfToSupabase: Erro no processo de upload do PDF de resumo de alta:", error);
+    return null;
+  }
+};
+
+export const deleteDischargeSummaryPdfFromSupabase = async (publicUrl: string): Promise<boolean> => {
+  console.log("deleteDischargeSummaryPdfFromSupabase: Iniciando exclusão do PDF de resumo de alta para URL:", publicUrl);
+  if (!publicUrl) {
+    console.log("deleteDischargeSummaryPdfFromSupabase: Nenhuma publicUrl fornecida, nada para deletar.");
+    return true;
+  }
+
+  try {
+    const url = new URL(publicUrl);
+    const pathSegments = url.pathname.split('/');
+    const bucketIndex = pathSegments.indexOf(DISCHARGE_SUMMARIES_BUCKET_NAME);
+    if (bucketIndex === -1 || bucketIndex + 1 >= pathSegments.length) {
+      console.warn("deleteDischargeSummaryPdfFromSupabase: URL pública inválida para exclusão do PDF de resumo de alta:", publicUrl);
+      return false;
+    }
+    const filePath = pathSegments.slice(bucketIndex + 1).join('/');
+    console.log(`deleteDischargeSummaryPdfFromSupabase: Tentando deletar filePath: ${filePath} do bucket: ${DISCHARGE_SUMMARIES_BUCKET_NAME}`);
+
+    const { error } = await supabase.storage
+      .from(DISCHARGE_SUMMARIES_BUCKET_NAME)
+      .remove([filePath]);
+
+    if (error) {
+      console.error("deleteDischargeSummaryPdfFromSupabase: Erro ao deletar PDF de resumo de alta do storage:", error);
+      return false;
+    }
+    console.log("deleteDischargeSummaryPdfToSupabase: PDF de resumo de alta deletado com sucesso.");
+    return true;
+  } catch (error) {
+    console.error("deleteDischargeSummaryPdfFromSupabase: Erro no processo de exclusão do PDF de resumo de alta:", error);
     return false;
   }
 };

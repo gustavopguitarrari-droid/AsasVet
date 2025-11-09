@@ -10,7 +10,7 @@ import {
   DialogFooter, // Importar DialogFooter
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope } from "lucide-react";
+import { Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, FileText } from "lucide-react"; // NOVO: Importar FileText
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { InternedPatient } from "@/pages/Internacao"; // Importar a interface atualizada
@@ -36,6 +36,7 @@ interface InternmentHistoryDialogProps {
   historyPatients: InternedPatient[];
   onClearHistory: () => void; // Nova prop para limpar o histórico
   isClearingHistory: boolean; // Nova prop para indicar se a limpeza está em andamento
+  onViewDischargeSummaryPdf: (patient: InternedPatient) => void; // NOVO: Prop para visualizar PDF de resumo de alta
 }
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
@@ -70,6 +71,7 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
   historyPatients,
   onClearHistory,
   isClearingHistory,
+  onViewDischargeSummaryPdf, // NOVO: Destrutura a nova prop
 }) => {
   const [searchTerm, setSearchTerm] = React.useState<string>("");
   const [activeTab, setActiveTab] = React.useState<"alta" | "obito">("alta");
@@ -121,6 +123,16 @@ const InternmentHistoryDialog: React.FC<InternmentHistoryDialogProps> = ({
                   <CalendarDays className="h-4 w-4 mr-1" /> {finalDate}
                 </span>
                 <span className="text-xs text-muted-foreground mt-1">Baia: {patient.bay_name}</span>
+                {patient.discharge_summary_pdf_url && ( // NOVO: Botão para ver o PDF
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => onViewDischargeSummaryPdf(patient)}
+                  >
+                    <FileText className="h-4 w-4 mr-1" /> Ver Resumo
+                  </Button>
+                )}
               </div>
             </li>
           );
