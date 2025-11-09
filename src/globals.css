@@ -202,12 +202,12 @@
     --sidebar-item-bg-9: 0 0% 50%; /* Gray */
 
     /* Cores para Categorias de Eventos - PASTEL TONES */
-    --event-consulta: 210 60% 85%; /* Pastel Blue */
-    --event-cirurgia: 30 70% 88%; /* Pastel Peach */
-    --event-vacina: 150 50% 85%; /* Pastel Green */
-    --event-exame: 270 40% 88%; /* Pastel Lavender */
-    --event-retorno: 50 80% 90%; /* Pastel Creamy Yellow */
-    --event-outros: 210 10% 90%; /* Pastel Gray */
+    --event-consulta: 210 60% 75%; /* Azul Pastel */
+    --event-cirurgia: 30 70% 78%; /* Pêssego Pastel */
+    --event-vacina: 150 50% 75%; /* Verde Pastel */
+    --event-exame: 270 40% 78%; /* Lavanda Pastel */
+    --event-retorno: 50 80% 80%; /* Amarelo Cremoso Pastel */
+    --event-outros: 210 10% 80%; /* Cinza Azulado Pastel */
 
     /* NOVO: Cores para botões/abas não selecionados no tema Nature Vet */
     --primary-unselected: var(--nv-lp-bege-areia); /* Bege claro para o fundo */
@@ -319,12 +319,12 @@
     --sidebar-item-bg-9: 0 0% 85%; /* Light Gray */
 
     /* Cores para Categorias de Eventos - PASTEL TONES */
-    --event-consulta: 210 60% 85%; /* Pastel Blue */
-    --event-cirurgia: 30 70% 88%; /* Pastel Peach */
-    --event-vacina: 150 50% 85%; /* Pastel Green */
-    --event-exame: 270 40% 88%; /* Pastel Lavender */
-    --event-retorno: 50 80% 90%; /* Pastel Creamy Yellow */
-    --event-outros: 210 10% 90%; /* Pastel Gray */
+    --event-consulta: 210 60% 75%; /* Azul Pastel */
+    --event-cirurgia: 30 70% 78%; /* Pêssego Pastel */
+    --event-vacina: 150 50% 75%; /* Verde Pastel */
+    --event-exame: 270 40% 78%; /* Lavanda Pastel */
+    --event-retorno: 50 80% 80%; /* Amarelo Cremoso Pastel */
+    --event-outros: 210 10% 80%; /* Cinza Azulado Pastel */
 
     /* NOVO: Cores para botões/abas não selecionados no tema Pastel Blue */
     --primary-unselected: 210 30% 90%; /* Azul pastel mais claro */
