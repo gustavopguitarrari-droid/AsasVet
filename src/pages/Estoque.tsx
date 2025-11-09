@@ -99,7 +99,7 @@ const Estoque = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button variant="outline">Filtrar</Button>
+          {/* Botão "Filtrar" removido */}
         </div>
       </div>
 
