@@ -36,7 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       if (isNavCollapsed) {
         sidebarPanelRef.current.expand(); // Expande o painel
       } else {
-        sidebarPanelRef.current.collapse(); // Recolhe o painel
+        sidebarPanelPanelRef.current.collapse(); // Recolhe o painel
       }
       // O estado `isNavCollapsed` será atualizado pelos callbacks `onCollapse` e `onExpand` do ResizablePanel
       // Não precisamos mais alterná-lo manualmente aqui.
@@ -73,7 +73,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <ResizablePanel className="bg-background">
         <div className="flex flex-1 flex-col h-full overflow-hidden">
           <Header />
-          <div className="flex-1 overflow-y-auto"> {/* Removido p-4 aqui */}
+          <div className="flex-1 overflow-y-auto px-4"> {/* Adicionado px-4 aqui */}
             <main className="flex flex-col">{children}</main>
           </div>
           <MadeWithDyad />
