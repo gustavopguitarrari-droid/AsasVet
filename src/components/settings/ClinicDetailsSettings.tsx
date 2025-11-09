@@ -211,9 +211,6 @@ const ClinicDetailsSettings: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Removido: <p className="text-muted-foreground">Gerencie o nome, logo, informações de contato e endereço da sua clínica.</p> */}
-
-        {/* Seção de Logo da Clínica - MOVIDA PARA O INÍCIO */}
         <div className="flex flex-col items-center space-y-4 mt-6">
           <Label className="text-lg font-semibold flex items-center">
             <ImageIcon className="h-5 w-5 mr-2" /> Logo da Clínica
@@ -229,14 +226,24 @@ const ClinicDetailsSettings: React.FC = () => {
           </Avatar>
           <div className="grid w-full max-w-sm items-center gap-1.5">
             <Label htmlFor="logo-upload">Escolher Logo</Label>
-            <Input
+            {/* Input de arquivo nativo oculto */}
+            <input
               id="logo-upload"
               type="file"
               accept="image/*"
               onChange={handleFileChange}
               ref={fileInputRef}
-              disabled={isSubmitting}
+              className="hidden" // Oculta o input nativo
             />
+            {/* Botão customizado que aciona o input de arquivo */}
+            <Button
+              type="button" // Importante para não submeter o formulário
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full flex items-center justify-center bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg" // Estilo do botão
+              disabled={isSubmitting}
+            >
+              <Upload className="h-4 w-4 mr-2" /> Escolher Arquivo
+            </Button>
           </div>
           <div className="flex space-x-2 mt-4">
             <Button
