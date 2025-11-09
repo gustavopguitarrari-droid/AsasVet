@@ -811,24 +811,24 @@ const ConsultationPage: React.FC = () => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="flex flex-wrap justify-between gap-x-8 gap-y-4 py-4"> {/* Alterado aqui */}
-          <div className="flex items-center w-full md:w-1/2 lg:w-1/3"> {/* Adicionado w-full md:w-1/2 lg:w-1/3 */}
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 py-4"> {/* Alterado aqui */}
+          <div className="flex items-center"> {/* Removido w-full md:w-1/2 lg:w-1/3 */}
             <User className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Tutor: <span className="font-semibold">{appointment.client_name}</span></p>
           </div>
-          <div className="flex items-center w-full md:w-1/2 lg:w-1/3"> {/* Adicionado w-full md:w-1/2 lg:w-1/3 */}
+          <div className="flex items-center"> {/* Removido w-full md:w-1/2 lg:w-1/3 */}
             <PawPrint className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Animal: <span className="font-semibold">{appointment.pet_name} ({appointment.species})</span></p>
           </div>
-          <div className="flex items-center w-full md:w-1/2 lg:w-1/3"> {/* Adicionado w-full md:w-1/2 lg:w-1/3 */}
+          <div className="flex items-center"> {/* Removido w-full md:w-1/2 lg:w-1/3 */}
             <Stethoscope className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Veterinário: <span className="font-semibold">{appointment.veterinarian}</span></p>
           </div>
-          <div className="flex items-center w-full md:w-1/2 lg:w-1/3"> {/* Adicionado w-full md:w-1/2 lg:w-1/3 */}
+          <div className="flex items-center"> {/* Removido w-full md:w-1/2 lg:w-1/3 */}
             <CalendarCheck className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Data: <span className="font-semibold">{format(parseISO(appointment.date), "dd/MM/yyyy", { locale: ptBR })}</span></p>
           </div>
-          <div className="flex items-center w-full md:w-1/2 lg:w-1/3"> {/* Adicionado w-full md:w-1/2 lg:w-1/3 */}
+          <div className="flex items-center"> {/* Removido w-full md:w-1/2 lg:w-1/3 */}
             <Clock className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Hora: <span className="font-semibold">{appointment.time}</span></p>
           </div>
