@@ -156,17 +156,17 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                   <div
                     key={event.id}
                     className={cn(
-                      "flex items-center space-x-3 p-3 rounded-md shadow-sm", // Removido text-white daqui
+                      "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white", // Adicionado text-white aqui
                       categoryColorMap[event.category],
                       (isCancelled || isRealizada) && "opacity-70"
                     )}
                   >
-                    <span className="font-bold text-lg text-foreground">{event.time}</span> {/* Adicionado text-foreground */}
+                    <span className="font-bold text-lg">{event.time}</span>
                     <div className="flex-1">
-                      <p className={cn("font-medium text-foreground", (isCancelled || isRealizada) && "line-through text-muted-foreground")}> {/* Adicionado text-foreground */}
+                      <p className={cn("font-medium", (isCancelled || isRealizada) && "line-through text-white/80")}> {/* Alterado para text-white/80 */}
                         {event.title}
                       </p>
-                      <Badge variant="secondary" className="mt-1 text-xs bg-white/40 text-foreground"> {/* Alterado para bg-white/40 e text-foreground */}
+                      <Badge variant="secondary" className="mt-1 text-xs bg-white/40 text-white"> {/* Alterado para bg-white/40 e text-white */}
                         {event.category}
                       </Badge>
                     </div>
@@ -182,8 +182,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                       <Button
                         variant="ghost"
                         size="icon"
-                        // Alterado para text-foreground
-                        className="h-8 w-8 text-foreground hover:bg-foreground/20"
+                        className="h-8 w-8 text-white hover:bg-white/20" // Alterado para text-white
                         onClick={(e) => {
                           e.stopPropagation();
                           onEventClick(event);
