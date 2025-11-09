@@ -21,17 +21,17 @@ interface PrescriptionPdfData {
 }
 
 export const generatePrescriptionPdf = ({ appointment, prescriptions, logoUrl, clinicDetails }: PrescriptionPdfData): Promise<Blob> => {
-  return new Promise<Blob>(async (resolve, reject) => { // <-- Tornando o callback assíncrono aqui
+  return new Promise<Blob>(async (resolve, reject) => {
     try {
       const doc = new jsPDF('p', 'mm', 'a4');
       const margin = 15;
       let yPos = margin;
-      const lineHeight = 5;
-      const sectionSpacing = 8;
+      const lineHeight = 6; // Aumentado de 5 para 6 para mais espaço entre as linhas
+      const sectionSpacing = 10; // Aumentado de 8 para 10 para mais espaço entre as seções
       const maxWidth = 210 - 2 * margin;
 
       // Colors and fonts
-      const primaryColor = '#3b82f6';
+      const darkGreenColor = '#1a472a'; // Um verde escuro para os títulos
       const textColor = '#333333';
       const lightTextColor = '#666666';
       doc.setFont('helvetica');
@@ -79,13 +79,13 @@ export const generatePrescriptionPdf = ({ appointment, prescriptions, logoUrl, c
         const clinicNameY = headerStartY + lineHeight;
         doc.setFontSize(16);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(primaryColor);
+        doc.setTextColor(darkGreenColor); // Usar verde escuro para o nome da clínica
         doc.text(clinicDetails.companyName || 'Nome da Clínica', clinicNameX, clinicNameY);
 
         // Document Title
         doc.setFontSize(20);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(primaryColor);
+        doc.setTextColor(darkGreenColor); // Usar verde escuro para o título principal
         doc.text('RECEITA MÉDICA VETERINÁRIA', 210 / 2, clinicNameY + lineHeight * 1.5, { align: 'center' });
 
         // Issue Date (below main title)
@@ -96,17 +96,17 @@ export const generatePrescriptionPdf = ({ appointment, prescriptions, logoUrl, c
         yPos += lineHeight * 2;
       };
 
-      await addMainHeader(); // <-- Agora esta linha é válida
+      await addMainHeader();
 
       // Separator line after main header
-      doc.setDrawColor(primaryColor);
+      doc.setDrawColor(darkGreenColor); // Usar verde escuro para a linha
       doc.line(margin, yPos, 210 - margin, yPos);
       yPos += sectionSpacing;
 
       // --- Patient and Owner Details ---
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(primaryColor);
+      doc.setTextColor(darkGreenColor); // Usar verde escuro para o título da seção
       doc.text('DADOS DO PACIENTE E TUTOR', margin, yPos);
       yPos += lineHeight;
 
@@ -153,9 +153,9 @@ export const generatePrescriptionPdf = ({ appointment, prescriptions, logoUrl, c
       // --- Prescriptions Section ---
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(primaryColor);
+      doc.setTextColor(darkGreenColor); // Usar verde escuro para o título da seção
       doc.text('PRESCRIÇÕES', margin, yPos);
-      yPos += lineHeight;
+      yPos += sectionSpacing; // Aumentado o espaçamento após o título da seção
 
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(textColor);
@@ -182,7 +182,7 @@ export const generatePrescriptionPdf = ({ appointment, prescriptions, logoUrl, c
             doc.text(instructionsText, margin + 10 + doc.getTextWidth(`  Instruções: `), yPos);
             yPos += instructionsText.length * lineHeight;
           }
-          yPos += lineHeight;
+          yPos += lineHeight * 1.5; // Espaço extra após cada item de prescrição
         });
       } else {
         addPageIfNeeded(lineHeight * 2);
