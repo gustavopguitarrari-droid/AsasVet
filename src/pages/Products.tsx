@@ -201,31 +201,33 @@ const Products = () => {
   return (
     <div className="space-y-6">
       {/* Novo contêiner flexível para filtros, busca e botão */}
-      <div className="flex flex-col md:flex-row items-center justify-between flex-wrap gap-4">
-        <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} options={productCategoryOptions} />
-        <div className="flex items-center space-x-2 w-full md:w-auto flex-1">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar produtos ou serviços..."
-              className="pl-9 border border-input rounded-lg"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <div className="p-4 border rounded-md bg-background shadow-md space-y-4 mb-6"> {/* Adicionado o fundo aqui */}
+        <div className="flex flex-col md:flex-row items-center justify-between flex-wrap gap-4">
+          <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} options={productCategoryOptions} />
+          <div className="flex items-center space-x-2 w-full md:w-auto flex-1">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar produtos ou serviços..."
+                className="pl-9 border border-input rounded-lg"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Dialog open={isAddProductDialogOpen} onOpenChange={setIsAddProductDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="font-bold shrink-0">
+                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Item
+                </Button>
+              </DialogTrigger>
+              <AddProductDialog
+                isOpen={isAddProductDialogOpen}
+                onClose={() => setIsAddProductDialogOpen(false)}
+                onSubmit={addProductMutation.mutate}
+                isSubmitting={addProductMutation.isPending}
+              />
+            </Dialog>
           </div>
-          <Dialog open={isAddProductDialogOpen} onOpenChange={setIsAddProductDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="font-bold shrink-0">
-                <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Item
-              </Button>
-            </DialogTrigger>
-            <AddProductDialog
-              isOpen={isAddProductDialogOpen}
-              onClose={() => setIsAddProductDialogOpen(false)}
-              onSubmit={addProductMutation.mutate}
-              isSubmitting={addProductMutation.isPending}
-            />
-          </Dialog>
         </div>
       </div>
 
