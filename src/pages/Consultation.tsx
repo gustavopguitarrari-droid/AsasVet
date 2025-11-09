@@ -27,8 +27,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf';
-import { uploadRecipePdfToSupabase, deleteRecipePdfFromSupabase, uploadMedicalRecordPdfToSupabase, deleteMedicalRecordPdfToSupabase } from '@/utils/supabaseStorage';
-import PdfPreviewDialog from '@/components/PdfPreviewDialog';
+import * as SupabaseStorage from '@/utils/supabaseStorage'; // ALTERADO: Importa o módulo inteiro
 import { Client, Pet } from '@/types/cadastro';
 import { TeamMember } from '@/pages/Veterinarios';
 import AddAnimalDebitDialog, { AddAnimalDebitFormValues } from '@/components/consultation/AddAnimalDebitDialog';
@@ -37,6 +36,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from "@/components/ui/badge";
 import { cn } from '@/lib/utils';
 import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf';
+import PdfPreviewDialog from '@/components/PdfPreviewDialog'; // Movido para cá para evitar conflito
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -327,7 +327,7 @@ const ConsultationPage: React.FC = () => {
       // If an existing recipe PDF URL is found, delete the old PDF from storage
       if (existingRecipePdfUrl) {
         console.log("generateAndSaveRecipePdfMutation: Existing recipe PDF found, attempting to delete:", existingRecipePdfUrl);
-        await deleteRecipePdfFromSupabase(existingRecipePdfUrl);
+        await SupabaseStorage.deleteRecipePdfFromSupabase(existingRecipePdfUrl); // ALTERADO: Usando SupabaseStorage
       }
 
       console.log("generateAndSaveRecipePdfMutation: Gerando PDF da receita...");
@@ -340,7 +340,7 @@ const ConsultationPage: React.FC = () => {
       console.log("generateAndSaveRecipePdfMutation: PDF Blob da receita gerado:", pdfBlob);
 
       console.log("generateAndSaveRecipePdfMutation: Fazendo upload do PDF da receita para o Supabase Storage...");
-      const newPdfUrl = await uploadRecipePdfToSupabase(pdfBlob, organizationId, userId, appointmentId); // NOVO: Passando userId
+      const newPdfUrl = await SupabaseStorage.uploadRecipePdfToSupabase(pdfBlob, organizationId, userId, appointmentId); // ALTERADO: Usando SupabaseStorage
       console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
 
       if (!newPdfUrl) {
@@ -429,7 +429,7 @@ const ConsultationPage: React.FC = () => {
       // If there's an existing medical record PDF, delete it before generating a new one
       if (existingMedicalRecordPdfUrl) {
         console.log("saveMedicalRecordMutation: Existing medical record PDF found, attempting to delete:", existingMedicalRecordPdfUrl);
-        await deleteMedicalRecordPdfFromSupabase(existingMedicalRecordPdfUrl);
+        await SupabaseStorage.deleteMedicalRecordPdfFromSupabase(existingMedicalRecordPdfUrl); // ALTERADO: Usando SupabaseStorage
       }
 
       // Generate the new PDF for the medical record
@@ -474,7 +474,7 @@ const ConsultationPage: React.FC = () => {
 
       // Now that we have the medical record ID (either new or existing), upload the PDF
       const medicalRecordIdForPdf = upsertedRecord.id;
-      const newMedicalRecordPdfUrl = await uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId, userId, medicalRecordIdForPdf); // NOVO: Passando userId
+      const newMedicalRecordPdfUrl = await SupabaseStorage.uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId, userId, medicalRecordIdForPdf); // ALTERADO: Usando SupabaseStorage
       if (!newMedicalRecordPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF do prontuário.");
       }
