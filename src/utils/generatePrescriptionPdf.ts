@@ -29,6 +29,7 @@ export const generatePrescriptionPdf = ({ appointment, prescriptions, logoUrl, c
       const lineHeight = 6; // Aumentado de 5 para 6 para mais espaço entre as linhas
       const sectionSpacing = 10; // Aumentado de 8 para 10 para mais espaço entre as seções
       const maxWidth = 210 - 2 * margin;
+      const labelValueOffset = 2; // NOVO: Espaçamento entre o rótulo e o valor
 
       // Colors and fonts
       const darkGreenColor = '#1a472a'; // Um verde escuro para os títulos
@@ -130,9 +131,9 @@ export const generatePrescriptionPdf = ({ appointment, prescriptions, logoUrl, c
       patientDetails.forEach((detail, index) => {
         addPageIfNeeded(detailLineHeight);
         doc.setFont('helvetica', 'bold');
-        doc.text(`${detail.label}: `, currentX, yPos);
+        doc.text(`${detail.label}:`, currentX, yPos); // Removido o espaço extra aqui
         doc.setFont('helvetica', 'normal');
-        doc.text(detail.value, currentX + doc.getTextWidth(`${detail.label}: `), yPos);
+        doc.text(detail.value, currentX + doc.getTextWidth(`${detail.label}:`) + labelValueOffset, yPos); // Adicionado labelValueOffset
 
         if (index % 2 === 0 && index < patientDetails.length - 1) {
           currentX += colWidth;
@@ -166,9 +167,9 @@ export const generatePrescriptionPdf = ({ appointment, prescriptions, logoUrl, c
         prescriptions.forEach((p, index) => {
           addPageIfNeeded(lineHeight * 5);
           doc.setFont('helvetica', 'bold');
-          doc.text(`${index + 1}. Medicamento: `, margin + 5, yPos);
+          doc.text(`${index + 1}. Medicamento:`, margin + 5, yPos); // Removido o espaço extra aqui
           doc.setFont('helvetica', 'normal');
-          doc.text(p.medication, margin + 5 + doc.getTextWidth(`${index + 1}. Medicamento: `), yPos);
+          doc.text(p.medication, margin + 5 + doc.getTextWidth(`${index + 1}. Medicamento:`) + labelValueOffset, yPos); // Adicionado labelValueOffset
           yPos += lineHeight;
 
           doc.text(`  Dosagem: ${p.dosage}`, margin + 10, yPos);
