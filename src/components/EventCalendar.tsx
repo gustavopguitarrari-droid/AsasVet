@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trash2, CheckCircle, CalendarX } from "lucide-react"; // Importar CalendarX para o AlertDialog
+import { Trash2, CheckCircle, CalendarX } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,7 +19,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle as AlertDialogTitleComponent,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"; // Importar AlertDialog
+} from "@/components/ui/alert-dialog";
 
 export interface CalendarEvent {
   id: string;
@@ -27,7 +27,7 @@ export interface CalendarEvent {
   date: Date;
   time: string;
   category: "Consulta" | "Cirurgia" | "Vacina" | "Exame" | "Retorno" | "Outros";
-  status?: "Agendada" | "Cancelada" | "Realizada"; // Adicionado status "Realizada"
+  status?: "Agendada" | "Cancelada" | "Realizada";
 }
 
 interface EventCalendarProps {
@@ -35,17 +35,25 @@ interface EventCalendarProps {
   onAddEventClick: (date: Date) => void;
   onEventClick: (event: CalendarEvent) => void;
   searchTerm: string;
-  onClearAllEvents: () => void; // NOVO: Prop para limpar todos os eventos
-  isClearingEvents: boolean; // NOVO: Prop para indicar se a limpeza está em andamento
+  onClearAllEvents: () => void;
+  isClearingEvents: boolean;
 }
 
-const categoryColorMap: Record<CalendarEvent["category"], string> = {
-  Consulta: "bg-event-consulta",
-  Cirurgia: "bg-event-cirurgia",
-  Vacina: "bg-event-vacina",
-  Exame: "bg-event-exame",
-  Retorno: "bg-event-retorno",
-  Outros: "bg-event-outros",
+// Mapeamento de cores para as categorias de eventos (já definido em globals.css)
+// Este mapa agora é usado para obter o nome da variável CSS
+const categoryCssVarMap: Record<CalendarEvent["category"], string> = {
+  Consulta: "var(--event-consulta)",
+  Cirurgia: "var(--event-cirurgia)",
+  Vacina: "var(--event-vacina)",
+  Exame: "var(--event-exame)",
+  Retorno: "var(--event-retorno)",
+  Outros: "var(--event-outros)",
+};
+
+// Função auxiliar para obter o valor completo da variável CSS (hsl(var(--...)))
+const getFullCssVarForCategory = (category: CalendarEvent["category"]) => {
+  const cssVarName = categoryCssVarMap[category];
+  return `hsl(${cssVarName})`;
 };
 
 // Definição das categorias para a legenda
@@ -156,9 +164,9 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                     key={event.id}
                     className={cn(
                       "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white",
-                      `!${categoryColorMap[event.category]}`, // Reintroduzido o ! para forçar o background
                       (isCancelled || isRealizada) && "opacity-70"
                     )}
+                    style={{ backgroundColor: getFullCssVarForCategory(event.category) }} // Aplicação do estilo inline
                   >
                     <span className="font-bold text-lg text-white">{event.time}</span>
                     <div className="flex-1">
