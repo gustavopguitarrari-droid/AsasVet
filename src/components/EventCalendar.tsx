@@ -155,8 +155,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                   <div
                     key={event.id}
                     className={cn(
-                      "flex items-center space-x-3 p-3 rounded-md shadow-sm", // Removido text-white daqui
-                      categoryColorMap[event.category], // Aplicando a classe de cor diretamente
+                      "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white",
+                      `!${categoryColorMap[event.category]}`, // Reintroduzido o ! para forçar o background
                       (isCancelled || isRealizada) && "opacity-70"
                     )}
                   >
