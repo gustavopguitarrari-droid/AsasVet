@@ -684,7 +684,13 @@ const Appointments = () => {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
-    return [hours, minutes, seconds]
+
+    if (hours > 0) {
+      return [hours, minutes, seconds]
+        .map(v => v < 10 ? "0" + v : v)
+        .join(":");
+    }
+    return [minutes, seconds]
       .map(v => v < 10 ? "0" + v : v)
       .join(":");
   };
@@ -948,7 +954,7 @@ const Appointments = () => {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Buscar consultas..."
-              className="pl-9"
+              className="pl-9 border rounded-lg"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />

@@ -669,7 +669,7 @@ const Internacao = () => {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Buscar pacientes internados..."
-                className="pl-9"
+                className="pl-9 border rounded-lg"
                 value={patientSearchTerm}
                 onChange={(e) => setPatientSearchTerm(e.target.value)}
               />
@@ -747,7 +747,7 @@ const Internacao = () => {
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Buscar pacientes no mapa de execução..."
-                className="pl-9"
+                className="pl-9 border rounded-lg"
                 value={executionMapSearchTerm}
                 onChange={(e) => setExecutionMapSearchTerm(e.target.value)}
               />

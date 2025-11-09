@@ -61,7 +61,7 @@ const ProductCombobox: React.FC<ProductComboboxProps> = ({ onAddProduct, product
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 rounded-lg shadow-md"> {/* Adicionado rounded-lg e shadow-md */}
-          <Command className="rounded-lg"> {/* Adicionado rounded-lg */}
+          <Command className="rounded-lg border"> {/* Adicionado borda aqui */}
             <CommandInput placeholder="Buscar produto/serviço..." />
             <CommandList>
               {isLoadingProducts ? (

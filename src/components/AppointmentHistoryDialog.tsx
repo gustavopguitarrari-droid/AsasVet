@@ -156,7 +156,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Buscar no histórico..."
-            className="pl-9"
+            className="pl-9 border rounded-lg"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -165,7 +165,7 @@ const AppointmentHistoryDialog: React.FC<AppointmentHistoryDialogProps> = ({
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "realizadas" | "canceladas")} className="w-full flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-2 h-auto p-1 mb-4">
             <TabsTrigger value="realizadas" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Realizadas ({completedAppointments.length})</TabsTrigger>
-            <TabsTrigger value="canceladas" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Canceladas ({cancelledAppointments.length})</TabsTrigger>
+            <TabsTrigger value="obito" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Canceladas ({cancelledAppointments.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="realizadas" className="flex-1 flex flex-col">
