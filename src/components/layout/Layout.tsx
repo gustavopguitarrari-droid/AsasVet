@@ -36,7 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       if (isNavCollapsed) {
         sidebarPanelRef.current.expand(); // Expande o painel
       } else {
-        sidebarPanelPanelRef.current.collapse(); // Recolhe o painel
+        sidebarPanelRef.current.collapse(); // Recolhe o painel
       }
       // O estado `isNavCollapsed` será atualizado pelos callbacks `onCollapse` e `onExpand` do ResizablePanel
       // Não precisamos mais alterná-lo manualmente aqui.
