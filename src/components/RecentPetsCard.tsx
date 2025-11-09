@@ -27,9 +27,10 @@ interface RecentPetsCardProps {
 
 const RecentPetsCard: React.FC<RecentPetsCardProps> = ({ className }) => {
   const { user: appUser } = useUser();
-  const organizationId = appUser?.organizationId; // Usar organizationId
+  const organizationId = appUser?.organizationId;
 
-  console.log("RecentPetsCard: Current organizationId:", organizationId); // Debug log 1
+  // NOVO LOG: Verifica se o componente está sendo renderizado e quais são os valores iniciais
+  console.log("RecentPetsCard: Component rendering. appUser:", appUser, "organizationId:", organizationId);
 
   const { data: recentPets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
     queryKey: ['recentPetsDashboard', organizationId], // Alterado para organizationId
