@@ -785,7 +785,7 @@ const ConsultationPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 w-full"> {/* Removido max-w-4xl mx-auto */}
+    <div className="space-y-6 w-full">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold flex items-center">
           <CalendarCheck className="mr-3 h-7 w-7 text-primary" /> Consulta em Andamento
@@ -811,24 +811,24 @@ const ConsultationPage: React.FC = () => {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="grid gap-4 py-4">
-          <div className="flex items-center">
+        <CardContent className="flex flex-wrap justify-between gap-x-8 gap-y-4 py-4"> {/* Alterado aqui */}
+          <div className="flex items-center w-full md:w-1/2 lg:w-1/3"> {/* Adicionado w-full md:w-1/2 lg:w-1/3 */}
             <User className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Tutor: <span className="font-semibold">{appointment.client_name}</span></p>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center w-full md:w-1/2 lg:w-1/3"> {/* Adicionado w-full md:w-1/2 lg:w-1/3 */}
             <PawPrint className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Animal: <span className="font-semibold">{appointment.pet_name} ({appointment.species})</span></p>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center w-full md:w-1/2 lg:w-1/3"> {/* Adicionado w-full md:w-1/2 lg:w-1/3 */}
             <Stethoscope className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Veterinário: <span className="font-semibold">{appointment.veterinarian}</span></p>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center w-full md:w-1/2 lg:w-1/3"> {/* Adicionado w-full md:w-1/2 lg:w-1/3 */}
             <CalendarCheck className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Data: <span className="font-semibold">{format(parseISO(appointment.date), "dd/MM/yyyy", { locale: ptBR })}</span></p>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center w-full md:w-1/2 lg:w-1/3"> {/* Adicionado w-full md:w-1/2 lg:w-1/3 */}
             <Clock className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Hora: <span className="font-semibold">{appointment.time}</span></p>
           </div>
