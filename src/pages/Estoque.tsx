@@ -86,19 +86,21 @@ const Estoque = () => {
         </Button>
       </div>
 
-      <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} options={stockCategoryOptions} />
+      <div className="p-4 border rounded-md bg-background shadow-md space-y-4 mb-6"> {/* Adicionado o fundo aqui */}
+        <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} options={stockCategoryOptions} />
 
-      <div className="flex items-center space-x-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar itens no estoque..."
-            className="pl-9 border border-input rounded-lg"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex items-center space-x-2">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar itens no estoque..."
+              className="pl-9 border border-input rounded-lg"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Button variant="outline">Filtrar</Button>
         </div>
-        <Button variant="outline">Filtrar</Button>
       </div>
 
       <div className="rounded-md border">
