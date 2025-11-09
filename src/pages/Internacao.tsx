@@ -761,7 +761,7 @@ const Internacao = () => {
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-[280px] justify-start text-left font-normal",
+                      "w-[280px] justify-start text-left font-normal border border-input rounded-lg",
                       !selectedDate && "text-muted-foreground"
                     )}
                   >

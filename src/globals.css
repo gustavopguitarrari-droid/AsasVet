@@ -37,8 +37,8 @@
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 214.3 31.8% 80%; /* Ajustado para um cinza mais visível */
+    --input: var(--border);  /* Input border agora usa a cor de --border */
     --ring: 222.2 84% 4.9%;
 
     /* Sidebar colors (adaptam-se ao tema principal) */
@@ -132,11 +132,11 @@
   /* TEMA: Nature Vet */
   .theme-nature-vet {
     /* Mapeamento direto para as cores da Landing Page */
-    --nv-lp-verde-bambu: var(--lp-verde-bambu);
-    --nv-lp-verde-folha-seca: var(--lp-verde-folha-seca);
-    --nv-lp-creme-terra: var(--lp-creme-terra);
-    --nv-lp-marrom-avela: var(--lp-marrom-avela);
-    --nv-lp-bege-areia: var(--lp-bege-areia);
+    --nv-lp-verde-bambu: 90 40% 70%;
+    --nv-lp-verde-folha-seca: 90 40% 67%;
+    --nv-lp-creme-terra: 50 100% 99%;
+    --nv-lp-marrom-avela: 20 20% 47%;
+    --nv-lp-bege-areia: 40 100% 85%;
 
     /* NOVO: Definir um verde escuro para o sidebar */
     --nv-dark-green: 90 40% 20%;
@@ -168,8 +168,8 @@
     --destructive: 0 84.2% 60.2%; /* Mantém vermelho para ações destrutivas */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 20 15% 35%; /* Marrom escuro para bordas */
-    --input: var(--nv-lp-creme-terra);
+    --border: 20 15% 50%; /* Ajustado para um marrom-cinza mais visível */
+    --input: var(--border);  /* Input border agora usa a cor de --border */
     --ring: var(--nv-lp-verde-folha-seca);
 
     /* Sidebar colors - AJUSTADO PARA CONTRASTE */
@@ -277,8 +277,8 @@
     --destructive: 0 84.2% 60.2%; /* Mantém vermelho */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 80%; /* Borda azul clara */
-    --input: 210 30% 95%;
+    --border: 210 20% 70%; /* Ajustado para um azul-cinza mais visível */
+    --input: var(--border);  /* Input border agora usa a cor de --border */
     --ring: 210 60% 70%;
 
     /* Sidebar colors para Pastel Blue */
