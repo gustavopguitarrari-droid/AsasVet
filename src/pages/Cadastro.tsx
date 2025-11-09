@@ -729,7 +729,7 @@ const Cadastro = () => {
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Buscar tutores..."
-                  className="pl-9 w-64 border rounded-lg"
+                  className="pl-9 w-64 border border-input rounded-lg"
                   value={clientSearchTerm}
                   onChange={(e) => setClientSearchTerm(e.target.value)}
                 />
@@ -880,7 +880,7 @@ const Cadastro = () => {
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Buscar animais por nome, raça ou tutor..."
-                  className="pl-9 border rounded-lg"
+                  className="pl-9 border border-input rounded-lg"
                   value={petSearchTerm}
                   onChange={(e) => setPetSearchTerm(e.target.value)}
                 />

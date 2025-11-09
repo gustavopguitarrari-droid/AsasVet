@@ -51,7 +51,7 @@ const ProductCombobox: React.FC<ProductComboboxProps> = ({ onAddProduct, product
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between rounded-lg" // Adicionado rounded-lg
+            className="w-full justify-between border border-input rounded-lg" // Adicionado border border-input
             disabled={isLoadingProducts}
           >
             {value
@@ -61,7 +61,7 @@ const ProductCombobox: React.FC<ProductComboboxProps> = ({ onAddProduct, product
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 rounded-lg shadow-md"> {/* Adicionado rounded-lg e shadow-md */}
-          <Command className="rounded-lg border"> {/* Adicionado borda aqui */}
+          <Command className="rounded-lg border"> {/* Já tem borda */}
             <CommandInput placeholder="Buscar produto/serviço..." />
             <CommandList>
               {isLoadingProducts ? (
