@@ -23,7 +23,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CameraCaptureDialog from "./CameraCaptureDialog";
 import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
-import { Label } from "@/components/ui/label";
+import { Label } from "@/components/ui/label"; // Adicionado importação do Label
 import { useUser } from "@/context/UserContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -46,7 +46,7 @@ const formSchema = z.object({
   observations: z.string().optional(),
   photoUrl: z.string().optional(), // Pode ser Base64 ou URL pública
   ownerId: z.string().min(1, "O tutor é obrigatório."), // Este campo será preenchido pela busca
-  cpfSearch: z.string().optional(), // Campo para input de CPF na UI
+  // cpfSearch: z.string().optional(), // Campo para input de CPF na UI - REMOVIDO
 });
 
 export type PetFormValues = z.infer<typeof formSchema>;
@@ -77,7 +77,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
       weight: initialData?.weight || undefined,
       observations: initialData?.observations || "",
       ownerId: initialData?.ownerId || defaultOwnerId || "",
-      cpfSearch: "", // Inicializa o campo de busca de CPF
+      // cpfSearch: "", // Inicializa o campo de busca de CPF - REMOVIDO
     },
   });
 
@@ -85,7 +85,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isCameraDialogOpen, setIsCameraDialogOpen] = useState(false);
 
-  const [cpfInput, setCpfInput] = useState<string>("");
+  const [ownerSearchInput, setOwnerSearchInput] = useState<string>(""); // Renomeado de cpfInput
   const [foundClient, setFoundClient] = useState<Client | null>(null);
 
   useEffect(() => {
@@ -99,7 +99,6 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
       weight: initialData?.weight || undefined,
       observations: initialData?.observations || "",
       ownerId: initialData?.ownerId || defaultOwnerId || "",
-      cpfSearch: "", // Reseta o campo de busca de CPF
     });
     setPreviewUrl(initialData?.photoUrl || null);
     if (fileInputRef.current) {
@@ -108,7 +107,7 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
 
     // Lida com os dados iniciais do tutor para edição ou adição a partir da visualização do cliente
     let initialOwner: Client | null = null;
-    let initialCpf = "";
+    let initialOwnerSearch = "";
 
     if (initialData?.ownerId) {
       initialOwner = allClients.find(c => c.id === initialData.ownerId) || null;
@@ -117,59 +116,46 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
     }
 
     if (initialOwner) {
-      initialCpf = initialOwner.cpf;
+      initialOwnerSearch = initialOwner.name; // Preenche com o nome do tutor
       setFoundClient(initialOwner);
       form.setValue("ownerId", initialOwner.id);
     } else {
       setFoundClient(null);
       form.setValue("ownerId", "");
     }
-    setCpfInput(initialCpf);
-
+    setOwnerSearchInput(initialOwnerSearch); // Atualiza o campo de busca
   }, [initialData, form, allClients, defaultOwnerId, defaultOwnerName]);
 
-  const handleCpfInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, ''); // Apenas números
-    setCpfInput(value);
+  const handleOwnerSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => { // Renomeado
+    setOwnerSearchInput(e.target.value);
   };
 
-  const handleSearchCpf = async () => {
-    if (!userId) {
-      showError("Usuário não autenticado.");
-      return;
-    }
-    const cleanCpf = cpfInput.replace(/\D/g, '');
-    if (cleanCpf.length !== 11) {
-      showError("CPF inválido. Digite 11 dígitos.");
+  const handleSearchOwner = () => { // Renomeado
+    const searchTerm = ownerSearchInput.trim();
+    if (!searchTerm) {
+      showError("Digite o CPF ou nome do tutor para pesquisar.");
       setFoundClient(null);
       form.setValue("ownerId", "");
       return;
     }
 
-    try {
-      const { data: foundClientData, error } = await supabase
-        .from('clients')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('cpf', cleanCpf)
-        .single();
+    const cleanSearchTerm = searchTerm.replace(/\D/g, '');
+    const isCpfSearch = cleanSearchTerm.length === 11 && /^\d+$/.test(cleanSearchTerm);
+    let found: Client | null = null;
 
-      if (error && error.code !== 'PGRST116') { // PGRST116 significa que nenhuma linha foi encontrada
-        throw error;
-      }
+    if (isCpfSearch) {
+      found = allClients.find(client => client.cpf === cleanSearchTerm);
+    } else {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase();
+      found = allClients.find(client => client.name.toLowerCase().includes(lowerCaseSearchTerm));
+    }
 
-      if (foundClientData) {
-        setFoundClient(foundClientData);
-        form.setValue("ownerId", foundClientData.id);
-        showSuccess(`Tutor ${foundClientData.name} encontrado!`);
-      } else {
-        showError("Tutor não encontrado com este CPF.");
-        setFoundClient(null);
-        form.setValue("ownerId", "");
-      }
-    } catch (err: any) {
-      console.error("Erro ao buscar cliente por CPF:", err.message);
-      showError(`Erro ao buscar tutor: ${err.message}`);
+    if (found) {
+      setFoundClient(found);
+      form.setValue("ownerId", found.id);
+      showSuccess(`Tutor ${found.name} encontrado!`);
+    } else {
+      showError("Tutor não encontrado com este CPF ou nome.");
       setFoundClient(null);
       form.setValue("ownerId", "");
     }
@@ -275,21 +261,20 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
             </div>
           </div>
 
-          {/* Busca de Tutor por CPF */}
+          {/* Busca de Tutor por CPF ou Nome */}
           <div className="space-y-2 border p-3 rounded-md">
             <Label className="flex items-center">
-              <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor por CPF
+              <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor (Nome ou CPF)
             </Label>
             <div className="flex space-x-2">
               <Input
-                placeholder="Digite o CPF do tutor (somente números)"
-                value={cpfInput}
-                onChange={handleCpfInputChange}
-                maxLength={11}
+                placeholder="Digite o CPF ou nome do tutor"
+                value={ownerSearchInput}
+                onChange={handleOwnerSearchInputChange}
                 className="flex-1"
-                disabled={!!defaultOwnerId} // Desabilita se defaultOwnerId for fornecido
+                disabled={!!defaultOwnerId}
               />
-              <Button type="button" onClick={handleSearchCpf} size="icon" disabled={!!defaultOwnerId}>
+              <Button type="button" onClick={handleSearchOwner} size="icon" disabled={!!defaultOwnerId}>
                 <Search className="h-4 w-4" />
                 <span className="sr-only">Buscar Tutor</span>
               </Button>
