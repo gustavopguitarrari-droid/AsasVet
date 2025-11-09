@@ -47,7 +47,7 @@ export const generatePrescriptionPdf = ({ appointment, prescriptions, logoUrl, c
 
       // --- Main Header ---
       const addMainHeader = async () => {
-        const headerStartY = yPos;
+        let currentHeaderY = yPos; // Start of the header block
 
         // Clinic Logo (top left corner)
         if (logoUrl) {
@@ -63,37 +63,38 @@ export const generatePrescriptionPdf = ({ appointment, prescriptions, logoUrl, c
             
             const imgWidth = 25;
             const imgHeight = (img.height * imgWidth) / img.width;
-            doc.addImage(img, 'PNG', margin, yPos, imgWidth, imgHeight);
-            yPos += imgHeight > lineHeight * 2 ? imgHeight : lineHeight * 2;
+            doc.addImage(img, 'PNG', margin, currentHeaderY, imgWidth, imgHeight);
+            currentHeaderY = Math.max(currentHeaderY, currentHeaderY + imgHeight + lineHeight); // Ensure enough space below logo
           } catch (e) {
             console.error("Error loading or adding logo to PDF:", e);
-            // Continue without logo if it fails
-            yPos += lineHeight * 2;
+            currentHeaderY += lineHeight * 2; // Fallback space
           }
         } else {
-          yPos += lineHeight * 2;
+          currentHeaderY += lineHeight; // Just some initial space if no logo
         }
 
-        // Clinic Name (next to logo or at top if no logo)
-        const clinicNameX = logoUrl ? margin + 30 : margin;
-        const clinicNameY = headerStartY + lineHeight;
-        doc.setFontSize(16);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(darkGreenColor); // Usar verde escuro para o nome da clínica
-        doc.text(clinicDetails.companyName || 'Nome da Clínica', clinicNameX, clinicNameY);
-
-        // Document Title
+        // Document Title (always centered)
         doc.setFontSize(20);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(darkGreenColor); // Usar verde escuro para o título principal
-        doc.text('RECEITA MÉDICA VETERINÁRIA', 210 / 2, clinicNameY + lineHeight * 1.5, { align: 'center' });
+        doc.setTextColor(darkGreenColor);
+        doc.text('RECEITA MÉDICA VETERINÁRIA', 210 / 2, currentHeaderY, { align: 'center' });
+        currentHeaderY += lineHeight * 1.5; // Space after main title
 
-        // Issue Date (below main title)
+        // Clinic Name (now centered below the main title)
+        doc.setFontSize(16);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(darkGreenColor);
+        doc.text(clinicDetails.companyName || 'Nome da Clínica', 210 / 2, currentHeaderY, { align: 'center' });
+        currentHeaderY += lineHeight * 1.5; // Space after company name
+
+        // Issue Date (left-aligned)
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
         doc.setTextColor(lightTextColor);
-        doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, margin, yPos + lineHeight * 0.5);
-        yPos += lineHeight * 2;
+        doc.text(`Data de Emissão: ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}`, margin, currentHeaderY);
+        currentHeaderY += lineHeight * 2; // Space before separator
+
+        yPos = currentHeaderY; // Update global yPos
       };
 
       await addMainHeader();
