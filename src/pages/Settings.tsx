@@ -12,7 +12,7 @@ import ImportDataSettings from "@/components/settings/ImportDataSettings";
 
 const Settings = () => {
   return (
-    <div className="space-y-6 max-w-6xl mx-auto"> {/* Aumentado de max-w-4xl para max-w-6xl */}
+    <div className="space-y-6 max-w-full mx-auto"> {/* Alterado de max-w-6xl para max-w-full */}
       <h2 className="text-3xl font-bold">Configurações</h2>
       <p className="text-muted-foreground">Gerencie as preferências da sua conta e do aplicativo.</p>
 
