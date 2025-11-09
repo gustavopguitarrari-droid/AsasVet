@@ -73,7 +73,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <ResizablePanel className="bg-background">
         <div className="flex flex-1 flex-col h-full overflow-hidden">
           <Header />
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto"> {/* Removido p-4 aqui */}
             <main className="flex flex-col">{children}</main>
           </div>
           <MadeWithDyad />

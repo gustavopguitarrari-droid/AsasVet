@@ -211,9 +211,7 @@ const ClinicDetailsSettings: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <p className="text-muted-foreground">
-          Gerencie o nome, logo, informações de contato e endereço da sua clínica.
-        </p>
+        {/* Removido: <p className="text-muted-foreground">Gerencie o nome, logo, informações de contato e endereço da sua clínica.</p> */}
 
         {/* Seção de Logo da Clínica - MOVIDA PARA O INÍCIO */}
         <div className="flex flex-col items-center space-y-4 mt-6">

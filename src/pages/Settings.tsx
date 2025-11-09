@@ -12,7 +12,7 @@ import ImportDataSettings from "@/components/settings/ImportDataSettings";
 
 const Settings = () => {
   return (
-    <div className="space-y-6 max-w-full mx-auto"> {/* Alterado de max-w-6xl para max-w-full */}
+    <div className="space-y-6 w-full p-4"> {/* Alterado de max-w-full mx-auto para w-full p-4 */}
       <h2 className="text-3xl font-bold">Configurações</h2>
       <p className="text-muted-foreground">Gerencie as preferências da sua conta e do aplicativo.</p>
 
@@ -62,7 +62,7 @@ const Settings = () => {
           <ImportDataSettings />
         </TabsContent>
 
-        <TabsContent value="my-plan" className="mt-4"> {/* Removida a restrição de largura aqui */}
+        <TabsContent value="my-plan" className="mt-4">
           <MyPlanSettings />
         </TabsContent>
 
