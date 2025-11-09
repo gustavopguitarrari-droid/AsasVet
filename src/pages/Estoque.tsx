@@ -79,9 +79,9 @@ const Estoque = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold">Estoque</h2>
+      {/* Removido: <h2 className="text-3xl font-bold">Estoque</h2> */}
 
-      <div className="p-4 border rounded-md bg-background shadow-md mb-6"> {/* Removido space-y-4 */}
+      <div className="p-4 border rounded-md bg-background shadow-md mb-6">
         <div className="flex flex-col md:flex-row items-center justify-between flex-wrap gap-4">
           <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} options={stockCategoryOptions} />
           <div className="flex items-center space-x-2 w-full md:w-auto flex-1">
