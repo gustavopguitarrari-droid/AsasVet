@@ -156,12 +156,12 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                   <div
                     key={event.id}
                     className={cn(
-                      "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white", // Adicionado text-white aqui para o container principal
-                      categoryColorMap[event.category], // Aplicando a cor de fundo aqui
+                      "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white", // Mantém text-white aqui para o container principal
+                      `!${categoryColorMap[event.category]}`, // Usando !bg- para forçar o background
                       (isCancelled || isRealizada) && "opacity-70"
                     )}
                   >
-                    <span className="font-bold text-lg">{event.time}</span> {/* Removido text-white redundante */}
+                    <span className="font-bold text-lg">{event.time}</span>
                     <div className="flex-1">
                       <p className={cn("font-medium", (isCancelled || isRealizada) && "line-through text-white/80")}>
                         {event.title}
@@ -176,19 +176,20 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                       </Badge>
                     ) : isRealizada ? (
                       <Badge className="bg-green-600 text-white">
-                        <CheckCircle className="h-3 w-3 mr-1" /> Realizada
+                        <CheckCircle className="h-3 w-3 mr-1 text-white" /> {/* Adicionado text-white */}
+                        Realizada
                       </Badge>
                     ) : (
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 hover:bg-white/20" // Removido text-white redundante
+                        className="h-8 w-8 text-white hover:bg-white/20"
                         onClick={(e) => {
                           e.stopPropagation();
                           onEventClick(event);
                         }}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 text-white" /> {/* Adicionado text-white */}
                         <span className="sr-only">Cancelar Agendamento</span>
                       </Button>
                     )}
