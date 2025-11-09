@@ -156,17 +156,17 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                   <div
                     key={event.id}
                     className={cn(
-                      "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white", // Adicionado text-white aqui
-                      categoryColorMap[event.category],
+                      "flex items-center space-x-3 p-3 rounded-md shadow-sm", // Removido text-white daqui
+                      categoryColorMap[event.category], // Aplicando a cor de fundo aqui
                       (isCancelled || isRealizada) && "opacity-70"
                     )}
                   >
-                    <span className="font-bold text-lg">{event.time}</span>
+                    <span className="font-bold text-lg text-white">{event.time}</span> {/* Adicionado text-white */}
                     <div className="flex-1">
-                      <p className={cn("font-medium", (isCancelled || isRealizada) && "line-through text-white/80")}> {/* Alterado para text-white/80 */}
+                      <p className={cn("font-medium text-white", (isCancelled || isRealizada) && "line-through text-white/80")}> {/* Adicionado text-white */}
                         {event.title}
                       </p>
-                      <Badge variant="secondary" className="mt-1 text-xs bg-white/40 text-white"> {/* Alterado para bg-white/40 e text-white */}
+                      <Badge variant="secondary" className="mt-1 text-xs bg-white/40 text-white">
                         {event.category}
                       </Badge>
                     </div>
@@ -182,7 +182,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-white hover:bg-white/20" // Alterado para text-white
+                        className="h-8 w-8 text-white hover:bg-white/20"
                         onClick={(e) => {
                           e.stopPropagation();
                           onEventClick(event);
