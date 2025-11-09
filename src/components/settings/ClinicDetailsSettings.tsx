@@ -204,7 +204,7 @@ const ClinicDetailsSettings: React.FC = () => {
   const isSubmitting = updateProfileMutation.isPending;
 
   return (
-    <Card>
+    <Card className="w-full"> {/* Adicionado w-full aqui */}
       <CardHeader>
         <CardTitle className="flex items-center">
           <Building2 className="mr-2 h-5 w-5" /> Detalhes da Clínica
