@@ -961,9 +961,33 @@ const Appointments = () => {
         <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "em-espera" | "em-andamento" | "finalizadas")} className="w-full md:w-auto flex-1"> {/* Adicionado flex-1 */}
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="em-espera" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Em Espera</TabsTrigger>
-              <TabsTrigger value="em-andamento" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Em Andamento</TabsTrigger>
-              <TabsTrigger value="finalizadas" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Finalizadas</TabsTrigger>
+              <TabsTrigger
+                value="em-espera"
+                className="
+                  bg-appointments-tab-waiting-inactive-bg text-appointments-tab-waiting-inactive-fg
+                  data-[state=active]:bg-appointments-status-waiting-bg data-[state=active]:text-appointments-status-waiting-fg
+                "
+              >
+                Em Espera
+              </TabsTrigger>
+              <TabsTrigger
+                value="em-andamento"
+                className="
+                  bg-appointments-tab-in-progress-inactive-bg text-appointments-tab-in-progress-inactive-fg
+                  data-[state=active]:bg-appointments-status-in-progress-bg data-[state=active]:text-appointments-status-in-progress-fg
+                "
+              >
+                Em Andamento
+              </TabsTrigger>
+              <TabsTrigger
+                value="finalizadas"
+                className="
+                  bg-appointments-tab-finalized-inactive-bg text-appointments-tab-finalized-inactive-fg
+                  data-[state=active]:bg-appointments-status-completed-bg data-[state=active]:text-appointments-status-completed-fg
+                "
+              >
+                Finalizadas
+              </TabsTrigger>
             </TabsList>
           </Tabs>
           <div className="relative flex-1 w-full md:w-auto">
@@ -1051,7 +1075,6 @@ const Appointments = () => {
           isOpen={isHistoryDialogOpen}
           onClose={() => setIsHistoryDialogOpen(false)}
           historyAppointments={historyAppointments}
-          onViewDetails={handleViewHistoryDetails}
           onClearHistory={clearHistoryAppointmentsMutation.mutate}
           isClearingHistory={clearHistoryAppointmentsMutation.isPending}
           onViewMedicalRecordPdf={handleOpenMedicalRecordPdfPreviewDialog}

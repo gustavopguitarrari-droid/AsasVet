@@ -105,6 +105,14 @@
     --appointments-status-cancelled-bg: 0 84.2% 60.2%; /* Destructive */
     --appointments-status-cancelled-fg: 0 0% 100%;
 
+    /* NOVO: Cores para as abas de status de consultas (inativas) */
+    --appointments-tab-waiting-inactive-bg: 0 0% 85%; /* Light Gray */
+    --appointments-tab-waiting-inactive-fg: 0 0% 30%; /* Darker Gray */
+    --appointments-tab-in-progress-inactive-bg: 30 90% 85%; /* Light Orange */
+    --appointments-tab-in-progress-inactive-fg: 30 90% 30%; /* Darker Orange */
+    --appointments-tab-finalized-inactive-bg: 140 70% 85%; /* Light Green */
+    --appointments-tab-finalized-inactive-fg: 140 70% 20%; /* Darker Green */
+
     /* Risk Level Colors */
     --risk-no-risk-bg: 220 80% 60%; /* Blue */
     --risk-low-bg: 140 70% 40%; /* Green */
@@ -229,6 +237,14 @@
     --appointments-status-cancelled-bg: 0 84.2% 60.2%;
     --appointments-status-cancelled-fg: 0 0% 100%;
 
+    /* NOVO: Cores para as abas de status de consultas (inativas) no tema Nature Vet */
+    --appointments-tab-waiting-inactive-bg: 20 20% 60%; /* Um cinza mais claro do marrom-avela */
+    --appointments-tab-waiting-inactive-fg: 50 100% 99%; /* lp-creme-terra */
+    --appointments-tab-in-progress-inactive-bg: 30 70% 70%; /* Um laranja mais claro */
+    --appointments-tab-in-progress-inactive-fg: 0 0% 100%;
+    --appointments-tab-finalized-inactive-bg: 90 40% 80%; /* Um verde mais claro da folha-seca */
+    --appointments-tab-finalized-inactive-fg: 20 20% 47%; /* lp-marrom-avela */
+
     /* Risk Level Colors for Nature Vet */
     --risk-no-risk-bg: 220 80% 60%; /* Blue */
     --risk-low-bg: 140 70% 40%; /* Green */
@@ -337,6 +353,14 @@
     --appointments-status-completed-fg: 210 30% 100%;
     --appointments-status-cancelled-bg: 0 84.2% 60.2%;
     --appointments-status-cancelled-fg: 0 0% 100%;
+
+    /* NOVO: Cores para as abas de status de consultas (inativas) no tema Pastel Blue */
+    --appointments-tab-waiting-inactive-bg: 210 20% 70%; /* Um cinza azulado mais claro */
+    --appointments-tab-waiting-inactive-fg: 210 50% 20%; /* Azul escuro */
+    --appointments-tab-in-progress-inactive-bg: 30 70% 80%; /* Um laranja pastel mais claro */
+    --appointments-tab-in-progress-inactive-fg: 30 70% 30%; /* Laranja escuro */
+    --appointments-tab-finalized-inactive-bg: 150 50% 80%; /* Um verde pastel mais claro */
+    --appointments-tab-finalized-inactive-fg: 150 50% 30%; /* Verde escuro */
 
     /* Risk Level Colors for Pastel Blue */
     --risk-no-risk-bg: 210 70% 75%; /* Light Blue */
