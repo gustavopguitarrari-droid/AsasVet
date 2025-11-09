@@ -367,7 +367,7 @@ const Cadastro = () => {
         .from('clients')
         .delete()
         .eq('id', clientId)
-        .eq('organization_id', organizationId); // Adicionado organization_id para segurança
+        .eq('organization_id', organizationId) // Adicionado organization_id para segurança
       if (error) {
         throw error;
       }
@@ -722,36 +722,38 @@ const Cadastro = () => {
         </TabsList>
 
         <TabsContent value="tutores" className="mt-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4"> {/* Novo contêiner flexível */}
-            <CadastroLegend /> {/* Componente de legenda */}
-            <div className="flex items-center space-x-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar tutores..."
-                  className="pl-9 w-64 border border-input rounded-lg"
-                  value={clientSearchTerm}
-                  onChange={(e) => setClientSearchTerm(e.target.value)}
-                />
-              </div>
-              <Dialog open={isAddClientDialogOpen} onOpenChange={setIsAddClientDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="font-bold">
-                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>Adicionar Novo Tutor</DialogTitle>
-                  </DialogHeader>
-                  <ClientForm
-                    key={isAddClientDialogOpen ? "open" : "closed"}
-                    onSubmit={handleAddClient}
-                    onCancel={() => setIsAddClientDialogOpen(false)}
-                    isSubmittingParent={addClientMutation.isPending}
+          <div className="p-4 border rounded-md bg-background shadow-md space-y-4 mb-6"> {/* Adicionado o fundo aqui */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4"> {/* Novo contêiner flexível */}
+              <CadastroLegend /> {/* Componente de legenda */}
+              <div className="flex items-center space-x-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Buscar tutores..."
+                    className="pl-9 w-64 border border-input rounded-lg"
+                    value={clientSearchTerm}
+                    onChange={(e) => setClientSearchTerm(e.target.value)}
                   />
-                </DialogContent>
-              </Dialog>
+                </div>
+                <Dialog open={isAddClientDialogOpen} onOpenChange={setIsAddClientDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="font-bold">
+                      <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Tutor
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Adicionar Novo Tutor</DialogTitle>
+                    </DialogHeader>
+                    <ClientForm
+                      key={isAddClientDialogOpen ? "open" : "closed"}
+                      onSubmit={handleAddClient}
+                      onCancel={() => setIsAddClientDialogOpen(false)}
+                      isSubmittingParent={addClientMutation.isPending}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
           </div>
 
@@ -873,41 +875,43 @@ const Cadastro = () => {
         </TabsContent>
 
         <TabsContent value="animais" className="mt-4">
-          <div className="flex flex-col md:flex-row items-center justify-between flex-wrap gap-4 mb-4">
-            <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
-            <div className="flex items-center space-x-2">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar animais por nome, raça ou tutor..."
-                  className="pl-9 border border-input rounded-lg"
-                  value={petSearchTerm}
-                  onChange={(e) => setPetSearchTerm(e.target.value)}
-                />
-              </div>
-              <Dialog open={isAddPetDialogOpen} onOpenChange={setIsAddPetDialogOpen}>
-                <DialogTrigger asChild>
-                  <Button className="font-bold" disabled={clients.length === 0}>
-                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>
-                      {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <PetForm
-                    key={isAddPetDialogOpen ? "open" : "closed"}
-                    onSubmit={handleAddPet}
-                    onCancel={() => setIsAddPetDialogOpen(false)}
-                    allClients={clients}
-                    defaultOwnerId={defaultOwnerIdForPet}
-                    defaultOwnerName={defaultOwnerNameForPet}
-                    isSubmittingParent={addPetMutation.isPending}
+          <div className="p-4 border rounded-md bg-background shadow-md space-y-4 mb-4"> {/* Adicionado o fundo aqui */}
+            <div className="flex flex-col md:flex-row items-center justify-between flex-wrap gap-4">
+              <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
+              <div className="flex items-center space-x-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Buscar animais por nome, raça ou tutor..."
+                    className="pl-9 border border-input rounded-lg"
+                    value={petSearchTerm}
+                    onChange={(e) => setPetSearchTerm(e.target.value)}
                   />
-                </DialogContent>
-              </Dialog>
+                </div>
+                <Dialog open={isAddPetDialogOpen} onOpenChange={setIsAddPetDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button className="font-bold" disabled={clients.length === 0}>
+                      <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Animal
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>
+                        {defaultOwnerNameForPet ? `Adicionar Animal para ${defaultOwnerNameForPet}` : "Adicionar Novo Animal"}
+                      </DialogTitle>
+                    </DialogHeader>
+                    <PetForm
+                      key={isAddPetDialogOpen ? "open" : "closed"}
+                      onSubmit={handleAddPet}
+                      onCancel={() => setIsAddPetDialogOpen(false)}
+                      allClients={clients}
+                      defaultOwnerId={defaultOwnerIdForPet}
+                      defaultOwnerName={defaultOwnerNameForPet}
+                      isSubmittingParent={addPetMutation.isPending}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
           </div>
 
