@@ -86,9 +86,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
       <Card className="flex-1 lg:max-w-[600px]">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2"> {/* Ajustado para flex-row */}
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle>Calendário de Agendamentos</CardTitle>
-          {/* NOVO: Botão de Limpar Agenda */}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive" size="sm" disabled={events.length === 0 || isClearingEvents}>
@@ -135,7 +134,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
             {selectedDay ? format(selectedDay, "PPP", { locale: ptBR }) : "Nenhum dia selecionado"}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="bg-transparent"> {/* Adicionado bg-transparent aqui */}
           {/* Legenda de Cores */}
           <div className="flex flex-wrap gap-2 mb-4">
             {eventCategories.map((category) => (
@@ -147,7 +146,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
           </div>
 
           {eventsForSelectedDay.length > 0 ? (
-            <div className="space-y-3">
+            <div className="space-y-3 bg-transparent"> {/* Adicionado bg-transparent aqui também */}
               {eventsForSelectedDay.map((event) => {
                 const isCancelled = event.status === "Cancelada";
                 const isRealizada = event.status === "Realizada";
@@ -161,9 +160,9 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                       (isCancelled || isRealizada) && "opacity-70"
                     )}
                   >
-                    <span className="font-bold text-lg">{event.time}</span>
+                    <span className="font-bold text-lg text-white">{event.time}</span> {/* Explicitamente text-white */}
                     <div className="flex-1">
-                      <p className={cn("font-medium", (isCancelled || isRealizada) && "line-through text-white/80")}>
+                      <p className={cn("font-medium text-white", (isCancelled || isRealizada) && "line-through text-white/80")}> {/* Explicitamente text-white */}
                         {event.title}
                       </p>
                       <Badge variant="secondary" className="mt-1 text-xs bg-white/40 text-white">
@@ -176,8 +175,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                       </Badge>
                     ) : isRealizada ? (
                       <Badge className="bg-green-600 text-white">
-                        <CheckCircle className="h-3 w-3 mr-1 text-white" /> {/* Adicionado text-white */}
-                        Realizada
+                        <CheckCircle className="h-3 w-3 mr-1 text-white" /> Realizada
                       </Badge>
                     ) : (
                       <Button
@@ -189,7 +187,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                           onEventClick(event);
                         }}
                       >
-                        <Trash2 className="h-4 w-4 text-white" /> {/* Adicionado text-white */}
+                        <Trash2 className="h-4 w-4 text-white" />
                         <span className="sr-only">Cancelar Agendamento</span>
                       </Button>
                     )}
