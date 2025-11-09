@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, Dog, Camera, XCircle, Upload, Search, User, MoreHorizontal } from "lucide-react"; // Removido Horse e Cow, adicionado MoreHorizontal
+import { PlusCircle, Dog, Camera, XCircle, Upload, Search, User, MoreHorizontal, Check, ChevronsUpDown } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -23,9 +23,22 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CameraCaptureDialog from "./CameraCaptureDialog";
 import { Client, Pet } from "@/types/cadastro";
 import { showError, showSuccess } from "@/utils/toast";
-import { Label } from "@/components/ui/label"; // Adicionado importação do Label
+import { Label } from "@/components/ui/label";
 import { useUser } from "@/context/UserContext";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // Esquema de validação do formulário com Zod
 const formSchema = z.object({
@@ -46,7 +59,6 @@ const formSchema = z.object({
   observations: z.string().optional(),
   photoUrl: z.string().optional(), // Pode ser Base64 ou URL pública
   ownerId: z.string().min(1, "O tutor é obrigatório."), // Este campo será preenchido pela busca
-  // cpfSearch: z.string().optional(), // Campo para input de CPF na UI - REMOVIDO
 });
 
 export type PetFormValues = z.infer<typeof formSchema>;
@@ -77,7 +89,6 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
       weight: initialData?.weight || undefined,
       observations: initialData?.observations || "",
       ownerId: initialData?.ownerId || defaultOwnerId || "",
-      // cpfSearch: "", // Inicializa o campo de busca de CPF - REMOVIDO
     },
   });
 
@@ -85,8 +96,9 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isCameraDialogOpen, setIsCameraDialogOpen] = useState(false);
 
-  const [ownerSearchInput, setOwnerSearchInput] = useState<string>(""); // Renomeado de cpfInput
-  const [foundClient, setFoundClient] = useState<Client | null>(null);
+  const [openOwnerCombobox, setOpenOwnerCombobox] = useState(false);
+  const [ownerSearchInput, setOwnerSearchInput] = useState<string>("");
+  const [selectedOwnerFromCombobox, setSelectedOwnerFromCombobox] = useState<Client | null>(null);
 
   useEffect(() => {
     form.reset({
@@ -105,9 +117,8 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
       fileInputRef.current.value = '';
     }
 
-    // Lida com os dados iniciais do tutor para edição ou adição a partir da visualização do cliente
     let initialOwner: Client | null = null;
-    let initialOwnerSearch = "";
+    let initialOwnerSearchValue = "";
 
     if (initialData?.ownerId) {
       initialOwner = allClients.find(c => c.id === initialData.ownerId) || null;
@@ -116,48 +127,33 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
     }
 
     if (initialOwner) {
-      initialOwnerSearch = initialOwner.name; // Preenche com o nome do tutor
-      setFoundClient(initialOwner);
+      setSelectedOwnerFromCombobox(initialOwner);
       form.setValue("ownerId", initialOwner.id);
+      initialOwnerSearchValue = initialOwner.name;
     } else {
-      setFoundClient(null);
+      setSelectedOwnerFromCombobox(null);
       form.setValue("ownerId", "");
     }
-    setOwnerSearchInput(initialOwnerSearch); // Atualiza o campo de busca
+    setOwnerSearchInput(initialOwnerSearchValue);
   }, [initialData, form, allClients, defaultOwnerId, defaultOwnerName]);
 
-  const handleOwnerSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => { // Renomeado
-    setOwnerSearchInput(e.target.value);
-  };
+  const filteredClients = useMemo(() => {
+    if (!ownerSearchInput) return allClients;
+    const lowerCaseSearchTerm = ownerSearchInput.toLowerCase();
+    return allClients.filter(client =>
+      client.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+      client.cpf.replace(/\D/g, '').includes(lowerCaseSearchTerm.replace(/\D/g, ''))
+    );
+  }, [allClients, ownerSearchInput]);
 
-  const handleSearchOwner = () => { // Renomeado
-    const searchTerm = ownerSearchInput.trim();
-    if (!searchTerm) {
-      showError("Digite o CPF ou nome do tutor para pesquisar.");
-      setFoundClient(null);
-      form.setValue("ownerId", "");
-      return;
-    }
-
-    const cleanSearchTerm = searchTerm.replace(/\D/g, '');
-    const isCpfSearch = cleanSearchTerm.length === 11 && /^\d+$/.test(cleanSearchTerm);
-    let found: Client | null = null;
-
-    if (isCpfSearch) {
-      found = allClients.find(client => client.cpf === cleanSearchTerm);
-    } else {
-      const lowerCaseSearchTerm = searchTerm.toLowerCase();
-      found = allClients.find(client => client.name.toLowerCase().includes(lowerCaseSearchTerm));
-    }
-
-    if (found) {
-      setFoundClient(found);
-      form.setValue("ownerId", found.id);
-      showSuccess(`Tutor ${found.name} encontrado!`);
-    } else {
-      showError("Tutor não encontrado com este CPF ou nome.");
-      setFoundClient(null);
-      form.setValue("ownerId", "");
+  const handleSelectOwner = (clientId: string) => {
+    const client = allClients.find(c => c.id === clientId);
+    if (client) {
+      setSelectedOwnerFromCombobox(client);
+      form.setValue("ownerId", client.id);
+      setOwnerSearchInput(client.name); // Display selected client's name in input
+      showSuccess(`Tutor ${client.name} selecionado!`);
+      setOpenOwnerCombobox(false); // Close combobox
     }
   };
 
@@ -261,33 +257,56 @@ const PetForm: React.FC<PetFormProps> = ({ onSubmit, onCancel, initialData, allC
             </div>
           </div>
 
-          {/* Busca de Tutor por CPF ou Nome */}
+          {/* Busca de Tutor por CPF ou Nome - Usando Combobox */}
           <div className="space-y-2 border p-3 rounded-md">
             <Label className="flex items-center">
-              <User className="h-4 w-4 mr-2 text-muted-foreground" /> Buscar Tutor (Nome ou CPF)
+              <User className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Tutor (Nome ou CPF)
             </Label>
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Digite o CPF ou nome do tutor"
-                value={ownerSearchInput}
-                onChange={handleOwnerSearchInputChange}
-                className="flex-1"
-                disabled={!!defaultOwnerId}
-              />
-              <Button type="button" onClick={handleSearchOwner} size="icon" disabled={!!defaultOwnerId}>
-                <Search className="h-4 w-4" />
-                <span className="sr-only">Buscar Tutor</span>
-              </Button>
-            </div>
-            {foundClient ? (
-              <p className="text-sm text-muted-foreground mt-2">
-                Tutor selecionado: <span className="font-semibold">{foundClient.name}</span>
-              </p>
-            ) : (
-              <p className="text-sm text-muted-foreground mt-2">
-                {defaultOwnerName ? `Tutor padrão: ${defaultOwnerName}` : "Nenhum tutor selecionado."}
-              </p>
-            )}
+            <Popover open={openOwnerCombobox} onOpenChange={setOpenOwnerCombobox}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={openOwnerCombobox}
+                  className="w-full justify-between"
+                  disabled={!!defaultOwnerId}
+                >
+                  {selectedOwnerFromCombobox
+                    ? selectedOwnerFromCombobox.name
+                    : "Buscar ou selecionar tutor..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
+                <Command>
+                  <CommandInput
+                    placeholder="Buscar tutor por nome ou CPF..."
+                    value={ownerSearchInput}
+                    onValueChange={setOwnerSearchInput}
+                  />
+                  <CommandList>
+                    <CommandEmpty>Nenhum tutor encontrado.</CommandEmpty>
+                    <CommandGroup>
+                      {filteredClients.map((client) => (
+                        <CommandItem
+                          key={client.id}
+                          value={`${client.name} ${client.cpf}`} // Use both for searchability
+                          onSelect={() => handleSelectOwner(client.id)}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedOwnerFromCombobox?.id === client.id ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {client.name} (CPF: {client.cpf})
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
             {/* Campo oculto para ownerId, valor definido pela busca ou initialData */}
             <FormField
               control={form.control}
