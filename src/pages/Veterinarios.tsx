@@ -282,23 +282,25 @@ const Veterinarios = () => {
         </TabsContent>
 
         <TabsContent value="equipe" className="mt-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
-            <RoleFilter selectedRole={selectedRole} onSelectRole={handleSelectRole} />
-            <div className="flex items-center gap-2 w-full flex-1">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar membros da equipe..."
-                  className="pl-9 border border-input rounded-lg"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
+          <div className="p-4 border rounded-md bg-background shadow-md space-y-4 mb-4"> {/* Adicionado o fundo aqui */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <RoleFilter selectedRole={selectedRole} onSelectRole={handleSelectRole} />
+              <div className="flex items-center gap-2 w-full flex-1">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Buscar membros da equipe..."
+                    className="pl-9 border border-input rounded-lg"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                {isAdmin && ( // Apenas administradores podem adicionar membros
+                  <Button onClick={() => setIsAddMemberDialogOpen(true)} className="font-bold shrink-0">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
+                  </Button>
+                )}
               </div>
-              {isAdmin && ( // Apenas administradores podem adicionar membros
-                <Button onClick={() => setIsAddMemberDialogOpen(true)} className="font-bold shrink-0">
-                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Membro
-                </Button>
-              )}
             </div>
           </div>
 
