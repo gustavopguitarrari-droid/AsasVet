@@ -81,22 +81,23 @@ const Estoque = () => {
     <div className="space-y-6">
       <h2 className="text-3xl font-bold">Estoque</h2>
 
-      <div className="p-4 border rounded-md bg-background shadow-md space-y-4 mb-6">
-        <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} options={stockCategoryOptions} />
-
-        <div className="flex items-center space-x-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar itens no estoque..."
-              className="pl-9 border border-input rounded-lg"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+      <div className="p-4 border rounded-md bg-background shadow-md mb-6"> {/* Removido space-y-4 */}
+        <div className="flex flex-col md:flex-row items-center justify-between flex-wrap gap-4">
+          <CategoryFilter selectedCategory={selectedCategory} onSelectCategory={handleSelectCategory} options={stockCategoryOptions} />
+          <div className="flex items-center space-x-2 w-full md:w-auto flex-1">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar itens no estoque..."
+                className="pl-9 border border-input rounded-lg"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <Button>
+              <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Item
+            </Button>
           </div>
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Item
-          </Button>
         </div>
       </div>
 
