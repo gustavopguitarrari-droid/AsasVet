@@ -916,14 +916,14 @@ const Appointments = () => {
         {/* Removido o div flex items-center justify-between que continha os botões */}
 
         <div className="grid gap-4 md:grid-cols-4">
-          <Card className="bg-gray-700 text-white shadow-md">
+          <Card className="bg-appointments-status-waiting-bg text-appointments-status-waiting-fg shadow-md">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Em espera</CardTitle>
-              <CalendarClock className="h-4 w-4 text-white" />
+              <CalendarClock className="h-4 w-4 text-current" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalAgendadas}</div>
-              <p className="text-gray-200 text-xs">Consultas aguardando</p>
+              <p className="text-current/80 text-xs">Consultas aguardando</p>
             </CardContent>
           </Card>
           <Card className="bg-orange-500 text-white shadow-md">
