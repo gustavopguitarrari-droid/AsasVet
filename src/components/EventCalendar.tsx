@@ -127,7 +127,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
         </CardContent>
       </Card>
 
-      <Card className="flex-1 bg-transparent"> {/* Adicionado bg-transparent aqui */}
+      <Card className="flex-1 bg-transparent">
         <CardHeader>
           <CardTitle>
             Agendamentos para{" "}
@@ -155,8 +155,8 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                   <div
                     key={event.id}
                     className={cn(
-                      "flex items-center space-x-3 p-3 rounded-md shadow-sm text-white",
-                      `!${categoryColorMap[event.category]}`, // Usando !bg- para forçar o background
+                      "flex items-center space-x-3 p-3 rounded-md shadow-sm", // Removido text-white daqui
+                      categoryColorMap[event.category], // Aplicando a classe de cor diretamente
                       (isCancelled || isRealizada) && "opacity-70"
                     )}
                   >
