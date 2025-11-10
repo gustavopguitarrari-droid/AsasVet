@@ -543,8 +543,10 @@ const ConsultationPage: React.FC = () => {
         console.error("addAnimalDebitMutation: Missing required IDs:", missing.join(', '));
         throw new Error(`Missing required IDs: ${missing.join(', ')}`);
       }
-      console.log("ConsultationPage: addAnimalDebitMutation - Attempting to insert animal debit with payload:", debitData); // LOG DE DEBBUG
-      const { data, error } = await supabase
+      console.log("ConsultationPage: addAnimalDebitMutation - Attempting to insert animal debit with payload:", debitData);
+      
+      // Modificação aqui: Removido .single() para depuração
+      const { data, error, status, statusText } = await supabase
         .from('animal_debits')
         .insert({
           user_id: userId,
@@ -552,28 +554,34 @@ const ConsultationPage: React.FC = () => {
           pet_id: appointment.pet_id,
           appointment_id: appointmentId,
           description: debitData.description,
-          amount: debitData.calculatedTotalAmount, // Usar o valor total calculado
+          amount: debitData.calculatedTotalAmount,
           is_paid: false,
           transaction_id: null,
         })
-        .select()
-        .single();
+        .select(); // Removido .single() para depuração
+
+      console.log("ConsultationPage: Supabase raw response - data:", data, "error:", error, "status:", status, "statusText:", statusText);
+
       if (error) {
-        console.error("ConsultationPage: addAnimalDebitMutation - Supabase insert error:", error); // LOG DE ERRO
+        console.error("ConsultationPage: addAnimalDebitMutation - Supabase insert error:", error);
         throw error;
       }
-      console.log("ConsultationPage: addAnimalDebitMutation - Supabase insert response (data):", data); // LOG DE SUCESSO
-      return data;
+      if (!data || data.length === 0) {
+        console.error("ConsultationPage: addAnimalDebitMutation - Supabase insert returned no data.");
+        throw new Error("Supabase insert returned no data.");
+      }
+      console.log("ConsultationPage: addAnimalDebitMutation - Supabase insert response (data):", data);
+      return data[0]; // Retorna o primeiro item, já que .single() foi removido
     },
     onSuccess: () => {
-      console.log("ConsultationPage: addAnimalDebitMutation - onSuccess triggered."); // LOG DE SUCESSO
+      console.log("ConsultationPage: addAnimalDebitMutation - onSuccess triggered.");
       queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] });
       showSuccess("Débito adicionado ao animal com sucesso!");
       setIsAddAnimalDebitDialogOpen(false);
     },
     onError: (err) => {
-      console.error("ConsultationPage: addAnimalDebitMutation - onError triggered with error:", err); // LOG DE ERRO
-      showError(`Erro ao adicionar débito: ${err.message}. Detalhes: ${JSON.stringify(err)}`); // More detailed error toast
+      console.error("ConsultationPage: addAnimalDebitMutation - onError triggered with error:", err);
+      showError(`Erro ao adicionar débito: ${err.message}. Detalhes: ${JSON.stringify(err)}`);
     },
   });
 
@@ -668,7 +676,7 @@ const ConsultationPage: React.FC = () => {
   };
 
   const handleAddAnimalDebit = (data: FinalAnimalDebitData) => { // Atualizado para FinalAnimalDebitData
-    console.log("ConsultationPage: handleAddAnimalDebit called with data:", data); // LOG DE DEBBUG
+    console.log("ConsultationPage: handleAddAnimalDebit called with data:", data);
     console.log("ConsultationPage: Current appointment object for debit:", appointment);
     console.log("ConsultationPage: Current appUser for debit:", appUser);
     try {
