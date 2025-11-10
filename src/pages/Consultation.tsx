@@ -851,7 +851,7 @@ const ConsultationPage: React.FC = () => {
         onSubmit={handleAddAnimalDebit}
         isSubmitting={addAnimalDebitMutation.isPending}
         products={products}
-        existingAnimalDebits={animalDebits} {/* NOVO: Passando os débitos existentes */}
+        existingAnimalDebits={animalDebits}
       />
 
       <PdfPreviewDialog
