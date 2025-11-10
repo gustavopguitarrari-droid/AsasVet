@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { usePageTitle } from "@/context/PageTitleContext";
@@ -19,6 +19,9 @@ import { Appointment } from "@/pages/Appointments";
 import { Client, Pet } from "@/types/cadastro";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { generateFinancialReportPdf } from "@/utils/generateFinancialReportPdf";
+import { showError, showSuccess } from "@/utils/toast";
+import PdfPreviewDialog from "@/components/PdfPreviewDialog";
 
 const Reports = () => {
   const { setPageTitle } = usePageTitle();
@@ -29,6 +32,10 @@ const Reports = () => {
     from: subDays(new Date(), 29),
     to: new Date(),
   });
+
+  const [isPdfPreviewOpen, setIsPdfPreviewOpen] = useState(false);
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const [pdfFilename, setPdfFilename] = useState("");
 
   useEffect(() => {
     setPageTitle("Financeiro - Relatórios");
@@ -81,6 +88,52 @@ const Reports = () => {
     };
   }, [reportData]);
 
+  const generateReportPdfMutation = useMutation({
+    mutationFn: async () => {
+      if (!reportData || !dateRange?.from || !dateRange?.to || !appUser) {
+        throw new Error("Dados insuficientes para gerar o relatório.");
+      }
+      const blob = await generateFinancialReportPdf({
+        transactions: reportData.transactions,
+        summary,
+        dateRange,
+        logoUrl: appUser.logoUrl,
+        clinicDetails: {
+          companyName: appUser.companyName || "Sua Clínica",
+          address: `${appUser.addressStreet || ''}, ${appUser.addressNumber || ''} - ${appUser.addressCity || ''}`,
+          phone: appUser.phone || '',
+          email: appUser.email || '',
+        },
+      });
+      return blob;
+    },
+    onSuccess: (blob) => {
+      setPdfBlob(blob);
+      const from = format(dateRange!.from!, 'yyyy-MM-dd');
+      const to = format(dateRange!.to!, 'yyyy-MM-dd');
+      setPdfFilename(`Relatorio_Financeiro_${from}_a_${to}.pdf`);
+      setIsPdfPreviewOpen(true);
+    },
+    onError: (err: any) => {
+      showError(`Erro ao gerar PDF: ${err.message}`);
+    },
+  });
+
+  const handlePrintReport = () => {
+    generateReportPdfMutation.mutate();
+  };
+
+  const handleConfirmPdfDownload = (filename: string, downloadUrl: string) => {
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showSuccess("Relatório baixado com sucesso!");
+    setIsPdfPreviewOpen(false);
+  };
+
   if (error) {
     return <div className="text-center text-destructive">Erro ao carregar dados do relatório: {error.message}</div>;
   }
@@ -101,8 +154,9 @@ const Reports = () => {
           <label className="font-medium">Período do Relatório:</label>
           <DateRangePicker date={dateRange} onDateChange={setDateRange} />
         </div>
-        <Button disabled={isLoading}>
-          <Printer className="mr-2 h-4 w-4" /> Imprimir Relatório
+        <Button onClick={handlePrintReport} disabled={isLoading || generateReportPdfMutation.isPending}>
+          <Printer className="mr-2 h-4 w-4" />
+          {generateReportPdfMutation.isPending ? "Gerando..." : "Imprimir Relatório"}
         </Button>
       </div>
 
@@ -206,6 +260,14 @@ const Reports = () => {
           </div>
         </>
       ) : null}
+
+      <PdfPreviewDialog
+        isOpen={isPdfPreviewOpen}
+        onClose={() => setIsPdfPreviewOpen(false)}
+        pdfBlob={pdfBlob}
+        filename={pdfFilename}
+        onConfirmDownload={handleConfirmPdfDownload}
+      />
     </div>
   );
 };
