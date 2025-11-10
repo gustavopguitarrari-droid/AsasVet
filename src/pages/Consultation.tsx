@@ -779,7 +779,7 @@ const ConsultationPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-full text-destructive">
         <p>Erro ao carregar dados: {error?.message || medicalRecordError?.message || clientsError?.message || petsError?.message || veterinariansError?.message || productsError?.message || animalDebitsError?.message}</p>
-        <Button onClick={() => navigate('/consultas')} className="ml-4">
+        <Button onClick={() => navigate('/consultas')} className="ml-4 bg-green-600 hover:bg-green-700 text-white">
           <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
         </Button>
       </div>
@@ -790,7 +790,7 @@ const ConsultationPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-full text-muted-foreground">
         <p>Consulta não encontrada.</p>
-        <Button onClick={() => navigate('/consultas')} className="ml-4">
+        <Button onClick={() => navigate('/consultas')} className="ml-4 bg-green-600 hover:bg-green-700 text-white">
           <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
         </Button>
       </div>
@@ -836,7 +836,7 @@ const ConsultationPage: React.FC = () => {
         <h2 className="text-3xl font-bold flex items-center">
           <CalendarCheck className="mr-3 h-7 w-7 text-primary" /> Consulta em Andamento
         </h2>
-        <Button onClick={() => navigate('/consultas')} variant="outline">
+        <Button onClick={() => navigate('/consultas')} className="bg-green-600 hover:bg-green-700 text-white">
           <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para Consultas
         </Button>
       </div>
