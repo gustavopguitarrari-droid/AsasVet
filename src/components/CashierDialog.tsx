@@ -326,7 +326,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-full md:w-[700px] lg:w-[900px] flex flex-col rounded-l-xl shadow-lg">
+      <SheetContent side="right" className="w-full md:w-[800px] lg:w-[1100px] flex flex-col rounded-l-xl shadow-lg">
         <SheetHeader className="pb-4">
           <SheetTitle className="flex items-center">
             <ShoppingCart className="h-5 w-5 mr-2" /> Caixa
