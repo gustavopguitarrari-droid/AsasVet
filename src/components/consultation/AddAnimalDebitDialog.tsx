@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, DollarSign, Tag, Package, Search as SearchIcon, CheckCircle, ReceiptText } from "lucide-react"; // Added CheckCircle and ReceiptText
+import { PlusCircle, DollarSign, Tag, Package, Search as SearchIcon, CheckCircle, ReceiptText } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -26,26 +26,61 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Product, AnimalDebit } from "@/types/cashier"; // Import AnimalDebit
+import { Product, AnimalDebit } from "@/types/cashier";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // Import Table components
-import { Badge } from "@/components/ui/badge"; // Import Badge
-import { cn } from "@/lib/utils"; // Import cn for conditional classes
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Import Tabs
-import { showError } from "@/utils/toast"; // Import showError
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { showError } from "@/utils/toast";
 
 const formSchema = z.object({
-  description: z.string().min(1, "A descrição é obrigatória."),
+  description: z.string().optional(), // Tornar opcional no nível superior
   amount: z.preprocess(
     (val) => (val === "" ? undefined : Number(String(val).replace(',', '.'))),
-    z.number().min(0.01, "O valor deve ser maior que zero.")
+    z.number().optional() // Tornar opcional no nível superior
   ),
   quantity: z.preprocess(
     (val) => (val === "" ? undefined : Number(val)),
     z.number().int().min(1, "A quantidade deve ser pelo menos 1.").default(1)
   ),
   productId: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.productId) {
+    // Se um produto é selecionado, a descrição e o valor são implicitamente válidos do produto.
+    // Apenas garantir que eles não estejam completamente vazios se um produto for selecionado.
+    if (!data.description || data.description.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "A descrição do produto é obrigatória.",
+        path: ["description"],
+      });
+    }
+    if (data.amount === undefined || data.amount <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "O valor do produto deve ser maior que zero.",
+        path: ["amount"],
+      });
+    }
+  } else {
+    // Se nenhum produto é selecionado, então a descrição e o valor personalizados são obrigatórios
+    if (!data.description || data.description.trim() === "") {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "A descrição é obrigatória.",
+        path: ["description"],
+      });
+    }
+    if (data.amount === undefined || data.amount <= 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "O valor deve ser maior que zero.",
+        path: ["amount"],
+      });
+    }
+  }
 });
 
 export type AddAnimalDebitFormValues = z.infer<typeof formSchema>;
@@ -56,8 +91,8 @@ interface AddAnimalDebitDialogProps {
   onSubmit: (data: AddAnimalDebitFormValues) => void;
   isSubmitting: boolean;
   products: Product[];
-  animalDebits: AnimalDebit[]; // NEW: Existing animal debits
-  onMarkDebitAsPaid: (debitId: string) => void; // NEW: Handler to mark debit as paid
+  animalDebits: AnimalDebit[];
+  onMarkDebitAsPaid: (debitId: string) => void;
 }
 
 const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
@@ -66,8 +101,8 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
   onSubmit,
   isSubmitting,
   products,
-  animalDebits, // Destructure new prop
-  onMarkDebitAsPaid, // Destructure new prop
+  animalDebits,
+  onMarkDebitAsPaid,
 }) => {
   const form = useForm<AddAnimalDebitFormValues>({
     resolver: zodResolver(formSchema),
@@ -80,15 +115,18 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
   });
 
   const [selectedProductId, setSelectedProductId] = useState<string | undefined>(undefined);
-  const [customDescription, setCustomDescription] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<"add" | "view">("add"); // NEW: State for tabs within the dialog
+  const activeTab = form.watch("activeTab") || "add"; // Assuming activeTab is also part of form state or managed externally
 
   React.useEffect(() => {
     if (isOpen) {
-      form.reset();
+      form.reset({
+        description: "",
+        amount: undefined,
+        quantity: 1,
+        productId: undefined,
+      });
       setSelectedProductId(undefined);
-      setCustomDescription("");
-      setActiveTab("add"); // Reset to 'add' tab when dialog opens
+      // setActiveTab("add"); // Reset to 'add' tab when dialog opens
     }
   }, [isOpen, form]);
 
@@ -96,30 +134,28 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
     setSelectedProductId(productId);
     const product = products.find(p => p.id === productId);
     if (product) {
-      form.setValue("description", product.name);
-      form.setValue("amount", product.price);
-      form.setValue("productId", product.id);
-      setCustomDescription("");
+      form.setValue("description", product.name, { shouldValidate: true });
+      form.setValue("amount", product.price, { shouldValidate: true });
+      form.setValue("productId", product.id, { shouldValidate: true });
       form.clearErrors(["description", "amount", "productId"]);
     }
   };
 
   const handleCustomDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCustomDescription(e.target.value);
-    form.setValue("description", e.target.value);
-    form.setValue("productId", undefined);
+    form.setValue("description", e.target.value, { shouldValidate: true });
+    form.setValue("productId", undefined, { shouldValidate: true });
     setSelectedProductId(undefined);
     form.clearErrors(["description", "productId"]);
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(',', '.');
-    form.setValue("amount", value === "" ? undefined : parseFloat(value));
+    form.setValue("amount", value === "" ? undefined : parseFloat(value), { shouldValidate: true });
   };
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    form.setValue("quantity", value === "" ? 1 : parseInt(value, 10));
+    form.setValue("quantity", value === "" ? 1 : parseInt(value, 10), { shouldValidate: true });
   };
 
   const currentQuantity = form.watch("quantity") || 1;
@@ -127,24 +163,12 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
   const totalAmount = useMemo(() => currentQuantity * currentAmountPerUnit, [currentQuantity, currentAmountPerUnit]);
 
   const handleSubmit = (data: AddAnimalDebitFormValues) => {
-    if (selectedProductId) {
-      const product = products.find(p => p.id === selectedProductId);
-      if (product) {
-        data.description = product.name;
-        data.amount = product.price * data.quantity;
-        data.productId = product.id;
-      }
-    } else {
-      data.description = customDescription;
-      data.amount = totalAmount;
-      data.productId = undefined;
-    }
     onSubmit(data);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto"> {/* Increased max-width */}
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <ReceiptText className="h-5 w-5 mr-2" /> Gerenciar Débitos do Animal
@@ -166,7 +190,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
 
           <TabsContent value="add" className="mt-4">
             <Form {...form}>
-              <form className="space-y-4 py-4"> {/* Removido onSubmit do form */}
+              <form className="space-y-4 py-4">
                 <div className="space-y-2">
                   <Label className="flex items-center">
                     <SearchIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Produto/Serviço
@@ -212,9 +236,8 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                         <Textarea
                           placeholder="Ex: Consulta de emergência, Raio-X de pata"
                           {...field}
-                          value={customDescription}
-                          onChange={handleCustomDescriptionChange}
-                          disabled={!!selectedProductId}
+                          readOnly={!!selectedProductId} // Usar readOnly
+                          onChange={selectedProductId ? undefined : handleCustomDescriptionChange} // Apenas permitir onChange se não houver produto selecionado
                         />
                       </FormControl>
                       <FormMessage />
@@ -235,9 +258,10 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                           <Input
                             type="text"
                             placeholder="0,00"
+                            {...field}
                             value={field.value === undefined ? "" : String(field.value).replace('.', ',')}
                             onChange={handleAmountChange}
-                            disabled={!!selectedProductId}
+                            readOnly={!!selectedProductId} // Usar readOnly
                           />
                         </FormControl>
                         <FormMessage />
@@ -278,7 +302,6 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                     Cancelar
                   </Button>
                   <Button
-                    // Removido type="submit" para controle manual do clique
                     disabled={isSubmitting || !form.formState.isValid}
                     onClick={() => {
                       if (!form.formState.isValid) {
@@ -331,7 +354,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                               variant="outline"
                               size="sm"
                               onClick={() => onMarkDebitAsPaid(debit.id)}
-                              disabled={isSubmitting} // Use isSubmitting from parent for this action too
+                              disabled={isSubmitting}
                             >
                               <CheckCircle className="mr-2 h-4 w-4" /> Marcar como Pago
                             </Button>
