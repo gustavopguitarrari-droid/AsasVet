@@ -174,7 +174,7 @@ const ConsultationPage: React.FC = () => {
         id: dbPet.id,
         name: dbPet.name,
         species: dbPet.species as Pet["species"],
-        breed: db.breed,
+        breed: dbPet.breed, // Corrected from db.breed
         age: dbPet.age,
         gender: dbPet.gender as Pet["gender"],
         color: dbPet.color,
@@ -822,7 +822,8 @@ const ConsultationPage: React.FC = () => {
         onSubmit={handleAddAnimalDebit}
         isSubmitting={addAnimalDebitMutation.isPending}
         products={products}
-        // Removido animalDebits e onMarkDebitAsPaid
+        animalDebits={animalDebits}
+        onMarkDebitAsPaid={markDebitAsPaidMutation.mutate} // Passa a mutação para marcar como pago
       />
 
       <PdfPreviewDialog
