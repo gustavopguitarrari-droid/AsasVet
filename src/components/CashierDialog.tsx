@@ -143,31 +143,6 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
     });
   };
 
-  // NOVO: Função memoizada para adicionar um débito de animal ao carrinho
-  const handleAddAnimalDebitToCart = React.useCallback((debit: AnimalDebit) => {
-    setCartItems((prevItems) => {
-      const existingItemIndex = prevItems.findIndex((item) => item.originalDebitId === debit.id && item.isDebit);
-
-      if (existingItemIndex > -1) {
-        return prevItems;
-      } else {
-        return [
-          ...prevItems,
-          {
-            name: debit.description,
-            price: debit.amount,
-            quantity: 1,
-            total: debit.amount,
-            organization_id: organizationId!,
-            isDebit: true,
-            originalDebitId: debit.id,
-            petId: debit.pet_id,
-          },
-        ];
-      }
-    });
-  }, [organizationId]); // A dependência é estável
-
   const handleUpdateQuantity = (itemId: string, newQuantity: number, isDebit: boolean) => {
     setCartItems((prevItems) => {
       // Débitos de animais não podem ter a quantidade alterada
@@ -198,14 +173,8 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
       if (error) throw error;
       return debitId;
     },
-    onSuccess: (deletedDebitId) => {
-      // ATUALIZADO: Atualiza manualmente o cache do React Query para remover o débito
-      queryClient.setQueryData(
-        ['animalDebitsCashier', selectedPetId, organizationId],
-        (oldData: AnimalDebit[] | undefined) => {
-          return oldData ? oldData.filter(debit => debit.id !== deletedDebitId) : [];
-        }
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['animalDebitsCashier', selectedPetId, organizationId] });
       showSuccess("Débito removido com sucesso!");
     },
     onError: (err: any) => {
@@ -214,12 +183,12 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
   });
 
   const handleRemoveItem = (itemId: string, isDebit: boolean) => {
-    // Remove o item do estado local do carrinho para feedback imediato
-    setCartItems((prevItems) => prevItems.filter((item) => (isDebit ? item.originalDebitId !== itemId : item.productId !== itemId)));
-    
-    // Se for um débito, chama a mutação para deletar do banco de dados
     if (isDebit) {
+      // Para débitos, apenas chama a mutação. O useEffect cuidará da atualização da UI.
       deleteAnimalDebitMutation.mutate(itemId);
+    } else {
+      // Para produtos, atualiza o estado local imediatamente.
+      setCartItems((prevItems) => prevItems.filter((item) => item.productId !== itemId));
     }
   };
 
@@ -338,24 +307,31 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
     setSelectedPetId(petId);
   };
 
-  // NOVO: Efeito para adicionar débitos automaticamente quando um animal é selecionado
+  // Efeito para sincronizar os débitos do animal com o carrinho
   useEffect(() => {
     if (selectedPetId && animalDebits && !isLoadingAnimalDebits) {
-      animalDebits.forEach(debit => {
-        handleAddAnimalDebitToCart(debit);
+      const debitItemsInCart = animalDebits.map(debit => ({
+        name: debit.description,
+        price: debit.amount,
+        quantity: 1,
+        total: debit.amount,
+        organization_id: organizationId!,
+        isDebit: true,
+        originalDebitId: debit.id,
+        petId: debit.pet_id,
+      }));
+
+      setCartItems(prevItems => {
+        // Mantém apenas os itens que não são débitos (produtos/serviços)
+        const nonDebitItems = prevItems.filter(item => !item.isDebit);
+        // Adiciona os débitos atuais do animal selecionado
+        return [...nonDebitItems, ...debitItemsInCart];
       });
     } else if (!selectedPetId) {
-      // Se nenhum animal estiver selecionado, remove apenas os itens de débito do carrinho
-      setCartItems(prevItems => {
-        const itemsWithoutDebits = prevItems.filter(item => !item.isDebit);
-        // Apenas atualiza o estado se houver realmente uma mudança
-        if (itemsWithoutDebits.length < prevItems.length) {
-          return itemsWithoutDebits;
-        }
-        return prevItems;
-      });
+      // Se nenhum animal estiver selecionado, remove todos os itens de débito do carrinho
+      setCartItems(prevItems => prevItems.filter(item => !item.isDebit));
     }
-  }, [selectedPetId, animalDebits, isLoadingAnimalDebits, handleAddAnimalDebitToCart]);
+  }, [selectedPetId, animalDebits, isLoadingAnimalDebits, organizationId]);
 
 
   const isLoadingAll = isLoadingProducts || isLoadingClients || isLoadingPets || isLoadingAnimalDebits;
