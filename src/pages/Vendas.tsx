@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
@@ -13,8 +14,9 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Search, DollarSign, Calendar, ShoppingCart, List } from "lucide-react";
+import { Search, DollarSign, Calendar, ShoppingCart, List, ArrowLeft } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 
 // Estende a interface Transaction para garantir que sale_items esteja sempre presente
 interface SaleTransaction extends Transaction {
@@ -92,7 +94,14 @@ const Vendas = () => {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-bold">Histórico de Vendas</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-3xl font-bold">Histórico de Vendas</h2>
+        <Button asChild variant="outline">
+          <Link to="/financeiro">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Voltar
+          </Link>
+        </Button>
+      </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
