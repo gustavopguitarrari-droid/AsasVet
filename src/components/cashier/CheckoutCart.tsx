@@ -14,7 +14,7 @@ interface CheckoutCartProps {
   onUpdateQuantity: (itemId: string, newQuantity: number, isDebit: boolean) => void;
   onRemoveItem: (itemId: string, isDebit: boolean) => void;
   animalDebits: AnimalDebit[];
-  onAddAnimalDebitToCart: (debit: AnimalDebit) => void;
+  // onAddAnimalDebitToCart removido
   selectedPetId?: string | null;
   isLoadingAnimalDebits: boolean;
 }
@@ -24,7 +24,7 @@ const CheckoutCart: React.FC<CheckoutCartProps> = ({
   onUpdateQuantity,
   onRemoveItem,
   animalDebits,
-  onAddAnimalDebitToCart,
+  // onAddAnimalDebitToCart removido
   selectedPetId,
   isLoadingAnimalDebits,
 }) => {
@@ -105,21 +105,20 @@ const CheckoutCart: React.FC<CheckoutCartProps> = ({
             ) : animalDebits.length === 0 ? (
               <p className="text-center text-muted-foreground">Nenhum débito pendente para este animal.</p>
             ) : (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {animalDebits.map((debit) => (
                   <div key={debit.id} className="flex items-center justify-between p-2 border rounded-lg bg-card shadow-sm">
                     <div className="flex-1">
                       <p className="font-medium">{debit.description}</p>
                       <p className="text-sm text-muted-foreground">R$ {debit.amount.toFixed(2).replace('.', ',')}</p>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => onAddAnimalDebitToCart(debit)}
-                      className="flex items-center gap-1"
-                    >
-                      <Plus className="h-4 w-4" /> Adicionar
-                    </Button>
+                    {/* Botão "Adicionar" removido, pois os débitos são adicionados automaticamente */}
+                    <Badge className={cn(
+                      "text-white",
+                      debit.is_paid ? "bg-green-500" : "bg-orange-500"
+                    )}>
+                      {debit.is_paid ? "Pago" : "Pendente"}
+                    </Badge>
                   </div>
                 ))}
               </div>

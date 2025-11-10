@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, X } from "lucide-react";
 import {
@@ -139,13 +139,13 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
     });
   };
 
-  // NOVO: Função para adicionar um débito de animal ao carrinho
+  // NOVO: Função para adicionar um débito de animal ao carrinho (agora definida aqui)
   const handleAddAnimalDebitToCart = (debit: AnimalDebit) => {
     setCartItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex((item) => item.originalDebitId === debit.id && item.isDebit);
 
       if (existingItemIndex > -1) {
-        showError("Este débito já está no carrinho.");
+        // showError("Este débito já está no carrinho."); // Removido para evitar spam de toast ao adicionar automaticamente
         return prevItems;
       } else {
         return [
@@ -301,9 +301,21 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
 
   const handleSelectPet = (petId: string | null) => {
     setSelectedPetId(petId);
-    // Opcional: Limpar o carrinho ao mudar de animal, ou manter itens não relacionados a débitos
-    // setCartItems(prev => prev.filter(item => !item.isDebit));
   };
+
+  // NOVO: Efeito para adicionar débitos automaticamente quando um animal é selecionado
+  useEffect(() => {
+    if (selectedPetId && animalDebits && !isLoadingAnimalDebits) {
+      console.log("CashierDialog: useEffect - Adding animal debits to cart for pet:", selectedPetId);
+      animalDebits.forEach(debit => {
+        handleAddAnimalDebitToCart(debit);
+      });
+    } else if (!selectedPetId) {
+      // Se nenhum animal estiver selecionado, remove todos os débitos do carrinho
+      console.log("CashierDialog: useEffect - No pet selected, clearing debit items from cart.");
+      setCartItems(prevItems => prevItems.filter(item => !item.isDebit));
+    }
+  }, [selectedPetId, animalDebits, isLoadingAnimalDebits]); // Depende de selectedPetId e animalDebits
 
   const isLoadingAll = isLoadingProducts || isLoadingClients || isLoadingPets || isLoadingAnimalDebits;
 
@@ -342,8 +354,8 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
               items={cartItems}
               onUpdateQuantity={handleUpdateQuantity}
               onRemoveItem={handleRemoveItem}
-              animalDebits={animalDebits}
-              onAddAnimalDebitToCart={handleAddAnimalDebitToCart}
+              animalDebits={animalDebits} // Ainda passa para exibir a lista de débitos pendentes
+              // onAddAnimalDebitToCart removido, pois agora é automático
               selectedPetId={selectedPetId}
               isLoadingAnimalDebits={isLoadingAnimalDebits}
             />
