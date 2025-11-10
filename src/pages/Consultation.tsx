@@ -37,6 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from '@/lib/utils';
 import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf';
 import PdfPreviewDialog from '@/components/PdfPreviewDialog';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'; // Importar Tooltip
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -755,6 +756,31 @@ const ConsultationPage: React.FC = () => {
     prescriptions: medicalRecord?.prescriptions || [],
   };
 
+  // Debugging the disabled condition for the "Débitos do Animal" button
+  const isPetIdPresent = !!appointment?.pet_id;
+  const isPetInOrg = appointment?.pet_id && allPets.some(pet => pet.id === appointment.pet_id && pet.organization_id === organizationId);
+  const isDebitButtonDisabled = !isPetIdPresent || !isPetInOrg;
+
+  console.log("--- Debugging 'Débitos do Animal' button ---");
+  console.log("appointment?.pet_id:", appointment?.pet_id);
+  console.log("organizationId:", organizationId);
+  console.log("isPetIdPresent:", isPetIdPresent);
+  console.log("isPetInOrg (check in allPets):", isPetInOrg);
+  console.log("isDebitButtonDisabled:", isDebitButtonDisabled);
+  console.log("allPets (first 5 items):", allPets.slice(0, 5)); // Log a few pets to see structure
+  if (appointment?.pet_id) {
+    const foundPet = allPets.find(pet => pet.id === appointment.pet_id);
+    console.log("Found pet in allPets for appointment.pet_id:", foundPet);
+  }
+  console.log("-------------------------------------------");
+
+  let debitButtonTooltipMessage = "Adicionar débitos ao animal desta consulta.";
+  if (!isPetIdPresent) {
+    debitButtonTooltipMessage = "Não é possível adicionar débitos: Esta consulta não está vinculada a um animal.";
+  } else if (!isPetInOrg) {
+    debitButtonTooltipMessage = "Não é possível adicionar débitos: O animal desta consulta não foi encontrado ou não pertence à sua organização.";
+  }
+
   return (
     <div className="space-y-6 w-full">
       <div className="flex items-center justify-between">
@@ -772,16 +798,20 @@ const ConsultationPage: React.FC = () => {
           <div className="flex items-center space-x-2">
             <Clock className="h-5 w-5 mr-2 text-muted-foreground" />
             {appointment.start_time && <AppointmentChronometer startTime={appointment.start_time} />}
-            <Button
-              onClick={() => setIsAddAnimalDebitDialogOpen(true)}
-              size="sm"
-              variant="default"
-              className="ml-4 bg-green-600 text-white hover:bg-green-700"
-              // Desabilita se pet_id estiver ausente ou se o animal não pertencer à organização
-              disabled={!appointment?.pet_id || !allPets.some(pet => pet.id === appointment.pet_id && pet.organization_id === organizationId)}
-            >
-              <ReceiptText className="mr-2 h-4 w-4" /> Débitos do Animal
-            </Button>
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Button
+                  onClick={() => setIsAddAnimalDebitDialogOpen(true)}
+                  size="sm"
+                  variant="default"
+                  className="ml-4 bg-green-600 text-white hover:bg-green-700"
+                  disabled={isDebitButtonDisabled}
+                >
+                  <ReceiptText className="mr-2 h-4 w-4" /> Débitos do Animal
+                </Button>
+              </TooltipTrigger>
+              {isDebitButtonDisabled && <TooltipContent side="bottom">{debitButtonTooltipMessage}</TooltipContent>}
+            </Tooltip>
           </div>
         </CardHeader>
         <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 py-4">
