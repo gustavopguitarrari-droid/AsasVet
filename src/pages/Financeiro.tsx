@@ -12,6 +12,7 @@ import {
   Settings,
 } from "lucide-react";
 import { usePageTitle } from "@/context/PageTitleContext";
+import { cn } from "@/lib/utils";
 
 const financialSections = [
   {
@@ -52,6 +53,15 @@ const financialSections = [
   },
 ];
 
+const cardColors = [
+  "bg-dashboard-card-1",
+  "bg-dashboard-card-2",
+  "bg-dashboard-card-3",
+  "bg-dashboard-card-4",
+  "bg-dashboard-card-5",
+  "bg-dashboard-card-6",
+];
+
 const Financeiro = () => {
   const { setPageTitle } = usePageTitle();
   useEffect(() => {
@@ -69,9 +79,12 @@ const Financeiro = () => {
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pt-4">
-        {financialSections.map((section) => (
+        {financialSections.map((section, index) => (
           <Link to={section.link} key={section.title} className="block">
-            <Card className="h-48 flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out">
+            <Card className={cn(
+              "h-48 flex flex-col justify-between hover:shadow-lg hover:-translate-y-1 transition-all duration-200 ease-in-out",
+              cardColors[index % cardColors.length]
+            )}>
               <CardHeader>
                 <CardTitle className="flex items-center text-xl">
                   <section.icon className="h-6 w-6 mr-3 text-primary" />
