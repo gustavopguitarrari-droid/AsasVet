@@ -191,7 +191,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
 
           <TabsContent value="add-debit" className="flex-1 flex flex-col"> {/* Adicionado flex-1 flex flex-col */}
             <Form {...form}>
-              <form className="space-y-4 py-4 flex-1 flex flex-col"> {/* Adicionado flex-1 flex flex-col */}
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4 flex-1 flex flex-col"> {/* Adicionado flex-1 flex flex-col */}
                 <ScrollArea className="flex-1 pr-2"> {/* Adicionado ScrollArea */}
                   <div className="space-y-4">
                     <div className="space-y-2">
@@ -307,15 +307,8 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                     Cancelar
                   </Button>
                   <Button
+                    type="submit" // Alterado para type="submit"
                     disabled={isSubmitting || !form.formState.isValid}
-                    onClick={() => {
-                      if (!form.formState.isValid) {
-                        console.log("Form validation errors:", form.formState.errors);
-                        showError("Por favor, preencha todos os campos obrigatórios corretamente.");
-                      } else {
-                        form.handleSubmit(handleSubmit)();
-                      }
-                    }}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
                     {isSubmitting ? "Adicionando..." : "Adicionar Débito"}
