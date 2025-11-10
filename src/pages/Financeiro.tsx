@@ -31,7 +31,7 @@ const financialSections = [
     title: "Contas a Receber",
     description: "Gerencie os débitos de clientes.",
     icon: CircleDollarSign,
-    link: "#", // Placeholder link
+    link: "/financeiro/contas-a-receber", // Link atualizado
   },
   {
     title: "Despesas",
