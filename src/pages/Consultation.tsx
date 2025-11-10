@@ -535,8 +535,13 @@ const ConsultationPage: React.FC = () => {
   const addAnimalDebitMutation = useMutation({
     mutationFn: async (debitData: FinalAnimalDebitData) => { // Atualizado para FinalAnimalDebitData
       if (!userId || !appointmentId || !appointment?.pet_id || !organizationId) {
-        console.error("addAnimalDebitMutation: Missing required IDs - userId:", userId, "appointmentId:", appointmentId, "pet_id:", appointment?.pet_id, "organizationId:", organizationId);
-        throw new Error("User, Appointment, Pet ID, or Organization ID not available.");
+        const missing = [];
+        if (!userId) missing.push('userId');
+        if (!appointmentId) missing.push('appointmentId');
+        if (!appointment?.pet_id) missing.push('appointment.pet_id');
+        if (!organizationId) missing.push('organizationId');
+        console.error("addAnimalDebitMutation: Missing required IDs:", missing.join(', '));
+        throw new Error(`Missing required IDs: ${missing.join(', ')}`);
       }
       console.log("ConsultationPage: addAnimalDebitMutation - Attempting to insert animal debit with payload:", debitData); // LOG DE DEBBUG
       const { data, error } = await supabase
@@ -568,7 +573,7 @@ const ConsultationPage: React.FC = () => {
     },
     onError: (err) => {
       console.error("ConsultationPage: addAnimalDebitMutation - onError triggered with error:", err); // LOG DE ERRO
-      showError(`Erro ao adicionar débito: ${err.message}`);
+      showError(`Erro ao adicionar débito: ${err.message}. Detalhes: ${JSON.stringify(err)}`); // More detailed error toast
     },
   });
 
@@ -664,7 +669,14 @@ const ConsultationPage: React.FC = () => {
 
   const handleAddAnimalDebit = (data: FinalAnimalDebitData) => { // Atualizado para FinalAnimalDebitData
     console.log("ConsultationPage: handleAddAnimalDebit called with data:", data); // LOG DE DEBBUG
-    addAnimalDebitMutation.mutate(data);
+    console.log("ConsultationPage: Current appointment object for debit:", appointment);
+    console.log("ConsultationPage: Current appUser for debit:", appUser);
+    try {
+      addAnimalDebitMutation.mutate(data);
+    } catch (syncError) {
+      console.error("ConsultationPage: Synchronous error calling addAnimalDebitMutation.mutate:", syncError);
+      showError(`Erro síncrono ao adicionar débito: ${syncError instanceof Error ? syncError.message : String(syncError)}`);
+    }
   };
 
   // REMOVIDO: handleMarkDebitAsPaid
