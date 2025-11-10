@@ -231,7 +231,8 @@ const ConsultationPage: React.FC = () => {
         .from('animal_debits')
         .select('*')
         .eq('appointment_id', appointmentId)
-        .eq('organization_id', organizationId);
+        .eq('organization_id', organizationId)
+        .eq('is_paid', false); // Apenas débitos pendentes
       if (error) throw error;
       return data as AnimalDebit[];
     },
