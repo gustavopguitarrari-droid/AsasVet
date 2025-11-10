@@ -609,10 +609,31 @@ const ConsultationPage: React.FC = () => {
     },
     onSuccess: (deletedDebitId) => {
       queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] });
-      showSuccess(`Débito ${deletedDebitId} excluído com sucesso!`);
+      showSuccess(`Débito excluído com sucesso!`);
     },
     onError: (err) => {
       showError(`Erro ao excluir débito: ${err.message}`);
+    },
+  });
+
+  // NOVO: Mutação para limpar todos os débitos da consulta
+  const clearAnimalDebitsMutation = useMutation({
+    mutationFn: async () => {
+      if (!userId || !organizationId || !appointmentId) throw new Error("Dados da consulta ou organização não disponíveis.");
+      const { error } = await supabase
+        .from('animal_debits')
+        .delete()
+        .eq('appointment_id', appointmentId)
+        .eq('organization_id', organizationId);
+      if (error) throw error;
+      return true;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] });
+      showSuccess("Todos os débitos da consulta foram removidos com sucesso!");
+    },
+    onError: (err) => {
+      showError(`Erro ao limpar débitos: ${err.message}`);
     },
   });
 
@@ -720,7 +741,7 @@ const ConsultationPage: React.FC = () => {
     );
 
     if (!petExistsAndBelongsToOrg) {
-      showError("Não é possível adicionar débito: O animal da consulta não foi encontrado ou não pertence à sua organização.");
+      showError("Não é possível adicionar débito: O animal desta consulta não foi encontrado ou não pertence à sua organização.");
       return;
     }
 
@@ -738,6 +759,11 @@ const ConsultationPage: React.FC = () => {
   // NOVO: Handler para exclusão de débito
   const handleDeleteAnimalDebit = (debitId: string, description: string) => {
     deleteAnimalDebitMutation.mutate(debitId);
+  };
+
+  // NOVO: Handler para limpar todos os débitos
+  const handleClearAnimalDebits = () => {
+    clearAnimalDebitsMutation.mutate();
   };
 
   if (isLoading || isLoadingMedicalRecord || isLoadingClients || isLoadingPets || isLoadingVeterinarians || isLoadingProducts || isLoadingAnimalDebits) {
@@ -934,7 +960,9 @@ const ConsultationPage: React.FC = () => {
         isSubmitting={addAnimalDebitMutation.isPending}
         products={products}
         existingAnimalDebits={animalDebits}
-        onDeleteDebit={handleDeleteAnimalDebit} // NOVO: Passa o handler de exclusão
+        onDeleteDebit={handleDeleteAnimalDebit}
+        onClearAllDebits={handleClearAnimalDebits}
+        isClearingDebits={clearAnimalDebitsMutation.isPending}
       />
 
       <PdfPreviewDialog

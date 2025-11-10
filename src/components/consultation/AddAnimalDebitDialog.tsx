@@ -106,7 +106,9 @@ interface AddAnimalDebitDialogProps {
   isSubmitting: boolean;
   products: Product[];
   existingAnimalDebits: AnimalDebit[];
-  onDeleteDebit: (debitId: string, description: string) => void; // NOVO: Prop para exclusão
+  onDeleteDebit: (debitId: string, description: string) => void;
+  onClearAllDebits: () => void; // NOVO: Prop para limpar todos os débitos
+  isClearingDebits: boolean; // NOVO: Prop para indicar se a limpeza está em andamento
 }
 
 const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
@@ -116,7 +118,9 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
   isSubmitting,
   products,
   existingAnimalDebits,
-  onDeleteDebit, // NOVO
+  onDeleteDebit,
+  onClearAllDebits, // NOVO
+  isClearingDebits, // NOVO
 }) => {
   const form = useForm<AddAnimalDebitFormValues>({
     resolver: zodResolver(formSchema),
@@ -130,7 +134,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
 
   const [selectedProductId, setSelectedProductId] = useState<string | undefined>(undefined);
   const [activeTab, setActiveTab] = useState<'add-debit' | 'existing-debits'>('add-debit');
-  const [debitToDelete, setDebitToDelete] = useState<{ id: string; description: string } | null>(null); // NOVO: Estado para o débito a ser excluído
+  const [debitToDelete, setDebitToDelete] = useState<{ id: string; description: string } | null>(null);
 
   React.useEffect(() => {
     if (isOpen) {
@@ -141,7 +145,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
         productId: undefined,
       });
       setSelectedProductId(undefined);
-      setActiveTab('add-debit'); // Reseta para a aba de adicionar ao abrir
+      setActiveTab('add-debit');
     }
   }, [isOpen, form]);
 
@@ -154,7 +158,6 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
       form.setValue("productId", product.id, { shouldValidate: true });
       form.clearErrors(["description", "amount", "productId"]);
     } else {
-      // If product is not found (e.g., "no-products" selected), clear product-related fields
       form.setValue("description", "", { shouldValidate: true });
       form.setValue("amount", undefined, { shouldValidate: true });
       form.setValue("productId", undefined, { shouldValidate: true });
@@ -184,16 +187,14 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
     onSubmit(finalData);
   };
 
-  // NOVO: Handler para abrir o AlertDialog de confirmação de exclusão
   const handleOpenDeleteConfirm = (debit: AnimalDebit) => {
     setDebitToDelete({ id: debit.id, description: debit.description });
   };
 
-  // NOVO: Handler para confirmar a exclusão
   const handleConfirmDelete = () => {
     if (debitToDelete) {
       onDeleteDebit(debitToDelete.id, debitToDelete.description);
-      setDebitToDelete(null); // Limpa o estado após a exclusão
+      setDebitToDelete(null);
     }
   };
 
@@ -372,7 +373,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                         )}>
                           {debit.is_paid ? "Pago" : "Pendente"}
                         </Badge>
-                        {!debit.is_paid && ( // Só permite excluir se não estiver pago
+                        {!debit.is_paid && (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button
@@ -410,7 +411,34 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                 </div>
               )}
             </ScrollArea>
-            <DialogFooter className="pt-4">
+            <DialogFooter className="pt-4 flex justify-between">
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="destructive"
+                    disabled={existingAnimalDebits.filter(d => !d.is_paid).length === 0 || isClearingDebits}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    {isClearingDebits ? "Limpando..." : "Limpar Débitos"}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitleComponent className="flex items-center">
+                      <AlertTriangle className="h-5 w-5 mr-2 text-destructive" /> Confirmar Limpeza
+                    </AlertDialogTitleComponent>
+                    <AlertDialogDescription>
+                      Tem certeza que deseja excluir TODOS os débitos pendentes desta consulta? Esta ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooterComponent>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={onClearAllDebits} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                      Limpar Tudo
+                    </AlertDialogAction>
+                  </AlertDialogFooterComponent>
+                </AlertDialogContent>
+              </AlertDialog>
               <Button variant="outline" onClick={onClose} type="button">
                 Fechar
               </Button>
