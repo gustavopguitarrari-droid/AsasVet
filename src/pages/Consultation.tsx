@@ -777,8 +777,8 @@ const ConsultationPage: React.FC = () => {
               size="sm"
               variant="default"
               className="ml-4 bg-green-600 text-white hover:bg-green-700"
-              // Desabilita se pet_id estiver ausente
-              disabled={!appointment?.pet_id} 
+              // Desabilita se pet_id estiver ausente ou se o animal não pertencer à organização
+              disabled={!appointment?.pet_id || !allPets.some(pet => pet.id === appointment.pet_id && pet.organization_id === organizationId)}
             >
               <ReceiptText className="mr-2 h-4 w-4" /> Débitos do Animal
             </Button>
