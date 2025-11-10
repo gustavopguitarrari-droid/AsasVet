@@ -282,8 +282,8 @@ const Dashboard = () => {
             </Card>
           </Link>
         );
-      case "waitingAppointments": // NOVO: Renderiza o WaitingAppointmentsCard
-        return <WaitingAppointmentsCard key={item.id} className={cardBgClass} />; // Pass class to component
+      case "waitingAppointments":
+        return <WaitingAppointmentsCard key={item.id} />;
       case "averageWaitingTime":
         return <AverageWaitingTimeCard key={item.id} className={cardBgClass} />; // Pass class to component
       case "averageConsultationTime":
