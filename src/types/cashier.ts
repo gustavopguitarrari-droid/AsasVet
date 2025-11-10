@@ -7,6 +7,7 @@ export interface Product {
 }
 
 export interface SaleItem {
+  id: string;
   productId?: string; // Opcional, para produtos/serviços
   name: string;
   price: number;
@@ -38,8 +39,8 @@ export interface Transaction {
   amount: number;
   date: string;
   time: string;
-  items?: SaleItem[]; // Opcional, para transações de venda detalhadas
-  paymentMethod?: string; // Opcional, para transações de venda
+  sale_items?: SaleItem[]; // Opcional, para transações de venda detalhadas
+  payment_method?: string; // Opcional, para transações de venda
   user_id: string; // Matches transactions table (NOT NULL)
   organization_id?: string; // Matches transactions table (NULLABLE)
 }

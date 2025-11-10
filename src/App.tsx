@@ -23,6 +23,7 @@ import { SessionContextProvider } from "./context/SessionContext";
 import ScrollToTop from "./components/ScrollToTop";
 import { PageTitleProvider } from "./context/PageTitleContext";
 import React from "react"; // Removido useState e useEffect, pois não são mais necessários para a animação
+import Vendas from "./pages/Vendas"; // Importar a nova página de Vendas
 
 // Removido: const queryClient = new QueryClient();
 
@@ -77,6 +78,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <AgendamentosMedicos />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/financeiro/vendas"
+                element={
+                  <ProtectedRoute>
+                    <Vendas />
                   </ProtectedRoute>
                 }
               />

@@ -24,7 +24,7 @@ const financialSections = [
     title: "Vendas",
     description: "Visualize o histórico de vendas.",
     icon: ShoppingCart,
-    link: "#", // Placeholder link
+    link: "/financeiro/vendas", // Link atualizado
   },
   {
     title: "Contas a Receber",
