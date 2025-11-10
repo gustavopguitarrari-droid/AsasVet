@@ -291,6 +291,7 @@ const Appointments = () => {
         observations: dbPet.observations || undefined,
         photoUrl: dbPet.photo_url || undefined,
         ownerId: dbPet.owner_id,
+        organization_id: dbPet.organization_id,
       }));
     },
     enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis

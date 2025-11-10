@@ -150,15 +150,16 @@ const Cadastro = () => {
       return data.map(dbPet => ({
         id: dbPet.id,
         name: dbPet.name,
-        species: dbPet.species,
+        species: dbPet.species as Pet["species"],
         breed: dbPet.breed,
         age: dbPet.age,
-        gender: dbPet.gender,
+        gender: dbPet.gender as Pet["gender"],
         color: dbPet.color,
         weight: dbPet.weight || undefined,
         observations: dbPet.observations || undefined,
         photoUrl: dbPet.photo_url || undefined,
         ownerId: dbPet.owner_id,
+        organization_id: dbPet.organization_id,
       }));
     },
     enabled: !!userId && !!organizationId, // Habilitar query apenas se userId E organizationId estiverem disponíveis
@@ -878,8 +879,8 @@ const Cadastro = () => {
           <div className="p-4 border rounded-md bg-background shadow-md space-y-4 mb-4"> {/* Adicionado o fundo aqui */}
             <div className="flex flex-col md:flex-row items-center justify-between flex-wrap gap-4">
               <SpeciesFilter selectedSpecies={selectedSpecies} onSelectSpecies={handleSelectSpecies} />
-              <div className="flex items-center space-x-2">
-                <div className="relative">
+              <div className="flex items-center space-x-2 w-full md:w-auto flex-1">
+                <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     placeholder="Buscar animais por nome, raça ou tutor..."
