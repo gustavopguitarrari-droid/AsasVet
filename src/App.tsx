@@ -25,6 +25,7 @@ import { PageTitleProvider } from "./context/PageTitleContext";
 import React from "react"; // Removido useState e useEffect, pois não são mais necessários para a animação
 import Vendas from "./pages/Vendas"; // Importar a nova página de Vendas
 import ContasAReceber from "./pages/ContasAReceber"; // Importar a nova página
+import FluxoDeCaixa from "./pages/FluxoDeCaixa"; // Importar a nova página
 
 // Removido: const queryClient = new QueryClient();
 
@@ -95,6 +96,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <ContasAReceber />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/financeiro/fluxo-de-caixa"
+                element={
+                  <ProtectedRoute>
+                    <FluxoDeCaixa />
                   </ProtectedRoute>
                 }
               />

@@ -19,7 +19,7 @@ const financialSections = [
     title: "Fluxo de Caixa",
     description: "Acompanhe todas as entradas e saídas.",
     icon: TrendingUp,
-    link: "#", // Placeholder link
+    link: "/financeiro/fluxo-de-caixa", // Link atualizado
   },
   {
     title: "Vendas",
