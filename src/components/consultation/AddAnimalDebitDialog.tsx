@@ -115,7 +115,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
   });
 
   const [selectedProductId, setSelectedProductId] = useState<string | undefined>(undefined);
-  const activeTab = form.watch("activeTab") || "add"; // Assuming activeTab is also part of form state or managed externally
+  const [activeTab, setActiveTab] = useState<"add" | "view">("add"); // Inicializado com useState
 
   React.useEffect(() => {
     if (isOpen) {
@@ -126,7 +126,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
         productId: undefined,
       });
       setSelectedProductId(undefined);
-      // setActiveTab("add"); // Reset to 'add' tab when dialog opens
+      setActiveTab("add"); // Reset to 'add' tab when dialog opens
     }
   }, [isOpen, form]);
 
@@ -236,8 +236,8 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                         <Textarea
                           placeholder="Ex: Consulta de emergência, Raio-X de pata"
                           {...field}
-                          readOnly={!!selectedProductId} // Usar readOnly
-                          onChange={selectedProductId ? undefined : handleCustomDescriptionChange} // Apenas permitir onChange se não houver produto selecionado
+                          readOnly={!!selectedProductId}
+                          onChange={selectedProductId ? undefined : field.onChange} // Usar field.onChange diretamente
                         />
                       </FormControl>
                       <FormMessage />
@@ -261,7 +261,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                             {...field}
                             value={field.value === undefined ? "" : String(field.value).replace('.', ',')}
                             onChange={handleAmountChange}
-                            readOnly={!!selectedProductId} // Usar readOnly
+                            readOnly={!!selectedProductId}
                           />
                         </FormControl>
                         <FormMessage />
