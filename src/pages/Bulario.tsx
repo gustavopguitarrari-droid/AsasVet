@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 interface DrugInfo {
   id: string;
   name: string;
-  principle: string;
+  active_principle: string;
   manufacturer: string;
   indications: string;
   contraindications: string;
@@ -52,14 +52,14 @@ const Bulario = () => {
     setError(null);
     setHasSearched(true);
     try {
-      const { data, error: functionError } = await supabase.functions.invoke('vetsmart-bulario', {
-        body: { query: searchTerm },
-      });
+      const { data, error: dbError } = await supabase
+        .from('medications')
+        .select('*')
+        .or(`name.ilike.%${searchTerm.trim()}%,active_principle.ilike.%${searchTerm.trim()}%`);
 
-      if (functionError) throw functionError;
-      if (data.error) throw new Error(data.error);
+      if (dbError) throw dbError;
 
-      setSearchResults(data.data || []);
+      setSearchResults(data || []);
     } catch (err: any) {
       setError(err.message);
       showError(`Erro ao buscar no bulário: ${err.message}`);
@@ -74,7 +74,7 @@ const Bulario = () => {
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold flex items-center">
           <BookOpenCheck className="h-8 w-8 mr-3 text-primary" />
-          Bulário Digital (Simulação Vet Smart)
+          Bulário Digital
         </h2>
       </div>
       <p className="text-muted-foreground">
@@ -139,7 +139,7 @@ const Bulario = () => {
                     <Pill className="h-5 w-5 mr-2 text-primary" />
                     {drug.name}
                   </div>
-                  <Badge variant="secondary">{drug.principle}</Badge>
+                  <Badge variant="secondary">{drug.active_principle}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
