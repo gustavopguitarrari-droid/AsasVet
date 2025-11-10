@@ -4,12 +4,12 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, X } from "lucide-react";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetFooter,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import ProductCombobox from "./cashier/ProductCombobox";
 import CheckoutCart from "./cashier/CheckoutCart";
 import PaymentSection from "./cashier/PaymentSection";
@@ -325,13 +325,13 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
   const isLoadingAll = isLoadingProducts || isLoadingClients || isLoadingPets || isLoadingAnimalDebits;
 
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-[90vw] max-w-[1400px] flex flex-col rounded-l-xl shadow-lg">
-        <SheetHeader className="pb-4">
-          <SheetTitle className="flex items-center">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="w-[90vw] max-w-[1400px] h-[90vh] flex flex-col rounded-xl shadow-lg">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="flex items-center">
             <ShoppingCart className="h-5 w-5 mr-2" /> Caixa
-          </SheetTitle>
-        </SheetHeader>
+          </DialogTitle>
+        </DialogHeader>
 
         <div className="flex-1 flex flex-col gap-6 p-4 overflow-y-auto">
           {/* NOVO: Seleção de Animal */}
@@ -377,13 +377,13 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <SheetFooter className="pt-4">
+        <DialogFooter className="pt-4">
           <Button variant="outline" onClick={onClose} className="rounded-lg">
             <X className="h-4 w-4 mr-2" /> Fechar
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
