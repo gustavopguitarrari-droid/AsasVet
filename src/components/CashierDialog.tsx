@@ -139,13 +139,12 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
     });
   };
 
-  // NOVO: Função para adicionar um débito de animal ao carrinho (agora definida aqui)
-  const handleAddAnimalDebitToCart = (debit: AnimalDebit) => {
+  // NOVO: Função memoizada para adicionar um débito de animal ao carrinho
+  const handleAddAnimalDebitToCart = React.useCallback((debit: AnimalDebit) => {
     setCartItems((prevItems) => {
       const existingItemIndex = prevItems.findIndex((item) => item.originalDebitId === debit.id && item.isDebit);
 
       if (existingItemIndex > -1) {
-        // showError("Este débito já está no carrinho."); // Removido para evitar spam de toast ao adicionar automaticamente
         return prevItems;
       } else {
         return [
@@ -153,7 +152,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
           {
             name: debit.description,
             price: debit.amount,
-            quantity: 1, // Débitos são sempre 1 unidade
+            quantity: 1,
             total: debit.amount,
             organization_id: organizationId!,
             isDebit: true,
@@ -163,7 +162,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
         ];
       }
     });
-  };
+  }, [organizationId]); // A dependência é estável
 
   const handleUpdateQuantity = (itemId: string, newQuantity: number, isDebit: boolean) => {
     setCartItems((prevItems) => {
@@ -306,16 +305,22 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
   // NOVO: Efeito para adicionar débitos automaticamente quando um animal é selecionado
   useEffect(() => {
     if (selectedPetId && animalDebits && !isLoadingAnimalDebits) {
-      console.log("CashierDialog: useEffect - Adding animal debits to cart for pet:", selectedPetId);
       animalDebits.forEach(debit => {
         handleAddAnimalDebitToCart(debit);
       });
     } else if (!selectedPetId) {
-      // Se nenhum animal estiver selecionado, remove todos os débitos do carrinho
-      console.log("CashierDialog: useEffect - No pet selected, clearing debit items from cart.");
-      setCartItems(prevItems => prevItems.filter(item => !item.isDebit));
+      // Se nenhum animal estiver selecionado, remove apenas os itens de débito do carrinho
+      setCartItems(prevItems => {
+        const itemsWithoutDebits = prevItems.filter(item => !item.isDebit);
+        // Apenas atualiza o estado se houver realmente uma mudança
+        if (itemsWithoutDebits.length < prevItems.length) {
+          return itemsWithoutDebits;
+        }
+        return prevItems;
+      });
     }
-  }, [selectedPetId, animalDebits, isLoadingAnimalDebits]); // Depende de selectedPetId e animalDebits
+  }, [selectedPetId, animalDebits, isLoadingAnimalDebits, handleAddAnimalDebitToCart]);
+
 
   const isLoadingAll = isLoadingProducts || isLoadingClients || isLoadingPets || isLoadingAnimalDebits;
 
