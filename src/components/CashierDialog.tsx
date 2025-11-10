@@ -146,11 +146,24 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
   const deleteAnimalDebitMutation = useMutation({
     mutationFn: async (debitId: string) => {
       if (!organizationId) throw new Error("Organization ID not available.");
-      const { error } = await supabase.from('animal_debits').delete().eq('id', debitId).eq('organization_id', organizationId);
+      const { error } = await supabase
+        .from('animal_debits')
+        .delete()
+        .eq('id', debitId)
+        .eq('organization_id', organizationId);
       if (error) throw error;
       return debitId;
     },
-    onSuccess: () => {
+    onSuccess: (deletedDebitId) => {
+      // Manually update the cache for an instant UI change
+      queryClient.setQueryData(
+        ['animalDebitsCashier', selectedPetId, organizationId],
+        (oldData: AnimalDebit[] | undefined) => {
+          if (!oldData) return [];
+          return oldData.filter(debit => debit.id !== deletedDebitId);
+        }
+      );
+      // Invalidate to refetch in the background and ensure consistency
       queryClient.invalidateQueries({ queryKey: ['animalDebitsCashier', selectedPetId, organizationId] });
       showSuccess("Débito removido com sucesso!");
     },
