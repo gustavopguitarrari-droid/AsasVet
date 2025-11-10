@@ -198,8 +198,14 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
       if (error) throw error;
       return debitId;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['animalDebitsCashier', selectedPetId, organizationId] });
+    onSuccess: (deletedDebitId) => {
+      // ATUALIZADO: Atualiza manualmente o cache do React Query para remover o débito
+      queryClient.setQueryData(
+        ['animalDebitsCashier', selectedPetId, organizationId],
+        (oldData: AnimalDebit[] | undefined) => {
+          return oldData ? oldData.filter(debit => debit.id !== deletedDebitId) : [];
+        }
+      );
       showSuccess("Débito removido com sucesso!");
     },
     onError: (err: any) => {
