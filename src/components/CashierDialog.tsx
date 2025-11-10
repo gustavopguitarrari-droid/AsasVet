@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, X } from "lucide-react";
+import { ShoppingCart, X, ReceiptText } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +21,9 @@ import { showError, showSuccess } from "@/utils/toast";
 import { format } from "date-fns";
 import { Client, Pet } from "@/types/cadastro";
 import PetSelectionCombobox from "./cashier/PetSelectionCombobox";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface CashierDialogProps {
   isOpen: boolean;
@@ -344,6 +347,39 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
             />
           </div>
 
+          {/* Seção de Débitos Pendentes */}
+          {selectedPetId && (
+            <div className="space-y-3 border-t pt-4">
+              <h4 className="text-lg font-semibold flex items-center">
+                <ReceiptText className="h-5 w-5 mr-2" /> Débitos Pendentes do Animal
+              </h4>
+              <ScrollArea className="h-[150px] rounded-lg border p-3 shadow-inner bg-muted/20">
+                {isLoadingAnimalDebits ? (
+                  <p className="text-center text-muted-foreground">Carregando débitos...</p>
+                ) : animalDebits.length === 0 ? (
+                  <p className="text-center text-muted-foreground">Nenhum débito pendente para este animal.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {animalDebits.map((debit) => (
+                      <div key={debit.id} className="flex items-center justify-between p-2 border rounded-lg bg-card shadow-sm">
+                        <div className="flex-1">
+                          <p className="font-medium">{debit.description}</p>
+                          <p className="text-sm text-muted-foreground">R$ {debit.amount.toFixed(2).replace('.', ',')}</p>
+                        </div>
+                        <Badge className={cn(
+                          "text-white",
+                          debit.is_paid ? "bg-green-500" : "bg-orange-500"
+                        )}>
+                          {debit.is_paid ? "Pago" : "Pendente"}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+          )}
+
           {/* 1. Produtos e Serviços */}
           <div className="space-y-4">
             <ProductCombobox
@@ -359,10 +395,6 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
               items={cartItems}
               onUpdateQuantity={handleUpdateQuantity}
               onRemoveItem={handleRemoveItem}
-              animalDebits={animalDebits} // Ainda passa para exibir a lista de débitos pendentes
-              // onAddAnimalDebitToCart removido, pois agora é automático
-              selectedPetId={selectedPetId}
-              isLoadingAnimalDebits={isLoadingAnimalDebits}
             />
           </div>
 
