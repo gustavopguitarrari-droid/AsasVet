@@ -26,6 +26,7 @@ import React from "react"; // Removido useState e useEffect, pois não são mais
 import Vendas from "./pages/Vendas"; // Importar a nova página de Vendas
 import ContasAReceber from "./pages/ContasAReceber"; // Importar a nova página
 import FluxoDeCaixa from "./pages/FluxoDeCaixa"; // Importar a nova página
+import Reports from "./pages/Reports"; // Importar a nova página de Relatórios
 
 // Removido: const queryClient = new QueryClient();
 
@@ -104,6 +105,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <FluxoDeCaixa />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/financeiro/relatorios"
+                element={
+                  <ProtectedRoute>
+                    <Reports />
                   </ProtectedRoute>
                 }
               />

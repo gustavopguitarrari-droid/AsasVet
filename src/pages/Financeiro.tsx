@@ -43,7 +43,7 @@ const financialSections = [
     title: "Relatórios",
     description: "Gere relatórios financeiros detalhados.",
     icon: BarChart,
-    link: "#", // Placeholder link
+    link: "/financeiro/relatorios", // Link atualizado
   },
   {
     title: "Configurações",
