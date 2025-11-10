@@ -21,6 +21,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Client, Pet } from "@/types/cadastro";
 import { showSuccess } from "@/utils/toast";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface PetSelectionComboboxProps {
   allClients: Client[];
@@ -76,62 +77,73 @@ const PetSelectionCombobox: React.FC<PetSelectionComboboxProps> = ({
       <Label className="flex items-center">
         <PawPrint className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Animal
       </Label>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            role="combobox"
-            aria-expanded={open}
-            className="w-full justify-between border border-input rounded-lg"
-          >
-            {selectedPet
-              ? `${selectedPet.name} (${clientMap.get(selectedPet.ownerId)?.name || 'Tutor Desconhecido'})`
-              : "Buscar ou selecionar animal..."}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 rounded-lg shadow-md">
-          <Command className="rounded-lg border">
-            <CommandInput
-              placeholder="Buscar animal por nome, espécie ou tutor..."
-              value={search}
-              onValueChange={setSearch}
-            />
-            <CommandList>
-              <CommandEmpty>Nenhum animal encontrado.</CommandEmpty>
-              <CommandGroup>
-                {filteredPets.map((pet) => {
-                  const owner = clientMap.get(pet.ownerId);
-                  return (
-                    <CommandItem
-                      key={pet.id}
-                      value={`${pet.name} ${pet.species} ${owner?.name || ''}`}
-                      onSelect={() => handleSelect(pet.id)}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          selectedPetId === pet.id ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      <div className="flex flex-col items-start">
-                        <span>{pet.name} ({pet.species})</span>
-                        <span className="text-xs text-muted-foreground">Tutor: {owner?.name || 'Desconhecido'}</span>
-                      </div>
-                    </CommandItem>
-                  );
-                })}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-      {selectedPetId && (
-        <Button variant="outline" size="sm" onClick={() => onSelectPet(null)} className="w-full mt-2">
-          <XCircle className="h-4 w-4 mr-2" />
-          Limpar Seleção de Animal
-        </Button>
-      )}
+      <div className="flex items-center space-x-2">
+        <div className="flex-1">
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={open}
+                className="w-full justify-between border border-input rounded-lg"
+              >
+                {selectedPet
+                  ? `${selectedPet.name} (${clientMap.get(selectedPet.ownerId)?.name || 'Tutor Desconhecido'})`
+                  : "Buscar ou selecionar animal..."}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 rounded-lg shadow-md">
+              <Command className="rounded-lg border">
+                <CommandInput
+                  placeholder="Buscar animal por nome, espécie ou tutor..."
+                  value={search}
+                  onValueChange={setSearch}
+                />
+                <CommandList>
+                  <CommandEmpty>Nenhum animal encontrado.</CommandEmpty>
+                  <CommandGroup>
+                    {filteredPets.map((pet) => {
+                      const owner = clientMap.get(pet.ownerId);
+                      return (
+                        <CommandItem
+                          key={pet.id}
+                          value={`${pet.name} ${pet.species} ${owner?.name || ''}`}
+                          onSelect={() => handleSelect(pet.id)}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedPetId === pet.id ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <div className="flex flex-col items-start">
+                            <span>{pet.name} ({pet.species})</span>
+                            <span className="text-xs text-muted-foreground">Tutor: {owner?.name || 'Desconhecido'}</span>
+                          </div>
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </div>
+        {selectedPetId && (
+          <Tooltip delayDuration={0}>
+            <TooltipTrigger asChild>
+              <Button variant="destructive" size="icon" onClick={() => onSelectPet(null)}>
+                <XCircle className="h-4 w-4" />
+                <span className="sr-only">Limpar Seleção</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Limpar Seleção</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+      </div>
     </div>
   );
 };
