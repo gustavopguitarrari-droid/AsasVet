@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, DollarSign, Tag, Package, Search as SearchIcon, ReceiptText } from "lucide-react";
+import { PlusCircle, DollarSign, Tag, Package, Search as SearchIcon, ReceiptText, ListChecks } from "lucide-react"; // Adicionado ListChecks
 
 import { Button } from "@/components/ui/button";
 import {
@@ -26,10 +26,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Product } from "@/types/cashier";
+import { Product, AnimalDebit } from "@/types/cashier"; // Importado AnimalDebit
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
 import { showError } from "@/utils/toast";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar Tabs
+import { Badge } from "@/components/ui/badge"; // Importar Badge
+import { cn } from "@/lib/utils"; // Importar cn
 
 const formSchema = z.object({
   description: z.string().optional(),
@@ -88,6 +91,7 @@ interface AddAnimalDebitDialogProps {
   onSubmit: (data: FinalAnimalDebitData) => void;
   isSubmitting: boolean;
   products: Product[];
+  existingAnimalDebits: AnimalDebit[]; // NOVO: Prop para débitos existentes
 }
 
 const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
@@ -96,6 +100,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
   onSubmit,
   isSubmitting,
   products,
+  existingAnimalDebits, // NOVO
 }) => {
   const form = useForm<AddAnimalDebitFormValues>({
     resolver: zodResolver(formSchema),
@@ -108,6 +113,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
   });
 
   const [selectedProductId, setSelectedProductId] = useState<string | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState<'add-debit' | 'existing-debits'>('add-debit'); // NOVO: Estado para a aba ativa
 
   React.useEffect(() => {
     if (isOpen) {
@@ -118,6 +124,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
         productId: undefined,
       });
       setSelectedProductId(undefined);
+      setActiveTab('add-debit'); // Reseta para a aba de adicionar ao abrir
     }
   }, [isOpen, form]);
 
@@ -162,145 +169,197 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto flex flex-col"> {/* Adicionado flex-col */}
         <DialogHeader>
           <DialogTitle className="flex items-center">
-            <ReceiptText className="h-5 w-5 mr-2" /> Adicionar Débito ao Animal
+            <ReceiptText className="h-5 w-5 mr-2" /> Débitos do Animal
           </DialogTitle>
           <DialogDescription>
-            Adicione um novo débito para este animal.
+            Gerencie os débitos associados a este animal.
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
-          <form className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label className="flex items-center">
-                <SearchIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Produto/Serviço
-              </Label>
-              <Select onValueChange={handleProductSelect} value={selectedProductId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Buscar ou selecionar um item existente" />
-                </SelectTrigger>
-                <SelectContent>
-                  <ScrollArea className="h-[200px]">
-                    {products.length === 0 ? (
-                      <SelectItem value="no-products" disabled>Nenhum produto/serviço cadastrado</SelectItem>
-                    ) : (
-                      products.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          <div className="flex items-center">
-                            {product.category === "Produto" ? <Package className="h-4 w-4 mr-2" /> : <Tag className="h-4 w-4 mr-2" />}
-                            {product.name} - R$ {product.price.toFixed(2).replace('.', ',')} ({product.category})
-                          </div>
-                        </SelectItem>
-                      ))
-                    )}
-                  </ScrollArea>
-                </SelectContent>
-              </Select>
-            </div>
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'add-debit' | 'existing-debits')} className="flex-1 flex flex-col"> {/* Adicionado flex-1 flex flex-col */}
+          <TabsList className="grid w-full grid-cols-2 h-auto p-1 mb-4">
+            <TabsTrigger value="add-debit" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold flex items-center">
+              <PlusCircle className="h-5 w-5 mr-2" /> Adicionar Débito
+            </TabsTrigger>
+            <TabsTrigger value="existing-debits" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold flex items-center">
+              <ListChecks className="h-5 w-5 mr-2" /> Débitos Existentes ({existingAnimalDebits.length})
+            </TabsTrigger>
+          </TabsList>
 
-            <div className="relative flex items-center justify-center text-xs text-muted-foreground">
-              <hr className="flex-grow border-t border-border" />
-              <span className="px-2 bg-background">OU</span>
-              <hr className="flex-grow border-t border-border" />
-            </div>
+          <TabsContent value="add-debit" className="flex-1 flex flex-col"> {/* Adicionado flex-1 flex flex-col */}
+            <Form {...form}>
+              <form className="space-y-4 py-4 flex-1 flex flex-col"> {/* Adicionado flex-1 flex flex-col */}
+                <ScrollArea className="flex-1 pr-2"> {/* Adicionado ScrollArea */}
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label className="flex items-center">
+                        <SearchIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Produto/Serviço
+                      </Label>
+                      <Select onValueChange={handleProductSelect} value={selectedProductId}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Buscar ou selecionar um item existente" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <ScrollArea className="h-[200px]">
+                            {products.length === 0 ? (
+                              <SelectItem value="no-products" disabled>Nenhum produto/serviço cadastrado</SelectItem>
+                            ) : (
+                              products.map((product) => (
+                                <SelectItem key={product.id} value={product.id}>
+                                  <div className="flex items-center">
+                                    {product.category === "Produto" ? <Package className="h-4 w-4 mr-2" /> : <Tag className="h-4 w-4 mr-2" />}
+                                    {product.name} - R$ {product.price.toFixed(2).replace('.', ',')} ({product.category})
+                                  </div>
+                                </SelectItem>
+                              ))
+                            )}
+                          </ScrollArea>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center">
-                    <Tag className="h-4 w-4 mr-2 text-muted-foreground" /> Descrição Personalizada
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Ex: Consulta de emergência, Raio-X de pata"
-                      {...field}
-                      readOnly={!!selectedProductId}
-                      onChange={field.onChange} // Sempre usar field.onChange
+                    <div className="relative flex items-center justify-center text-xs text-muted-foreground">
+                      <hr className="flex-grow border-t border-border" />
+                      <span className="px-2 bg-background">OU</span>
+                      <hr className="flex-grow border-t border-border" />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className="flex items-center">
+                            <Tag className="h-4 w-4 mr-2 text-muted-foreground" /> Descrição Personalizada
+                          </FormLabel>
+                          <FormControl>
+                            <Textarea
+                              placeholder="Ex: Consulta de emergência, Raio-X de pata"
+                              {...field}
+                              readOnly={!!selectedProductId}
+                              onChange={field.onChange}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="amount"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center">
+                              <DollarSign className="h-4 w-4 mr-2 text-muted-foreground" /> Valor Unitário (R$)
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="text"
+                                placeholder="0,00"
+                                {...field}
+                                value={field.value === undefined ? "" : String(field.value).replace('.', ',')}
+                                onChange={handleAmountChange}
+                                readOnly={!!selectedProductId}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="quantity"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="flex items-center">
+                              <PlusCircle className="h-4 w-4 mr-2 text-muted-foreground" /> Quantidade
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min="1"
+                                placeholder="1"
+                                {...field}
+                                value={field.value === undefined ? "" : field.value}
+                                onChange={handleQuantityChange}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+
+                    <div className="flex justify-between items-center border-t pt-4">
+                      <p className="text-lg font-semibold">Total do Débito:</p>
+                      <p className="text-2xl font-bold">R$ {totalAmount.toFixed(2).replace('.', ',')}</p>
+                    </div>
+                  </div>
+                </ScrollArea>
+
+                <DialogFooter className="pt-4">
+                  <Button variant="outline" onClick={onClose} type="button" disabled={isSubmitting}>
+                    Cancelar
+                  </Button>
+                  <Button
+                    disabled={isSubmitting || !form.formState.isValid}
+                    onClick={() => {
+                      if (!form.formState.isValid) {
+                        console.log("Form validation errors:", form.formState.errors);
+                        showError("Por favor, preencha todos os campos obrigatórios corretamente.");
+                      } else {
+                        form.handleSubmit(handleSubmit)();
+                      }
+                    }}
+                  >
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    {isSubmitting ? "Adicionando..." : "Adicionar Débito"}
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </TabsContent>
+
+          <TabsContent value="existing-debits" className="flex-1 flex flex-col"> {/* Adicionado flex-1 flex flex-col */}
+            <ScrollArea className="flex-1 p-4 border rounded-lg bg-muted/20 shadow-inner">
+              {existingAnimalDebits.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Nenhum débito adicionado para este animal ainda.</p>
+              ) : (
+                <div className="space-y-3">
+                  {existingAnimalDebits.map((debit) => (
+                    <div key={debit.id} className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm">
+                      <div className="flex-1">
+                        <p className="font-medium flex items-center">
+                          <ReceiptText className="h-4 w-4 mr-2 text-muted-foreground" />
+                          {debit.description}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          R$ {debit.amount.toFixed(2).replace('.', ',')}
+                        </p>
+                      </div>
+                      <Badge className={cn(
+                        "text-white",
+                        debit.is_paid ? "bg-green-500" : "bg-orange-500"
+                      )}>
+                        {debit.is_paid ? "Pago" : "Pendente"}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
               )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center">
-                      <DollarSign className="h-4 w-4 mr-2 text-muted-foreground" /> Valor Unitário (R$)
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="text"
-                        placeholder="0,00"
-                        {...field}
-                        value={field.value === undefined ? "" : String(field.value).replace('.', ',')}
-                        onChange={handleAmountChange}
-                        readOnly={!!selectedProductId}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="quantity"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center">
-                      <PlusCircle className="h-4 w-4 mr-2 text-muted-foreground" /> Quantidade
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        placeholder="1"
-                        {...field}
-                        value={field.value === undefined ? "" : field.value}
-                        onChange={handleQuantityChange}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="flex justify-between items-center border-t pt-4">
-              <p className="text-lg font-semibold">Total do Débito:</p>
-              <p className="text-2xl font-bold">R$ {totalAmount.toFixed(2).replace('.', ',')}</p>
-            </div>
-
+            </ScrollArea>
             <DialogFooter className="pt-4">
-              <Button variant="outline" onClick={onClose} type="button" disabled={isSubmitting}>
-                Cancelar
-              </Button>
-              <Button
-                disabled={isSubmitting || !form.formState.isValid}
-                onClick={() => {
-                  if (!form.formState.isValid) {
-                    console.log("Form validation errors:", form.formState.errors);
-                    showError("Por favor, preencha todos os campos obrigatórios corretamente.");
-                  } else {
-                    form.handleSubmit(handleSubmit)();
-                  }
-                }}
-              >
-                <PlusCircle className="mr-2 h-4 w-4" />
-                {isSubmitting ? "Adicionando..." : "Adicionar Débito"}
+              <Button variant="outline" onClick={onClose} type="button">
+                Fechar
               </Button>
             </DialogFooter>
-          </form>
-        </Form>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );
