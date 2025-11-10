@@ -424,6 +424,7 @@ const ConsultationPage: React.FC = () => {
         await SupabaseStorage.deleteMedicalRecordPdfFromSupabase(existingMedicalRecordPdfUrl);
       }
 
+      // Generate the new PDF for the medical record
       console.log("ConsultationPage: saveMedicalRecordMutation - Gerando PDF do prontuário...");
       const medicalRecordPdfBlob = await generateMedicalRecordPdf({
         appointment,
@@ -757,7 +758,8 @@ const ConsultationPage: React.FC = () => {
               size="sm"
               variant="default"
               className="ml-4 bg-green-600 text-white hover:bg-green-700"
-              disabled={!appointment?.pet_id} {/* Desabilita se pet_id estiver ausente */}
+              // Desabilita se pet_id estiver ausente
+              disabled={!appointment?.pet_id} 
             >
               <ReceiptText className="mr-2 h-4 w-4" /> Débitos do Animal
             </Button>
