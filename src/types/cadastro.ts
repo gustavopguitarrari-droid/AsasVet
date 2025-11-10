@@ -30,4 +30,5 @@ export interface Pet {
   observations?: string; // Novo campo
   photoUrl?: string; // Novo campo para URL da foto (Base64)
   ownerId: string; // ID do tutor associado (chave estrangeira)
+  organization_id: string;
 }
