@@ -211,7 +211,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
           organization_id: organizationId,
           description: `Venda de produtos/serviços e débitos`,
           type: "Entrada",
-          amount: totalAmount,
+          amount: parseFloat(totalAmount.toFixed(2)), // CORREÇÃO AQUI
           date: transactionDate,
           time: transactionTime,
           payment_method: paymentMethod,
