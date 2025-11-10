@@ -37,7 +37,7 @@ const financialSections = [
     title: "Despesas",
     description: "Registre e categorize suas despesas.",
     icon: TrendingDown,
-    link: "#", // Placeholder link
+    link: "/financeiro/despesas", // Link atualizado
   },
   {
     title: "Relatórios",

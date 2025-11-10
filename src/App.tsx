@@ -27,6 +27,7 @@ import Vendas from "./pages/Vendas"; // Importar a nova página de Vendas
 import ContasAReceber from "./pages/ContasAReceber"; // Importar a nova página
 import FluxoDeCaixa from "./pages/FluxoDeCaixa"; // Importar a nova página
 import Reports from "./pages/Reports"; // Importar a nova página de Relatórios
+import Despesas from "./pages/Despesas"; // Importar a nova página de Despesas
 
 // Removido: const queryClient = new QueryClient();
 
@@ -113,6 +114,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Reports />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/financeiro/despesas"
+                element={
+                  <ProtectedRoute>
+                    <Despesas />
                   </ProtectedRoute>
                 }
               />
