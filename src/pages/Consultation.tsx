@@ -168,7 +168,7 @@ const ConsultationPage: React.FC = () => {
       if (!userId || !organizationId) return [];
       const { data, error } = await supabase
         .from('pets')
-        .select('*')
+        .select('*, organization_id') // GARANTIR QUE organization_id É SELECIONADO
         .eq('organization_id', organizationId);
       if (error) throw error;
       return data.map(dbPet => ({
@@ -183,6 +183,7 @@ const ConsultationPage: React.FC = () => {
         observations: dbPet.observations || undefined,
         photoUrl: dbPet.photo_url || undefined,
         ownerId: dbPet.owner_id,
+        organization_id: dbPet.organization_id, // Mapear organization_id
       }));
     },
     enabled: !!userId && !!organizationId,
