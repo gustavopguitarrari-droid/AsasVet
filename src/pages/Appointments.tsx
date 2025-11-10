@@ -273,7 +273,7 @@ const Appointments = () => {
   const { data: pets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
     queryKey: ['pets', userId, organizationId], // NOVO: Adicionado organizationId
     queryFn: async () => {
-      if (!userId || !organizationId) return []; // NOVO: Habilitar query apenas se organizationId estiver disponível
+      if (!userId || !organizationId) return []; // NOVO: Adicionado organizationId
       const { data, error } = await supabase
         .from('pets')
         .select('*')
@@ -287,6 +287,7 @@ const Appointments = () => {
         age: dbPet.age,
         gender: dbPet.gender as Pet["gender"], // Cast para o tipo de enumeração
         color: dbPet.color,
+        weight: dbPet.weight || undefined,
         observations: dbPet.observations || undefined,
         photoUrl: dbPet.photo_url || undefined,
         ownerId: dbPet.owner_id,
@@ -1079,6 +1080,7 @@ const Appointments = () => {
           isClearingHistory={clearHistoryAppointmentsMutation.isPending}
           onViewMedicalRecordPdf={handleOpenMedicalRecordPdfPreviewDialog}
           onViewRecipePdf={handleOpenRecipePdfPreviewDialog}
+          onViewDetails={handleViewHistoryDetails} // Adicionado a prop onViewDetails
         />
 
         <PdfPreviewDialog
