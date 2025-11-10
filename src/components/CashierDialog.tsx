@@ -136,6 +136,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
             total: quantity * product.price,
             organization_id: organizationId!,
             isDebit: false,
+            category: product.category,
           },
         ];
       }

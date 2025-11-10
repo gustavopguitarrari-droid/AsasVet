@@ -16,6 +16,7 @@ export interface SaleItem {
   isDebit?: boolean; // NOVO: Indica se o item é um débito de animal
   originalDebitId?: string; // NOVO: ID do débito original na tabela animal_debits
   petId?: string; // NOVO: ID do pet associado ao débito
+  category?: string;
 }
 
 export interface AnimalDebit { // NOVO: Interface para débitos de animais

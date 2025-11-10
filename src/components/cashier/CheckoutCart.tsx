@@ -42,6 +42,7 @@ const CheckoutCart: React.FC<CheckoutCartProps> = ({
                   </p>
                   <p className="text-sm text-muted-foreground">
                     R$ {item.price.toFixed(2).replace('.', ',')} {item.isDebit ? '' : `x ${item.quantity}`}
+                    {item.category && <Badge variant="outline" className="ml-2">{item.category}</Badge>}
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
