@@ -16,6 +16,7 @@ import {
   ReceiptText,
   Package,
   Tag,
+  BookOpenCheck, // NOVO: Ícone para o Bulário
   // Settings, // Removido o ícone Settings
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ export const allNavItems: NavItem[] = [
   { name: "Equipe", icon: Stethoscope, path: "/veterinarios" },
   { name: "Produtos", icon: Tag, path: "/products" },
   { name: "Financeiro", icon: DollarSign, path: "/financeiro" },
+  { name: "Bulário", icon: BookOpenCheck, path: "/bulario" }, // NOVO: Adicionado Bulário
   // { name: "Configurações", icon: Settings, path: "/settings" }, // Removido o item de configurações
 ];
 

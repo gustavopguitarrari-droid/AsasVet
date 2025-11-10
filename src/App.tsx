@@ -28,6 +28,7 @@ import ContasAReceber from "./pages/ContasAReceber"; // Importar a nova página
 import FluxoDeCaixa from "./pages/FluxoDeCaixa"; // Importar a nova página
 import Reports from "./pages/Reports"; // Importar a nova página de Relatórios
 import Despesas from "./pages/Despesas"; // Importar a nova página de Despesas
+import Bulario from "./pages/Bulario"; // NOVO: Importar a página Bulário
 
 // Removido: const queryClient = new QueryClient();
 
@@ -130,6 +131,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Financeiro />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/bulario"
+                element={
+                  <ProtectedRoute>
+                    <Bulario />
                   </ProtectedRoute>
                 }
               />
