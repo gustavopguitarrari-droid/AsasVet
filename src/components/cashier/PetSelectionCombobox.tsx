@@ -88,7 +88,7 @@ const PetSelectionCombobox: React.FC<PetSelectionComboboxProps> = ({
                 className="w-full justify-between border border-input rounded-lg"
               >
                 {selectedPet
-                  ? <span className="font-bold">{`${selectedPet.name} (${clientMap.get(selectedPet.ownerId)?.name || 'Tutor Desconhecido'})`}</span>
+                  ? <span className="font-bold text-primary">{`${selectedPet.name} (${clientMap.get(selectedPet.ownerId)?.name || 'Tutor Desconhecido'})`}</span>
                   : "Buscar ou selecionar animal..."}
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
