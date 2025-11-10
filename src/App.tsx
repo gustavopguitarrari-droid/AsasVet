@@ -11,7 +11,6 @@ import Financeiro from "./pages/Financeiro"; // Restaurado
 // import Caixa from "./pages/Caixa"; // Removido
 import Internacao from "./pages/Internacao";
 import Veterinarios from "./pages/Veterinarios";
-import Estoque from "./pages/Estoque";
 import Products from "./pages/Products"; // Import the new Products page
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
@@ -111,14 +110,6 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Products />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/estoque"
-                element={
-                  <ProtectedRoute>
-                    <Estoque />
                   </ProtectedRoute>
                 }
               />

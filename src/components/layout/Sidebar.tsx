@@ -37,7 +37,6 @@ export const allNavItems: NavItem[] = [
   { name: "Agenda", icon: CalendarDays, path: "/medical-records" },
   { name: "Equipe", icon: Stethoscope, path: "/veterinarios" },
   { name: "Produtos", icon: Tag, path: "/products" },
-  { name: "Estoque", icon: Package, path: "/estoque" },
   { name: "Financeiro", icon: DollarSign, path: "/financeiro" },
   // { name: "Configurações", icon: Settings, path: "/settings" }, // Removido o item de configurações
 ];
