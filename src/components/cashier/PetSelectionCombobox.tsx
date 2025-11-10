@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown, PawPrint, User } from "lucide-react";
+import { Check, ChevronsUpDown, PawPrint, User, XCircle } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -127,7 +127,8 @@ const PetSelectionCombobox: React.FC<PetSelectionComboboxProps> = ({
         </PopoverContent>
       </Popover>
       {selectedPetId && (
-        <Button variant="ghost" size="sm" onClick={() => onSelectPet(null)} className="text-destructive hover:bg-destructive/10">
+        <Button variant="outline" size="sm" onClick={() => onSelectPet(null)} className="w-full mt-2">
+          <XCircle className="h-4 w-4 mr-2" />
           Limpar Seleção de Animal
         </Button>
       )}
