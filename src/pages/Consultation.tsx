@@ -27,16 +27,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { generatePrescriptionPdf } from '@/utils/generatePrescriptionPdf';
-import * as SupabaseStorage from '@/utils/supabaseStorage'; // ALTERADO: Importa o módulo inteiro
+import * as SupabaseStorage from '@/utils/supabaseStorage';
 import { Client, Pet } from '@/types/cadastro';
 import { TeamMember } from '@/pages/Veterinarios';
-import AddAnimalDebitDialog, { AddAnimalDebitFormValues } from '@/components/consultation/AddAnimalDebitDialog';
+import AddAnimalDebitDialog, { AddAnimalDebitFormValues, FinalAnimalDebitData } from '@/components/consultation/AddAnimalDebitDialog'; // Importar FinalAnimalDebitData
 import { AnimalDebit, Product } from '@/types/cashier';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from "@/components/ui/badge";
 import { cn } from '@/lib/utils';
 import { generateMedicalRecordPdf } from '@/utils/generateMedicalRecordPdf';
-import PdfPreviewDialog from '@/components/PdfPreviewDialog'; // Movido para cá para evitar conflito
+import PdfPreviewDialog from '@/components/PdfPreviewDialog';
 
 // Interface para o prontuário médico (deve corresponder à tabela medical_records)
 interface MedicalRecord {
@@ -47,7 +47,7 @@ interface MedicalRecord {
   physical_exam?: string | null;
   diagnosis?: string | null;
   treatment?: string | null;
-  prescriptions: { medication: string; dosage: string; frequency: string; instructions?: string }[]; // Alterado para array não nulo
+  prescriptions: { medication: string; dosage: string; frequency: string; instructions?: string }[];
   recipe_pdf_url?: string | null;
   medical_record_pdf_url?: string | null;
   created_at: string;
@@ -83,34 +83,32 @@ const ConsultationPage: React.FC = () => {
 
   // Query para buscar os detalhes da consulta
   const { data: appointment, isLoading, error } = useQuery<Appointment>({
-    queryKey: ['appointment', appointmentId, userId, organizationId], // NOVO: Adicionado organizationId
+    queryKey: ['appointment', appointmentId, userId, organizationId],
     queryFn: async () => {
-      if (!userId || !appointmentId || !organizationId) throw new Error("User, Appointment ID, or Organization ID not available."); // NOVO: Adicionado organizationId
+      if (!userId || !appointmentId || !organizationId) throw new Error("User, Appointment ID, or Organization ID not available.");
       const { data, error } = await supabase
         .from('appointments')
         .select('*')
         .eq('id', appointmentId)
-        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização veja a consulta
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .single();
       if (error) throw error;
       return data;
     },
-    enabled: !!userId && !!appointmentId && !!organizationId, // NOVO: Habilitar query apenas se userId, appointmentId E organizationId estiverem disponíveis
+    enabled: !!userId && !!appointmentId && !!organizationId,
   });
 
   // Query para buscar o prontuário médico da consulta
   const { data: medicalRecord, isLoading: isLoadingMedicalRecord, error: medicalRecordError } = useQuery<MedicalRecord | null>({
-    queryKey: ['medicalRecord', appointmentId, userId, organizationId], // NOVO: Adicionado organizationId
+    queryKey: ['medicalRecord', appointmentId, userId, organizationId],
     queryFn: async () => {
-      if (!userId || !appointmentId || !organizationId) return null; // NOVO: Adicionado organizationId
+      if (!userId || !appointmentId || !organizationId) return null;
       const { data, error } = await supabase
         .from('medical_records')
         .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, recipe_pdf_url, medical_record_pdf_url, created_at, updated_at')
         .eq('appointment_id', appointmentId)
-        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização veja o prontuário
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
-        .maybeSingle(); // ALTERADO: Usando maybeSingle() aqui
+        .eq('organization_id', organizationId)
+        .maybeSingle();
       if (error) {
         console.error("ConsultationPage: Error fetching medical record:", error);
         throw error;
@@ -119,26 +117,25 @@ const ConsultationPage: React.FC = () => {
         console.log("ConsultationPage: No medical record found for appointment", appointmentId, ". Returning null.");
         return null;
       }
-      console.log("ConsultationPage: Raw medical record data from Supabase:", data); // ADDED LOG
-      // Garante que prescriptions seja sempre um array
+      console.log("ConsultationPage: Raw medical record data from Supabase:", data);
       return {
         ...data,
         prescriptions: data.prescriptions || [],
       } as MedicalRecord;
     },
-    enabled: !!userId && !!appointmentId && !!organizationId, // NOVO: Habilitar query apenas se userId, appointmentId E organizationId estiverem disponíveis
+    enabled: !!userId && !!appointmentId && !!organizationId,
   });
 
   // Fetch all clients
   const { data: allClients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
-    queryKey: ['allClientsConsultation', userId, organizationId], // NOVO: Adicionado organizationId
+    queryKey: ['allClientsConsultation', userId, organizationId],
     queryFn: async () => {
-      if (!userId || !organizationId) return []; // NOVO: Adicionado organizationId
+      if (!userId || !organizationId) return [];
       const { data, error } = await supabase
         .from('clients')
         .select('*')
         .eq('user_id', userId)
-        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId);
       if (error) throw error;
       return data.map(dbClient => ({
         id: dbClient.id,
@@ -160,18 +157,18 @@ const ConsultationPage: React.FC = () => {
         photoUrl: dbClient.photo_url || undefined,
       }));
     },
-    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
+    enabled: !!userId && !!organizationId,
   });
 
   // Fetch all pets
   const { data: allPets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
-    queryKey: ['allPetsConsultation', userId, organizationId], // NOVO: Adicionado organizationId
+    queryKey: ['allPetsConsultation', userId, organizationId],
     queryFn: async () => {
-      if (!userId || !organizationId) return []; // NOVO: Adicionado organizationId
+      if (!userId || !organizationId) return [];
       const { data, error } = await supabase
         .from('pets')
         .select('*')
-        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId);
       if (error) throw error;
       return data.map(dbPet => ({
         id: dbPet.id,
@@ -187,62 +184,61 @@ const ConsultationPage: React.FC = () => {
         ownerId: dbPet.owner_id,
       }));
     },
-    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
+    enabled: !!userId && !!organizationId,
   });
 
   // Fetch all veterinarians (team members with role 'Veterinário' or 'Administrador')
   const { data: allVeterinarians = [], isLoading: isLoadingVeterinarians, error: veterinariansError } = useQuery<TeamMember[]>({
-    queryKey: ['allVeterinariansConsultation', userId, organizationId], // NOVO: Adicionado organizationId
+    queryKey: ['allVeterinariansConsultation', userId, organizationId],
     queryFn: async () => {
-      if (!userId || !organizationId) return []; // NOVO: Adicionado organizationId
+      if (!userId || !organizationId) return [];
       const { data, error } = await supabase
         .from('profiles')
         .select('id, first_name, last_name, email, phone, crmv, role')
         .eq('organization_id', organizationId)
-        .in('role', ['Veterinário', 'Administrador']); // NOVO: Inclui administradores
+        .in('role', ['Veterinário', 'Administrador']);
       if (error) throw error;
       return data as TeamMember[];
     },
-    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
+    enabled: !!userId && !!organizationId,
   });
 
   // NOVO: Query para buscar todos os produtos/serviços
   const { data: products = [], isLoading: isLoadingProducts, error: productsError } = useQuery<Product[]>({
-    queryKey: ['productsConsultation', userId, organizationId], // NOVO: Adicionado organizationId
+    queryKey: ['productsConsultation', userId, organizationId],
     queryFn: async () => {
-      if (!userId || !organizationId) return []; // NOVO: Adicionado organizationId
+      if (!userId || !organizationId) return [];
       const { data, error } = await supabase
         .from('products')
         .select('*')
         .eq('user_id', userId)
-        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId);
       if (error) throw error;
       return data as Product[];
     },
-    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
+    enabled: !!userId && !!organizationId,
   });
 
   // NOVO: Query para buscar débitos do animal para esta consulta
   const { data: animalDebits = [], isLoading: isLoadingAnimalDebits, error: animalDebitsError } = useQuery<AnimalDebit[]>({
-    queryKey: ['animalDebits', appointmentId, userId, organizationId], // NOVO: Adicionado organizationId
+    queryKey: ['animalDebits', appointmentId, userId, organizationId],
     queryFn: async () => {
-      if (!userId || !appointmentId || !organizationId) return []; // NOVO: Adicionado organizationId
+      if (!userId || !appointmentId || !organizationId) return [];
       const { data, error } = await supabase
         .from('animal_debits')
         .select('*')
         .eq('appointment_id', appointmentId)
-        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização veja os débitos
-        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId);
       if (error) throw error;
       return data as AnimalDebit[];
     },
-    enabled: !!userId && !!appointmentId && !!organizationId, // NOVO: Habilitar query apenas se userId, appointmentId E organizationId estiverem disponíveis
+    enabled: !!userId && !!appointmentId && !!organizationId,
   });
 
   // Mutação para finalizar a consulta
   const finalizeAppointmentMutation = useMutation({
     mutationFn: async (id: string) => {
-      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // NOVO: Adicionado organizationId
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available.");
       const now = new Date();
       const { data, error } = await supabase
         .from('appointments')
@@ -251,16 +247,15 @@ const ConsultationPage: React.FC = () => {
           completion_timestamp: now.toISOString(),
         })
         .eq('id', id)
-        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização finalize
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .select()
         .single();
       if (error) throw error;
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalida com organizationId
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] }); // NOVO: Invalida com organizationId
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] });
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] });
       showSuccess("Consulta finalizada com sucesso!");
       // Redireciona para a aba 'finalizadas' na página de consultas
       navigate('/consultas', { state: { activeTab: 'finalizadas' } });
@@ -273,7 +268,7 @@ const ConsultationPage: React.FC = () => {
   // Mutação para gerar e salvar o PDF da receita
   const generateAndSaveRecipePdfMutation = useMutation({
     mutationFn: async ({ prescriptions, medicalRecordId, shouldOpenPreview = false }: { prescriptions: MedicalRecordFormValues['prescriptions']; medicalRecordId: string; shouldOpenPreview?: boolean }) => {
-      console.log("generateAndSaveRecipePdfMutation: Iniciando com medicalRecordId:", medicalRecordId); // ADDED LOG
+      console.log("generateAndSaveRecipePdfMutation: Iniciando com medicalRecordId:", medicalRecordId);
       if (!userId || !appointmentId || !appointment || !organizationId) {
         console.error("generateAndSaveRecipePdfMutation: Dados da consulta, usuário ou organização não disponíveis.");
         throw new Error("Dados da consulta, usuário ou organização não disponíveis.");
@@ -313,8 +308,7 @@ const ConsultationPage: React.FC = () => {
         .from('medical_records')
         .select('recipe_pdf_url')
         .eq('id', currentMedicalRecordId)
-        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização veja o prontuário
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .single();
 
       if (fetchCurrentRecordError) {
@@ -327,7 +321,7 @@ const ConsultationPage: React.FC = () => {
       // If an existing recipe PDF URL is found, delete the old PDF from storage
       if (existingRecipePdfUrl) {
         console.log("generateAndSaveRecipePdfMutation: Existing recipe PDF found, attempting to delete:", existingRecipePdfUrl);
-        await SupabaseStorage.deleteRecipePdfFromSupabase(existingRecipePdfUrl); // ALTERADO: Usando SupabaseStorage
+        await SupabaseStorage.deleteRecipePdfFromSupabase(existingRecipePdfUrl);
       }
 
       console.log("generateAndSaveRecipePdfMutation: Gerando PDF da receita...");
@@ -340,7 +334,7 @@ const ConsultationPage: React.FC = () => {
       console.log("generateAndSaveRecipePdfMutation: PDF Blob da receita gerado:", pdfBlob);
 
       console.log("generateAndSaveRecipePdfMutation: Fazendo upload do PDF da receita para o Supabase Storage...");
-      const newPdfUrl = await SupabaseStorage.uploadRecipePdfToSupabase(pdfBlob, organizationId, userId, appointmentId); // ALTERADO: Usando SupabaseStorage
+      const newPdfUrl = await SupabaseStorage.uploadRecipePdfToSupabase(pdfBlob, organizationId, userId, appointmentId);
       console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Uploaded new recipe PDF to URL:", newPdfUrl);
 
       if (!newPdfUrl) {
@@ -353,8 +347,7 @@ const ConsultationPage: React.FC = () => {
         .from('medical_records')
         .update({ recipe_pdf_url: newPdfUrl })
         .eq('id', currentMedicalRecordId)
-        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização atualize o prontuário
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .select()
         .single();
 
@@ -365,13 +358,13 @@ const ConsultationPage: React.FC = () => {
       console.log("ConsultationPage: generateAndSaveRecipePdfMutation - Medical record updated with new recipe_pdf_url:", data.recipe_pdf_url);
       return { pdfBlob, newPdfUrl, shouldOpenPreview };
     },
-    onSuccess: async ({ pdfBlob, newPdfUrl, shouldOpenPreview }) => { // Adicionado 'async' aqui
+    onSuccess: async ({ pdfBlob, newPdfUrl, shouldOpenPreview }) => {
       console.log("generateAndSaveRecipePdfMutation: onSuccess - Invalidating queries and showing success.");
       console.log("generateAndSaveRecipePdfMutation: Prescriptions after save:", medicalRecordFormRef.current?.getValues().prescriptions);
-      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId, organizationId] }); // NOVO: Invalida com organizationId
-      await queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalidate
-      await queryClient.refetchQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Force refetch
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] }); // NOVO: Invalida com organizationId
+      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId, organizationId] });
+      await queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] });
+      await queryClient.refetchQueries({ queryKey: ['appointments', userId, organizationId] });
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] });
       showSuccess("Receita PDF gerada e salva com sucesso!");
       if (shouldOpenPreview) {
         setRecipePdfBlob(pdfBlob);
@@ -414,11 +407,10 @@ const ConsultationPage: React.FC = () => {
         .from('medical_records')
         .select('id, medical_record_pdf_url')
         .eq('appointment_id', appointmentId)
-        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização veja o prontuário
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .maybeSingle();
 
-      if (fetchCurrentRecordError && fetchCurrentRecordError.code !== 'PGRST116') { // PGRST116 means no rows found
+      if (fetchCurrentRecordError && fetchCurrentRecordError.code !== 'PGRST116') {
         console.error("saveMedicalRecordMutation: Error fetching current medical record for PDF deletion:", fetchCurrentRecordError);
         throw fetchCurrentRecordError;
       }
@@ -429,7 +421,7 @@ const ConsultationPage: React.FC = () => {
       // If there's an existing medical record PDF, delete it before generating a new one
       if (existingMedicalRecordPdfUrl) {
         console.log("saveMedicalRecordMutation: Existing medical record PDF found, attempting to delete:", existingMedicalRecordPdfUrl);
-        await SupabaseStorage.deleteMedicalRecordPdfFromSupabase(existingMedicalRecordPdfUrl); // ALTERADO: Usando SupabaseStorage
+        await SupabaseStorage.deleteMedicalRecordPdfFromSupabase(existingMedicalRecordPdfUrl);
       }
 
       // Generate the new PDF for the medical record
@@ -449,7 +441,7 @@ const ConsultationPage: React.FC = () => {
         id: existingMedicalRecordId, // Pass existing ID if available
         user_id: userId,
         appointment_id: appointmentId,
-        organization_id: organizationId, // NOVO: Adicionado organization_id aqui
+        organization_id: organizationId,
         anamnesis: recordData.anamnesis || null,
         physical_exam: recordData.physicalExam || null,
         diagnosis: recordData.diagnosis || null,
@@ -474,7 +466,7 @@ const ConsultationPage: React.FC = () => {
 
       // Now that we have the medical record ID (either new or existing), upload the PDF
       const medicalRecordIdForPdf = upsertedRecord.id;
-      const newMedicalRecordPdfUrl = await SupabaseStorage.uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId, userId, medicalRecordIdForPdf); // ALTERADO: Usando SupabaseStorage
+      const newMedicalRecordPdfUrl = await SupabaseStorage.uploadMedicalRecordPdfToSupabase(medicalRecordPdfBlob, organizationId, userId, medicalRecordIdForPdf);
       if (!newMedicalRecordPdfUrl) {
         throw new Error("Falha ao fazer upload do PDF do prontuário.");
       }
@@ -485,8 +477,7 @@ const ConsultationPage: React.FC = () => {
         .from('medical_records')
         .update({ medical_record_pdf_url: newMedicalRecordPdfUrl })
         .eq('id', medicalRecordIdForPdf)
-        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização atualize o prontuário
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .select()
         .single();
 
@@ -497,11 +488,14 @@ const ConsultationPage: React.FC = () => {
       console.log("saveMedicalRecordMutation: Medical record updated successfully with PDF URL:", finalRecord.medical_record_pdf_url);
       return finalRecord;
     },
-    onSuccess: async (data) => { // 'data' here is the updated medical record from Supabase
-      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId, organizationId] }); // NOVO: Invalida com organizationId
-      await queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalidate
-      await queryClient.refetchQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Force refetch
-      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] }); // NOVO: Invalida com organizationId
+    onSuccess: async (data) => {
+      console.log("saveMedicalRecordMutation: onSuccess - Data received:", data);
+      console.log("saveMedicalRecordMutation: Updated patient status in onSuccess:", data.status);
+
+      queryClient.invalidateQueries({ queryKey: ['medicalRecord', appointmentId, userId, organizationId] });
+      await queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] });
+      await queryClient.refetchQueries({ queryKey: ['appointments', userId, organizationId] });
+      queryClient.invalidateQueries({ queryKey: ['historyAppointments', userId, organizationId] });
       showSuccess("Prontuário salvo com sucesso!");
 
       if (isAttemptingFinalize) {
@@ -539,20 +533,20 @@ const ConsultationPage: React.FC = () => {
 
   // NOVO: Mutação para adicionar um débito ao animal
   const addAnimalDebitMutation = useMutation({
-    mutationFn: async (debitData: AddAnimalDebitFormValues) => {
-      if (!userId || !appointmentId || !appointment?.pet_id || !organizationId) { // Adicionado organizationId
+    mutationFn: async (debitData: FinalAnimalDebitData) => { // Atualizado para FinalAnimalDebitData
+      if (!userId || !appointmentId || !appointment?.pet_id || !organizationId) {
         throw new Error("User, Appointment, Pet ID, or Organization ID not available.");
       }
       const { data, error } = await supabase
         .from('animal_debits')
         .insert({
-          user_id: userId, // O user_id aqui é o do usuário logado, que está adicionando o débito
-          organization_id: organizationId, // NOVO: Adicionado organization_id
+          user_id: userId,
+          organization_id: organizationId,
           pet_id: appointment.pet_id,
           appointment_id: appointmentId,
           description: debitData.description,
-          amount: debitData.amount,
-          is_paid: false, // Sempre inicia como não pago
+          amount: debitData.calculatedTotalAmount, // Usar o valor total calculado
+          is_paid: false,
           transaction_id: null,
         })
         .select()
@@ -561,7 +555,7 @@ const ConsultationPage: React.FC = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] }); // NOVO: Invalida com organizationId
+      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] });
       showSuccess("Débito adicionado ao animal com sucesso!");
       setIsAddAnimalDebitDialogOpen(false);
     },
@@ -582,8 +576,7 @@ const ConsultationPage: React.FC = () => {
         .from('animal_debits')
         .select('*')
         .eq('id', debitId)
-        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização marque como pago
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .single();
 
       if (fetchDebitError || !debitToPay) {
@@ -628,8 +621,7 @@ const ConsultationPage: React.FC = () => {
           transaction_id: transactionId,
         })
         .eq('id', debitId)
-        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização atualize o débito
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .select()
         .single();
 
@@ -642,8 +634,8 @@ const ConsultationPage: React.FC = () => {
       return updatedDebit;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] }); // NOVO: Invalida com organizationId
-      queryClient.invalidateQueries({ queryKey: ['transactions', userId, organizationId] }); // NOVO: Invalida com organizationId
+      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] });
+      queryClient.invalidateQueries({ queryKey: ['transactions', userId, organizationId] });
       showSuccess("Débito marcado como pago e transação registrada!");
     },
     onError: (err: any) => {
@@ -673,7 +665,7 @@ const ConsultationPage: React.FC = () => {
   };
 
   // NOVO: Função para gerar PDF da receita, garantindo que o prontuário seja salvo primeiro
-  const handleGenerateRecipePdf = async (prescriptions: MedicalRecordFormValues['prescriptions'], shouldOpenPreview: boolean) => { // Adicionado shouldOpenPreview
+  const handleGenerateRecipePdf = async (prescriptions: MedicalRecordFormValues['prescriptions'], shouldOpenPreview: boolean) => {
     if (!medicalRecordFormRef.current) {
       showError("Erro: Formulário de prontuário não disponível.");
       return;
@@ -690,13 +682,13 @@ const ConsultationPage: React.FC = () => {
       // Chame a mutação de salvar o prontuário. Use mutateAsync para esperar a conclusão.
       const savedMedicalRecord = await saveMedicalRecordMutation.mutateAsync(medicalRecordFormRef.current.getValues());
       showSuccess("Prontuário salvo. Gerando receita...");
-      console.log("ConsultationPage: handleGenerateRecipePdf - Saved medical record ID:", savedMedicalRecord.id); // ADDED LOG
+      console.log("ConsultationPage: handleGenerateRecipePdf - Saved medical record ID:", savedMedicalRecord.id);
 
       // Em seguida, gere e salve o PDF da receita, passando o ID do prontuário salvo
       await generateAndSaveRecipePdfMutation.mutateAsync({
         prescriptions,
         medicalRecordId: savedMedicalRecord.id, // Pass the ID here
-        shouldOpenPreview: shouldOpenPreview // Passa shouldOpenPreview para a mutação
+        shouldOpenPreview: shouldOpenPreview
       });
     } catch (err: any) {
       console.error("Erro ao salvar prontuário e gerar receita:", err);
@@ -738,7 +730,7 @@ const ConsultationPage: React.FC = () => {
     setIsMedicalRecordPdfPreviewDialogOpen(false);
   };
 
-  const handleAddAnimalDebit = (data: AddAnimalDebitFormValues) => {
+  const handleAddAnimalDebit = (data: FinalAnimalDebitData) => { // Atualizado para FinalAnimalDebitData
     addAnimalDebitMutation.mutate(data);
   };
 
@@ -804,31 +796,31 @@ const ConsultationPage: React.FC = () => {
             <Button
               onClick={() => setIsAddAnimalDebitDialogOpen(true)}
               size="sm"
-              variant="default" // Alterado para default
-              className="ml-4 bg-green-600 text-white hover:bg-green-700" // Adicionado classes de cor verde
+              variant="default"
+              className="ml-4 bg-green-600 text-white hover:bg-green-700"
             >
               <ReceiptText className="mr-2 h-4 w-4" /> Débitos do Animal
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 py-4"> {/* Alterado aqui */}
-          <div className="flex items-center"> {/* Removido w-full md:w-1/2 lg:w-1/3 */}
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-4 py-4">
+          <div className="flex items-center">
             <User className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Tutor: <span className="font-semibold">{appointment.client_name}</span></p>
           </div>
-          <div className="flex items-center"> {/* Removido w-full md:w-1/2 lg:w-1/3 */}
+          <div className="flex items-center">
             <PawPrint className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Animal: <span className="font-semibold">{appointment.pet_name} ({appointment.species})</span></p>
           </div>
-          <div className="flex items-center"> {/* Removido w-full md:w-1/2 lg:w-1/3 */}
+          <div className="flex items-center">
             <Stethoscope className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Veterinário: <span className="font-semibold">{appointment.veterinarian}</span></p>
           </div>
-          <div className="flex items-center"> {/* Removido w-full md:w-1/2 lg:w-1/3 */}
+          <div className="flex items-center">
             <CalendarCheck className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Data: <span className="font-semibold">{format(parseISO(appointment.date), "dd/MM/yyyy", { locale: ptBR })}</span></p>
           </div>
-          <div className="flex items-center"> {/* Removido w-full md:w-1/2 lg:w-1/3 */}
+          <div className="flex items-center">
             <Clock className="h-5 w-5 mr-2 text-muted-foreground" />
             <p className="text-lg font-medium">Hora: <span className="font-semibold">{appointment.time}</span></p>
           </div>

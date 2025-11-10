@@ -85,10 +85,15 @@ const formSchema = z.object({
 
 export type AddAnimalDebitFormValues = z.infer<typeof formSchema>;
 
+// Nova interface para os dados finais enviados ao pai
+export interface FinalAnimalDebitData extends AddAnimalDebitFormValues {
+  calculatedTotalAmount: number;
+}
+
 interface AddAnimalDebitDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: AddAnimalDebitFormValues) => void;
+  onSubmit: (data: FinalAnimalDebitData) => void; // Atualizado para FinalAnimalDebitData
   isSubmitting: boolean;
   products: Product[];
   animalDebits: AnimalDebit[];
@@ -163,7 +168,11 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
   const totalAmount = useMemo(() => currentQuantity * currentAmountPerUnit, [currentQuantity, currentAmountPerUnit]);
 
   const handleSubmit = (data: AddAnimalDebitFormValues) => {
-    onSubmit(data);
+    const finalData: FinalAnimalDebitData = {
+      ...data,
+      calculatedTotalAmount: totalAmount, // Passa o valor total calculado
+    };
+    onSubmit(finalData);
   };
 
   return (
@@ -237,7 +246,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                           placeholder="Ex: Consulta de emergência, Raio-X de pata"
                           {...field}
                           readOnly={!!selectedProductId}
-                          onChange={selectedProductId ? undefined : field.onChange} // Usar field.onChange diretamente
+                          onChange={selectedProductId ? undefined : field.onChange} // Apenas permitir onChange se não houver produto selecionado
                         />
                       </FormControl>
                       <FormMessage />
