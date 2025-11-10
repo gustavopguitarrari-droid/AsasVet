@@ -424,7 +424,6 @@ const ConsultationPage: React.FC = () => {
         await SupabaseStorage.deleteMedicalRecordPdfFromSupabase(existingMedicalRecordPdfUrl);
       }
 
-      // Generate the new PDF for the medical record
       console.log("ConsultationPage: saveMedicalRecordMutation - Gerando PDF do prontuário...");
       const medicalRecordPdfBlob = await generateMedicalRecordPdf({
         appointment,
@@ -684,7 +683,27 @@ const ConsultationPage: React.FC = () => {
     setIsMedicalRecordPdfPreviewDialogOpen(false);
   };
 
-  const handleAddAnimalDebit = (data: FinalAnimalDebitData) => { // Atualizado para FinalAnimalDebitData
+  const handleAddAnimalDebit = (data: FinalAnimalDebitData) => {
+    // Validação adicional antes de chamar a mutação
+    if (!appointment?.pet_id) {
+      showError("Não é possível adicionar débito: ID do animal da consulta não disponível.");
+      return;
+    }
+    if (!organizationId) {
+      showError("Não é possível adicionar débito: ID da organização não disponível.");
+      return;
+    }
+
+    // Verifica se o pet_id da consulta existe na lista de todos os pets e pertence à organização
+    const petExistsAndBelongsToOrg = allPets.some(
+      (pet) => pet.id === appointment.pet_id && pet.organization_id === organizationId
+    );
+
+    if (!petExistsAndBelongsToOrg) {
+      showError("Não é possível adicionar débito: O animal da consulta não foi encontrado ou não pertence à sua organização.");
+      return;
+    }
+
     console.log("ConsultationPage: handleAddAnimalDebit called with data:", data);
     console.log("ConsultationPage: Current appointment object for debit:", appointment);
     console.log("ConsultationPage: Current appUser for debit:", appUser);
