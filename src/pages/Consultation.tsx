@@ -535,6 +535,7 @@ const ConsultationPage: React.FC = () => {
   const addAnimalDebitMutation = useMutation({
     mutationFn: async (debitData: FinalAnimalDebitData) => { // Atualizado para FinalAnimalDebitData
       if (!userId || !appointmentId || !appointment?.pet_id || !organizationId) {
+        console.error("addAnimalDebitMutation: Missing required IDs - userId:", userId, "appointmentId:", appointmentId, "pet_id:", appointment?.pet_id, "organizationId:", organizationId);
         throw new Error("User, Appointment, Pet ID, or Organization ID not available.");
       }
       console.log("ConsultationPage: addAnimalDebitMutation - Attempting to insert animal debit with payload:", debitData); // LOG DE DEBBUG
@@ -662,6 +663,7 @@ const ConsultationPage: React.FC = () => {
   };
 
   const handleAddAnimalDebit = (data: FinalAnimalDebitData) => { // Atualizado para FinalAnimalDebitData
+    console.log("ConsultationPage: handleAddAnimalDebit called with data:", data); // LOG DE DEBBUG
     addAnimalDebitMutation.mutate(data);
   };
 
