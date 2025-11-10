@@ -4,19 +4,19 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Trash2, Minus, Plus, ReceiptText, DollarSign, CheckCircle } from "lucide-react"; // Adicionado ReceiptText
-import { SaleItem, AnimalDebit } from "@/types/cashier"; // Importar AnimalDebit
+import { Trash2, Minus, Plus, ReceiptText, DollarSign, CheckCircle } from "lucide-react";
+import { SaleItem, AnimalDebit } from "@/types/cashier";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
 interface CheckoutCartProps {
   items: SaleItem[];
-  onUpdateQuantity: (itemId: string, newQuantity: number, isDebit: boolean) => void; // Atualizado para incluir isDebit
-  onRemoveItem: (itemId: string, isDebit: boolean) => void; // Atualizado para incluir isDebit
-  animalDebits: AnimalDebit[]; // NOVO: Débitos pendentes do animal selecionado
-  onAddAnimalDebitToCart: (debit: AnimalDebit) => void; // NOVO: Função para adicionar débito ao carrinho
-  selectedPetId?: string | null; // NOVO: ID do pet selecionado
-  isLoadingAnimalDebits: boolean; // NOVO: Estado de carregamento dos débitos
+  onUpdateQuantity: (itemId: string, newQuantity: number, isDebit: boolean) => void;
+  onRemoveItem: (itemId: string, isDebit: boolean) => void;
+  animalDebits: AnimalDebit[];
+  onAddAnimalDebitToCart: (debit: AnimalDebit) => void;
+  selectedPetId?: string | null;
+  isLoadingAnimalDebits: boolean;
 }
 
 const CheckoutCart: React.FC<CheckoutCartProps> = ({
@@ -30,6 +30,10 @@ const CheckoutCart: React.FC<CheckoutCartProps> = ({
 }) => {
   const subtotal = items.reduce((sum, item) => sum + item.total, 0);
 
+  console.log("CheckoutCart: Received animalDebits prop:", animalDebits);
+  console.log("CheckoutCart: isLoadingAnimalDebits:", isLoadingAnimalDebits);
+  console.log("CheckoutCart: selectedPetId:", selectedPetId);
+
   return (
     <div className="space-y-4">
       <h3 className="text-xl font-semibold">Carrinho</h3>
@@ -40,7 +44,7 @@ const CheckoutCart: React.FC<CheckoutCartProps> = ({
           <div className="space-y-2">
             {items.map((item) => (
               <div
-                key={item.isDebit ? `debit-${item.originalDebitId}` : `product-${item.productId}`} // Chave única
+                key={item.isDebit ? `debit-${item.originalDebitId}` : `product-${item.productId}`}
                 className="flex items-center justify-between p-3 border rounded-lg bg-card shadow-sm"
               >
                 <div className="flex-1">
@@ -53,7 +57,7 @@ const CheckoutCart: React.FC<CheckoutCartProps> = ({
                   </p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  {!item.isDebit && ( // Apenas permite alterar quantidade para produtos/serviços
+                  {!item.isDebit && (
                     <div className="flex items-center border rounded-lg">
                       <Button
                         variant="ghost"

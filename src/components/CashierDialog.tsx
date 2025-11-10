@@ -10,17 +10,17 @@ import {
   SheetTitle,
   SheetFooter,
 } from "@/components/ui/sheet";
-import ProductCombobox from "./cashier/ProductCombobox"; // Importar ProductCombobox
+import ProductCombobox from "./cashier/ProductCombobox";
 import CheckoutCart from "./cashier/CheckoutCart";
 import PaymentSection from "./cashier/PaymentSection";
-import { Product, SaleItem, AnimalDebit } from "@/types/cashier"; // Importar AnimalDebit
+import { Product, SaleItem, AnimalDebit } from "@/types/cashier";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@/context/UserContext";
 import { showError, showSuccess } from "@/utils/toast";
 import { format } from "date-fns";
-import { Client, Pet } from "@/types/cadastro"; // Importar Client e Pet
-import PetSelectionCombobox from "./cashier/PetSelectionCombobox"; // NOVO: Importar PetSelectionCombobox
+import { Client, Pet } from "@/types/cadastro";
+import PetSelectionCombobox from "./cashier/PetSelectionCombobox";
 
 interface CashierDialogProps {
   isOpen: boolean;
@@ -34,7 +34,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
   const organizationId = appUser?.organizationId;
 
   const [cartItems, setCartItems] = useState<SaleItem[]>([]);
-  const [selectedPetId, setSelectedPetId] = useState<string | null>(null); // NOVO: Estado para o pet selecionado
+  const [selectedPetId, setSelectedPetId] = useState<string | null>(null);
 
   // Queries existentes
   const { data: products = [], isLoading: isLoadingProducts } = useQuery<Product[]>({
@@ -83,14 +83,22 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
   const { data: animalDebits = [], isLoading: isLoadingAnimalDebits } = useQuery<AnimalDebit[]>({
     queryKey: ['animalDebitsCashier', selectedPetId, organizationId],
     queryFn: async () => {
-      if (!selectedPetId || !organizationId) return [];
+      console.log("CashierDialog: Fetching animal debits for petId:", selectedPetId, "organizationId:", organizationId);
+      if (!selectedPetId || !organizationId) {
+        console.log("CashierDialog: Skipping animal debits query because petId or organizationId is missing.");
+        return [];
+      }
       const { data, error } = await supabase
         .from('animal_debits')
         .select('*')
         .eq('pet_id', selectedPetId)
         .eq('organization_id', organizationId)
         .eq('is_paid', false); // Apenas débitos pendentes
-      if (error) throw error;
+      if (error) {
+        console.error("CashierDialog: Error fetching animal debits:", error);
+        throw error;
+      }
+      console.log("CashierDialog: Animal debits fetched:", data);
       return data as AnimalDebit[];
     },
     enabled: !!selectedPetId && !!organizationId,
@@ -334,10 +342,10 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
               items={cartItems}
               onUpdateQuantity={handleUpdateQuantity}
               onRemoveItem={handleRemoveItem}
-              animalDebits={animalDebits} // Passa os débitos do animal
-              onAddAnimalDebitToCart={handleAddAnimalDebitToCart} // Passa a função para adicionar débito
-              selectedPetId={selectedPetId} // Passa o pet selecionado
-              isLoadingAnimalDebits={isLoadingAnimalDebits} // Passa o estado de carregamento
+              animalDebits={animalDebits}
+              onAddAnimalDebitToCart={handleAddAnimalDebitToCart}
+              selectedPetId={selectedPetId}
+              isLoadingAnimalDebits={isLoadingAnimalDebits}
             />
           </div>
 
