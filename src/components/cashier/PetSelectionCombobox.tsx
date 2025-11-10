@@ -131,17 +131,10 @@ const PetSelectionCombobox: React.FC<PetSelectionComboboxProps> = ({
           </Popover>
         </div>
         {selectedPetId && (
-          <Tooltip delayDuration={0}>
-            <TooltipTrigger asChild>
-              <Button variant="destructive" size="icon" onClick={() => onSelectPet(null)}>
-                <XCircle className="h-4 w-4" />
-                <span className="sr-only">Limpar Seleção</span>
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Limpar Seleção</p>
-            </TooltipContent>
-          </Tooltip>
+          <Button variant="destructive" onClick={() => onSelectPet(null)}>
+            <XCircle className="h-4 w-4 mr-2" />
+            Limpar
+          </Button>
         )}
       </div>
     </div>
