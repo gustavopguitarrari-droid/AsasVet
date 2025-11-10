@@ -804,8 +804,8 @@ const ConsultationPage: React.FC = () => {
             <Button
               onClick={() => setIsAddAnimalDebitDialogOpen(true)}
               size="sm"
-              variant="secondary"
-              className="ml-4"
+              variant="default" // Alterado para default
+              className="ml-4 bg-green-600 text-white hover:bg-green-700" // Adicionado classes de cor verde
             >
               <ReceiptText className="mr-2 h-4 w-4" /> Débitos do Animal
             </Button>
