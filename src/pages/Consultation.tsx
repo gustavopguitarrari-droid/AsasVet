@@ -174,7 +174,7 @@ const ConsultationPage: React.FC = () => {
         id: dbPet.id,
         name: dbPet.name,
         species: dbPet.species as Pet["species"],
-        breed: dbPet.breed,
+        breed: db.breed,
         age: dbPet.age,
         gender: dbPet.gender as Pet["gender"],
         color: dbPet.color,
@@ -564,84 +564,8 @@ const ConsultationPage: React.FC = () => {
     },
   });
 
-  // NOVO: Mutação para marcar um débito como pago
-  const markDebitAsPaidMutation = useMutation({
-    mutationFn: async (debitId: string) => {
-      if (!userId || !organizationId) {
-        throw new Error("User or Organization ID not available.");
-      }
-
-      // 1. Fetch the debit details
-      const { data: debitToPay, error: fetchDebitError } = await supabase
-        .from('animal_debits')
-        .select('*')
-        .eq('id', debitId)
-        .eq('organization_id', organizationId)
-        .single();
-
-      if (fetchDebitError || !debitToPay) {
-        throw fetchDebitError || new Error("Débito não encontrado.");
-      }
-
-      if (debitToPay.is_paid) {
-        throw new Error("Este débito já foi pago.");
-      }
-
-      // 2. Create a new transaction
-      const now = new Date();
-      const transactionDate = format(now, "yyyy-MM-dd");
-      const transactionTime = format(now, "HH:mm");
-
-      const { data: transactionData, error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          user_id: userId,
-          organization_id: organizationId,
-          description: `Pagamento de débito: ${debitToPay.description} (Animal: ${appointment?.pet_name})`,
-          type: "Entrada",
-          amount: debitToPay.amount,
-          date: transactionDate,
-          time: transactionTime,
-          payment_method: "Dinheiro", // Default to cash, could be expanded
-        })
-        .select('id')
-        .single();
-
-      if (transactionError || !transactionData) {
-        throw transactionError || new Error("Falha ao criar a transação de pagamento.");
-      }
-
-      const transactionId = transactionData.id;
-
-      // 3. Update the animal debit to mark as paid and link to transaction
-      const { data: updatedDebit, error: updateDebitError } = await supabase
-        .from('animal_debits')
-        .update({
-          is_paid: true,
-          transaction_id: transactionId,
-        })
-        .eq('id', debitId)
-        .eq('organization_id', organizationId)
-        .select()
-        .single();
-
-      if (updateDebitError) {
-        // If updating debit fails, try to roll back the transaction
-        await supabase.from('transactions').delete().eq('id', transactionId);
-        throw updateDebitError;
-      }
-
-      return updatedDebit;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] });
-      queryClient.invalidateQueries({ queryKey: ['transactions', userId, organizationId] });
-      showSuccess("Débito marcado como pago e transação registrada!");
-    },
-    onError: (err: any) => {
-      showError(`Erro ao marcar débito como pago: ${err.message}`);
-    },
-  });
+  // NOVO: Mutação para marcar um débito como pago (REMOVIDA DAQUI, AGORA NO CASHIERDIALOG)
+  // const markDebitAsPaidMutation = useMutation({ ... });
 
   const handleFinalizeConsultationClick = () => {
     setIsFinalizeConfirmDialogOpen(true);
@@ -734,9 +658,7 @@ const ConsultationPage: React.FC = () => {
     addAnimalDebitMutation.mutate(data);
   };
 
-  const handleMarkDebitAsPaid = (debitId: string) => {
-    markDebitAsPaidMutation.mutate(debitId);
-  };
+  // Removido handleMarkDebitAsPaid
 
   if (isLoading || isLoadingMedicalRecord || isLoadingClients || isLoadingPets || isLoadingVeterinarians || isLoadingProducts || isLoadingAnimalDebits) {
     return (
@@ -900,8 +822,7 @@ const ConsultationPage: React.FC = () => {
         onSubmit={handleAddAnimalDebit}
         isSubmitting={addAnimalDebitMutation.isPending}
         products={products}
-        animalDebits={animalDebits}
-        onMarkDebitAsPaid={handleMarkDebitAsPaid}
+        // Removido animalDebits e onMarkDebitAsPaid
       />
 
       <PdfPreviewDialog

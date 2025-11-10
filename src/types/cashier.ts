@@ -7,12 +7,15 @@ export interface Product {
 }
 
 export interface SaleItem {
-  productId: string;
+  productId?: string; // Opcional, para produtos/serviços
   name: string;
   price: number;
   quantity: number;
   total: number;
   organization_id: string; // Matches sale_items table
+  isDebit?: boolean; // NOVO: Indica se o item é um débito de animal
+  originalDebitId?: string; // NOVO: ID do débito original na tabela animal_debits
+  petId?: string; // NOVO: ID do pet associado ao débito
 }
 
 export interface AnimalDebit { // NOVO: Interface para débitos de animais
