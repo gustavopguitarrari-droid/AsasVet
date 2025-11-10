@@ -537,7 +537,7 @@ const ConsultationPage: React.FC = () => {
       if (!userId || !appointmentId || !appointment?.pet_id || !organizationId) {
         throw new Error("User, Appointment, Pet ID, or Organization ID not available.");
       }
-      console.log("ConsultationPage: addAnimalDebitMutation - Dados do débito a serem inseridos:", debitData); // LOG DE DEBBUG
+      console.log("ConsultationPage: addAnimalDebitMutation - Attempting to insert animal debit with payload:", debitData); // LOG DE DEBBUG
       const { data, error } = await supabase
         .from('animal_debits')
         .insert({
@@ -552,15 +552,21 @@ const ConsultationPage: React.FC = () => {
         })
         .select()
         .single();
-      if (error) throw error;
+      if (error) {
+        console.error("ConsultationPage: addAnimalDebitMutation - Supabase insert error:", error); // LOG DE ERRO
+        throw error;
+      }
+      console.log("ConsultationPage: addAnimalDebitMutation - Supabase insert response (data):", data); // LOG DE SUCESSO
       return data;
     },
     onSuccess: () => {
+      console.log("ConsultationPage: addAnimalDebitMutation - onSuccess triggered."); // LOG DE SUCESSO
       queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] });
       showSuccess("Débito adicionado ao animal com sucesso!");
       setIsAddAnimalDebitDialogOpen(false);
     },
     onError: (err) => {
+      console.error("ConsultationPage: addAnimalDebitMutation - onError triggered with error:", err); // LOG DE ERRO
       showError(`Erro ao adicionar débito: ${err.message}`);
     },
   });
