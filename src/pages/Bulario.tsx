@@ -53,7 +53,7 @@ const Bulario = () => {
     setHasSearched(true);
     try {
       const { data, error: functionError } = await supabase.functions.invoke('vetsmart-bulario', {
-        body: JSON.stringify({ query: searchTerm }),
+        body: { query: searchTerm },
       });
 
       if (functionError) throw functionError;
