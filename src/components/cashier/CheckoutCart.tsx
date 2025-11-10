@@ -4,10 +4,21 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Trash2, Minus, Plus, ReceiptText, DollarSign, CheckCircle } from "lucide-react";
+import { Trash2, Minus, Plus, ReceiptText, DollarSign, CheckCircle, AlertTriangle } from "lucide-react";
 import { SaleItem, AnimalDebit } from "@/types/cashier";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface CheckoutCartProps {
   items: SaleItem[];
@@ -68,14 +79,41 @@ const CheckoutCart: React.FC<CheckoutCartProps> = ({
                       </Button>
                     </div>
                   )}
-                  <Button
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => onRemoveItem(item.isDebit ? item.originalDebitId! : item.productId!, item.isDebit || false)}
-                    className="rounded-lg"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  {item.isDebit ? (
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="destructive" size="icon" className="rounded-lg">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="flex items-center">
+                            <AlertTriangle className="h-5 w-5 mr-2 text-destructive" /> Confirmar Exclusão
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Tem certeza que deseja excluir o débito: <span className="font-bold">{item.name}</span>?
+                            Esta ação removerá o débito permanentemente do histórico do animal.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => onRemoveItem(item.originalDebitId!, true)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            Excluir Débito
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  ) : (
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      onClick={() => onRemoveItem(item.productId!, false)}
+                      className="rounded-lg"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}

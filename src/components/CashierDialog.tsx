@@ -187,8 +187,34 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
     });
   };
 
+  const deleteAnimalDebitMutation = useMutation({
+    mutationFn: async (debitId: string) => {
+      if (!organizationId) throw new Error("Organization ID not available.");
+      const { error } = await supabase
+        .from('animal_debits')
+        .delete()
+        .eq('id', debitId)
+        .eq('organization_id', organizationId);
+      if (error) throw error;
+      return debitId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['animalDebitsCashier', selectedPetId, organizationId] });
+      showSuccess("Débito removido com sucesso!");
+    },
+    onError: (err: any) => {
+      showError(`Erro ao remover débito: ${err.message}`);
+    },
+  });
+
   const handleRemoveItem = (itemId: string, isDebit: boolean) => {
-    setCartItems((prevItems) => prevItems.filter((item) => (item.productId !== itemId && item.originalDebitId !== itemId) || item.isDebit !== isDebit));
+    // Remove o item do estado local do carrinho para feedback imediato
+    setCartItems((prevItems) => prevItems.filter((item) => (isDebit ? item.originalDebitId !== itemId : item.productId !== itemId)));
+    
+    // Se for um débito, chama a mutação para deletar do banco de dados
+    if (isDebit) {
+      deleteAnimalDebitMutation.mutate(itemId);
+    }
   };
 
   const handleCancelSale = () => {
