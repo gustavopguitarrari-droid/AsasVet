@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState } useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -33,6 +33,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge"; // Import Badge
 import { cn } from "@/lib/utils"; // Import cn for conditional classes
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Import Tabs
+import { showError } from "@/utils/toast"; // Import showError
 
 const formSchema = z.object({
   description: z.string().min(1, "A descrição é obrigatória."),
@@ -123,7 +124,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
 
   const currentQuantity = form.watch("quantity") || 1;
   const currentAmountPerUnit = form.watch("amount") || 0;
-  const totalAmount = currentQuantity * currentAmountPerUnit;
+  const totalAmount = useMemo(() => currentQuantity * currentAmountPerUnit, [currentQuantity, currentAmountPerUnit]);
 
   const handleSubmit = (data: AddAnimalDebitFormValues) => {
     if (selectedProductId) {
@@ -165,7 +166,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
 
           <TabsContent value="add" className="mt-4">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4">
+              <form className="space-y-4 py-4"> {/* Removido onSubmit do form */}
                 <div className="space-y-2">
                   <Label className="flex items-center">
                     <SearchIcon className="h-4 w-4 mr-2 text-muted-foreground" /> Selecionar Produto/Serviço
@@ -276,7 +277,18 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                   <Button variant="outline" onClick={onClose} type="button" disabled={isSubmitting}>
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={isSubmitting || !form.formState.isValid}>
+                  <Button
+                    // Removido type="submit" para controle manual do clique
+                    disabled={isSubmitting || !form.formState.isValid}
+                    onClick={() => {
+                      if (!form.formState.isValid) {
+                        console.log("Form validation errors:", form.formState.errors);
+                        showError("Por favor, preencha todos os campos obrigatórios corretamente.");
+                      } else {
+                        form.handleSubmit(handleSubmit)();
+                      }
+                    }}
+                  >
                     <PlusCircle className="mr-2 h-4 w-4" />
                     {isSubmitting ? "Adicionando..." : "Adicionar Débito"}
                   </Button>
