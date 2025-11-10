@@ -537,6 +537,7 @@ const ConsultationPage: React.FC = () => {
       if (!userId || !appointmentId || !appointment?.pet_id || !organizationId) {
         throw new Error("User, Appointment, Pet ID, or Organization ID not available.");
       }
+      console.log("ConsultationPage: addAnimalDebitMutation - Dados do débito a serem inseridos:", debitData); // LOG DE DEBBUG
       const { data, error } = await supabase
         .from('animal_debits')
         .insert({
@@ -822,7 +823,6 @@ const ConsultationPage: React.FC = () => {
         onSubmit={handleAddAnimalDebit}
         isSubmitting={addAnimalDebitMutation.isPending}
         products={products}
-        // Removido animalDebits e onMarkDebitAsPaid
       />
 
       <PdfPreviewDialog
