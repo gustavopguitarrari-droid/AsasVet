@@ -82,50 +82,51 @@ const ConsultationPage: React.FC = () => {
 
   const [isAddAnimalDebitDialogOpen, setIsAddAnimalDebitDialogOpen] = useState(false);
 
-  // Query para buscar os detalhes da consulta
+  // Query para buscar os detalhes da consulta e o prontuário médico associado
   const { data: appointment, isLoading, error } = useQuery<Appointment>({
     queryKey: ['appointment', appointmentId, userId, organizationId],
     queryFn: async () => {
       if (!userId || !appointmentId || !organizationId) throw new Error("User, Appointment ID, or Organization ID not available.");
       const { data, error } = await supabase
         .from('appointments')
-        .select('*')
+        .select(`
+          *,
+          medical_records (
+            id,
+            appointment_id,
+            user_id,
+            anamnesis,
+            physical_exam,
+            diagnosis,
+            treatment,
+            prescriptions,
+            recipe_pdf_url,
+            medical_record_pdf_url,
+            created_at,
+            updated_at
+          )
+        `)
         .eq('id', appointmentId)
         .eq('organization_id', organizationId)
         .single();
       if (error) throw error;
-      return data;
+
+      // Supabase retorna o registro relacionado como um array, mesmo para uma relação de um para um.
+      // Precisamos achatá-lo para um único objeto ou nulo.
+      const medicalRecordData = Array.isArray(data.medical_records) ? data.medical_records[0] : data.medical_records;
+
+      return {
+        ...data,
+        medical_records: medicalRecordData ? { ...medicalRecordData, prescriptions: medicalRecordData.prescriptions || [] } : null,
+      } as Appointment;
     },
     enabled: !!userId && !!appointmentId && !!organizationId,
   });
 
-  // Query para buscar o prontuário médico da consulta
-  const { data: medicalRecord, isLoading: isLoadingMedicalRecord, error: medicalRecordError } = useQuery<MedicalRecord | null>({
-    queryKey: ['medicalRecord', appointmentId, userId, organizationId],
-    queryFn: async () => {
-      if (!userId || !appointmentId || !organizationId) return null;
-      const { data, error } = await supabase
-        .from('medical_records')
-        .select('id, appointment_id, user_id, anamnesis, physical_exam, diagnosis, treatment, prescriptions, recipe_pdf_url, medical_record_pdf_url, created_at, updated_at')
-        .eq('appointment_id', appointmentId)
-        .eq('organization_id', organizationId)
-        .maybeSingle();
-      if (error) {
-        console.error("ConsultationPage: Error fetching medical record:", error);
-        throw error;
-      }
-      if (!data) {
-        console.log("ConsultationPage: No medical record found for appointment", appointmentId, ". Returning null.");
-        return null;
-      }
-      console.log("ConsultationPage: Raw medical record data from Supabase:", data);
-      return {
-        ...data,
-        prescriptions: data.prescriptions || [],
-      } as MedicalRecord;
-    },
-    enabled: !!userId && !!appointmentId && !!organizationId,
-  });
+  // Deriva o prontuário médico dos dados da consulta
+  const medicalRecord = appointment?.medical_records || null;
+  const isLoadingMedicalRecord = isLoading;
+  const medicalRecordError = error;
 
   // Fetch all clients
   const { data: allClients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
