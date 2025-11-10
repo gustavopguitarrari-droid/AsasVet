@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { PlusCircle, DollarSign, Tag, Package, Search as SearchIcon, ReceiptText, ListChecks } from "lucide-react"; // Adicionado ListChecks
+import { PlusCircle, DollarSign, Tag, Package, Search as SearchIcon, ReceiptText, ListChecks, Trash2, AlertTriangle } from "lucide-react"; // Adicionado ListChecks, Trash2, AlertTriangle
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,10 +29,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { Product, AnimalDebit } from "@/types/cashier"; // Importado AnimalDebit
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from "@/components/ui/label";
-import { showError } from "@/utils/toast";
+import { showError, showSuccess } from "@/utils/toast";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // Importar Tabs
 import { Badge } from "@/components/ui/badge"; // Importar Badge
 import { cn } from "@/lib/utils"; // Importar cn
+import { useMutation, useQueryClient } from "@tanstack/react-query"; // Importar useMutation e useQueryClient
+import { supabase } from "@/integrations/supabase/client"; // Importar supabase
+import { useUser } from "@/context/UserContext"; // Importar useUser
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter as AlertDialogFooterComponent,
+  AlertDialogHeader,
+  AlertDialogTitle as AlertDialogTitleComponent,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"; // Importar AlertDialog
 
 const formSchema = z.object({
   description: z.string().optional(),
@@ -91,7 +105,8 @@ interface AddAnimalDebitDialogProps {
   onSubmit: (data: FinalAnimalDebitData) => void;
   isSubmitting: boolean;
   products: Product[];
-  existingAnimalDebits: AnimalDebit[]; // NOVO: Prop para débitos existentes
+  existingAnimalDebits: AnimalDebit[];
+  onDeleteDebit: (debitId: string, description: string) => void; // NOVO: Prop para exclusão
 }
 
 const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
@@ -100,7 +115,8 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
   onSubmit,
   isSubmitting,
   products,
-  existingAnimalDebits, // NOVO
+  existingAnimalDebits,
+  onDeleteDebit, // NOVO
 }) => {
   const form = useForm<AddAnimalDebitFormValues>({
     resolver: zodResolver(formSchema),
@@ -113,7 +129,8 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
   });
 
   const [selectedProductId, setSelectedProductId] = useState<string | undefined>(undefined);
-  const [activeTab, setActiveTab] = useState<'add-debit' | 'existing-debits'>('add-debit'); // NOVO: Estado para a aba ativa
+  const [activeTab, setActiveTab] = useState<'add-debit' | 'existing-debits'>('add-debit');
+  const [debitToDelete, setDebitToDelete] = useState<{ id: string; description: string } | null>(null); // NOVO: Estado para o débito a ser excluído
 
   React.useEffect(() => {
     if (isOpen) {
@@ -167,9 +184,22 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
     onSubmit(finalData);
   };
 
+  // NOVO: Handler para abrir o AlertDialog de confirmação de exclusão
+  const handleOpenDeleteConfirm = (debit: AnimalDebit) => {
+    setDebitToDelete({ id: debit.id, description: debit.description });
+  };
+
+  // NOVO: Handler para confirmar a exclusão
+  const handleConfirmDelete = () => {
+    if (debitToDelete) {
+      onDeleteDebit(debitToDelete.id, debitToDelete.description);
+      setDebitToDelete(null); // Limpa o estado após a exclusão
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto flex flex-col"> {/* Adicionado flex-col */}
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             <ReceiptText className="h-5 w-5 mr-2" /> Débitos do Animal
@@ -179,7 +209,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'add-debit' | 'existing-debits')} className="flex-1 flex flex-col"> {/* Adicionado flex-1 flex flex-col */}
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as 'add-debit' | 'existing-debits')} className="flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-2 h-auto p-1 mb-4">
             <TabsTrigger value="add-debit" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold flex items-center">
               <PlusCircle className="h-5 w-5 mr-2" /> Adicionar Débito
@@ -189,10 +219,10 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="add-debit" className="flex-1 flex flex-col"> {/* Adicionado flex-1 flex flex-col */}
+          <TabsContent value="add-debit" className="flex-1 flex flex-col">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4 flex-1 flex flex-col"> {/* Adicionado flex-1 flex flex-col */}
-                <ScrollArea className="flex-1 pr-2"> {/* Adicionado ScrollArea */}
+              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4 py-4 flex-1 flex flex-col">
+                <ScrollArea className="flex-1 pr-2">
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label className="flex items-center">
@@ -307,7 +337,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                     Cancelar
                   </Button>
                   <Button
-                    type="submit" // Alterado para type="submit"
+                    type="submit"
                     disabled={isSubmitting || !form.formState.isValid}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
@@ -318,7 +348,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
             </Form>
           </TabsContent>
 
-          <TabsContent value="existing-debits" className="flex-1 flex flex-col"> {/* Adicionado flex-1 flex flex-col */}
+          <TabsContent value="existing-debits" className="flex-1 flex flex-col">
             <ScrollArea className="flex-1 p-4 border rounded-lg bg-muted/20 shadow-inner">
               {existingAnimalDebits.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">Nenhum débito adicionado para este animal ainda.</p>
@@ -335,12 +365,46 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                           R$ {debit.amount.toFixed(2).replace('.', ',')}
                         </p>
                       </div>
-                      <Badge className={cn(
-                        "text-white",
-                        debit.is_paid ? "bg-green-500" : "bg-orange-500"
-                      )}>
-                        {debit.is_paid ? "Pago" : "Pendente"}
-                      </Badge>
+                      <div className="flex items-center space-x-2">
+                        <Badge className={cn(
+                          "text-white",
+                          debit.is_paid ? "bg-green-500" : "bg-orange-500"
+                        )}>
+                          {debit.is_paid ? "Pago" : "Pendente"}
+                        </Badge>
+                        {!debit.is_paid && ( // Só permite excluir se não estiver pago
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="destructive"
+                                size="icon"
+                                className="h-8 w-8 rounded-lg"
+                                onClick={() => handleOpenDeleteConfirm(debit)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Excluir Débito</span>
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitleComponent className="flex items-center">
+                                  <AlertTriangle className="h-5 w-5 mr-2 text-destructive" /> Confirmar Exclusão
+                                </AlertDialogTitleComponent>
+                                <AlertDialogDescription>
+                                  Tem certeza que deseja excluir o débito: <span className="font-bold">{debitToDelete?.description || debit.description}</span>?
+                                  Esta ação não pode ser desfeita.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooterComponent>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                  Excluir
+                                </AlertDialogAction>
+                              </AlertDialogFooterComponent>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>

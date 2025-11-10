@@ -595,8 +595,26 @@ const ConsultationPage: React.FC = () => {
     },
   });
 
-  // REMOVIDO: Mutação para marcar um débito como pago
-  // const markDebitAsPaidMutation = useMutation({ ... });
+  // NOVO: Mutação para excluir um débito de animal
+  const deleteAnimalDebitMutation = useMutation({
+    mutationFn: async (debitId: string) => {
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available.");
+      const { error } = await supabase
+        .from('animal_debits')
+        .delete()
+        .eq('id', debitId)
+        .eq('organization_id', organizationId);
+      if (error) throw error;
+      return debitId;
+    },
+    onSuccess: (deletedDebitId) => {
+      queryClient.invalidateQueries({ queryKey: ['animalDebits', appointmentId, userId, organizationId] });
+      showSuccess(`Débito ${deletedDebitId} excluído com sucesso!`);
+    },
+    onError: (err) => {
+      showError(`Erro ao excluir débito: ${err.message}`);
+    },
+  });
 
   const handleFinalizeConsultationClick = () => {
     setIsFinalizeConfirmDialogOpen(true);
@@ -717,7 +735,10 @@ const ConsultationPage: React.FC = () => {
     }
   };
 
-  // REMOVIDO: handleMarkDebitAsPaid
+  // NOVO: Handler para exclusão de débito
+  const handleDeleteAnimalDebit = (debitId: string, description: string) => {
+    deleteAnimalDebitMutation.mutate(debitId);
+  };
 
   if (isLoading || isLoadingMedicalRecord || isLoadingClients || isLoadingPets || isLoadingVeterinarians || isLoadingProducts || isLoadingAnimalDebits) {
     return (
@@ -913,6 +934,7 @@ const ConsultationPage: React.FC = () => {
         isSubmitting={addAnimalDebitMutation.isPending}
         products={products}
         existingAnimalDebits={animalDebits}
+        onDeleteDebit={handleDeleteAnimalDebit} // NOVO: Passa o handler de exclusão
       />
 
       <PdfPreviewDialog
