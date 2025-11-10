@@ -233,7 +233,7 @@ const AddAnimalDebitDialog: React.FC<AddAnimalDebitDialogProps> = ({
                       placeholder="Ex: Consulta de emergência, Raio-X de pata"
                       {...field}
                       readOnly={!!selectedProductId}
-                      onChange={selectedProductId ? undefined : field.onChange}
+                      onChange={selectedProductId ? handleCustomDescriptionChange : field.onChange} // Ajustado aqui
                     />
                   </FormControl>
                   <FormMessage />
