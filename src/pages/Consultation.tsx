@@ -424,7 +424,6 @@ const ConsultationPage: React.FC = () => {
         await SupabaseStorage.deleteMedicalRecordPdfFromSupabase(existingMedicalRecordPdfUrl);
       }
 
-      // Generate the new PDF for the medical record
       console.log("ConsultationPage: saveMedicalRecordMutation - Gerando PDF do prontuário...");
       const medicalRecordPdfBlob = await generateMedicalRecordPdf({
         appointment,
@@ -543,9 +542,12 @@ const ConsultationPage: React.FC = () => {
         console.error("addAnimalDebitMutation: Missing required IDs:", missing.join(', '));
         throw new Error(`Missing required IDs: ${missing.join(', ')}`);
       }
-      console.log("ConsultationPage: addAnimalDebitMutation - Attempting to insert animal debit with payload:", debitData);
+      console.log("ConsultationPage: addAnimalDebitMutation - User ID:", userId);
+      console.log("ConsultationPage: addAnimalDebitMutation - Organization ID:", organizationId);
+      console.log("ConsultationPage: addAnimalDebitMutation - Pet ID from appointment:", appointment.pet_id);
+      console.log("ConsultationPage: addAnimalDebitMutation - Appointment ID:", appointmentId);
+      console.log("ConsultationPage: addAnimalDebitMutation - Debit data payload:", debitData);
       
-      // Modificação aqui: Removido .single() para depuração
       const { data, error, status, statusText } = await supabase
         .from('animal_debits')
         .insert({
@@ -558,7 +560,7 @@ const ConsultationPage: React.FC = () => {
           is_paid: false,
           transaction_id: null,
         })
-        .select(); // Removido .single() para depuração
+        .select();
 
       console.log("ConsultationPage: Supabase raw response - data:", data, "error:", error, "status:", status, "statusText:", statusText);
 
@@ -571,7 +573,7 @@ const ConsultationPage: React.FC = () => {
         throw new Error("Supabase insert returned no data.");
       }
       console.log("ConsultationPage: addAnimalDebitMutation - Supabase insert response (data):", data);
-      return data[0]; // Retorna o primeiro item, já que .single() foi removido
+      return data[0];
     },
     onSuccess: () => {
       console.log("ConsultationPage: addAnimalDebitMutation - onSuccess triggered.");
@@ -579,9 +581,15 @@ const ConsultationPage: React.FC = () => {
       showSuccess("Débito adicionado ao animal com sucesso!");
       setIsAddAnimalDebitDialogOpen(false);
     },
-    onError: (err) => {
+    onError: (err: any) => { // Usar 'any' para tratamento de erro mais amplo
       console.error("ConsultationPage: addAnimalDebitMutation - onError triggered with error:", err);
-      showError(`Erro ao adicionar débito: ${err.message}. Detalhes: ${JSON.stringify(err)}`);
+      let errorMessage = `Erro ao adicionar débito: ${err.message || "Erro desconhecido"}.`;
+      if (err && typeof err === 'object') {
+        if (err.code) errorMessage += ` Código: ${err.code}.`;
+        if (err.details) errorMessage += ` Detalhes: ${err.details}.`;
+        if (err.hint) errorMessage += ` Dica: ${err.hint}.`;
+      }
+      showError(errorMessage);
     },
   });
 
@@ -749,6 +757,7 @@ const ConsultationPage: React.FC = () => {
               size="sm"
               variant="default"
               className="ml-4 bg-green-600 text-white hover:bg-green-700"
+              disabled={!appointment?.pet_id} {/* Desabilita se pet_id estiver ausente */}
             >
               <ReceiptText className="mr-2 h-4 w-4" /> Débitos do Animal
             </Button>
