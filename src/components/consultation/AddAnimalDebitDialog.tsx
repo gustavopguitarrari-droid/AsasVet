@@ -36,10 +36,10 @@ import { Label } from "@/components/ui/label";
 import { showError } from "@/utils/toast";
 
 const formSchema = z.object({
-  description: z.string().optional(),
+  description: z.string().optional(), // Tornar opcional no nível superior
   amount: z.preprocess(
     (val) => (val === "" ? undefined : Number(String(val).replace(',', '.'))),
-    z.number().optional()
+    z.number().optional() // Tornar opcional no nível superior
   ),
   quantity: z.preprocess(
     (val) => (val === "" ? undefined : Number(val)),
@@ -48,6 +48,8 @@ const formSchema = z.object({
   productId: z.string().optional(),
 }).superRefine((data, ctx) => {
   if (data.productId) {
+    // Se um produto é selecionado, a descrição e o valor são implicitamente válidos do produto.
+    // Apenas garantir que eles não estejam completamente vazios se um produto for selecionado.
     if (!data.description || data.description.trim() === "") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
@@ -63,6 +65,7 @@ const formSchema = z.object({
       });
     }
   } else {
+    // Se nenhum produto é selecionado, então a descrição e o valor personalizados são obrigatórios
     if (!data.description || data.description.trim() === "") {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

@@ -174,7 +174,7 @@ const ConsultationPage: React.FC = () => {
         id: dbPet.id,
         name: dbPet.name,
         species: dbPet.species as Pet["species"],
-        breed: dbPet.breed, // Corrected from db.breed
+        breed: dbPet.breed,
         age: dbPet.age,
         gender: dbPet.gender as Pet["gender"],
         color: dbPet.color,
@@ -564,7 +564,7 @@ const ConsultationPage: React.FC = () => {
     },
   });
 
-  // NOVO: Mutação para marcar um débito como pago (REMOVIDA DAQUI, AGORA NO CASHIERDIALOG)
+  // REMOVIDO: Mutação para marcar um débito como pago
   // const markDebitAsPaidMutation = useMutation({ ... });
 
   const handleFinalizeConsultationClick = () => {
@@ -658,7 +658,7 @@ const ConsultationPage: React.FC = () => {
     addAnimalDebitMutation.mutate(data);
   };
 
-  // Removido handleMarkDebitAsPaid
+  // REMOVIDO: handleMarkDebitAsPaid
 
   if (isLoading || isLoadingMedicalRecord || isLoadingClients || isLoadingPets || isLoadingVeterinarians || isLoadingProducts || isLoadingAnimalDebits) {
     return (
@@ -822,8 +822,7 @@ const ConsultationPage: React.FC = () => {
         onSubmit={handleAddAnimalDebit}
         isSubmitting={addAnimalDebitMutation.isPending}
         products={products}
-        animalDebits={animalDebits}
-        onMarkDebitAsPaid={markDebitAsPaidMutation.mutate} // Passa a mutação para marcar como pago
+        // Removido animalDebits e onMarkDebitAsPaid
       />
 
       <PdfPreviewDialog
