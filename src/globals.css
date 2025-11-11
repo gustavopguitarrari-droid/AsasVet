@@ -429,15 +429,14 @@
 }
 
 .login-art-bg::before {
-  /* NOVO: Overlay para o tema Pastel Blue */
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: hsl(var(--background)); /* Usa a cor de fundo do tema atual */
-  opacity: 0.7; /* Ajuste a opacidade conforme necessário */
+  background: hsl(var(--foreground)); /* Usa a cor de texto do tema (escura) para criar um overlay sutil */
+  opacity: 0.2; /* Reduz a opacidade para tornar a imagem mais visível */
   z-index: 1;
 }
 
