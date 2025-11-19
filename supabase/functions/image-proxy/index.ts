@@ -22,11 +22,16 @@ serve(async (req) => {
       })
     }
 
-    // Busca a imagem da URL externa
-    const imageResponse = await fetch(imageUrl)
+    // Busca a imagem da URL externa, simulando um navegador para contornar proteções
+    const imageResponse = await fetch(imageUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Referer': new URL(imageUrl).origin + '/' // Adiciona um referer genérico
+      }
+    })
 
     if (!imageResponse.ok) {
-      return new Response(JSON.stringify({ error: 'Falha ao buscar a imagem' }), {
+      return new Response(JSON.stringify({ error: `Falha ao buscar a imagem. Status: ${imageResponse.status}` }), {
         status: imageResponse.status,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
