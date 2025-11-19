@@ -405,7 +405,7 @@ const Appointments = () => {
 
   const startAppointmentMutation = useMutation({
     mutationFn: async (appointmentId: string) => {
-      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available."); // NOVO: Adicionado organizationId
+      if (!userId || !organizationId) throw new Error("User not authenticated or organization ID not available.");
       if (!appUser?.name) throw new Error("User name not available to assign as veterinarian.");
 
       const now = new Date();
@@ -413,22 +413,21 @@ const Appointments = () => {
         .from('appointments')
         .update({
           status: "Em Andamento",
-          veterinarian: appUser.name,
+          veterinarian: `${appUser.name} ${appUser.lastName || ''}`.trim(),
           start_time: now.toISOString(),
         })
         .eq('id', appointmentId)
-        // .eq('user_id', userId) // REMOVIDO: Permite que qualquer membro da organização inicie
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .select()
-        .maybeSingle(); // ALTERADO: Usando maybeSingle() aqui
+        .maybeSingle();
       if (error) throw error;
       if (!data) {
         throw new Error("Nenhuma consulta encontrada ou permissão negada para iniciar.");
       }
-      return data as Appointment; // Cast para o tipo correto
+      return data as Appointment;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] }); // NOVO: Invalida com organizationId
+      queryClient.invalidateQueries({ queryKey: ['appointments', userId, organizationId] });
       showSuccess("Consulta iniciada com sucesso!");
       navigate(`/consultation/${data.id}`);
     },
