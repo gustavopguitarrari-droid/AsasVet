@@ -22,11 +22,11 @@ serve(async (req) => {
       })
     }
 
-    // Busca a imagem da URL externa, simulando um navegador para contornar proteções
+    // Fetch the image from the external URL, simulating a browser
     const imageResponse = await fetch(imageUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-        'Referer': new URL(imageUrl).origin + '/' // Adiciona um referer genérico
+        'Referer': new URL(imageUrl).origin + '/'
       }
     })
 
@@ -37,16 +37,17 @@ serve(async (req) => {
       })
     }
 
-    // Pega os dados da imagem como um blob
-    const imageBlob = await imageResponse.blob()
-    const contentType = imageResponse.headers.get('Content-Type') || 'image/jpeg'
-
-    // Retorna a imagem com os cabeçalhos corretos
+    // Create new headers for the response, including CORS and caching
     const headers = new Headers(corsHeaders)
-    headers.set('Content-Type', contentType)
-    headers.set('Cache-Control', 'public, max-age=31536000, immutable') // Cache de 1 ano
+    headers.set('Content-Type', imageResponse.headers.get('Content-Type') || 'image/jpeg')
+    headers.set('Cache-Control', 'public, max-age=31536000, immutable') // Cache for 1 year
 
-    return new Response(imageBlob, { headers })
+    // Stream the image body directly to the client
+    return new Response(imageResponse.body, {
+      status: imageResponse.status,
+      statusText: imageResponse.statusText,
+      headers: headers,
+    })
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
