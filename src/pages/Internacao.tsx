@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight, Horse } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
@@ -73,7 +73,7 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
-  Equino: MoreHorizontal, // Alterado de Horse para MoreHorizontal
+  Equino: Horse, // Alterado de Horse para MoreHorizontal
   Bovino: MoreHorizontal,   // Alterado de Cow para MoreHorizontal
   Outros: MoreHorizontal,
 };

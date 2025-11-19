@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { CalendarCheck, CalendarX, CalendarClock, Edit, Trash2, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play } from "lucide-react";
+import { CalendarCheck, CalendarX, CalendarClock, Edit, Trash2, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Play, Horse } from "lucide-react";
 import AppointmentForm, { AppointmentFormValues } from "./AppointmentForm";
 import { cn } from "@/lib/utils";
 import { Appointment } from "@/pages/Appointments";
@@ -41,7 +41,7 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
-  Equino: MoreHorizontal, // Usando MoreHorizontal como fallback
+  Equino: Horse, // Usando MoreHorizontal como fallback
   Bovino: MoreHorizontal, // Usando MoreHorizontal como fallback
   Outros: MoreHorizontal,
 };
