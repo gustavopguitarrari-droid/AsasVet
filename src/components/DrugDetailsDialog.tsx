@@ -11,6 +11,7 @@ import {
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Pill, Dog, Cat, Factory, AlertTriangle } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface DrugInfo {
   id: string;
@@ -24,6 +25,7 @@ interface DrugInfo {
     cats: string;
   };
   presentations: string[];
+  photo_url?: string | null;
 }
 
 interface DrugDetailsDialogProps {
@@ -39,19 +41,28 @@ const DrugDetailsDialog: React.FC<DrugDetailsDialogProps> = ({ drug, isOpen, onC
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center">
-            <Pill className="h-6 w-6 mr-3 text-primary" />
-            {drug.name}
-          </DialogTitle>
-          <DialogDescription>
-            <div className="flex items-center justify-between">
-              <span>{drug.active_principle}</span>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Factory className="h-4 w-4 mr-2" />
-                <span>{drug.manufacturer}</span>
-              </div>
+          <div className="flex items-center space-x-4">
+            <Avatar className="h-20 w-20 border">
+              <AvatarImage src={drug.photo_url || undefined} alt={drug.name} />
+              <AvatarFallback>
+                <Pill className="h-10 w-10" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <DialogTitle className="flex items-center text-2xl">
+                {drug.name}
+              </DialogTitle>
+              <DialogDescription>
+                <div className="flex items-center justify-between mt-1">
+                  <span>{drug.active_principle}</span>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Factory className="h-4 w-4 mr-2" />
+                    <span>{drug.manufacturer}</span>
+                  </div>
+                </div>
+              </DialogDescription>
             </div>
-          </DialogDescription>
+          </div>
         </DialogHeader>
         <div className="py-4">
           <Accordion type="single" collapsible defaultValue="indications" className="w-full">

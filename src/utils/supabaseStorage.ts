@@ -6,6 +6,7 @@ const LOGOS_BUCKET_NAME = 'logos';
 const PRESCRIPTIONS_BUCKET_NAME = 'prescriptions'; // NOVO: Nome do bucket para prescrições
 const MEDICAL_RECORDS_BUCKET_NAME = 'medical_records_pdfs'; // NOVO: Nome do bucket para prontuários médicos
 const DISCHARGE_SUMMARIES_BUCKET_NAME = 'discharge_summaries_pdfs'; // NOVO: Nome do bucket para resumos de alta
+const MEDICATION_PHOTOS_BUCKET_NAME = 'medication_photos';
 
 /**
  * Converte uma string Base64 em um Blob.
@@ -407,6 +408,72 @@ export const deleteDischargeSummaryPdfFromSupabase = async (publicUrl: string): 
     return true;
   } catch (error) {
     console.error("deleteDischargeSummaryPdfFromSupabase: Erro no processo de exclusão do PDF de resumo de alta:", error);
+    return false;
+  }
+};
+
+export const uploadMedicationPhotoToSupabase = async (
+  base64Image: string,
+  medicationId: string
+): Promise<string | null> => {
+  if (!base64Image) return null;
+
+  try {
+    const contentType = base64Image.substring(
+      base64Image.indexOf(":") + 1,
+      base64Image.indexOf(";")
+    );
+    const fileExtension = contentType.split('/')[1];
+    const fileName = `${uuidv4()}.${fileExtension}`;
+    const filePath = `${medicationId}/${fileName}`;
+
+    const { data, error } = await supabase.storage
+      .from(MEDICATION_PHOTOS_BUCKET_NAME)
+      .upload(filePath, base64ToBlob(base64Image, contentType), {
+        contentType,
+        upsert: false,
+      });
+
+    if (error) {
+      console.error("Erro ao fazer upload da foto do medicamento:", error);
+      throw error;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(MEDICATION_PHOTOS_BUCKET_NAME)
+      .getPublicUrl(filePath);
+
+    return publicUrlData.publicUrl;
+  } catch (error) {
+    console.error("Erro no processo de upload da foto do medicamento:", error);
+    return null;
+  }
+};
+
+export const deleteMedicationPhotoFromSupabase = async (publicUrl: string): Promise<boolean> => {
+  if (!publicUrl) return true;
+
+  try {
+    const url = new URL(publicUrl);
+    const pathSegments = url.pathname.split('/');
+    const bucketIndex = pathSegments.indexOf(MEDICATION_PHOTOS_BUCKET_NAME);
+    if (bucketIndex === -1 || bucketIndex + 1 >= pathSegments.length) {
+      console.warn("URL pública inválida para exclusão da foto do medicamento:", publicUrl);
+      return false;
+    }
+    const filePath = pathSegments.slice(bucketIndex + 1).join('/');
+
+    const { error } = await supabase.storage
+      .from(MEDICATION_PHOTOS_BUCKET_NAME)
+      .remove([filePath]);
+
+    if (error) {
+      console.error("Erro ao deletar foto do medicamento do storage:", error);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Erro no processo de exclusão da foto do medicamento:", error);
     return false;
   }
 };
