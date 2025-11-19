@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin, Eye, Edit, Trash2, Scale } from "lucide-react"; // Removido Horse e Cow
+import { PlusCircle, Search, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, Users as UsersIcon, Home, Calendar, IdCard, Mail, Phone, MapPin, Eye, Edit, Trash2, Scale, DollarSign } from "lucide-react"; // Adicionado DollarSign
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import SpeciesFilter from "@/components/SpeciesFilter";
 import PetDetailsDialog from "@/components/PetDetailsDialog";
@@ -32,7 +32,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ImagePreviewDialog from "@/components/ImagePreviewDialog";
 import CadastroLegend from "@/components/CadastroLegend";
-import { usePageTitle } from "@/context/PageTitleContext"; // Importar usePageTitle
+import { usePageTitle } from "@/context/PageTitleContext";
+import ClientDebtsDialog from "@/components/ClientDebtsDialog"; // Importar o novo diálogo
 
 const speciesIconMap: { [key: string]: React.ElementType } = {
   Cachorro: Dog,
@@ -104,6 +105,10 @@ const Cadastro = () => {
   const [isImagePreviewOpen, setIsImagePreviewOpen] = useState(false);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [imagePreviewAlt, setImagePreviewAlt] = useState("");
+
+  // NOVO: Estados para o diálogo de débitos
+  const [isDebtsDialogOpen, setIsDebtsDialogOpen] = useState(false);
+  const [clientForDebts, setClientForDebts] = useState<Client | null>(null);
 
   const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
     queryKey: ['clients', userId, organizationId], // Adicionado organizationId ao queryKey
@@ -692,6 +697,12 @@ const Cadastro = () => {
     }
   };
 
+  // NOVO: Handler para abrir o diálogo de débitos
+  const handleViewClientDebts = (client: Client) => {
+    setClientForDebts(client);
+    setIsDebtsDialogOpen(true);
+  };
+
   if (isLoadingClients || isLoadingPets) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -849,6 +860,14 @@ const Cadastro = () => {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end space-x-2">
+                            <Tooltip delayDuration={0}>
+                              <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleViewClientDebts(client); }}>
+                                  <DollarSign className="h-4 w-4 text-destructive" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent side="top">Ver Débitos</TooltipContent>
+                            </Tooltip>
                             <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleAddPetForClient(client); }}>
                               Adicionar Animal
                             </Button>
@@ -1145,6 +1164,12 @@ const Cadastro = () => {
         onClose={() => setIsImagePreviewOpen(false)}
         imageUrl={imagePreviewUrl}
         imageAlt={imagePreviewAlt}
+      />
+
+      <ClientDebtsDialog
+        isOpen={isDebtsDialogOpen}
+        onClose={() => setIsDebtsDialogOpen(false)}
+        client={clientForDebts}
       />
     </div>
   );
