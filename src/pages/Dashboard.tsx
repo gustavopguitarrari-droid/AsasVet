@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, PawPrint, CalendarDays, Settings, DollarSign, Bed, Stethoscope, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,8 +11,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { format } from "date-fns";
-// Removido: import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
+import { format, isThisMonth, parseISO } from "date-fns";
+import { Transaction } from "@/types/cashier";
 
 // Importar os novos componentes de gráfico
 import AppointmentsMonthlyChart from "@/components/charts/AppointmentsMonthlyChart";
@@ -23,14 +23,14 @@ import AverageWaitingTimeCard from "@/components/AverageWaitingTimeCard";
 import AverageConsultationTimeCard from "@/components/AverageConsultationTimeCard";
 import UpcomingEventsCard from "@/components/UpcomingEventsCard";
 import RecentPetsCard from "@/components/RecentPetsCard";
-import WaitingAppointmentsCard from "@/components/WaitingAppointmentsCard"; // NOVO: Importar o novo card
+import WaitingAppointmentsCard from "@/components/WaitingAppointmentsCard";
 
 interface DashboardItemConfig {
   id: string;
   name: string;
   isVisible: boolean;
   category: "overview" | "financial" | "recentActivity";
-  order: number; // NOVO: Adicionado propriedade 'order'
+  order: number;
 }
 
 const initialDashboardConfig: DashboardItemConfig[] = [
@@ -73,59 +73,56 @@ const Dashboard = () => {
   const [dashboardConfig, setDashboardConfig] = React.useState<DashboardItemConfig[]>(
     initialDashboardConfig
   );
-  const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "recentActivity">("recentActivity"); // 'animalHealth' removido
+  const [activeTab, setActiveTab] = React.useState<"overview" | "financial" | "recentActivity">("recentActivity");
   const [vetsOnDutyToday, setVetsOnDutyToday] = React.useState<number>(0);
 
   const { user } = useUser();
   const userId = user?.id;
-  const organizationId = user?.organizationId; // NOVO: Obter organizationId
+  const organizationId = user?.organizationId;
 
-  // Query para buscar a contagem de clientes
   const { data: totalClients = 0, isLoading: isLoadingClients } = useQuery<number>({
-    queryKey: ['totalClients', userId, organizationId], // NOVO: Adicionado organizationId
+    queryKey: ['totalClients', userId, organizationId],
     queryFn: async () => {
-      if (!userId || !organizationId) return 0; // NOVO: Habilitar query apenas se organizationId estiver disponível
+      if (!userId || !organizationId) return 0;
       const { count, error } = await supabase
         .from('clients')
         .select('*', { count: 'exact' })
         .eq('user_id', userId)
-        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId);
       if (error) {
         console.error("Erro ao buscar contagem de clientes:", error);
         throw error;
       }
       return count || 0;
     },
-    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
+    enabled: !!userId && !!organizationId,
   });
 
-  // Query para buscar a contagem de pets
   const { data: totalPets = 0, isLoading: isLoadingPets } = useQuery<number>({
-    queryKey: ['totalPets', userId, organizationId], // NOVO: Adicionado organizationId
+    queryKey: ['totalPets', userId, organizationId],
     queryFn: async () => {
-      if (!userId || !organizationId) return 0; // NOVO: Habilitar query apenas se organizationId estiver disponível
+      if (!userId || !organizationId) return 0;
       const { count, error } = await supabase
         .from('pets')
         .select('*', { count: 'exact' })
-        .eq('organization_id', organizationId); // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId);
       if (error) {
         console.error("Erro ao buscar contagem de pets:", error);
         throw error;
       }
       return count || 0;
     },
-    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
+    enabled: !!userId && !!organizationId,
   });
 
-  // Query para buscar a contagem de consultas agendadas (agora da tabela 'events')
   const { data: scheduledAppointmentsCount = 0, isLoading: isLoadingScheduledAppointments } = useQuery<number>({
-    queryKey: ['scheduledAppointmentsCount', userId, organizationId], // NOVO: Adicionado organizationId
+    queryKey: ['scheduledAppointmentsCount', userId, organizationId],
     queryFn: async () => {
-      if (!userId || !organizationId) return 0; // NOVO: Habilitar query apenas se organizationId estiver disponível
+      if (!userId || !organizationId) return 0;
       const { count, error } = await supabase
-        .from('appointments') // Alterado para 'appointments'
+        .from('appointments')
         .select('*', { count: 'exact' })
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .eq('status', 'Agendada');
       if (error) {
         console.error("Erro ao buscar contagem de consultas agendadas (appointments):", error);
@@ -134,19 +131,18 @@ const Dashboard = () => {
       console.log("Contagem de consultas agendadas (appointments) do Supabase:", count);
       return count || 0;
     },
-    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
+    enabled: !!userId && !!organizationId,
   });
 
-  // NOVO: Query para buscar a contagem de pacientes internados
   const { data: internedPatientsCount = 0, isLoading: isLoadingInternedPatients } = useQuery<number>({
-    queryKey: ['internedPatientsCount', userId, organizationId], // NOVO: Adicionado organizationId
+    queryKey: ['internedPatientsCount', userId, organizationId],
     queryFn: async () => {
-      if (!userId || !organizationId) return 0; // NOVO: Habilitar query apenas se organizationId estiver disponível
+      if (!userId || !organizationId) return 0;
       const { count, error } = await supabase
         .from('interned_patients')
         .select('*', { count: 'exact' })
         .eq('user_id', userId)
-        .eq('organization_id', organizationId) // NOVO: Filtrar por organization_id
+        .eq('organization_id', organizationId)
         .neq('status', 'Alta')
         .neq('status', 'Óbito');
       if (error) {
@@ -155,8 +151,46 @@ const Dashboard = () => {
       }
       return count || 0;
     },
-    enabled: !!userId && !!organizationId, // NOVO: Habilitar query apenas se userId E organizationId estiverem disponíveis
+    enabled: !!userId && !!organizationId,
   });
+
+  const { data: transactions = [], isLoading: isLoadingTransactions } = useQuery<Transaction[]>({
+    queryKey: ['transactions', organizationId],
+    queryFn: async () => {
+      if (!organizationId) return [];
+      const { data, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('organization_id', organizationId);
+      if (error) {
+        console.error("Erro ao buscar transações:", error);
+        throw error;
+      }
+      return data as Transaction[];
+    },
+    enabled: !!organizationId,
+  });
+
+  const financialSummary = useMemo(() => {
+    if (!transactions) return { monthRevenue: 0, currentBalance: 0 };
+
+    const now = new Date();
+    const monthRevenue = transactions
+      .filter(tx => tx.type === 'Entrada' && isThisMonth(parseISO(tx.date)))
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const totalRevenue = transactions
+      .filter(tx => tx.type === 'Entrada')
+      .reduce((sum, tx) => sum + tx.amount, 0);
+    
+    const totalExpenses = transactions
+      .filter(tx => tx.type === 'Saída')
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    const currentBalance = totalRevenue - totalExpenses;
+
+    return { monthRevenue, currentBalance };
+  }, [transactions]);
 
   React.useEffect(() => {
     const savedConfigString = localStorage.getItem("dashboardConfig");
@@ -166,36 +200,30 @@ const Dashboard = () => {
         savedConfig = JSON.parse(savedConfigString);
       } catch (error) {
         console.error("Erro ao analisar a configuração salva do painel:", error);
-        // Se houver um erro, usaremos a configuração inicial
       }
     }
 
-    // Crie um mapa para fácil acesso às configurações salvas
     const savedConfigMap = new Map(savedConfig.map(item => [item.id, item]));
 
-    // Mescle a configuração inicial com a salva
     const mergedConfig = initialDashboardConfig.map(initialItem => {
       const savedItem = savedConfigMap.get(initialItem.id);
       if (savedItem) {
-        // Se o item existe na configuração salva, use suas propriedades isVisible, category e order
         return {
-          ...initialItem, // Mantém id e name do initialConfig (para pegar novos nomes se atualizados)
+          ...initialItem,
           isVisible: savedItem.isVisible,
           category: savedItem.category,
-          order: savedItem.order !== undefined ? savedItem.order : initialItem.order, // Usa a ordem salva ou a inicial
+          order: savedItem.order !== undefined ? savedItem.order : initialItem.order,
         };
       }
-      // Se não existe na configuração salva, use o item do initialConfig
       return initialItem;
     });
 
     setDashboardConfig(mergedConfig);
   }, []);
 
-  // Efeito para carregar a escala de veterinários do localStorage
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedSchedule = localStorage.getItem(`teamSchedule_${organizationId}`); // Usar a chave específica da organização
+      const savedSchedule = localStorage.getItem(`teamSchedule_${organizationId}`);
       if (savedSchedule) {
         try {
           const scheduleMap = new Map<string, string[]>(JSON.parse(savedSchedule));
@@ -210,7 +238,7 @@ const Dashboard = () => {
         setVetsOnDutyToday(0);
       }
     }
-  }, [organizationId]); // Adicionado organizationId como dependência
+  }, [organizationId]);
 
   const handleSaveConfig = (newConfig: DashboardItemConfig[]) => {
     setDashboardConfig(newConfig);
@@ -218,11 +246,10 @@ const Dashboard = () => {
   };
 
   const getCardComponent = (item: DashboardItemConfig) => {
-    // Usando as novas variáveis CSS para cores pastel
-    const baseCardClasses = "shadow-md text-foreground"; // Texto marrom escuro para contraste
-    const iconClasses = "h-4 w-4 text-foreground"; // Ícones marrom escuro
-    const textMutedClasses = "text-muted-foreground"; // Texto muted marrom escuro
-    const cardBgClass = dashboardCardClasses[item.order % dashboardCardClasses.length]; // Fallback to default bg-card
+    const baseCardClasses = "shadow-md text-foreground";
+    const iconClasses = "h-4 w-4 text-foreground";
+    const textMutedClasses = "text-muted-foreground";
+    const cardBgClass = dashboardCardClasses[item.order % dashboardCardClasses.length];
 
     switch (item.id) {
       case "totalClients":
@@ -237,7 +264,6 @@ const Dashboard = () => {
                 <div className="text-2xl font-bold">
                   {isLoadingClients ? "..." : totalClients.toLocaleString('pt-BR')}
                 </div>
-                {/* <p className={textMutedClasses}>+20.1% do mês passado</p> */}
               </CardContent>
             </Card>
           </Link>
@@ -254,7 +280,6 @@ const Dashboard = () => {
                 <div className="text-2xl font-bold">
                   {isLoadingPets ? "..." : totalPets.toLocaleString('pt-BR')}
                 </div>
-                {/* <p className={textMutedClasses}>+18.5% do mês passado</p> */}
               </CardContent>
             </Card>
           </Link>
@@ -285,38 +310,46 @@ const Dashboard = () => {
       case "waitingAppointments":
         return <WaitingAppointmentsCard key={item.id} />;
       case "averageWaitingTime":
-        return <AverageWaitingTimeCard key={item.id} className={cardBgClass} />; // Pass class to component
+        return <AverageWaitingTimeCard key={item.id} className={cardBgClass} />;
       case "averageConsultationTime":
-        return <AverageConsultationTimeCard key={item.id} className={cardBgClass} />; // Pass class to component
+        return <AverageConsultationTimeCard key={item.id} className={cardBgClass} />;
       case "recentPets":
-        return <RecentPetsCard key={item.id} className={cardBgClass} />; // Pass class to component
+        return <RecentPetsCard key={item.id} className={cardBgClass} />;
       case "upcomingEvents":
-        return <UpcomingEventsCard key={item.id} className={cardBgClass} />; // Pass class to component
+        return <UpcomingEventsCard key={item.id} className={cardBgClass} />;
       case "financialSummary":
         return (
-          <Card key={item.id} className={cn(cardBgClass, baseCardClasses)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Resumo Financeiro</CardTitle>
-              <DollarSign className={iconClasses} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">R$ 12.500,00</div>
-              <p className={textMutedClasses}>Receita do mês</p>
-            </CardContent>
-          </Card>
+          <Link to="/financeiro" key={item.id} className="block">
+            <Card className={cn(cardBgClass, baseCardClasses)}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Resumo Financeiro</CardTitle>
+                <DollarSign className={iconClasses} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {isLoadingTransactions ? "..." : `R$ ${financialSummary.monthRevenue.toFixed(2).replace('.', ',')}`}
+                </div>
+                <p className={textMutedClasses}>Receita do mês</p>
+              </CardContent>
+            </Card>
+          </Link>
         );
       case "cashFlow":
         return (
-          <Card key={item.id} className={cn(cardBgClass, baseCardClasses)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Fluxo de Caixa</CardTitle>
-              <DollarSign className={iconClasses} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">R$ 5.230,00</div>
-              <p className={textMutedClasses}>Saldo atual</p>
-            </CardContent>
-          </Card>
+          <Link to="/financeiro/fluxo-de-caixa" key={item.id} className="block">
+            <Card className={cn(cardBgClass, baseCardClasses)}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Fluxo de Caixa</CardTitle>
+                <DollarSign className={iconClasses} />
+              </CardHeader>
+              <CardContent>
+                <div className={cn("text-2xl font-bold", financialSummary.currentBalance >= 0 ? "text-green-600" : "text-red-600")}>
+                  {isLoadingTransactions ? "..." : `R$ ${financialSummary.currentBalance.toFixed(2).replace('.', ',')}`}
+                </div>
+                <p className={textMutedClasses}>Saldo atual</p>
+              </CardContent>
+            </Card>
+          </Link>
         );
       case "internmentStatus":
         return (
@@ -371,13 +404,17 @@ const Dashboard = () => {
           </Card>
         );
       case "appointmentsMonthlyChart":
-        return <AppointmentsMonthlyChart key={item.id} className={cardBgClass} />; // Pass class to component
+        return <AppointmentsMonthlyChart key={item.id} className={cardBgClass} />;
       case "appointmentsWeeklyChart":
-        return <AppointmentsWeeklyChart key={item.id} className={cardBgClass} />; // Pass class to component
+        return <AppointmentsWeeklyChart key={item.id} className={cardBgClass} />;
       case "revenueMonthlyChart":
-        return <RevenueMonthlyChart key={item.id} className={cardBgClass} />; // Pass class to component
+        return (
+          <Link to="/financeiro/relatorios" key={item.id} className="block">
+            <RevenueMonthlyChart className={cardBgClass} transactions={transactions} isLoading={isLoadingTransactions} />
+          </Link>
+        );
       case "petsBySpeciesChart":
-        return <PetsBySpeciesChart key={item.id} className={cardBgClass} />; // Pass class to component
+        return <PetsBySpeciesChart key={item.id} className={cardBgClass} />;
       default:
         return null;
     }
@@ -385,13 +422,12 @@ const Dashboard = () => {
 
   const getGreeting = () => {
     if (!user) {
-      return "Bem-vindo(a)!"; // Removido "ao AsasVet!"
+      return "Bem-vindo(a)!";
     }
     const prefix = user.gender === "Feminino" ? "Dra." : "Dr.";
     return `Bem-vindo(a) ${prefix} ${user.name}!`;
   };
 
-  // Calcular as iniciais de forma mais robusta para o fallback do logo
   const firstNameInitial = user?.name ? user.name.charAt(0) : '';
   const lastNameInitial = user?.lastName ? user.lastName.charAt(0) : '';
   const initials = `${firstNameInitial}${lastNameInitial}`.toUpperCase();
@@ -400,16 +436,15 @@ const Dashboard = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          {/* Substituído o logo estático por um Avatar dinâmico */}
           {user?.logoUrl ? (
             <img 
               src={user.logoUrl} 
               alt={user.companyName || "Logo da Clínica"} 
-              className="h-32 w-auto mr-4 object-contain" // Ajustado para h-32 w-auto
+              className="h-32 w-auto mr-4 object-contain"
             />
           ) : (
-            <div className="h-32 w-32 flex items-center justify-center bg-muted text-muted-foreground mr-4 rounded-lg shadow-sm"> {/* Ajustado para h-32 w-32 */}
-              <PawPrint className="h-20 w-20" /> {/* Ícone maior para fallback */}
+            <div className="h-32 w-32 flex items-center justify-center bg-muted text-muted-foreground mr-4 rounded-lg shadow-sm">
+              <PawPrint className="h-20 w-20" />
             </div>
           )}
           
@@ -434,10 +469,9 @@ const Dashboard = () => {
         </Button>
       </div>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "recentActivity")} className="w-full"> {/* 'animalHealth' removido do tipo */}
-        <TabsList className="grid w-full grid-cols-3 h-auto p-1"> {/* Alterado para grid-cols-3 */}
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "financial" | "recentActivity")} className="w-full">
+        <TabsList className="grid w-full grid-cols-3 h-auto p-1">
           <TabsTrigger value="recentActivity" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Atividade Recente</TabsTrigger>
-          {/* TabsTrigger para 'animalHealth' removido */}
           <TabsTrigger value="overview" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Visão Geral</TabsTrigger>
           <TabsTrigger value="financial" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Financeiro</TabsTrigger>
         </TabsList>
@@ -445,7 +479,7 @@ const Dashboard = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "overview")
-              .sort((a, b) => a.order - b.order) // Ordena os cards visíveis
+              .sort((a, b) => a.order - b.order)
               .map(item => getCardComponent(item))}
           </div>
         </TabsContent>
@@ -453,16 +487,15 @@ const Dashboard = () => {
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "financial")
-              .sort((a, b) => a.order - b.order) // Ordena os cards visíveis
+              .sort((a, b) => a.order - b.order)
               .map(item => getCardComponent(item))}
           </div>
         </TabsContent>
-        {/* TabsContent para 'animalHealth' removido */}
         <TabsContent value="recentActivity" className="mt-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "recentActivity")
-              .sort((a, b) => a.order - b.order) // Ordena os cards visíveis
+              .sort((a, b) => a.order - b.order)
               .map(item => getCardComponent(item))}
           </div>
         </TabsContent>

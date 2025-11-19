@@ -9,44 +9,74 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useColorTheme } from "@/context/ColorThemeContext"; // Importar useColorTheme
-import { cn } from "@/lib/utils"; // Importar cn
-
-const data = [
-  { name: "Jan", receita: 4000 },
-  { name: "Fev", receita: 3000 },
-  { name: "Mar", receita: 5000 },
-  { name: "Abr", receita: 4500 },
-  { name: "Mai", receita: 6000 },
-  { name: "Jun", receita: 5500 },
-];
+import { useColorTheme } from "@/context/ColorThemeContext";
+import { cn } from "@/lib/utils";
+import { Transaction } from "@/types/cashier";
+import { format, subMonths, eachMonthOfInterval, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface RevenueMonthlyChartProps {
-  className?: string; // Adicionado prop className
+  className?: string;
+  transactions: Transaction[];
+  isLoading: boolean;
 }
 
-const RevenueMonthlyChart: React.FC<RevenueMonthlyChartProps> = ({ className }) => {
-  const { colorTheme } = useColorTheme(); // Obter o tema atual
-  // As cores do eixo e da grade agora se adaptam automaticamente via CSS,
-  // pois as variáveis CSS são definidas no globals.css para cada tema.
+const RevenueMonthlyChart: React.FC<RevenueMonthlyChartProps> = ({ className, transactions, isLoading }) => {
+  const { colorTheme } = useColorTheme();
   const axisLabelColor = "hsl(var(--foreground))";
   const gridLineColor = "hsl(var(--border))";
 
+  const chartData = React.useMemo(() => {
+    const today = new Date();
+    const monthsInterval = eachMonthOfInterval({
+      start: subMonths(today, 5),
+      end: today,
+    });
+
+    const initialData = monthsInterval.map(month => ({
+      name: format(month, 'MMM', { locale: ptBR }),
+      receita: 0,
+    }));
+
+    const dataMap = new Map(initialData.map(item => [item.name, item.receita]));
+
+    transactions
+      .filter(tx => tx.type === 'Entrada')
+      .forEach(tx => {
+        const txDate = parseISO(tx.date);
+        const monthName = format(txDate, 'MMM', { locale: ptBR });
+        if (dataMap.has(monthName)) {
+          dataMap.set(monthName, dataMap.get(monthName)! + tx.amount);
+        }
+      });
+
+    return initialData.map(item => ({
+      ...item,
+      receita: dataMap.get(item.name) || 0,
+    }));
+  }, [transactions]);
+
   return (
-    <Card className={cn("rounded-xl", className)}> {/* Aplicando className aqui */}
+    <Card className={cn("rounded-xl", className)}>
       <CardHeader>
         <CardTitle>Receita por Mês</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={250}>
-          <AreaChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke={gridLineColor} />
-            <XAxis dataKey="name" stroke={axisLabelColor} />
-            <YAxis stroke={axisLabelColor} />
-            <Tooltip />
-            <Area type="monotone" dataKey="receita" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} /> {/* Cor fixa: red-500 */}
-          </AreaChart>
-        </ResponsiveContainer>
+        {isLoading ? (
+          <div className="flex items-center justify-center h-[250px]">
+            <p className="text-muted-foreground">Carregando dados...</p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={250}>
+            <AreaChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke={gridLineColor} />
+              <XAxis dataKey="name" stroke={axisLabelColor} />
+              <YAxis stroke={axisLabelColor} tickFormatter={(value) => `R$${value}`} />
+              <Tooltip formatter={(value: number) => [`R$ ${value.toFixed(2).replace('.', ',')}`, "Receita"]} />
+              <Area type="monotone" dataKey="receita" stroke="#ef4444" fill="#ef4444" fillOpacity={0.3} />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   );
