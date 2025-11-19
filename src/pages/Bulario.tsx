@@ -1,20 +1,36 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { usePageTitle } from "@/context/PageTitleContext";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, BookOpenCheck, Pill, Dog, Cat, AlertTriangle, Factory } from "lucide-react";
+import { Search, BookOpenCheck, AlertTriangle, ArrowUpDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { showError } from "@/utils/toast";
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import DrugDetailsDialog from "@/components/DrugDetailsDialog";
 
 interface DrugInfo {
   id: string;
@@ -30,6 +46,12 @@ interface DrugInfo {
   presentations: string[];
 }
 
+type SortDirection = 'asc' | 'desc';
+interface SortConfig {
+  key: keyof DrugInfo;
+  direction: SortDirection;
+}
+
 const Bulario = () => {
   const { setPageTitle } = usePageTitle();
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,8 +60,15 @@ const Bulario = () => {
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
 
+  const [sortConfig, setSortConfig] = useState<SortConfig | null>({ key: 'name', direction: 'asc' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [selectedDrug, setSelectedDrug] = useState<DrugInfo | null>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [filterBy, setFilterBy] = useState<'name' | 'active_principle' | 'manufacturer'>('name');
+
   useEffect(() => {
-    setPageTitle("Bulário");
+    setPageTitle("Bulario");
     return () => setPageTitle("");
   }, [setPageTitle]);
 
@@ -51,11 +80,12 @@ const Bulario = () => {
     setIsLoading(true);
     setError(null);
     setHasSearched(true);
+    setCurrentPage(1); // Reset page on new search
     try {
       const { data, error: dbError } = await supabase
         .from('medications')
         .select('*')
-        .or(`name.ilike.%${searchTerm.trim()}%,active_principle.ilike.%${searchTerm.trim()}%`);
+        .ilike(filterBy, `%${searchTerm.trim()}%`);
 
       if (dbError) throw dbError;
 
@@ -69,122 +99,157 @@ const Bulario = () => {
     }
   };
 
+  const sortedResults = useMemo(() => {
+    let sortableItems = [...searchResults];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        const valA = a[sortConfig.key] || '';
+        const valB = b[sortConfig.key] || '';
+        if (valA < valB) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (valA > valB) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [searchResults, sortConfig]);
+
+  const paginatedResults = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return sortedResults.slice(startIndex, startIndex + itemsPerPage);
+  }, [sortedResults, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(sortedResults.length / itemsPerPage);
+
+  const handleSort = (key: keyof DrugInfo) => {
+    let direction: SortDirection = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const handleRowClick = (drug: DrugInfo) => {
+    setSelectedDrug(drug);
+    setIsDetailsOpen(true);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold flex items-center">
           <BookOpenCheck className="h-8 w-8 mr-3 text-primary" />
-          Bulário Digital
+          Bulario
         </h2>
       </div>
-      <p className="text-muted-foreground">
-        Consulte informações sobre medicamentos veterinários de forma rápida e fácil.
-      </p>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Buscar Medicamento</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex w-full max-w-lg items-center space-x-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Digite o nome do medicamento ou princípio ativo..."
-                className="pl-9"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              />
-            </div>
-            <Button onClick={handleSearch} disabled={isLoading}>
-              {isLoading ? "Buscando..." : "Buscar"}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {isLoading && (
-        <div className="text-center py-10">
-          <p className="text-muted-foreground">Buscando informações...</p>
+      <div className="flex flex-col md:flex-row w-full items-center space-y-2 md:space-y-0 md:space-x-2">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Pesquisar..."
+            className="pl-9"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          />
         </div>
-      )}
+        <div className="flex items-center space-x-2 w-full md:w-auto">
+          <span className="text-sm text-muted-foreground">Filtrar por:</span>
+          <Select value={filterBy} onValueChange={(value) => setFilterBy(value as any)}>
+            <SelectTrigger className="w-full md:w-[180px]">
+              <SelectValue placeholder="Filtrar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="name">Nome</SelectItem>
+              <SelectItem value="active_principle">Princípio Ativo</SelectItem>
+              <SelectItem value="manufacturer">Fabricante</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button onClick={handleSearch} disabled={isLoading} className="w-full md:w-auto">
+          {isLoading ? "Buscando..." : "Buscar"}
+        </Button>
+      </div>
 
       {error && (
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="flex items-center text-destructive">
-              <AlertTriangle className="h-5 w-5 mr-2" /> Erro na Busca
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{error}</p>
-          </CardContent>
-        </Card>
-      )}
-
-      {!isLoading && !error && hasSearched && searchResults.length === 0 && (
-        <div className="text-center py-10">
-          <p className="text-muted-foreground">Nenhum medicamento encontrado para "{searchTerm}".</p>
+        <div className="flex items-center justify-center p-4 border border-destructive bg-destructive/10 rounded-md">
+          <AlertTriangle className="h-5 w-5 mr-2 text-destructive" />
+          <p className="text-destructive">{error}</p>
         </div>
       )}
 
-      {!isLoading && !error && searchResults.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {searchResults.map((drug) => (
-            <Card key={drug.id}>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Pill className="h-5 w-5 mr-2 text-primary" />
-                    {drug.name}
-                  </div>
-                  <Badge variant="secondary">{drug.active_principle}</Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center text-sm text-muted-foreground mb-4">
-                  <Factory className="h-4 w-4 mr-2" />
-                  <span>{drug.manufacturer}</span>
-                </div>
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="indications">
-                    <AccordionTrigger>Indicações</AccordionTrigger>
-                    <AccordionContent>{drug.indications}</AccordionContent>
-                  </AccordionItem>
-                  <AccordionItem value="contraindications">
-                    <AccordionTrigger>Contraindicações</AccordionTrigger>
-                    <AccordionContent>{drug.contraindications}</AccordionContent>
-                  </AccordionItem>
-                  <AccordionItem value="dosage">
-                    <AccordionTrigger>Posologia</AccordionTrigger>
-                    <AccordionContent>
-                      <div className="space-y-2">
-                        <div className="flex items-start">
-                          <Dog className="h-4 w-4 mr-2 mt-1 shrink-0" />
-                          <p><span className="font-semibold">Cães:</span> {drug.dosage.dogs}</p>
-                        </div>
-                        <div className="flex items-start">
-                          <Cat className="h-4 w-4 mr-2 mt-1 shrink-0" />
-                          <p><span className="font-semibold">Gatos:</span> {drug.dosage.cats}</p>
-                        </div>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                  <AccordionItem value="presentations">
-                    <AccordionTrigger>Apresentações</AccordionTrigger>
-                    <AccordionContent>
-                      <div className="flex flex-wrap gap-2">
-                        {drug.presentations.map(p => <Badge key={p} variant="outline">{p}</Badge>)}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('name')}>
+                  Nome
+                  <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button variant="ghost" onClick={() => handleSort('manufacturer')}>
+                  Fabricante
+                  <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={2} className="h-24 text-center">
+                  Buscando...
+                </TableCell>
+              </TableRow>
+            ) : paginatedResults.length > 0 ? (
+              paginatedResults.map((drug) => (
+                <TableRow key={drug.id} onClick={() => handleRowClick(drug)} className="cursor-pointer">
+                  <TableCell className="font-medium">{drug.name}</TableCell>
+                  <TableCell>{drug.manufacturer || <span className="text-muted-foreground">N/A</span>}</TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={2} className="h-24 text-center">
+                  {hasSearched ? `Nenhum resultado para "${searchTerm}".` : "Digite um termo e clique em buscar para ver os resultados."}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.max(1, p - 1)); }} />
+            </PaginationItem>
+            {[...Array(totalPages).keys()].map(pageNumber => (
+              <PaginationItem key={pageNumber}>
+                <PaginationLink href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(pageNumber + 1); }} isActive={currentPage === pageNumber + 1}>
+                  {pageNumber + 1}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext href="#" onClick={(e) => { e.preventDefault(); setCurrentPage(p => Math.min(totalPages, p + 1)); }} />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
       )}
+
+      <DrugDetailsDialog
+        drug={selectedDrug}
+        isOpen={isDetailsOpen}
+        onClose={() => setIsDetailsOpen(false)}
+      />
     </div>
   );
 };
