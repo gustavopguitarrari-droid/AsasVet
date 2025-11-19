@@ -4,7 +4,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, ListFilter, Horse } from "lucide-react";
+import { Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, ListFilter } from "lucide-react";
 
 interface SpeciesOption {
   name: string;
@@ -20,7 +20,7 @@ const speciesOptions: SpeciesOption[] = [
   { name: "Pássaro", icon: Bird, colorClass: "bg-sidebar-item-bg-3", value: "Pássaro" },
   { name: "Roedor", icon: Rabbit, colorClass: "bg-sidebar-item-bg-7", value: "Roedor" },
   { name: "Peixe", icon: Fish, colorClass: "bg-sidebar-item-bg-5", value: "Peixe" },
-  { name: "Equino", icon: Horse, colorClass: "bg-sidebar-item-bg-2", value: "Equino" }, // Usando MoreHorizontal como fallback
+  { name: "Equino", icon: MoreHorizontal, colorClass: "bg-sidebar-item-bg-2", value: "Equino" }, // Usando MoreHorizontal como fallback
   { name: "Bovino", icon: MoreHorizontal, colorClass: "bg-sidebar-item-bg-6", value: "Bovino" }, // Usando MoreHorizontal como fallback
   { name: "Outros", icon: MoreHorizontal, colorClass: "bg-sidebar-item-bg-9", value: "Outros" },
 ];

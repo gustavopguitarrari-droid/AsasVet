@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, User, Calendar, Palette, Heart, Info, Edit, Trash2, Scale, Horse } from "lucide-react"; // Novos ícones
+import { Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, User, Calendar, Palette, Heart, Info, Edit, Trash2, Scale } from "lucide-react"; // Novos ícones
 import { Pet } from "@/types/cadastro"; // Importa a interface Pet
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Importar Avatar
 import { Button } from "@/components/ui/button"; // Importar Button
@@ -34,8 +34,6 @@ const speciesIconMap: { [key: string]: React.ElementType } = {
   Pássaro: Bird,
   Roedor: Rabbit,
   Peixe: Fish,
-  Equino: Horse,
-  Bovino: MoreHorizontal,
   Outros: MoreHorizontal,
 };
 
