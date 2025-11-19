@@ -36,6 +36,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import MedicationFormDialog, { MedicationFormValues } from "@/components/bulario/MedicationFormDialog";
 import { uploadMedicationPhotoToSupabase, deleteMedicationPhotoFromSupabase } from "@/utils/supabaseStorage";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { createProxyUrl } from "@/utils/imageProxy";
 
 interface DrugInfo {
   id: string;
@@ -326,7 +327,7 @@ const Bulario = () => {
                 <TableRow key={drug.id} onClick={() => handleRowClick(drug)} className="cursor-pointer">
                   <TableCell>
                     <Avatar>
-                      <AvatarImage src={drug.photo_url || undefined} alt={drug.name} crossOrigin="anonymous" />
+                      <AvatarImage src={createProxyUrl(drug.photo_url)} alt={drug.name} crossOrigin="anonymous" />
                       <AvatarFallback><Pill /></AvatarFallback>
                     </Avatar>
                   </TableCell>
