@@ -97,7 +97,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
       reason: initialData?.reason || "",
       admissionDate: initialData?.admissionDate || new Date(),
       expectedDischargeDate: initialData?.expectedDischargeDate || null,
-      veterinarian: initialData?.veterinarian || (allVeterinarians.length > 0 ? `${allVeterinarians[0].first_name} ${allVeterinarians[0].last_name}` : ""),
+      veterinarian: initialData?.veterinarian || (allVeterinarians.length > 0 ? `${allVeterinarians[0].first_name} ${allVeterinarians[0].last_name || ''}`.trim() : ""),
       risk: initialData?.risk || "Sem risco",
     },
   });
@@ -121,7 +121,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
       reason: initialData?.reason || "",
       admissionDate: initialData?.admissionDate || new Date(),
       expectedDischargeDate: initialData?.expectedDischargeDate || null,
-      veterinarian: initialData?.veterinarian || (allVeterinarians.length > 0 ? `${allVeterinarians[0].first_name} ${allVeterinarians[0].last_name}` : ""),
+      veterinarian: initialData?.veterinarian || (allVeterinarians.length > 0 ? `${allVeterinarians[0].first_name} ${allVeterinarians[0].last_name || ''}`.trim() : ""),
       risk: initialData?.risk || "Sem risco",
     });
     setClientSearchInput("");
@@ -372,8 +372,8 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
                 </FormControl>
                 <SelectContent>
                   {allVeterinarians.map((vet) => (
-                    <SelectItem key={vet.id} value={`${vet.first_name} ${vet.last_name}`}>
-                      {vet.first_name} {vet.last_name}
+                    <SelectItem key={vet.id} value={`${vet.first_name} ${vet.last_name || ''}`.trim()}>
+                      {`${vet.first_name} ${vet.last_name || ''}`.trim()}
                     </SelectItem>
                   ))}
                 </SelectContent>
