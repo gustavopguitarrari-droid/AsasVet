@@ -170,6 +170,27 @@ const Cadastro = () => {
     enabled: !!userId && !!organizationId, // Habilitar query apenas se userId E organizationId estiverem disponíveis
   });
 
+  // NOVO: Query para buscar todos os débitos não pagos da organização
+  const { data: allUnpaidDebts = [], isLoading: isLoadingDebts } = useQuery<{pet_id: string}[]>({
+    queryKey: ['allUnpaidDebtsForCadastro', organizationId],
+    queryFn: async () => {
+      if (!organizationId) return [];
+      
+      const { data, error } = await supabase
+        .from('animal_debits')
+        .select('pet_id')
+        .eq('organization_id', organizationId)
+        .eq('is_paid', false);
+      
+      if (error) {
+        console.error("Error fetching unpaid debts:", error);
+        throw error;
+      }
+      return data;
+    },
+    enabled: !!organizationId,
+  });
+
   const addClientMutation = useMutation({
     mutationFn: async (data: ClientFormValues) => {
       if (!userId || !organizationId) { // Adicionado organizationId aqui
@@ -659,6 +680,21 @@ const Cadastro = () => {
     });
   }, [pets, clientsMap, selectedSpecies, petSearchTerm]);
 
+  // NOVO: Memoize sets for pets and owners with debts
+  const petsWithDebts = useMemo(() => {
+    return new Set(allUnpaidDebts.map(d => d.pet_id));
+  }, [allUnpaidDebts]);
+
+  const ownersWithDebts = useMemo(() => {
+    const ownerIdSet = new Set<string>();
+    pets.forEach(pet => {
+      if (petsWithDebts.has(pet.id)) {
+        ownerIdSet.add(pet.ownerId);
+      }
+    });
+    return ownerIdSet;
+  }, [pets, petsWithDebts]);
+
   const handleViewClientPets = (client: Client) => {
     setClientToViewPets(client);
     setIsClientPetsDialogOpen(true);
@@ -703,7 +739,7 @@ const Cadastro = () => {
     setIsDebtsDialogOpen(true);
   };
 
-  if (isLoadingClients || isLoadingPets) {
+  if (isLoadingClients || isLoadingPets || isLoadingDebts) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando dados de cadastro...</p>
@@ -790,6 +826,7 @@ const Cadastro = () => {
                     const firstNameInitial = client.name ? client.name.charAt(0) : '';
                     const lastNameInitial = client.name.split(' ').pop()?.charAt(0) || '';
                     const initials = `${firstNameInitial}${lastNameInitial}`.toUpperCase();
+                    const clientHasDebts = ownersWithDebts.has(client.id);
 
                     return (
                       <TableRow key={client.id} className="cursor-pointer hover:bg-muted/50">
@@ -863,10 +900,15 @@ const Cadastro = () => {
                             <Tooltip delayDuration={0}>
                               <TooltipTrigger asChild>
                                 <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleViewClientDebts(client); }}>
-                                  <DollarSign className="h-4 w-4 text-destructive" />
+                                  <DollarSign 
+                                    className={clientHasDebts ? "text-destructive" : "text-green-600"}
+                                    strokeWidth={2.5} 
+                                  />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent side="top">Ver Débitos</TooltipContent>
+                              <TooltipContent side="top">
+                                {clientHasDebts ? "Ver débitos pendentes" : "Nenhum débito pendente"}
+                              </TooltipContent>
                             </Tooltip>
                             <Button variant="outline" size="sm" onClick={(e) => { e.stopPropagation(); handleAddPetForClient(client); }}>
                               Adicionar Animal
