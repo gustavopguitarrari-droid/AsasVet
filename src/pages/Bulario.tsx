@@ -31,6 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import DrugDetailsDialog from "@/components/DrugDetailsDialog";
+import { useQuery } from "@tanstack/react-query";
 
 interface DrugInfo {
   id: string;
@@ -55,11 +56,6 @@ interface SortConfig {
 const Bulario = () => {
   const { setPageTitle } = usePageTitle();
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<DrugInfo[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [hasSearched, setHasSearched] = useState(false);
-
   const [sortConfig, setSortConfig] = useState<SortConfig | null>({ key: 'name', direction: 'asc' });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -72,37 +68,39 @@ const Bulario = () => {
     return () => setPageTitle("");
   }, [setPageTitle]);
 
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) {
-      showError("Por favor, digite um termo para buscar.");
-      return;
-    }
-    setIsLoading(true);
-    setError(null);
-    setHasSearched(true);
-    setCurrentPage(1); // Reset page on new search
-    try {
+  const { data: allMedications = [], isLoading, error } = useQuery<DrugInfo[]>({
+    queryKey: ['medications'],
+    queryFn: async () => {
       const { data, error: dbError } = await supabase
         .from('medications')
         .select('*')
-        .ilike(filterBy, `%${searchTerm.trim()}%`);
+        .order('name', { ascending: true });
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        showError(`Erro ao carregar bulário: ${dbError.message}`);
+        throw dbError;
+      }
+      return data || [];
+    },
+  });
 
-      setSearchResults(data || []);
-    } catch (err: any) {
-      setError(err.message);
-      showError(`Erro ao buscar no bulário: ${err.message}`);
-      setSearchResults([]);
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterBy]);
+
+  const filteredAndSortedResults = useMemo(() => {
+    let filteredItems = [...allMedications];
+
+    if (searchTerm.trim()) {
+      const lowerCaseSearchTerm = searchTerm.toLowerCase().trim();
+      filteredItems = filteredItems.filter(drug => {
+        const valueToFilter = drug[filterBy]?.toString().toLowerCase() || '';
+        return valueToFilter.includes(lowerCaseSearchTerm);
+      });
     }
-  };
 
-  const sortedResults = useMemo(() => {
-    let sortableItems = [...searchResults];
     if (sortConfig !== null) {
-      sortableItems.sort((a, b) => {
+      filteredItems.sort((a, b) => {
         const valA = a[sortConfig.key] || '';
         const valB = b[sortConfig.key] || '';
         if (valA < valB) {
@@ -114,15 +112,16 @@ const Bulario = () => {
         return 0;
       });
     }
-    return sortableItems;
-  }, [searchResults, sortConfig]);
+    
+    return filteredItems;
+  }, [allMedications, searchTerm, filterBy, sortConfig]);
 
   const paginatedResults = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return sortedResults.slice(startIndex, startIndex + itemsPerPage);
-  }, [sortedResults, currentPage, itemsPerPage]);
+    return filteredAndSortedResults.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredAndSortedResults, currentPage, itemsPerPage]);
 
-  const totalPages = Math.ceil(sortedResults.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredAndSortedResults.length / itemsPerPage);
 
   const handleSort = (key: keyof DrugInfo) => {
     let direction: SortDirection = 'asc';
@@ -154,7 +153,6 @@ const Bulario = () => {
             className="pl-9"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
         <div className="flex items-center space-x-2 w-full md:w-auto">
@@ -170,15 +168,12 @@ const Bulario = () => {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={handleSearch} disabled={isLoading} className="w-full md:w-auto">
-          {isLoading ? "Buscando..." : "Buscar"}
-        </Button>
       </div>
 
       {error && (
         <div className="flex items-center justify-center p-4 border border-destructive bg-destructive/10 rounded-md">
           <AlertTriangle className="h-5 w-5 mr-2 text-destructive" />
-          <p className="text-destructive">{error}</p>
+          <p className="text-destructive">{error.message}</p>
         </div>
       )}
 
@@ -204,7 +199,7 @@ const Bulario = () => {
             {isLoading ? (
               <TableRow>
                 <TableCell colSpan={2} className="h-24 text-center">
-                  Buscando...
+                  Carregando bulário...
                 </TableCell>
               </TableRow>
             ) : paginatedResults.length > 0 ? (
@@ -217,7 +212,7 @@ const Bulario = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={2} className="h-24 text-center">
-                  {hasSearched ? `Nenhum resultado para "${searchTerm}".` : "Digite um termo e clique em buscar para ver os resultados."}
+                  {searchTerm ? `Nenhum resultado para "${searchTerm}".` : "Nenhum medicamento cadastrado."}
                 </TableCell>
               </TableRow>
             )}
