@@ -25,18 +25,20 @@ interface ForwardToInternmentDialogProps {
   isOpen: boolean;
   onClose: () => void;
   appointment: Appointment;
-  allClients: Client[]; // NOVO: Passar todos os clientes
-  allPets: Pet[];       // NOVO: Passar todos os pets
-  allVeterinarians: TeamMember[]; // NOVO: Passar todos os veterinários
+  allClients: Client[];
+  allPets: Pet[];
+  allVeterinarians: TeamMember[];
+  onInternmentSuccess: () => void; // NOVO: Callback para sucesso
 }
 
 const ForwardToInternmentDialog: React.FC<ForwardToInternmentDialogProps> = ({
   isOpen,
   onClose,
   appointment,
-  allClients, // NOVO
-  allPets,    // NOVO
-  allVeterinarians, // NOVO
+  allClients,
+  allPets,
+  allVeterinarians,
+  onInternmentSuccess, // NOVO
 }) => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
@@ -62,17 +64,17 @@ const ForwardToInternmentDialog: React.FC<ForwardToInternmentDialogProps> = ({
         .from('interned_patients')
         .insert({
           user_id: userId,
-          client_id: client.id, // NOVO: Adiciona client_id
-          pet_id: pet.id,       // NOVO: Adiciona pet_id
+          client_id: client.id,
+          pet_id: pet.id,
           bay_name: newPatientData.bayName,
-          pet_name: pet.name, // Usa o nome do pet do objeto pet
-          owner_name: client.name, // Usa o nome do cliente do objeto client
+          pet_name: pet.name,
+          owner_name: client.name,
           reason: newPatientData.reason,
           admission_date: format(newPatientData.admissionDate, "yyyy-MM-dd"),
           expected_discharge_date: newPatientData.expectedDischargeDate ? format(newPatientData.expectedDischargeDate, "yyyy-MM-dd") : null,
-          veterinarian: `${veterinarian.first_name} ${veterinarian.last_name}`, // Usa o nome completo do veterinário
+          veterinarian: `${veterinarian.first_name} ${veterinarian.last_name}`,
           status: "Em Observação",
-          species: pet.species, // Usa a espécie do pet do objeto pet
+          species: pet.species,
           risk: newPatientData.risk,
         })
         .select()
@@ -87,6 +89,7 @@ const ForwardToInternmentDialog: React.FC<ForwardToInternmentDialogProps> = ({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interned_patients', userId] });
       showSuccess("Paciente encaminhado para internação com sucesso!");
+      onInternmentSuccess(); // NOVO: Chama o callback de sucesso
       onClose();
     },
     onError: (error) => {
@@ -94,21 +97,20 @@ const ForwardToInternmentDialog: React.FC<ForwardToInternmentDialogProps> = ({
     },
   });
 
-  // Tenta encontrar o cliente e o pet da consulta para preencher os valores iniciais
   const initialClient = allClients.find(c => c.name === appointment.client_name);
   const initialPet = allPets.find(p => p.name === appointment.pet_name && p.ownerId === initialClient?.id);
 
   const initialInternmentData: Partial<InternmentFormValues> = {
     selectedClientId: initialClient?.id,
     selectedPetId: initialPet?.id,
-    petName: appointment.pet_name, // Mantido para fallback ou exibição inicial
-    ownerName: appointment.client_name, // Mantido para fallback ou exibição inicial
-    species: appointment.species, // Mantido para fallback ou exibição inicial
+    petName: appointment.pet_name,
+    ownerName: appointment.client_name,
+    species: appointment.species,
     veterinarian: appointment.veterinarian,
-    admissionDate: new Date(), // Default to today
-    risk: "Sem risco", // Default risk
-    bayName: "", // User must fill
-    reason: "", // User must fill
+    admissionDate: new Date(),
+    risk: "Sem risco",
+    bayName: "",
+    reason: "",
   };
 
   const handleSubmit = (data: InternmentFormValues) => {
@@ -131,9 +133,9 @@ const ForwardToInternmentDialog: React.FC<ForwardToInternmentDialogProps> = ({
           onCancel={onClose}
           initialData={initialInternmentData}
           isSubmittingParent={addPatientMutation.isPending}
-          allClients={allClients} // Passa todos os clientes
-          allPets={allPets}     // Passa todos os pets
-          allVeterinarians={allVeterinarians} // Passa todos os veterinários
+          allClients={allClients}
+          allPets={allPets}
+          allVeterinarians={allVeterinarians}
         />
       </DialogContent>
     </Dialog>

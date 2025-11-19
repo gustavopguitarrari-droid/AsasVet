@@ -768,6 +768,31 @@ const ConsultationPage: React.FC = () => {
     clearAnimalDebitsMutation.mutate();
   };
 
+  // NOVO: Handler para o sucesso da internação
+  const handleInternmentSuccess = async () => {
+    if (medicalRecordFormRef.current && appointmentId) {
+      const currentValues = medicalRecordFormRef.current.getValues();
+      const newTreatmentText = `${currentValues.treatment || ''}\n\n[ENCAMINHADO PARA INTERNAÇÃO EM ${format(new Date(), 'dd/MM/yyyy HH:mm', { locale: ptBR })}]`;
+      
+      const updatedRecordData = {
+        ...currentValues,
+        treatment: newTreatmentText,
+      };
+
+      try {
+        // Salva o prontuário com a nova nota e espera a conclusão
+        await saveMedicalRecordMutation.mutateAsync(updatedRecordData);
+        
+        // Após salvar, finaliza a consulta
+        finalizeAppointmentMutation.mutate(appointmentId);
+
+      } catch (error) {
+        console.error("Erro durante o processo de finalização automática:", error);
+        showError("Erro ao finalizar a consulta automaticamente após o encaminhamento.");
+      }
+    }
+  };
+
   if (isLoading || isLoadingMedicalRecord || isLoadingClients || isLoadingPets || isLoadingVeterinarians || isLoadingProducts || isLoadingAnimalDebits) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -952,6 +977,7 @@ const ConsultationPage: React.FC = () => {
           allClients={allClients}
           allPets={allPets}
           allVeterinarians={allVeterinarians}
+          onInternmentSuccess={handleInternmentSuccess}
         />
       )}
 
