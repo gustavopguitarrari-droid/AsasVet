@@ -50,7 +50,7 @@ interface MedicationFormDialogProps {
   onClose: () => void;
   onSubmit: (data: MedicationFormValues) => void;
   isSubmitting: boolean;
-  initialData?: MedicationFormValues & { id?: string; presentations: string[] };
+  initialData?: Omit<MedicationFormValues, 'presentations'> & { id?: string; presentations: string[] };
 }
 
 const MedicationFormDialog: React.FC<MedicationFormDialogProps> = ({
