@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
+import { v4 as uuidv4 } from 'uuid';
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, X, ReceiptText } from "lucide-react";
 import {
@@ -85,8 +86,9 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
   });
 
   // Deriva o carrinho completo a partir dos itens manuais e dos débitos do animal
-  const cartItems = useMemo(() => {
-    const debitItems = (animalDebits || []).map(debit => ({
+  const cartItems: SaleItem[] = useMemo(() => {
+    const debitItems: SaleItem[] = (animalDebits || []).map(debit => ({
+      id: uuidv4(),
       name: debit.description,
       price: debit.amount,
       quantity: 1,
@@ -115,6 +117,7 @@ const CashierDialog: React.FC<CashierDialogProps> = ({ isOpen, onClose }) => {
         return updatedItems;
       } else {
         return [...prevItems, {
+          id: uuidv4(),
           productId: product.id,
           name: product.name,
           price: product.price,

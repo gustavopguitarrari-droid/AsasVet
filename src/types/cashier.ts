@@ -39,6 +39,7 @@ export interface Transaction {
   amount: number;
   date: string;
   time: string;
+  created_at: string;
   sale_items?: SaleItem[]; // Opcional, para transações de venda detalhadas
   payment_method?: string; // Opcional, para transações de venda
   user_id: string; // Matches transactions table (NOT NULL)
