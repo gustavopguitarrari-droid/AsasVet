@@ -364,7 +364,7 @@ const InternmentForm: React.FC<InternmentFormProps> = ({ onSubmit, onCancel, ini
           render={({ field }) => (
             <FormItem>
               <FormLabel>Veterinário Responsável</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!!initialData?.veterinarian}>
+              <Select onValueChange={field.onChange} value={field.value} disabled={!!initialData?.veterinarian}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um veterinário" />
