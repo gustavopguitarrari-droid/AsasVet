@@ -43,7 +43,7 @@ const DrugDetailsDialog: React.FC<DrugDetailsDialogProps> = ({ drug, isOpen, onC
         <DialogHeader>
           <div className="flex items-center space-x-4">
             <Avatar className="h-20 w-20 border">
-              <AvatarImage src={drug.photo_url || undefined} alt={drug.name} />
+              <AvatarImage src={drug.photo_url || undefined} alt={drug.name} crossOrigin="anonymous" />
               <AvatarFallback>
                 <Pill className="h-10 w-10" />
               </AvatarFallback>

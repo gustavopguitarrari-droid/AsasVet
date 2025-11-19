@@ -326,7 +326,7 @@ const Bulario = () => {
                 <TableRow key={drug.id} onClick={() => handleRowClick(drug)} className="cursor-pointer">
                   <TableCell>
                     <Avatar>
-                      <AvatarImage src={drug.photo_url || undefined} alt={drug.name} />
+                      <AvatarImage src={drug.photo_url || undefined} alt={drug.name} crossOrigin="anonymous" />
                       <AvatarFallback><Pill /></AvatarFallback>
                     </Avatar>
                   </TableCell>
