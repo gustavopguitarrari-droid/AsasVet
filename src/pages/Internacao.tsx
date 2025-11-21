@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { PlusCircle, Dog, Cat, Bird, Rabbit, Fish, MoreHorizontal, CalendarDays, User, Stethoscope, Search, History, CalendarIcon, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import InternmentForm, { InternmentFormValues } from "@/components/InternmentForm";
 import InternmentDetailsDialog from "@/components/InternmentDetailsDialog";
@@ -30,6 +30,7 @@ import { TeamMember } from "@/pages/Veterinarios"; // Importar TeamMember
 import PdfPreviewDialog from '@/components/PdfPreviewDialog'; // Importar diálogo de pré-visualização
 import { generateDischargeSummaryPdf } from '@/utils/generateDischargeSummaryPdf'; // NOVO: Importar função de PDF de resumo de alta
 import { uploadDischargeSummaryPdfToSupabase, deleteDischargeSummaryPdfFromSupabase } from '@/utils/supabaseStorage'; // NOVO: Funções de storage para resumo de alta
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 type RiskLevel = "Sem risco" | "Baixo" | "Médio" | "Alto" | "Emergência";
 
@@ -139,6 +140,17 @@ const Internacao = () => {
   const [dischargePdfBlob, setDischargePdfBlob] = useState<Blob | null>(null);
   const [dischargePdfUrl, setDischargePdfUrl] = useState<string | null>(null); // NOVO: Para URL direta do PDF
   const [dischargePdfFilename, setDischargePdfFilename] = useState("");
+
+  // NOVO: Estado para o tamanho dos cards
+  const [cardSize, setCardSize] = useState<number>(4); // 2=grande, 3=médio, 4=padrão, 5=pequeno
+
+  // NOVO: Efeito para carregar o tamanho dos cards do localStorage
+  useEffect(() => {
+    const savedSize = localStorage.getItem('internmentCardSize');
+    if (savedSize && !isNaN(parseInt(savedSize, 10))) {
+      setCardSize(parseInt(savedSize, 10));
+    }
+  }, []);
 
   // NOVO: Efeito para atualizar o título da página com base na aba ativa
   useEffect(() => {
@@ -747,6 +759,33 @@ const Internacao = () => {
     }
   };
 
+  // NOVO: Handlers para o controle de tamanho dos cards
+  const handleIncreaseSize = () => {
+    setCardSize(prevSize => {
+      const newSize = Math.max(2, prevSize - 1); // Diminui o número de colunas para aumentar o tamanho
+      localStorage.setItem('internmentCardSize', newSize.toString());
+      return newSize;
+    });
+  };
+
+  const handleDecreaseSize = () => {
+    setCardSize(prevSize => {
+      const newSize = Math.min(5, prevSize + 1); // Aumenta o número de colunas para diminuir o tamanho
+      localStorage.setItem('internmentCardSize', newSize.toString());
+      return newSize;
+    });
+  };
+
+  // NOVO: Classe de grid dinâmica
+  const gridSizeClass = useMemo(() => {
+    switch (cardSize) {
+      case 2: return "lg:grid-cols-2";
+      case 3: return "lg:grid-cols-3";
+      case 5: return "lg:grid-cols-5";
+      default: return "lg:grid-cols-4";
+    }
+  }, [cardSize]);
+
   if (isLoadingPatients || isLoadingHistory || isLoadingActions || isLoadingClients || isLoadingPets || isLoadingVeterinarians) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -773,7 +812,31 @@ const Internacao = () => {
           <TabsTrigger value="mapa-execucao" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="pacientes-internados" className="mt-4">
+        <TabsContent value="pacientes-internados" className="mt-4 relative">
+          {/* NOVO: Botões de controle de tamanho */}
+          <div className="fixed top-1/2 -translate-y-1/2 right-4 z-50 flex flex-col space-y-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={handleIncreaseSize} disabled={cardSize <= 2}>
+                  <ZoomIn className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <p>Aumentar Tamanho</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline" size="icon" onClick={handleDecreaseSize} disabled={cardSize >= 5}>
+                  <ZoomOut className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="left">
+                <p>Diminuir Tamanho</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+
           <div className="p-4 border rounded-md bg-background shadow-md space-y-4 mb-6"> {/* Adicionado o fundo aqui */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4"> {/* Novo contêiner flexível */}
               {/* Legenda de Risco */}
@@ -831,7 +894,7 @@ const Internacao = () => {
             </div>
           </div>
           {filteredInternedPatients.length > 0 ? (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <ul className={cn("grid grid-cols-1 sm:grid-cols-2 gap-4", gridSizeClass)}>
               {filteredInternedPatients.map((patient) => {
                 const IconComponent = speciesIconMap[patient.species] || MoreHorizontal;
                 const speciesTextColorClass = speciesColorMap[patient.species] || "text-muted-foreground";
