@@ -73,7 +73,7 @@ const AgendamentosMedicos = () => {
       if (!organizationId) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, role')
+        .select('id, first_name, last_name, email, phone, crmv, role, avatar_url, organization_id')
         .eq('organization_id', organizationId)
         .in('role', ['Veterinário', 'Administrador']);
       if (error) throw error;
