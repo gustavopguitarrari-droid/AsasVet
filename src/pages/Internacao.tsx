@@ -853,6 +853,7 @@ const Internacao = () => {
                       {patient.pet_name}
                     </p>
                     <p className="text-base text-muted-foreground"><span className="font-bold">Tutor:</span> {patient.owner_name}</p>
+                    <p className="text-base text-muted-foreground"><span className="font-bold">Vet:</span> {patient.veterinarian}</p>
                     <p className="text-base text-muted-foreground"><span className="font-bold">Motivo:</span> {patient.reason}</p>
                     <p className="text-base text-muted-foreground"><span className="font-bold">Status:</span> {patient.status}</p>
                     <p className="text-base text-muted-foreground"><span className="font-bold">Risco:</span> {patient.risk}</p>
