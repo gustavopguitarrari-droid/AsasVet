@@ -29,72 +29,65 @@ const RecentPetsCard: React.FC<RecentPetsCardProps> = ({ className }) => {
   const { user: appUser } = useUser();
   const organizationId = appUser?.organizationId;
 
-  // NOVO LOG: Verifica se o componente está sendo renderizado e quais são os valores iniciais
-  console.log("RecentPetsCard: Component rendering. appUser:", appUser, "organizationId:", organizationId);
-
   const { data: recentPets = [], isLoading: isLoadingPets, error: petsError } = useQuery<Pet[]>({
-    queryKey: ['recentPetsDashboard', organizationId], // Alterado para organizationId
+    queryKey: ['recentPetsDashboard', organizationId],
     queryFn: async () => {
       if (!organizationId) {
-        console.log("RecentPetsCard: pets query skipped, organizationId is null/undefined."); // Debug log 2
         return [];
       }
-
-      // FIX: Execute the subquery first to get an array of client IDs
-      const { data: clientIdsData, error: clientIdsError } = await supabase
-        .from('clients')
-        .select('id')
-        .eq('organization_id', organizationId);
-
-      if (clientIdsError) {
-        console.error("RecentPetsCard: Erro ao buscar IDs de clientes para últimos animais:", clientIdsError);
-        throw clientIdsError;
-      }
-
-      const ownerIds = clientIdsData.map(client => client.id);
-      console.log("RecentPetsCard: Fetched ownerIds for organization:", ownerIds); // Debug log 3
 
       const { data, error } = await supabase
         .from('pets')
         .select('*')
-        .in('owner_id', ownerIds) // FIX: Pass the array of owner IDs
+        .eq('organization_id', organizationId)
         .order('created_at', { ascending: false })
         .limit(5);
+        
       if (error) {
         console.error("RecentPetsCard: Erro ao buscar últimos animais cadastrados:", error);
         throw error;
       }
-      console.log("RecentPetsCard: Fetched recentPets (raw):", data); // Debug log 4
-      return data as Pet[];
+
+      // Mapear snake_case para camelCase para corresponder à interface Pet
+      return data.map(dbPet => ({
+        id: dbPet.id,
+        name: dbPet.name,
+        species: dbPet.species as Pet["species"],
+        breed: dbPet.breed,
+        age: dbPet.age,
+        gender: dbPet.gender as Pet["gender"],
+        color: dbPet.color,
+        weight: dbPet.weight || undefined,
+        observations: dbPet.observations || undefined,
+        photoUrl: dbPet.photo_url || undefined,
+        ownerId: dbPet.owner_id, // Mapeamento crucial
+        organization_id: dbPet.organization_id,
+      }));
     },
-    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
+    enabled: !!organizationId,
   });
 
-  const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Client[]>({
-    queryKey: ['allClientsForRecentPets', organizationId], // Alterado para organizationId
+  const { data: clients = [], isLoading: isLoadingClients, error: clientsError } = useQuery<Pick<Client, 'id' | 'name'>[]>({
+    queryKey: ['allClientsForRecentPets', organizationId],
     queryFn: async () => {
       if (!organizationId) {
-        console.log("RecentPetsCard: clients query skipped, organizationId is null/undefined."); // Debug log 5
         return [];
       }
       const { data, error } = await supabase
         .from('clients')
-        .select('id, name') // Only need id and name
-        .eq('organization_id', organizationId); // Filtrar por organization_id
+        .select('id, name')
+        .eq('organization_id', organizationId);
       if (error) {
         console.error("RecentPetsCard: Erro ao buscar clients para últimos animais:", error);
         throw error;
       }
-      console.log("RecentPetsCard: Fetched clients (raw):", data); // Debug log 6
-      return data as Client[];
+      return data as Pick<Client, 'id' | 'name'>[];
     },
-    enabled: !!organizationId, // Habilitar query apenas se organizationId estiver disponível
+    enabled: !!organizationId,
   });
 
   const clientMap = React.useMemo(() => {
-    const map = new Map(clients.map(client => [client.id, client.name]));
-    console.log("RecentPetsCard: clientMap created:", Array.from(map.entries())); // Debug log 7
-    return map;
+    return new Map(clients.map(client => [client.id, client.name]));
   }, [clients]);
 
   if (isLoadingPets || isLoadingClients) {
@@ -140,7 +133,6 @@ const RecentPetsCard: React.FC<RecentPetsCardProps> = ({ className }) => {
               {recentPets.map((pet) => {
                 const IconComponent = speciesIconMap[pet.species] || MoreHorizontal;
                 const ownerName = clientMap.get(pet.ownerId) || "Tutor Desconhecido";
-                console.log(`RecentPetsCard: Pet ID: ${pet.id}, Owner ID: ${pet.ownerId}, Resolved Owner Name: ${ownerName}`); // Debug log 8
                 return (
                   <li key={pet.id} className="flex items-center space-x-2">
                     <IconComponent className="h-4 w-4 text-current/80" />
