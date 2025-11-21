@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Stethoscope } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DialogFooter, DialogDescription } from "@/components/ui/dialog"; // Importar DialogDescription
+import { DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { TeamMember } from "@/pages/Veterinarios";
 
 const formSchema = z.object({
   title: z.string().min(1, "O título do agendamento é obrigatório."),
@@ -32,6 +33,7 @@ const formSchema = z.object({
   category: z.enum(["Consulta", "Cirurgia", "Vacina", "Exame", "Retorno", "Outros"], {
     required_error: "A categoria do agendamento é obrigatória.",
   }),
+  assigned_to_id: z.string().optional(), // Novo campo para o veterinário
 });
 
 export type EventFormValues = z.infer<typeof formSchema>;
@@ -40,9 +42,10 @@ interface AddEventDialogProps {
   onSubmit: (data: EventFormValues) => void;
   onCancel: () => void;
   defaultDate?: Date;
+  veterinarians: TeamMember[]; // Adicionado para popular o select
 }
 
-const AddEventDialog: React.FC<AddEventDialogProps> = ({ onSubmit, onCancel, defaultDate }) => {
+const AddEventDialog: React.FC<AddEventDialogProps> = ({ onSubmit, onCancel, defaultDate, veterinarians }) => {
   const form = useForm<EventFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,6 +53,7 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onSubmit, onCancel, def
       date: defaultDate || new Date(),
       time: format(new Date(), "HH:mm"),
       category: "Consulta",
+      assigned_to_id: undefined,
     },
   });
 
@@ -142,6 +146,33 @@ const AddEventDialog: React.FC<AddEventDialogProps> = ({ onSubmit, onCancel, def
                   <SelectItem value="Exame">Exame</SelectItem>
                   <SelectItem value="Retorno">Retorno</SelectItem>
                   <SelectItem value="Outros">Outros</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="assigned_to_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex items-center">
+                <Stethoscope className="h-4 w-4 mr-2 text-muted-foreground" /> Atribuir a (Opcional)
+              </FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione um veterinário" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="unassigned">Não atribuído</SelectItem>
+                  {veterinarians.map((vet) => (
+                    <SelectItem key={vet.id} value={vet.id}>
+                      {vet.first_name} {vet.last_name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <FormMessage />

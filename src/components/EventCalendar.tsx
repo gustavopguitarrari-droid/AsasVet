@@ -28,6 +28,7 @@ export interface CalendarEvent {
   time: string;
   category: "Consulta" | "Cirurgia" | "Vacina" | "Exame" | "Retorno" | "Outros";
   status?: "Agendada" | "Cancelada" | "Realizada";
+  assigned_to_id?: string | null; // Novo campo
 }
 
 interface EventCalendarProps {

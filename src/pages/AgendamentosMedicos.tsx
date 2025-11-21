@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useSession } from "@/context/SessionContext";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import TeamScheduleView from "@/components/TeamScheduleView";
+import VeterinarianScheduleView from "@/components/VeterinarianScheduleView";
 import { TeamMember } from "./Veterinarios";
 
 const AgendamentosMedicos = () => {
@@ -62,6 +62,7 @@ const AgendamentosMedicos = () => {
         time: event.time,
         category: event.category as CalendarEvent["category"],
         status: (event.status || "Agendada") as CalendarEvent["status"],
+        assigned_to_id: event.assigned_to_id,
       }));
     },
     enabled: !!organizationId,
@@ -95,6 +96,7 @@ const AgendamentosMedicos = () => {
           time: newEventData.time,
           category: newEventData.category,
           status: "Agendada",
+          assigned_to_id: newEventData.assigned_to_id === 'unassigned' ? null : newEventData.assigned_to_id,
         })
         .select()
         .single();
@@ -237,7 +239,12 @@ const AgendamentosMedicos = () => {
                   <DialogHeader>
                     <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
                   </DialogHeader>
-                  <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsAddEventDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
+                  <AddEventDialog
+                    onSubmit={handleAddEvent}
+                    onCancel={() => setIsAddEventDialogOpen(false)}
+                    defaultDate={defaultDateForNewEvent}
+                    veterinarians={veterinarians}
+                  />
                 </DialogContent>
               </Dialog>
             </div>
@@ -254,7 +261,14 @@ const AgendamentosMedicos = () => {
         </TabsContent>
 
         <TabsContent value="agenda-veterinario" className="mt-4">
-          {organizationId && <TeamScheduleView veterinarians={veterinarians} organizationId={organizationId} />}
+          {organizationId && (
+            <VeterinarianScheduleView
+              events={events}
+              veterinarians={veterinarians}
+              onAddEventClick={handleOpenDialogWithDate}
+              onEventClick={handleEventClick}
+            />
+          )}
         </TabsContent>
       </Tabs>
 
