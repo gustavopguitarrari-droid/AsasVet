@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PlusCircle, CalendarX, Trash2, Search as SearchIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -25,12 +25,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useSession } from "@/context/SessionContext"; // Importar useSession
+import { useSession } from "@/context/SessionContext";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import TeamScheduleView from "@/components/TeamScheduleView";
+import { TeamMember } from "./Veterinarios";
 
 const AgendamentosMedicos = () => {
   const queryClient = useQueryClient();
   const { user: appUser } = useUser();
-  const { isLoading: isLoadingSessionContext } = useSession(); // Obter o estado de carregamento da sessão
+  const { isLoading: isLoadingSessionContext } = useSession();
   const organizationId = appUser?.organizationId;
 
   const [isAddEventDialogOpen, setIsAddEventDialogOpen] = React.useState(false);
@@ -38,8 +41,8 @@ const AgendamentosMedicos = () => {
   const [selectedEvent, setSelectedEvent] = React.useState<CalendarEvent | null>(null);
   const [isCancelConfirmDialogOpen, setIsCancelConfirmDialogOpen] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState<string>("");
+  const [activeTab, setActiveTab] = useState<string>("agenda-geral");
 
-  // Query para buscar eventos do Supabase
   const { data: events = [], isLoading: isLoadingEvents, error } = useQuery<CalendarEvent[]>({
     queryKey: ['events', organizationId],
     queryFn: async () => {
@@ -64,11 +67,24 @@ const AgendamentosMedicos = () => {
     enabled: !!organizationId,
   });
 
-  // Mutação para adicionar um novo evento
+  const { data: veterinarians = [], isLoading: isLoadingVeterinarians } = useQuery<TeamMember[]>({
+    queryKey: ['teamMembersForSchedule', organizationId],
+    queryFn: async () => {
+      if (!organizationId) return [];
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, role')
+        .eq('organization_id', organizationId)
+        .in('role', ['Veterinário', 'Administrador']);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!organizationId,
+  });
+
   const addEventMutation = useMutation({
     mutationFn: async (newEventData: EventFormValues) => {
       if (!organizationId) throw new Error("Organization ID not available.");
-      console.log("AgendamentosMedicos: addEventMutation - Inserting event with organization_id:", organizationId); // ADDED LOG
       const { data, error } = await supabase
         .from('events')
         .insert({
@@ -95,7 +111,6 @@ const AgendamentosMedicos = () => {
     },
   });
 
-  // Mutação para cancelar um evento
   const cancelEventMutation = useMutation({
     mutationFn: async (eventId: string) => {
       if (!organizationId) throw new Error("Organization ID not available.");
@@ -120,7 +135,6 @@ const AgendamentosMedicos = () => {
     },
   });
 
-  // Mutação para limpar todos os eventos
   const clearAllEventsMutation = useMutation({
     mutationFn: async () => {
       if (!organizationId) throw new Error("Organization ID not available.");
@@ -147,7 +161,6 @@ const AgendamentosMedicos = () => {
   const handleOpenDialogWithDate = (date: Date) => {
     setDefaultDateForNewEvent(date);
     setIsAddEventDialogOpen(true);
-    console.log("AgendamentosMedicos: handleOpenDialogWithDate - Setting isAddEventDialogOpen to true.");
   };
 
   const handleEventClick = (event: CalendarEvent) => {
@@ -165,18 +178,9 @@ const AgendamentosMedicos = () => {
     clearAllEventsMutation.mutate();
   };
 
-  // Determine if the add button should be disabled
   const isAddButtonDisabled = !organizationId || addEventMutation.isPending;
 
-  // Log the state of organizationId and loading for debugging
-  console.log("AgendamentosMedicos: Current organizationId:", organizationId);
-  console.log("AgendamentosMedicos: isLoadingEvents:", isLoadingEvents);
-  console.log("AgendamentosMedicos: isLoadingSessionContext:", isLoadingSessionContext);
-  console.log("AgendamentosMedicos: isAddButtonDisabled:", isAddButtonDisabled);
-  console.log("AgendamentosMedicos: isAddEventDialogOpen state:", isAddEventDialogOpen); // NOVO LOG
-
-  // Usar o estado de carregamento combinado
-  if (isLoadingEvents || isLoadingSessionContext) {
+  if (isLoadingEvents || isLoadingSessionContext || isLoadingVeterinarians) {
     return (
       <div className="flex items-center justify-center h-full">
         <p className="text-muted-foreground">Carregando agenda...</p>
@@ -194,60 +198,66 @@ const AgendamentosMedicos = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-        <div className="relative flex-1 w-full">
-          <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Buscar agendamentos por título ou categoria..."
-            className="pl-9 border border-input rounded-lg"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+          <TabsTrigger value="agenda-geral" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Agenda Geral</TabsTrigger>
+          <TabsTrigger value="agenda-veterinario" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Agenda por Veterinário</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="agenda-geral" className="mt-4">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+            <div className="relative flex-1 w-full">
+              <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Buscar agendamentos por título ou categoria..."
+                className="pl-9 border border-input rounded-lg"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="flex space-x-2 shrink-0">
+              <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      className="font-bold" 
+                      disabled={isAddButtonDisabled}
+                      onClick={() => setIsAddEventDialogOpen(true)}
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
+                    </Button>
+                  </TooltipTrigger>
+                  {isAddButtonDisabled && (
+                    <TooltipContent side="bottom">
+                      {!organizationId ? "Informações da organização não disponíveis." : "Adicionando agendamento..."}
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
+                  </DialogHeader>
+                  <AddEventDialog onSubmit={handleAddEvent} onCancel={() => setIsAddEventDialogOpen(false)} defaultDate={defaultDateForNewEvent} />
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+
+          <EventCalendar
+            events={events}
+            onAddEventClick={handleOpenDialogWithDate}
+            onEventClick={handleEventClick}
+            searchTerm={searchTerm}
+            onClearAllEvents={handleClearAllEvents}
+            isClearingEvents={clearAllEventsMutation.isPending}
           />
-        </div>
-        <div className="flex space-x-2 shrink-0">
-          <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}> {/* Removido o console.log do onOpenChange */}
-            <Tooltip delayDuration={0}>
-              <TooltipTrigger asChild>
-                <Button 
-                  className="font-bold" 
-                  disabled={isAddButtonDisabled}
-                  onClick={() => { // Adicionado onClick para definir o estado
-                    setIsAddEventDialogOpen(true);
-                    console.log("AgendamentosMedicos: Button onClick - Setting isAddEventDialogOpen to true.");
-                  }}
-                >
-                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
-                </Button>
-              </TooltipTrigger>
-              {isAddButtonDisabled && (
-                <TooltipContent side="bottom">
-                  {!organizationId ? "Informações da organização não disponíveis. Por favor, aguarde ou verifique seu perfil." : "Adicionando agendamento..."}
-                </TooltipContent>
-              )}
-            </Tooltip>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
-              </DialogHeader>
-              <AddEventDialog onSubmit={handleAddEvent} onCancel={() => {
-                setIsAddEventDialogOpen(false);
-                console.log("AgendamentosMedicos: AddEventDialog onCancel - Setting isAddEventDialogOpen to false.");
-              }} defaultDate={defaultDateForNewEvent} />
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
+        </TabsContent>
 
-      <EventCalendar
-        events={events}
-        onAddEventClick={handleOpenDialogWithDate}
-        onEventClick={handleEventClick}
-        searchTerm={searchTerm}
-        onClearAllEvents={handleClearAllEvents}
-        isClearingEvents={clearAllEventsMutation.isPending}
-      />
+        <TabsContent value="agenda-veterinario" className="mt-4">
+          {organizationId && <TeamScheduleView veterinarians={veterinarians} organizationId={organizationId} />}
+        </TabsContent>
+      </Tabs>
 
-      {/* Diálogo de Confirmação de Cancelamento */}
       <AlertDialog open={isCancelConfirmDialogOpen} onOpenChange={setIsCancelConfirmDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
