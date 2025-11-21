@@ -23,30 +23,31 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
   const [isLoadingSession, setIsLoadingSession] = useState(true); // Loading state for initial session fetch
   const { setUser: setAppUser } = useUser();
 
-  // Use useQuery to fetch the user profile
+  // Use useQuery to fetch the user profile via an Edge Function to bypass CORS issues
   const { data: profileData, isLoading: isLoadingProfile, error: profileError } = useQuery<UserProfile | null>({
-    queryKey: ['profiles', supabaseUser?.id],
+    queryKey: ['profile', supabaseUser?.id], // Changed queryKey to be more specific
     queryFn: async () => {
       if (!supabaseUser?.id) return null;
-      console.log('SessionContext: [useQuery] Attempting to fetch profile for user ID:', supabaseUser.id);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', supabaseUser.id)
-        .single();
+      console.log('SessionContext: [useQuery] Invoking get-profile function for user ID:', supabaseUser.id);
+      
+      // Invoke the edge function
+      const { data: profileDataFromFunction, error } = await supabase.functions.invoke('get-profile');
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          console.warn('SessionContext: [useQuery] No profile found for user ID:', supabaseUser.id, '. Returning null profile.');
-          return null;
-        }
-        console.error('SessionContext: [useQuery] Error fetching profile from Supabase:', error);
+        console.error('SessionContext: [useQuery] Error invoking get-profile function:', error);
         throw error;
       }
-      console.log('SessionContext: [useQuery] Raw profileData from Supabase:', data);
+
+      if (!profileDataFromFunction) {
+        console.warn('SessionContext: [useQuery] get-profile function returned null profile for user ID:', supabaseUser.id);
+        return null;
+      }
+      
+      console.log('SessionContext: [useQuery] Raw profileData from function:', profileDataFromFunction);
 
       // Map Supabase data to UserProfile interface
       const userMetadata = supabaseUser.user_metadata;
+      const data = profileDataFromFunction; // Use the data from the function
       
       // Ensure organization_id is always a string if present, otherwise provide a fallback
       // Prioriza o organization_id do perfil, depois dos metadados, depois o próprio ID do usuário
