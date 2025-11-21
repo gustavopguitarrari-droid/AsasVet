@@ -775,7 +775,7 @@ const Internacao = () => {
 
         <TabsContent value="pacientes-internados" className="mt-4">
           <div className="p-4 border rounded-md bg-background shadow-md space-y-4 mb-6"> {/* Adicionado o fundo aqui */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4"> {/* Novo contêiner flexível */}
               {/* Legenda de Risco */}
               <div className="flex flex-wrap gap-4">
                 {Object.entries(riskColorMap).map(([risk, colorClass]) => (
@@ -844,6 +844,9 @@ const Internacao = () => {
                     onClick={() => handleCardClick(patient)}
                   >
                     <div className={cn("absolute top-0 right-0 h-full w-4 rounded-r-md", riskStripeColorClass)}></div>
+                    <div className="absolute top-2 right-6 font-bold text-sm text-muted-foreground bg-card/80 px-2 py-1 rounded-md">
+                      {patient.bay_name}
+                    </div>
 
                     <p className="font-bold text-lg flex items-center">
                       <IconComponent className={cn("h-6 w-6 mr-2", speciesTextColorClass)} />
