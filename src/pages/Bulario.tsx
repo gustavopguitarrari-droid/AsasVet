@@ -83,14 +83,11 @@ const Bulario = () => {
   const { data: allMedications = [], isLoading, error } = useQuery<DrugInfo[]>({
     queryKey: ['medications'],
     queryFn: async () => {
-      const { data, error: dbError } = await supabase
-        .from('medications')
-        .select('*')
-        .order('name', { ascending: true });
+      const { data, error } = await supabase.functions.invoke('get-medications');
 
-      if (dbError) {
-        showError(`Erro ao carregar bulário: ${dbError.message}`);
-        throw dbError;
+      if (error) {
+        showError(`Erro ao carregar bulário: ${error.message}`);
+        throw error;
       }
       return data || [];
     },
