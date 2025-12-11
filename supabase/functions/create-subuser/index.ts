@@ -56,8 +56,8 @@ serve(async (req) => {
     }
     console.log('Edge Function: Requesting user is an Administrator with organization_id:', adminProfile.organization_id);
 
-    const { email, password, first_name, last_name, role } = await req.json();
-    console.log('Edge Function: Received payload for new sub-user:', { email, first_name, last_name, role });
+    const { email, password, first_name, last_name, role, crmv } = await req.json(); // Adicionado crmv
+    console.log('Edge Function: Received payload for new sub-user:', { email, first_name, last_name, role, crmv });
 
 
     if (!email || !password || !first_name || !last_name || !role) {
@@ -86,6 +86,7 @@ serve(async (req) => {
         first_name,
         last_name,
         role,
+        crmv: crmv || null, // Adicionado crmv
         organization_id: adminProfile.organization_id, // Pass the admin's organization_id
       },
     });
