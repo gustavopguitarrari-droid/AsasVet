@@ -171,6 +171,23 @@ const Dashboard = () => {
     enabled: !!organizationId,
   });
 
+  const { data: totalEvents = 0, isLoading: isLoadingEvents } = useQuery<number>({
+    queryKey: ['totalEvents', organizationId],
+    queryFn: async () => {
+      if (!organizationId) return 0;
+      const { count, error } = await supabase
+        .from('events')
+        .select('*', { count: 'exact' })
+        .eq('organization_id', organizationId);
+      if (error) {
+        console.error("Erro ao buscar contagem de eventos:", error);
+        throw error;
+      }
+      return count || 0;
+    },
+    enabled: !!organizationId,
+  });
+
   const financialSummary = useMemo(() => {
     if (!transactions) return { monthRevenue: 0, currentBalance: 0 };
 
@@ -392,16 +409,20 @@ const Dashboard = () => {
         );
       case "medicalRecordsSummary":
         return (
-          <Card key={item.id} className={cn(cardBgClass, baseCardClasses)}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Resumo da Agenda</CardTitle>
-              <FileText className={iconClasses} />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">50 Agendamentos</div>
-              <p className={textMutedClasses}>Atualizados esta semana</p>
-            </CardContent>
-          </Card>
+          <Link to="/medical-records" key={item.id} className="block">
+            <Card className={cn(cardBgClass, baseCardClasses)}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Resumo da Agenda</CardTitle>
+                <FileText className={iconClasses} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {isLoadingEvents ? "..." : `${totalEvents.toLocaleString('pt-BR')} Evento${totalEvents !== 1 ? 's' : ''}`}
+                </div>
+                <p className={textMutedClasses}>Total na agenda</p>
+              </CardContent>
+            </Card>
+          </Link>
         );
       case "appointmentsMonthlyChart":
         return <AppointmentsMonthlyChart key={item.id} className={cardBgClass} />;
