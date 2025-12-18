@@ -61,13 +61,12 @@ const Header: React.FC<HeaderProps> = ({ onCashierClick }) => {
     )}>
       <h1 className="text-2xl font-semibold">{getTitle()}</h1>
       <div className="flex items-center space-x-2">
-        <LiveClockCalendar />
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <Button
-              variant="ghost"
+              variant="default"
               size="icon"
-              className="h-9 w-9 rounded-lg"
+              className="h-9 w-9 rounded-lg bg-green-600 text-white hover:bg-green-700"
               onClick={onCashierClick}
             >
               <ShoppingCart className="h-[1.2rem] w-[1.2rem]" />
@@ -78,6 +77,7 @@ const Header: React.FC<HeaderProps> = ({ onCashierClick }) => {
             Abrir Caixa
           </TooltipContent>
         </Tooltip>
+        <LiveClockCalendar />
         <ColorThemeToggle />
         <UserProfile />
       </div>
