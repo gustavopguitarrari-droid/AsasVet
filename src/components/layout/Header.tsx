@@ -65,12 +65,11 @@ const Header: React.FC<HeaderProps> = ({ onCashierClick }) => {
           <TooltipTrigger asChild>
             <Button
               variant="default"
-              size="icon"
-              className="h-9 w-9 rounded-lg bg-green-600 text-white hover:bg-green-700"
+              className="h-9 rounded-lg bg-green-600 text-white hover:bg-green-700"
               onClick={onCashierClick}
             >
-              <ShoppingCart className="h-[1.2rem] w-[1.2rem]" />
-              <span className="sr-only">Abrir Caixa</span>
+              <ShoppingCart className="h-[1.2rem] w-[1.2rem] mr-2" />
+              CAIXA
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">
