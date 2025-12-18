@@ -46,7 +46,7 @@ const initialDashboardConfig: DashboardItemConfig[] = [
   { id: "cashFlow", name: "Fluxo de Caixa", isVisible: true, category: "financial", order: 1 },
   { id: "internmentStatus", name: "Status de Internação", isVisible: true, category: "overview", order: 6 },
   { id: "veterinariansOnDuty", name: "Veterinários de Plantão", isVisible: true, category: "overview", order: 7 },
-  { id: "medicalRecordsSummary", name: "Resumo da Agenda", isVisible: true, category: "overview", order: 8 },
+  { id: "medicalRecordsSummary", name: "Eventos Pendentes", isVisible: true, category: "overview", order: 8 },
   { id: "appointmentsMonthlyChart", name: "Consultas por Mês (Gráfico)", isVisible: true, category: "overview", order: 9 },
   { id: "appointmentsWeeklyChart", name: "Consultas por Semana (Gráfico)", isVisible: true, category: "overview", order: 10 },
   { id: "revenueMonthlyChart", name: "Receita por Mês (Gráfico)", isVisible: true, category: "financial", order: 2 },
@@ -178,7 +178,8 @@ const Dashboard = () => {
       const { count, error } = await supabase
         .from('events')
         .select('*', { count: 'exact' })
-        .eq('organization_id', organizationId);
+        .eq('organization_id', organizationId)
+        .eq('status', 'Agendada'); // Conta apenas eventos pendentes
       if (error) {
         console.error("Erro ao buscar contagem de eventos:", error);
         throw error;
@@ -412,14 +413,14 @@ const Dashboard = () => {
           <Link to="/medical-records" key={item.id} className="block">
             <Card className={cn(cardBgClass, baseCardClasses)}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Resumo da Agenda</CardTitle>
+                <CardTitle className="text-sm font-medium">Eventos Pendentes</CardTitle>
                 <FileText className={iconClasses} />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
                   {isLoadingEvents ? "..." : `${totalEvents.toLocaleString('pt-BR')} Evento${totalEvents !== 1 ? 's' : ''}`}
                 </div>
-                <p className={textMutedClasses}>Total na agenda</p>
+                <p className={textMutedClasses}>Eventos pendentes na agenda</p>
               </CardContent>
             </Card>
           </Link>
