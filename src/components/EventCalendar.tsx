@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trash2, CheckCircle, CalendarX } from "lucide-react";
+import { Trash2, CheckCircle, CalendarX, Stethoscope } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -20,6 +20,7 @@ import {
   AlertDialogTitle as AlertDialogTitleComponent,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { TeamMember } from "@/pages/Veterinarios";
 
 export interface CalendarEvent {
   id: string;
@@ -38,6 +39,7 @@ interface EventCalendarProps {
   searchTerm: string;
   onClearAllEvents: () => void;
   isClearingEvents: boolean;
+  veterinarians: TeamMember[];
 }
 
 // Mapeamento de cores para as categorias de eventos (já definido em globals.css)
@@ -67,8 +69,16 @@ const eventCategories = [
   { name: "Outros", value: "Outros", colorClass: "bg-event-outros" },
 ];
 
-const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick, searchTerm, onClearAllEvents, isClearingEvents }) => {
+const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick, searchTerm, onClearAllEvents, isClearingEvents, veterinarians }) => {
   const [selectedDay, setSelectedDay] = React.useState<Date | undefined>(new Date());
+
+  const vetMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+    for (const vet of veterinarians) {
+      map.set(vet.id, `${vet.first_name} ${vet.last_name}`);
+    }
+    return map;
+  }, [veterinarians]);
 
   const eventsForSelectedDay = React.useMemo(() => {
     if (!selectedDay) return [];
@@ -159,6 +169,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
               {eventsForSelectedDay.map((event) => {
                 const isCancelled = event.status === "Cancelada";
                 const isRealizada = event.status === "Realizada";
+                const vetName = event.assigned_to_id ? vetMap.get(event.assigned_to_id) : null;
 
                 return (
                   <div
@@ -178,28 +189,36 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
                         {event.category}
                       </Badge>
                     </div>
-                    {isCancelled ? (
-                      <Badge variant="destructive" className="bg-red-700 text-white">
-                        Cancelado
-                      </Badge>
-                    ) : isRealizada ? (
-                      <Badge className="bg-green-600 text-white">
-                        <CheckCircle className="h-3 w-3 mr-1 text-white" /> Realizada
-                      </Badge>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-white hover:bg-white/20"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onEventClick(event);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 text-white" />
-                        <span className="sr-only">Cancelar Agendamento</span>
-                      </Button>
-                    )}
+                    <div className="flex flex-col items-end space-y-1">
+                      {isCancelled ? (
+                        <Badge variant="destructive" className="bg-red-700 text-white">
+                          Cancelado
+                        </Badge>
+                      ) : isRealizada ? (
+                        <Badge className="bg-green-600 text-white">
+                          <CheckCircle className="h-3 w-3 mr-1 text-white" /> Realizada
+                        </Badge>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-white hover:bg-white/20"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEventClick(event);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4 text-white" />
+                          <span className="sr-only">Cancelar Agendamento</span>
+                        </Button>
+                      )}
+                      {vetName && (
+                        <span className="text-xs font-medium text-white/80 flex items-center">
+                          <Stethoscope className="h-3 w-3 mr-1" />
+                          {vetName}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 );
               })}

@@ -257,6 +257,7 @@ const AgendamentosMedicos = () => {
             searchTerm={searchTerm}
             onClearAllEvents={handleClearAllEvents}
             isClearingEvents={clearAllEventsMutation.isPending}
+            veterinarians={veterinarians}
           />
         </TabsContent>
 
