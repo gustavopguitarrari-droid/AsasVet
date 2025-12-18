@@ -2,22 +2,33 @@
 
 import React, { useState, useMemo } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Stethoscope } from "lucide-react";
-import EventCalendar, { CalendarEvent } from "@/components/EventCalendar";
+import { Card, CardContent } from "@/components/ui/card";
+import { Stethoscope, CalendarDays } from "lucide-react";
+import { CalendarEvent } from "@/components/EventCalendar";
 import { TeamMember } from "@/pages/Veterinarios";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface VeterinarianScheduleViewProps {
   events: CalendarEvent[];
   veterinarians: TeamMember[];
-  onAddEventClick: (date: Date) => void;
   onEventClick: (event: CalendarEvent) => void;
 }
+
+const categoryColorMap: Record<CalendarEvent["category"], string> = {
+  Consulta: "hsl(var(--event-consulta))",
+  Cirurgia: "hsl(var(--event-cirurgia))",
+  Vacina: "hsl(var(--event-vacina))",
+  Exame: "hsl(var(--event-exame))",
+  Retorno: "hsl(var(--event-retorno))",
+  Outros: "hsl(var(--event-outros))",
+};
 
 const VeterinarianScheduleView: React.FC<VeterinarianScheduleViewProps> = ({
   events,
   veterinarians,
-  onAddEventClick,
   onEventClick,
 }) => {
   const [selectedVetId, setSelectedVetId] = useState<string | "all">("all");
@@ -28,6 +39,26 @@ const VeterinarianScheduleView: React.FC<VeterinarianScheduleViewProps> = ({
     }
     return events.filter(event => event.assigned_to_id === selectedVetId);
   }, [events, selectedVetId]);
+
+  const groupedEvents = useMemo(() => {
+    const groups: { [key: string]: CalendarEvent[] } = {};
+    const sortedEvents = [...filteredEvents].sort((a, b) => {
+      const dateComparison = a.date.getTime() - b.date.getTime();
+      if (dateComparison !== 0) return dateComparison;
+      return a.time.localeCompare(b.time);
+    });
+
+    for (const event of sortedEvents) {
+      const dateKey = format(event.date, 'yyyy-MM-dd');
+      if (!groups[dateKey]) {
+        groups[dateKey] = [];
+      }
+      groups[dateKey].push(event);
+    }
+    return groups;
+  }, [filteredEvents]);
+
+  const sortedDateKeys = Object.keys(groupedEvents).sort();
 
   return (
     <div className="space-y-6">
@@ -51,14 +82,54 @@ const VeterinarianScheduleView: React.FC<VeterinarianScheduleViewProps> = ({
         </div>
       </div>
 
-      <EventCalendar
-        events={filteredEvents}
-        onAddEventClick={onAddEventClick}
-        onEventClick={onEventClick}
-        searchTerm="" // A busca principal não se aplica aqui, o filtro é pelo select
-        onClearAllEvents={() => {}} // A limpeza geral não deve ser feita nesta view
-        isClearingEvents={false}
-      />
+      <Card>
+        <CardContent className="p-4">
+          {sortedDateKeys.length > 0 ? (
+            <div className="space-y-6">
+              {sortedDateKeys.map(dateKey => (
+                <div key={dateKey}>
+                  <h4 className="font-semibold text-lg mb-3 flex items-center">
+                    <CalendarDays className="h-5 w-5 mr-2 text-primary" />
+                    {format(new Date(dateKey + 'T00:00:00'), "PPP", { locale: ptBR })}
+                  </h4>
+                  <div className="space-y-2">
+                    {groupedEvents[dateKey].map(event => (
+                      <div
+                        key={event.id}
+                        onClick={() => onEventClick(event)}
+                        className={cn(
+                          "flex items-center space-x-3 p-3 rounded-md shadow-sm cursor-pointer transition-colors hover:bg-accent",
+                          (event.status === "Cancelada" || event.status === "Realizada") && "opacity-60"
+                        )}
+                        style={{ borderLeft: `5px solid ${categoryColorMap[event.category]}` }}
+                      >
+                        <span className="font-bold text-lg">{event.time}</span>
+                        <div className="flex-1">
+                          <p className={cn("font-medium", (event.status === "Cancelada" || event.status === "Realizada") && "line-through")}>
+                            {event.title}
+                          </p>
+                          <Badge variant="secondary" className="mt-1 text-xs">
+                            {event.category}
+                          </Badge>
+                        </div>
+                        {event.status && event.status !== "Agendada" && (
+                          <Badge variant={event.status === "Cancelada" ? "destructive" : "default"} className={cn(event.status === "Realizada" && "bg-green-600")}>
+                            {event.status}
+                          </Badge>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-center py-8">
+              Nenhum agendamento encontrado para a seleção atual.
+            </p>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

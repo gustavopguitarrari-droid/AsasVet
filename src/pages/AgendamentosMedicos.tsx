@@ -265,7 +265,6 @@ const AgendamentosMedicos = () => {
             <VeterinarianScheduleView
               events={events}
               veterinarians={veterinarians}
-              onAddEventClick={handleOpenDialogWithDate}
               onEventClick={handleEventClick}
             />
           )}
