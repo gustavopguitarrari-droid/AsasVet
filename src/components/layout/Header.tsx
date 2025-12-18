@@ -7,14 +7,15 @@ import ColorThemeToggle from "@/components/ColorThemeToggle";
 import LiveClockCalendar from "@/components/LiveClockCalendar";
 import { usePageTitle } from "@/context/PageTitleContext";
 import { cn } from "@/lib/utils";
+import { ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-interface HeaderProps { 
-  // Removido: layoutDirection?: "horizontal" | "vertical";
-  // Removido: isNavCollapsed: boolean; // Nova prop
-  // Removido: onToggleNav: () => void; // Nova prop
+interface HeaderProps {
+  onCashierClick: () => void;
 }
 
-const Header: React.FC<HeaderProps> = () => { // Props removidas
+const Header: React.FC<HeaderProps> = ({ onCashierClick }) => {
   const location = useLocation();
   const { pageTitle } = usePageTitle();
 
@@ -55,12 +56,28 @@ const Header: React.FC<HeaderProps> = () => { // Props removidas
 
   return (
     <header className={cn(
-      "flex items-center justify-between border-b bg-background p-4 shadow-sm", // Restaurado p-4
+      "flex items-center justify-between border-b bg-background p-4 shadow-sm",
       "rounded-bl-xl rounded-tr-xl"
     )}>
       <h1 className="text-2xl font-semibold">{getTitle()}</h1>
       <div className="flex items-center space-x-2">
         <LiveClockCalendar />
+        <Tooltip delayDuration={0}>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 rounded-lg"
+              onClick={onCashierClick}
+            >
+              <ShoppingCart className="h-[1.2rem] w-[1.2rem]" />
+              <span className="sr-only">Abrir Caixa</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">
+            Abrir Caixa
+          </TooltipContent>
+        </Tooltip>
         <ColorThemeToggle />
         <UserProfile />
       </div>

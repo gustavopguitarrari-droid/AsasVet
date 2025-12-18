@@ -12,7 +12,6 @@ import { MadeWithDyad }
 import { cn } from "@/lib/utils";
 import FloatingChatButton from "@/components/FloatingChatButton";
 import ChatDialog from "@/components/ChatDialog";
-import FloatingCashierButton from "@/components/FloatingCashierButton";
 import CashierDialog from "@/components/CashierDialog";
 import DemoModeBanner from "@/components/DemoModeBanner";
 import { useUser } from "@/context/UserContext";
@@ -72,7 +71,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </ResizablePanel>
       <ResizablePanel className="bg-background">
         <div className="flex flex-1 flex-col h-full overflow-hidden">
-          <Header />
+          <Header onCashierClick={handleCashierButtonClick} />
           <div className="flex-1 overflow-y-auto px-4"> {/* Adicionado px-4 aqui */}
             <main className="flex flex-col">{children}</main>
           </div>
@@ -80,7 +79,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </div>
       </ResizablePanel>
 
-      <FloatingCashierButton onClick={handleCashierButtonClick} />
       <FloatingChatButton onClick={handleChatButtonClick} onClose={() => setIsChatDialogOpen(false)} />
       <ChatDialog isOpen={isChatDialogOpen} onClose={() => setIsChatDialogOpen(false)} />
       <CashierDialog isOpen={isCashierDialogOpen} onClose={() => setIsCashierDialogOpen(false)} />
