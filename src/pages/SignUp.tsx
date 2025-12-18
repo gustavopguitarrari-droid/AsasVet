@@ -26,11 +26,11 @@ const SignUp: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center login-art-bg p-4">
       <div className="w-full max-w-full md:max-w-4xl lg:max-w-6xl h-[90vh] overflow-y-auto p-8 space-y-6 bg-creme-terra/70 backdrop-blur-sm rounded-xl shadow-lg relative"> {/* Alterado para rounded-xl e shadow-lg */}
-        <Button asChild variant="ghost" className="absolute top-4 left-4 text-marrom-avela font-bold hover:bg-verde-folha-seca/20"> {/* Alterado cor do texto e hover */}
-          <Link to="/">
+        <Link to="/">
+          <Button variant="ghost" className="absolute top-4 left-4 text-marrom-avela font-bold hover:bg-verde-folha-seca/20"> {/* Alterado cor do texto e hover */}
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
-          </Link>
-        </Button>
+          </Button>
+        </Link>
         <h2 className="text-2xl font-bold text-center text-marrom-avela mt-8"> {/* Alterado cor do texto */}
           Crie sua Conta AsasVet
         </h2>
