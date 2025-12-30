@@ -265,121 +265,205 @@
     --plan-badge-enterprise-bg: 40 90% 70%; /* Golden */
   }
 
-  /* TEMA: Pastel Blue */
+  /* TEMA: Pastel Blue (AJUSTADO) */
   .theme-pastel-blue {
     /* Cores base para o tema Pastel Blue */
-    --background: 210 30% 98%; /* Azul muito claro */
-    --foreground: 210 50% 20%; /* Azul escuro para texto */
+    --background: 205 50% 98%; /* Azul muito claro, quase branco */
+    --foreground: 215 40% 25%; /* Azul escuro para texto */
 
-    --card: 210 30% 100%;
-    --card-foreground: 210 50% 20%;
+    --card: 205 50% 100%;
+    --card-foreground: 215 40% 25%;
 
-    --popover: 210 30% 100%;
-    --popover-foreground: 210 50% 20%;
+    --popover: 205 50% 100%;
+    --popover-foreground: 215 40% 25%;
 
-    --primary: 210 60% 70%; /* Azul pastel médio */
-    --primary-darker: 210 60% 60%; /* Um pouco mais escuro para hover */
-    --primary-foreground: 210 50% 10%; /* Azul escuro para texto em primary */
+    --primary: 195 55% 75%; /* Azul celeste pastel */
+    --primary-darker: 195 55% 65%; /* Um pouco mais escuro para hover */
+    --primary-foreground: 215 40% 15%; /* Azul bem escuro para texto em primary */
 
-    --secondary: 210 30% 90%; /* Azul pastel mais claro */
-    --secondary-foreground: 210 50% 20%;
+    --secondary: 195 40% 92%; /* Azul pastel mais claro */
+    --secondary-foreground: 215 40% 25%;
 
-    --muted: 210 30% 90%;
-    --muted-foreground: 210 20% 50%; /* Cinza azulado para muted */
+    --muted: 195 40% 92%;
+    --muted-foreground: 215 20% 55%; /* Cinza azulado para muted */
 
-    --accent: 210 30% 85%;
-    --accent-foreground: 210 50% 20%;
+    --accent: 195 40% 88%;
+    --accent-foreground: 215 40% 25%;
 
     --destructive: 0 84.2% 60.2%; /* Mantém vermelho */
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 70%; /* Ajustado para um azul-cinza mais visível */
-    --input: var(--border);  /* Input border agora usa a cor de --border */
-    --ring: 210 60% 70%;
+    --border: 205 30% 80%; /* Ajustado para um azul-cinza mais visível */
+    --input: var(--border);
+    --ring: 195 55% 75%;
 
     /* Sidebar colors para Pastel Blue */
-    --sidebar-background: 210 60% 70%; /* Azul pastel médio */
-    --sidebar-foreground: 210 50% 10%; /* Azul escuro para texto */
-    --sidebar-primary: 210 30% 98%; /* Fundo claro para item ativo */
-    --sidebar-primary-foreground: 210 50% 10%; /* Texto escuro para item ativo */
-    --sidebar-accent: 210 30% 90%; /* Fundo mais claro para hover */
-    --sidebar-accent-foreground: 210 50% 10%; /* Texto escuro para hover */
-    --sidebar-border: 210 20% 80%;
-    --sidebar-ring: 210 60% 70%;
+    --sidebar-background: 195 55% 75%;
+    --sidebar-foreground: 215 40% 15%;
+    --sidebar-primary: 205 50% 98%;
+    --sidebar-primary-foreground: 215 40% 15%;
+    --sidebar-accent: 195 40% 92%;
+    --sidebar-accent-foreground: 215 40% 15%;
+    --sidebar-border: 205 30% 85%;
+    --sidebar-ring: 195 55% 75%;
 
-    /* Sidebar Item Backgrounds (ajustando para a nova paleta) */
-    --sidebar-item-bg-1: 210 70% 75%; /* Light Blue */
-    --sidebar-item-bg-2: 240 70% 75%; /* Light Indigo */
-    --sidebar-item-bg-3: 180 70% 75%; /* Light Cyan */
-    --sidebar-item-bg-4: 270 70% 75%; /* Light Purple */
-    --sidebar-item-bg-5: 300 70% 75%; /* Light Magenta */
-    --sidebar-item-bg-6: 150 70% 75%; /* Light Green */
-    --sidebar-item-bg-7: 30 70% 75%; /* Light Orange */
-    --sidebar-item-bg-8: 60 70% 75%; /* Light Yellow */
-    --sidebar-item-bg-9: 0 0% 85%; /* Light Gray */
-
-    /* Cores para Categorias de Eventos - PASTEL TONES */
-    --event-consulta: 210 60% 75%; /* Azul Pastel */
-    --event-cirurgia: 30 70% 78%; /* Pêssego Pastel */
-    --event-vacina: 150 50% 75%; /* Verde Pastel */
-    --event-exame: 270 40% 78%; /* Lavanda Pastel */
-    --event-retorno: 50 80% 80%; /* Amarelo Cremoso Pastel */
-    --event-outros: 210 10% 80%; /* Cinza Azulado Pastel */
-
-    /* NOVO: Cores para botões/abas não selecionados no tema Pastel Blue */
-    --primary-unselected: 210 30% 90%; /* Azul pastel mais claro */
-    --primary-unselected-foreground: 210 50% 20%; /* Azul escuro para o texto */
-
-    /* NOVO: Cores pastel para os cards do Dashboard no tema Pastel Blue */
-    --dashboard-card-1: 210 60% 85%;    /* Um azul claro e suave */
-    --dashboard-card-2: 150 50% 85%;   /* Um verde menta suave */
-    --dashboard-card-3: 60 80% 90%;   /* Um amarelo cremoso pálido */
-    --dashboard-card-4: 330 60% 90%;    /* Um rosa claro e suave */
-    --dashboard-card-5: 270 40% 88%;  /* Uma lavanda suave */
-    --dashboard-card-6: 30 70% 88%;   /* Um pêssego claro */
-    --dashboard-card-7: 210 10% 90%;     /* Um cinza azulado muito claro */
-    --dashboard-card-8: 210 60% 80%;    /* Slightly darker blue */
-    --dashboard-card-9: 150 50% 80%;   /* Slightly darker green */
-    --dashboard-card-10: 60 80% 85%;   /* Slightly darker yellow */
-    --dashboard-card-11: 330 60% 85%;    /* Slightly darker pink */
-    --dashboard-card-12: 270 40% 83%;  /* Slightly darker purple */
-
-    /* Appointments Status Card Colors for Pastel Blue */
-    --appointments-status-waiting-bg: 210 20% 50%; /* Muted blue-gray */
+    /* ... (outras variáveis mantêm a lógica, mas com a nova base de cor) ... */
+    --sidebar-item-bg-1: 210 70% 75%;
+    --sidebar-item-bg-2: 240 70% 75%;
+    --sidebar-item-bg-3: 180 70% 75%;
+    --sidebar-item-bg-4: 270 70% 75%;
+    --sidebar-item-bg-5: 300 70% 75%;
+    --sidebar-item-bg-6: 150 70% 75%;
+    --sidebar-item-bg-7: 30 70% 75%;
+    --sidebar-item-bg-8: 60 70% 75%;
+    --sidebar-item-bg-9: 0 0% 85%;
+    --event-consulta: 210 60% 75%;
+    --event-cirurgia: 30 70% 78%;
+    --event-vacina: 150 50% 75%;
+    --event-exame: 270 40% 78%;
+    --event-retorno: 50 80% 80%;
+    --event-outros: 210 10% 80%;
+    --primary-unselected: 195 40% 92%;
+    --primary-unselected-foreground: 215 40% 25%;
+    --dashboard-card-1: 210 60% 85%;
+    --dashboard-card-2: 150 50% 85%;
+    --dashboard-card-3: 60 80% 90%;
+    --dashboard-card-4: 330 60% 90%;
+    --dashboard-card-5: 270 40% 88%;
+    --dashboard-card-6: 30 70% 88%;
+    --dashboard-card-7: 210 10% 90%;
+    --dashboard-card-8: 210 60% 80%;
+    --dashboard-card-9: 150 50% 80%;
+    --dashboard-card-10: 60 80% 85%;
+    --dashboard-card-11: 330 60% 85%;
+    --dashboard-card-12: 270 40% 83%;
+    --appointments-status-waiting-bg: 210 20% 50%;
     --appointments-status-waiting-fg: 210 30% 100%;
-    --appointments-status-in-progress-bg: 30 70% 50%; /* A warm orange */
+    --appointments-status-in-progress-bg: 30 70% 50%;
     --appointments-status-in-progress-fg: 0 0% 100%;
-    --appointments-status-completed-bg: 150 50% 60%; /* Muted green */
+    --appointments-status-completed-bg: 150 50% 60%;
     --appointments-status-completed-fg: 210 30% 100%;
     --appointments-status-cancelled-bg: 0 84.2% 60.2%;
     --appointments-status-cancelled-fg: 0 0% 100%;
+    --appointments-tab-waiting-inactive-bg: 210 20% 70%;
+    --appointments-tab-waiting-inactive-fg: 210 50% 20%;
+    --appointments-tab-in-progress-inactive-bg: 30 70% 80%;
+    --appointments-tab-in-progress-inactive-fg: 30 70% 30%;
+    --appointments-tab-finalized-inactive-bg: 150 50% 80%;
+    --appointments-tab-finalized-inactive-fg: 150 50% 30%;
+    --risk-no-risk-bg: 210 70% 75%;
+    --risk-low-bg: 150 50% 60%;
+    --risk-medium-bg: 60 80% 70%;
+    --risk-high-bg: 30 70% 60%;
+    --risk-emergency-bg: 0 84.2% 60.2%;
+    --internment-status-observacao-bg: 210 70% 75%;
+    --internment-status-estavel-bg: 150 50% 60%;
+    --internment-status-critico-bg: 0 84.2% 60.2%;
+    --internment-status-alta-bg: 210 20% 50%;
+    --internment-status-obito-bg: 210 50% 20%;
+    --plan-badge-basic-bg: 210 20% 50%;
+    --plan-badge-premium-bg: 150 50% 60%;
+    --plan-badge-enterprise-bg: 210 60% 70%;
+  }
 
-    /* NOVO: Cores para as abas de status de consultas (inativas) no tema Pastel Blue */
-    --appointments-tab-waiting-inactive-bg: 210 20% 70%; /* Um cinza azulado mais claro */
-    --appointments-tab-waiting-inactive-fg: 210 50% 20%; /* Azul escuro */
-    --appointments-tab-in-progress-inactive-bg: 30 70% 80%; /* Um laranja pastel mais claro */
-    --appointments-tab-in-progress-inactive-fg: 30 70% 30%; /* Laranja escuro */
-    --appointments-tab-finalized-inactive-bg: 150 50% 80%; /* Um verde pastel mais claro */
-    --appointments-tab-finalized-inactive-fg: 150 50% 30%; /* Verde escuro */
+  /* NOVO TEMA: Sweet Lilac */
+  .theme-sweet-lilac {
+    --background: 270 40% 98%; /* Lilás muito claro */
+    --foreground: 270 30% 25%; /* Roxo escuro para texto */
 
-    /* Risk Level Colors for Pastel Blue */
-    --risk-no-risk-bg: 210 70% 75%; /* Light Blue */
-    --risk-low-bg: 150 50% 60%; /* Muted Green */
-    --risk-medium-bg: 60 80% 70%; /* Muted Yellow */
-    --risk-high-bg: 30 70% 60%; /* Muted Orange */
-    --risk-emergency-bg: 0 84.2% 60.2%; /* Red */
+    --card: 270 40% 100%;
+    --card-foreground: 270 30% 25%;
 
-    /* Internment Status Badge Colors for Pastel Blue */
-    --internment-status-observacao-bg: 210 70% 75%; /* Light Blue */
-    --internment-status-estavel-bg: 150 50% 60%; /* Muted Green */
-    --internment-status-critico-bg: 0 84.2% 60.2%; /* Red */
-    --internment-status-alta-bg: 210 20% 50%; /* Muted blue-gray */
-    --internment-status-obito-bg: 210 50% 20%; /* Dark blue */
+    --popover: 270 40% 100%;
+    --popover-foreground: 270 30% 25%;
 
-    /* Plan Badge Colors for Pastel Blue */
-    --plan-badge-basic-bg: 210 20% 50%; /* Muted blue-gray */
-    --plan-badge-premium-bg: 150 50% 60%; /* Muted Green */
-    --plan-badge-enterprise-bg: 210 60% 70%; /* Pastel Blue */
+    --primary: 270 50% 80%; /* Lilás pastel médio */
+    --primary-darker: 270 50% 70%; /* Um pouco mais escuro para hover */
+    --primary-foreground: 270 30% 15%; /* Roxo bem escuro para texto em primary */
+
+    --secondary: 270 40% 92%; /* Lilás pastel mais claro */
+    --secondary-foreground: 270 30% 25%;
+
+    --muted: 270 40% 92%;
+    --muted-foreground: 270 20% 55%; /* Cinza arroxeado para muted */
+
+    --accent: 270 40% 88%;
+    --accent-foreground: 270 30% 25%;
+
+    --destructive: 0 84.2% 60.2%; /* Mantém vermelho */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 270 30% 80%; /* Ajustado para um lilás-cinza mais visível */
+    --input: var(--border);
+    --ring: 270 50% 80%;
+
+    /* Sidebar colors para Sweet Lilac */
+    --sidebar-background: 270 50% 80%;
+    --sidebar-foreground: 270 30% 15%;
+    --sidebar-primary: 270 40% 98%;
+    --sidebar-primary-foreground: 270 30% 15%;
+    --sidebar-accent: 270 40% 92%;
+    --sidebar-accent-foreground: 270 30% 15%;
+    --sidebar-border: 270 30% 85%;
+    --sidebar-ring: 270 50% 80%;
+
+    /* ... (outras variáveis mantêm a lógica, mas com a nova base de cor) ... */
+    --sidebar-item-bg-1: 210 70% 75%;
+    --sidebar-item-bg-2: 240 70% 75%;
+    --sidebar-item-bg-3: 180 70% 75%;
+    --sidebar-item-bg-4: 270 70% 75%;
+    --sidebar-item-bg-5: 300 70% 75%;
+    --sidebar-item-bg-6: 150 70% 75%;
+    --sidebar-item-bg-7: 30 70% 75%;
+    --sidebar-item-bg-8: 60 70% 75%;
+    --sidebar-item-bg-9: 0 0% 85%;
+    --event-consulta: 210 60% 75%;
+    --event-cirurgia: 30 70% 78%;
+    --event-vacina: 150 50% 75%;
+    --event-exame: 270 40% 78%;
+    --event-retorno: 50 80% 80%;
+    --event-outros: 210 10% 80%;
+    --primary-unselected: 270 40% 92%;
+    --primary-unselected-foreground: 270 30% 25%;
+    --dashboard-card-1: 210 60% 85%;
+    --dashboard-card-2: 150 50% 85%;
+    --dashboard-card-3: 60 80% 90%;
+    --dashboard-card-4: 330 60% 90%;
+    --dashboard-card-5: 270 40% 88%;
+    --dashboard-card-6: 30 70% 88%;
+    --dashboard-card-7: 210 10% 90%;
+    --dashboard-card-8: 210 60% 80%;
+    --dashboard-card-9: 150 50% 80%;
+    --dashboard-card-10: 60 80% 85%;
+    --dashboard-card-11: 330 60% 85%;
+    --dashboard-card-12: 270 40% 83%;
+    --appointments-status-waiting-bg: 270 20% 50%;
+    --appointments-status-waiting-fg: 270 30% 100%;
+    --appointments-status-in-progress-bg: 30 70% 50%;
+    --appointments-status-in-progress-fg: 0 0% 100%;
+    --appointments-status-completed-bg: 150 50% 60%;
+    --appointments-status-completed-fg: 270 30% 100%;
+    --appointments-status-cancelled-bg: 0 84.2% 60.2%;
+    --appointments-status-cancelled-fg: 0 0% 100%;
+    --appointments-tab-waiting-inactive-bg: 270 20% 70%;
+    --appointments-tab-waiting-inactive-fg: 270 50% 20%;
+    --appointments-tab-in-progress-inactive-bg: 30 70% 80%;
+    --appointments-tab-in-progress-inactive-fg: 30 70% 30%;
+    --appointments-tab-finalized-inactive-bg: 150 50% 80%;
+    --appointments-tab-finalized-inactive-fg: 150 50% 30%;
+    --risk-no-risk-bg: 210 70% 75%;
+    --risk-low-bg: 150 50% 60%;
+    --risk-medium-bg: 60 80% 70%;
+    --risk-high-bg: 30 70% 60%;
+    --risk-emergency-bg: 0 84.2% 60.2%;
+    --internment-status-observacao-bg: 210 70% 75%;
+    --internment-status-estavel-bg: 150 50% 60%;
+    --internment-status-critico-bg: 0 84.2% 60.2%;
+    --internment-status-alta-bg: 270 20% 50%;
+    --internment-status-obito-bg: 270 50% 20%;
+    --plan-badge-basic-bg: 270 20% 50%;
+    --plan-badge-premium-bg: 150 50% 60%;
+    --plan-badge-enterprise-bg: 270 50% 80%;
   }
 
   body {

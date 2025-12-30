@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { showError, showSuccess } from '@/utils/toast';
 
-type ColorTheme = 'nature-vet' | 'pastel-blue'; // Tipo atualizado para incluir 'pastel-blue'
+type ColorTheme = 'nature-vet' | 'pastel-blue' | 'sweet-lilac'; // Tipo atualizado para incluir 'sweet-lilac'
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
