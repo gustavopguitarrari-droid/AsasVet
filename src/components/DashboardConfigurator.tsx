@@ -105,7 +105,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
             Arraste para reordenar, selecione a aba e ative ou desative os cards do seu painel.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="flex-1 pr-4">
+        <ScrollArea className="flex-1 min-h-0 pr-4">
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="all-items">
               {(provided) => (
