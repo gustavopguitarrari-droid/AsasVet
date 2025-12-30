@@ -664,10 +664,3 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-
-/* NOVO: Desloca as notificações sonner para a direita da sidebar */
-.toaster[data-sonner-toaster] {
-  /* A variável --sidebar-width é definida dinamicamente em Layout.tsx */
-  /* O offset padrão é 16px (1rem), então adicionamos isso ao nosso cálculo */
-  left: calc(var(--sidebar-width, 5%) + 1rem) !important;
-}
