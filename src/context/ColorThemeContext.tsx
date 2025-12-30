@@ -21,22 +21,25 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
 
   const [colorTheme, setInternalColorTheme] = useState<ColorTheme>('nature-vet');
 
-  // This effect runs ONLY when the user object changes (e.g., on login).
-  // It sets the theme from the user's profile.
+  // This effect syncs the theme from the user's profile when it becomes available.
+  // It only runs if the user's theme is different from the current state to avoid loops.
   useEffect(() => {
-    if (user?.colorTheme) {
-      setInternalColorTheme(user.colorTheme as ColorTheme);
+    const userTheme = user?.colorTheme as ColorTheme;
+    if (userTheme && userTheme !== colorTheme) {
+      setInternalColorTheme(userTheme);
     }
-  }, [user]); // Depend only on the user object.
+  }, [user?.colorTheme, colorTheme]); // Depend on the specific property and the local state
 
   // This effect applies the class to the HTML tag whenever the theme state changes.
   useEffect(() => {
     const root = window.document.documentElement;
+    // Clean up old theme classes
     root.classList.forEach(cls => {
       if (cls.startsWith('theme-')) {
         root.classList.remove(cls);
       }
     });
+    // Add the new theme class
     root.classList.add(`theme-${colorTheme}`);
   }, [colorTheme]);
 
@@ -55,6 +58,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
       return data;
     },
     onSuccess: (data) => {
+      // Update the user context. This will trigger the effect above, but it's safe.
       setUser((prevUser) => ({
         ...prevUser!,
         colorTheme: data.color_theme || undefined,
@@ -70,7 +74,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   const setColorTheme = (theme: ColorTheme) => {
     // Update the state immediately for a responsive UI.
     setInternalColorTheme(theme);
-    // If the user is logged in, save the preference.
+    // If the user is logged in, save the preference to the database.
     if (user?.id) {
       updateColorThemeMutation.mutate(theme);
     }
