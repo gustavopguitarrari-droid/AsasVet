@@ -33,6 +33,14 @@ const VeterinarianScheduleView: React.FC<VeterinarianScheduleViewProps> = ({
 }) => {
   const [selectedVetId, setSelectedVetId] = useState<string | "all">("all");
 
+  const vetMap = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const vet of veterinarians) {
+      map.set(vet.id, `${vet.first_name} ${vet.last_name}`);
+    }
+    return map;
+  }, [veterinarians]);
+
   const filteredEvents = useMemo(() => {
     if (selectedVetId === "all") {
       return events;
@@ -93,32 +101,43 @@ const VeterinarianScheduleView: React.FC<VeterinarianScheduleViewProps> = ({
                     {format(new Date(dateKey + 'T00:00:00'), "PPP", { locale: ptBR })}
                   </h4>
                   <div className="space-y-2">
-                    {groupedEvents[dateKey].map(event => (
-                      <div
-                        key={event.id}
-                        onClick={() => onEventClick(event)}
-                        className={cn(
-                          "flex items-center space-x-3 p-3 rounded-md shadow-sm cursor-pointer transition-colors hover:bg-accent",
-                          (event.status === "Cancelada" || event.status === "Realizada") && "opacity-60"
-                        )}
-                        style={{ borderLeft: `5px solid ${categoryColorMap[event.category]}` }}
-                      >
-                        <span className="font-bold text-lg">{event.time}</span>
-                        <div className="flex-1">
-                          <p className={cn("font-medium", (event.status === "Cancelada" || event.status === "Realizada") && "line-through")}>
-                            {event.title}
-                          </p>
-                          <Badge variant="secondary" className="mt-1 text-xs">
-                            {event.category}
-                          </Badge>
+                    {groupedEvents[dateKey].map(event => {
+                      const vetName = event.assigned_to_id ? vetMap.get(event.assigned_to_id) : null;
+                      return (
+                        <div
+                          key={event.id}
+                          onClick={() => onEventClick(event)}
+                          className={cn(
+                            "flex items-center space-x-3 p-3 rounded-md shadow-sm cursor-pointer transition-colors hover:bg-accent",
+                            (event.status === "Cancelada" || event.status === "Realizada") && "opacity-60"
+                          )}
+                          style={{ borderLeft: `5px solid ${categoryColorMap[event.category]}` }}
+                        >
+                          <span className="font-bold text-lg">{event.time}</span>
+                          <div className="flex-1">
+                            <p className={cn("font-medium", (event.status === "Cancelada" || event.status === "Realizada") && "line-through")}>
+                              {event.title}
+                            </p>
+                            <Badge variant="secondary" className="mt-1 text-xs">
+                              {event.category}
+                            </Badge>
+                          </div>
+                          <div className="flex flex-col items-end space-y-1">
+                            {event.status && event.status !== "Agendada" && (
+                              <Badge variant={event.status === "Cancelada" ? "destructive" : "default"} className={cn(event.status === "Realizada" && "bg-green-600")}>
+                                {event.status}
+                              </Badge>
+                            )}
+                            {vetName && (
+                              <span className="text-xs font-medium text-muted-foreground flex items-center">
+                                <Stethoscope className="h-3 w-3 mr-1" />
+                                {vetName}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        {event.status && event.status !== "Agendada" && (
-                          <Badge variant={event.status === "Cancelada" ? "destructive" : "default"} className={cn(event.status === "Realizada" && "bg-green-600")}>
-                            {event.status}
-                          </Badge>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               ))}
