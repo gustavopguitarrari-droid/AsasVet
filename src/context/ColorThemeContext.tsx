@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { showError, showSuccess } from '@/utils/toast';
 
-type ColorTheme = 'nature-vet' | 'pastel-blue' | 'sweet-lilac'; // Tipo atualizado para incluir 'sweet-lilac'
+type ColorTheme = 'nature-vet' | 'pastel-blue' | 'sweet-lilac';
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -19,21 +19,27 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   const { user, setUser } = useUser();
   const queryClient = useQueryClient();
 
-  // Default to 'nature-vet'
-  const initialTheme: ColorTheme = 'nature-vet';
-  const [internalColorTheme, setInternalColorTheme] = useState<ColorTheme>(initialTheme);
+  const [colorTheme, setInternalColorTheme] = useState<ColorTheme>('nature-vet');
 
-  // Update internal state when user.colorTheme changes from outside (e.g., on login/profile fetch)
+  // This effect runs ONLY when the user object changes (e.g., on login).
+  // It sets the theme from the user's profile.
   useEffect(() => {
-    // Prioritize user's saved theme, otherwise use the initial default theme
-    const themeToApply = user?.colorTheme || initialTheme;
-    if (themeToApply !== internalColorTheme) {
-      setInternalColorTheme(themeToApply as ColorTheme);
+    if (user?.colorTheme) {
+      setInternalColorTheme(user.colorTheme as ColorTheme);
     }
-  }, [user?.colorTheme, initialTheme, internalColorTheme]); // Depend on user.colorTheme and initialTheme
+  }, [user]); // Depend only on the user object.
 
+  // This effect applies the class to the HTML tag whenever the theme state changes.
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.forEach(cls => {
+      if (cls.startsWith('theme-')) {
+        root.classList.remove(cls);
+      }
+    });
+    root.classList.add(`theme-${colorTheme}`);
+  }, [colorTheme]);
 
-  // Mutação para atualizar o tema de cor no perfil do usuário
   const updateColorThemeMutation = useMutation({
     mutationFn: async (newTheme: ColorTheme) => {
       if (!user?.id) {
@@ -49,7 +55,6 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
       return data;
     },
     onSuccess: (data) => {
-      // Atualiza o contexto do usuário com o novo tema
       setUser((prevUser) => ({
         ...prevUser!,
         colorTheme: data.color_theme || undefined,
@@ -62,30 +67,17 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
     },
   });
 
-  useEffect(() => {
-    const root = window.document.documentElement;
-    // Remove todas as classes de tema existentes que começam com 'theme-'
-    root.classList.forEach(cls => {
-      if (cls.startsWith('theme-')) {
-        root.classList.remove(cls);
-      }
-    });
-    // Sempre adiciona a classe do tema atual
-    root.classList.add(`theme-${internalColorTheme}`);
-    console.log(`ColorThemeContext: Applied theme class: theme-${internalColorTheme}. Current classes:`, root.classList.value); // ADDED LOG
-  }, [internalColorTheme]); // Depende do estado interno do tema
-
   const setColorTheme = (theme: ColorTheme) => {
-    setInternalColorTheme(theme); // Update internal state immediately for UI responsiveness
+    // Update the state immediately for a responsive UI.
+    setInternalColorTheme(theme);
+    // If the user is logged in, save the preference.
     if (user?.id) {
       updateColorThemeMutation.mutate(theme);
-    } else {
-      showError("Faça login para salvar seu tema de cor.");
     }
   };
 
   return (
-    <ColorThemeContext.Provider value={{ colorTheme: internalColorTheme, setColorTheme }}>
+    <ColorThemeContext.Provider value={{ colorTheme, setColorTheme }}>
       {children}
     </ColorThemeContext.Provider>
   );
