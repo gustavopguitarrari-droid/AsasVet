@@ -37,8 +37,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const toggleNav = () => {
     if (sidebarPanelRef.current) {
-      const isCollapsed = sidebarPanelRef.current.getCollapsed();
-      if (isCollapsed) {
+      if (sidebarPanelRef.current.isCollapsed()) {
         sidebarPanelRef.current.expand();
       } else {
         sidebarPanelRef.current.collapse();
