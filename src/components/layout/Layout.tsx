@@ -27,19 +27,28 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isCashierDialogOpen, setIsCashierDialogOpen] = React.useState(false);
   const { user } = useUser();
   const { pageTitle } = usePageTitle();
+  const sidebarPanelRef = useRef<React.ElementRef<typeof ResizablePanel>>(null);
 
-  const sidebarPanelRef = useRef<React.ElementRef<typeof ResizablePanel>>(null); // Criar a ref para o painel da sidebar
+  // This effect runs once on mount to set the initial state correctly.
+  React.useEffect(() => {
+    sidebarPanelRef.current?.collapse();
+    document.documentElement.style.setProperty('--sidebar-width', '5%');
+  }, []);
 
   const toggleNav = () => {
     if (sidebarPanelRef.current) {
-      if (isNavCollapsed) {
-        sidebarPanelRef.current.expand(); // Expande o painel
+      const isCollapsed = sidebarPanelRef.current.getCollapsed();
+      if (isCollapsed) {
+        sidebarPanelRef.current.expand();
       } else {
-        sidebarPanelRef.current.collapse(); // Recolhe o painel
+        sidebarPanelRef.current.collapse();
       }
-      // O estado `isNavCollapsed` será atualizado pelos callbacks `onCollapse` e `onExpand` do ResizablePanel
-      // Não precisamos mais alterná-lo manualmente aqui.
     }
+  };
+
+  const updateSidebarState = (size: number) => {
+    document.documentElement.style.setProperty('--sidebar-width', `${size}%`);
+    setIsNavCollapsed(size <= 5);
   };
 
   const handleChatButtonClick = () => {
@@ -56,15 +65,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       className="flex h-screen w-screen overflow-hidden"
     >
       <ResizablePanel
-        ref={sidebarPanelRef} // Atribuir a ref ao ResizablePanel
-        defaultSize={12} // Ajustado de 15 para 12
-        collapsedSize={5} // Ajustado de 6 para 5
+        ref={sidebarPanelRef}
+        defaultSize={12}
+        collapsedSize={5}
         collapsible={true}
-        onCollapse={() => setIsNavCollapsed(true)} // Atualiza o estado quando o painel recolhe
-        onExpand={() => setIsNavCollapsed(false)}   // Atualiza o estado quando o painel expande
+        onCollapse={() => updateSidebarState(5)}
+        onExpand={() => {
+          // onResize will handle the exact size, but we can set a temporary state
+          setIsNavCollapsed(false);
+        }}
+        onResize={updateSidebarState}
         className={cn(
           "flex flex-col transition-all duration-300 ease-in-out",
-          "rounded-r-xl shadow-lg" // Adicionado rounded-r-xl e shadow-lg
+          "rounded-r-xl shadow-lg"
         )}
       >
         <Sidebar isCollapsed={isNavCollapsed} onToggleCollapse={toggleNav} />
