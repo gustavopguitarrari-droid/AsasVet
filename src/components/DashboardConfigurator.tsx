@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { GripVertical } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -105,7 +104,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
             Arraste para reordenar, selecione a aba e ative ou desative os cards do seu painel.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="flex-1 min-h-0 pr-4">
+        <div className="flex-1 overflow-y-auto pr-4">
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="all-items">
               {(provided) => (
@@ -163,7 +162,7 @@ const DashboardConfigurator: React.FC<DashboardConfiguratorProps> = ({
               )}
             </Droppable>
           </DragDropContext>
-        </ScrollArea>
+        </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
