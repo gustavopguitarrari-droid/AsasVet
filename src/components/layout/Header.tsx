@@ -7,17 +7,21 @@ import ColorThemeToggle from "@/components/ColorThemeToggle";
 import LiveClockCalendar from "@/components/LiveClockCalendar";
 import { usePageTitle } from "@/context/PageTitleContext";
 import { cn } from "@/lib/utils";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { SheetTrigger } from "@/components/ui/sheet";
 
 interface HeaderProps {
   onCashierClick: () => void;
+  onMenuClick?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ onCashierClick }) => {
+const Header: React.FC<HeaderProps> = ({ onCashierClick, onMenuClick }) => {
   const location = useLocation();
   const { pageTitle } = usePageTitle();
+  const isMobile = useIsMobile();
 
   const getTitle = () => {
     if (pageTitle) {
@@ -59,7 +63,17 @@ const Header: React.FC<HeaderProps> = ({ onCashierClick }) => {
       "flex items-center justify-between border-b bg-background p-4 shadow-sm",
       "rounded-bl-xl rounded-tr-xl"
     )}>
-      <h1 className="text-2xl font-semibold">{getTitle()}</h1>
+      <div className="flex items-center gap-2">
+        {isMobile && (
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" onClick={onMenuClick}>
+              <Menu className="h-6 w-6" />
+              <span className="sr-only">Abrir menu</span>
+            </Button>
+          </SheetTrigger>
+        )}
+        <h1 className="text-xl md:text-2xl font-semibold">{getTitle()}</h1>
+      </div>
       <div className="flex items-center space-x-2">
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
@@ -68,15 +82,15 @@ const Header: React.FC<HeaderProps> = ({ onCashierClick }) => {
               className="h-9 rounded-lg bg-green-600 text-white hover:bg-green-700"
               onClick={onCashierClick}
             >
-              <ShoppingCart className="h-[1.2rem] w-[1.2rem] mr-2" />
-              CAIXA
+              <ShoppingCart className="h-[1.2rem] w-[1.2rem] md:mr-2" />
+              <span className="hidden md:inline">CAIXA</span>
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">
             Abrir Caixa
           </TooltipContent>
         </Tooltip>
-        <LiveClockCalendar />
+        {!isMobile && <LiveClockCalendar />}
         <ColorThemeToggle />
         <UserProfile />
       </div>

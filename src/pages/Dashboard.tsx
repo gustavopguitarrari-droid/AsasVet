@@ -456,27 +456,27 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center space-x-4">
           {user?.logoUrl ? (
             <img 
               src={user.logoUrl} 
               alt={user.companyName || "Logo da Clínica"} 
-              className="h-32 w-auto mr-4 object-contain"
+              className="h-24 w-auto object-contain"
             />
           ) : (
-            <div className="h-32 w-32 flex items-center justify-center bg-muted text-muted-foreground mr-4 rounded-lg shadow-sm">
-              <PawPrint className="h-20 w-20" />
+            <div className="h-24 w-24 flex items-center justify-center bg-muted text-muted-foreground rounded-lg shadow-sm">
+              <PawPrint className="h-16 w-16" />
             </div>
           )}
           
           <div>
-            <h2 className="text-3xl font-bold">{getGreeting()}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold">{getGreeting()}</h2>
             <p className="text-muted-foreground">
               Visão geral do seu consultório veterinário.
             </p>
             {user?.role === "Administrador" && (
-              <p className="text-green-600 font-semibold mt-2">
+              <p className="text-green-600 font-semibold mt-2 text-sm">
                 (Você está logado como Administrador e tem acesso total ao sistema.)
               </p>
             )}
@@ -485,7 +485,7 @@ const Dashboard = () => {
         <Button
           onClick={() => setIsConfiguratorOpen(true)}
           variant="default"
-          className="font-bold"
+          className="font-bold w-full md:w-auto"
         >
           <Settings className="mr-2 h-4 w-4" /> Configurar Painel
         </Button>
@@ -498,7 +498,7 @@ const Dashboard = () => {
           <TabsTrigger value="financial" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Financeiro</TabsTrigger>
         </TabsList>
         <TabsContent value="overview" className="mt-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "overview")
               .sort((a, b) => a.order - b.order)
@@ -506,7 +506,7 @@ const Dashboard = () => {
           </div>
         </TabsContent>
         <TabsContent value="financial" className="mt-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "financial")
               .sort((a, b) => a.order - b.order)
@@ -514,7 +514,7 @@ const Dashboard = () => {
           </div>
         </TabsContent>
         <TabsContent value="recentActivity" className="mt-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {dashboardConfig
               .filter(item => item.isVisible && item.category === "recentActivity")
               .sort((a, b) => a.order - b.order)
