@@ -9,29 +9,25 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useSession } from '@/context/SessionContext';
 import { cn } from '@/lib/utils';
-import { useColorTheme } from '@/context/ColorThemeContext'; // Importar useColorTheme
+import { useColorTheme } from '@/context/ColorThemeContext';
 
 const Login = () => {
   const navigate = useNavigate();
   const { session, isLoading } = useSession();
   const location = useLocation();
-  const { colorTheme } = useColorTheme(); // Obter o tema de cor atual
+  const { colorTheme } = useColorTheme();
   const [authView, setAuthView] = useState<'sign_in' | 'forgotten_password' | 'update_password'>(() => {
     const state = location.state as { view?: 'forgotten_password' | 'update_password' };
     return state?.view || 'sign_in';
   });
 
   useEffect(() => {
-    console.log('Login Page - isLoading:', isLoading, 'session:', session);
     if (session && !isLoading) {
-      console.log('Login Page - Session found and not loading, redirecting to /painel.');
       navigate('/painel');
     }
   }, [session, isLoading, navigate]);
 
-  // Determina se o tema atual é considerado "escuro" para o componente Auth
-  // Para ThemeSupa, vamos mapear ambos os temas atuais para "light" já que são predominantemente claros.
-  const supabaseAuthTheme = (colorTheme === 'nature-vet' || colorTheme === 'pastel-blue') ? 'light' : 'light'; // Default to light
+  const supabaseAuthTheme = (colorTheme === 'nature-vet' || colorTheme === 'pastel-blue' || colorTheme === 'sweet-lilac') ? 'light' : 'light';
 
   return (
     <div className={cn(
@@ -50,7 +46,7 @@ const Login = () => {
           appearance={{
             theme: ThemeSupa,
             variables: {
-              default: { // Variáveis para o tema claro (ThemeSupa default)
+              default: {
                 colors: {
                   brand: 'hsl(var(--primary))',
                   brandAccent: 'hsl(var(--primary-darker))',
@@ -67,7 +63,7 @@ const Login = () => {
                   anchorTextHoverColor: 'hsl(var(--primary-darker))',
                 },
               },
-              dark: { // Variáveis para o tema escuro (ThemeSupa dark)
+              dark: {
                 colors: {
                   brand: 'hsl(var(--primary))',
                   brandAccent: 'hsl(var(--primary-darker))',
@@ -86,8 +82,7 @@ const Login = () => {
               },
             },
           }}
-          // Define o tema do Auth component com base no tema de cor atual do aplicativo
-          theme={supabaseAuthTheme} // Agora dinâmico
+          theme={supabaseAuthTheme}
           redirectTo={window.location.origin + '/painel'}
           view={authView}
           localization={{
@@ -117,8 +112,9 @@ const Login = () => {
                 button_label: 'Atualizar senha',
               },
             },
+            // A chave deve ser a string exata da mensagem de erro do servidor.
             messages: {
-              'Invalid login credentials': 'Email ou senha inválidos',
+              'Invalid login credentials': 'Email ou senha inválidos.',
             }
           }}
         />
