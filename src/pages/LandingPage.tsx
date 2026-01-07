@@ -93,7 +93,6 @@ interface Plan {
   features: string[];
   badgeText: string;
   badgeColorClass: string;
-  imageUrl?: string;
 }
 
 const availablePlans: Plan[] = [
@@ -104,7 +103,6 @@ const availablePlans: Plan[] = [
     features: ["1 Subusuário", "Gerenciamento de Clientes e Pets", "Agenda Básica"],
     badgeText: "Básico",
     badgeColorClass: "bg-green-500",
-    imageUrl: "/public/images/Plano Verde.png",
   },
   {
     id: "clinica-vet",
@@ -113,7 +111,6 @@ const availablePlans: Plan[] = [
     features: ["3 Subusuários", "Gerenciamento Completo", "Internação", "Caixa e Financeiro", "Suporte Prioritário"],
     badgeText: "Premium",
     badgeColorClass: "bg-purple-500",
-    imageUrl: "/public/images/planoroxo.png",
   },
   {
     id: "hospital-vet",
@@ -122,20 +119,19 @@ const availablePlans: Plan[] = [
     features: ["10 Subusuários", "Todos os recursos Premium", "Relatórios Avançados", "Integrações Personalizadas", "Suporte Dedicado 24/7"],
     badgeText: "Empresarial",
     badgeColorClass: "bg-blue-500",
-    imageUrl: "/public/images/planodourado.png",
   },
 ];
 
 const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-landingPage-lp-verde-bambu text-landingPage-lp-marrom-avela">
+    <div className="min-h-screen bg-landingPage-lp-creme-terra text-landingPage-lp-marrom-avela theme-nature-vet">
       <LandingHeader />
 
       {/* Hero Section */}
       <section id="hero" className="relative min-h-screen flex items-center justify-center text-center p-8 pt-20 overflow-hidden">
-        {/* Background image with a subtle green overlay */}
+        {/* Background image with a subtle overlay */}
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/vet-landing-bg.png')" }}>
-          <div className="absolute inset-0 bg-landingPage-lp-verde-folha-seca opacity-70"></div> {/* Green overlay */}
+          <div className="absolute inset-0 bg-landingPage-lp-marrom-avela opacity-50"></div> {/* Overlay */}
         </div>
         
         <div className="relative z-10 max-w-5xl mx-auto space-y-8">
@@ -146,10 +142,10 @@ const LandingPage: React.FC = () => {
             Simplifique sua clínica, maximize seu tempo e eleve o cuidado com os animais.
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 mt-10 animate-fade-in-up">
-            <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-landingPage-lp-marrom-avela hover:bg-landingPage-lp-marrom-avela/90 text-landingPage-lp-creme-terra text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
+            <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-landingPage-lp-verde-folha-seca hover:bg-landingPage-lp-verde-folha-seca/90 text-white text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
               Comece Grátis
             </Link>
-            <a href="#features" className={cn(buttonVariants({ variant: "default", size: "lg" }), "bg-landingPage-lp-verde-bambu hover:bg-landingPage-lp-verde-bambu/90 text-landingPage-lp-marrom-avela text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
+            <a href="#features" className={cn(buttonVariants({ variant: "outline", size: "lg" }), "bg-transparent hover:bg-landingPage-lp-creme-terra/20 text-landingPage-lp-creme-terra border-landingPage-lp-creme-terra border-2 text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
               Saiba Mais
             </a>
           </div>
@@ -158,11 +154,11 @@ const LandingPage: React.FC = () => {
 
       {/* Features Section */}
       <section id="features" className="py-24 px-8 bg-landingPage-lp-creme-terra text-center">
-        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-verde-folha-seca">Recursos Essenciais para o Seu Sucesso</h2>
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-marrom-avela">Recursos Essenciais para o Seu Sucesso</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {coreFeatures.map((feature, index) => (
-            <Card key={index} className="flex flex-col items-center p-8 space-y-5 bg-landingPage-lp-verde-bambu shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 border-b-4 border-landingPage-lp-verde-folha-seca rounded-xl">
-              <div className="p-4 rounded-full bg-landingPage-lp-creme-terra text-landingPage-lp-marrom-avela shadow-md">
+            <Card key={index} className="flex flex-col items-center p-8 space-y-5 bg-white shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 border-b-4 border-landingPage-lp-verde-folha-seca rounded-xl">
+              <div className="p-4 rounded-full bg-landingPage-lp-verde-folha-seca/10 text-landingPage-lp-verde-folha-seca">
                 <feature.icon className="h-10 w-10" strokeWidth={1.5} />
               </div>
               <h3 className="text-2xl font-semibold text-landingPage-lp-marrom-avela">{feature.title}</h3>
@@ -176,19 +172,16 @@ const LandingPage: React.FC = () => {
       <section id="about" className="py-24 px-8 bg-landingPage-lp-verde-folha-seca text-center">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="text-left space-y-6">
-            <h2 className="text-4xl md:text-5xl font-bold text-landingPage-lp-marrom-avela">Nossa Paixão: Cuidar de Quem Cuida</h2>
-            <p className="text-lg md:text-xl text-landingPage-lp-marrom-avela/90 leading-relaxed">
+            <h2 className="text-4xl md:text-5xl font-bold text-landingPage-lp-creme-terra">Nossa Paixão: Cuidar de Quem Cuida</h2>
+            <p className="text-lg md:text-xl text-landingPage-lp-creme-terra/90 leading-relaxed">
               Na AsasVet, acreditamos que a paixão por animais deve ser acompanhada por uma gestão eficiente e descomplicada. Desenvolvemos uma plataforma intuitiva e completa, pensada para veterinários que buscam excelência no atendimento e otimização de suas rotinas.
             </p>
-            <p className="text-lg md:text-xl text-landingPage-lp-marrom-avela/90 leading-relaxed">
+            <p className="text-lg md:text-xl text-landingPage-lp-creme-terra/90 leading-relaxed">
               Nossa missão é empoderar clínicas e profissionais, liberando tempo para o que realmente importa: cuidar da saúde e felicidade dos pets. Com a AsasVet, você tem mais controle, mais organização e mais tempo para o que ama fazer.
             </p>
-            <Link to="/signup" className={cn(buttonVariants({ variant: "link" }), "text-landingPage-lp-marrom-avela hover:text-landingPage-lp-marrom-avela/80 text-lg font-semibold flex items-center")}>
-              Conheça Nossa História <Leaf className="ml-2 h-5 w-5" />
-            </Link>
           </div>
           <div className="relative h-96 w-full bg-landingPage-lp-verde-bambu rounded-xl shadow-xl overflow-hidden">
-            <img src="/public/images/vet-landing-bg.png" alt="Veterinário cuidando de um animal" className="absolute inset-0 w-full h-full object-cover opacity-70" />
+            <img src="/public/images/vet-landing-bg.png" alt="Veterinário cuidando de um animal" className="absolute inset-0 w-full h-full object-cover opacity-30" />
             <div className="absolute inset-0 flex items-center justify-center bg-landingPage-lp-verde-folha-seca/30">
               <PawPrint className="h-24 w-24 text-landingPage-lp-creme-terra opacity-70" />
             </div>
@@ -196,14 +189,14 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* NOVO: Seção de Planos */}
-      <section id="plans" className="py-24 px-8 bg-landingPage-lp-bege-areia text-center">
+      {/* Plans Section */}
+      <section id="plans" className="py-24 px-8 bg-landingPage-lp-creme-terra text-center">
         <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-marrom-avela">Escolha o Plano Ideal para Sua Clínica</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {availablePlans.map((plan) => (
             <Card
               key={plan.id}
-              className="flex flex-col justify-between p-6 space-y-4 bg-landingPage-lp-creme-terra shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 border-b-4 border-landingPage-lp-verde-folha-seca rounded-xl"
+              className="flex flex-col justify-between p-6 space-y-4 bg-white shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 border-b-4 border-landingPage-lp-verde-folha-seca rounded-xl"
             >
               <div>
                 <div className="flex items-center justify-between mb-4">
@@ -212,21 +205,7 @@ const LandingPage: React.FC = () => {
                     {plan.badgeText}
                   </Badge>
                 </div>
-                <p className="text-4xl font-extrabold text-landingPage-lp-verde-folha-seca mb-4">{plan.price}</p>
-                {plan.imageUrl && (
-                  <div className="flex justify-center mb-4">
-                    <img 
-                      src={plan.imageUrl} 
-                      alt={`Capa do plano ${plan.name}`} 
-                      className={cn(
-                        "w-auto object-contain",
-                        plan.id === "hospital-vet" ? "h-[280px]" : 
-                        plan.id === "vet-domiciliar" ? "h-[220px]" : 
-                        "h-[250px]" 
-                      )} 
-                    />
-                  </div>
-                )}
+                <p className="text-4xl font-extrabold text-landingPage-lp-verde-folha-seca mb-6">{plan.price}</p>
                 <ul className="space-y-2 text-lg text-landingPage-lp-marrom-avela/90 mb-6 text-left">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-center">
@@ -235,7 +214,7 @@ const LandingPage: React.FC = () => {
                   ))}
                 </ul>
               </div>
-              <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "w-full bg-landingPage-lp-verde-folha-seca hover:bg-landingPage-lp-verde-folha-seca/90 text-landingPage-lp-marrom-avela text-xl px-10 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}>
+              <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "w-full bg-landingPage-lp-verde-folha-seca hover:bg-landingPage-lp-verde-folha-seca/90 text-white text-xl px-10 py-6 rounded-full shadow-lg transition-all duration-300 ease-in-out hover:scale-105")}>
                 Comece Agora
               </Link>
             </Card>
@@ -244,12 +223,12 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section id="why-choose-us" className="py-24 px-8 bg-landingPage-lp-verde-bambu text-center">
-        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-verde-folha-seca">Por Que Escolher AsasVet?</h2>
+      <section id="why-choose-us" className="py-24 px-8 bg-landingPage-lp-verde-folha-seca text-center">
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-creme-terra">Por Que Escolher AsasVet?</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
           {whyChooseUs.map((item, index) => (
-            <Card key={index} className="flex flex-col items-center p-8 space-y-5 bg-landingPage-lp-creme-terra shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 border-l-4 border-landingPage-lp-verde-folha-seca rounded-xl">
-              <div className="p-4 rounded-full bg-landingPage-lp-verde-folha-seca text-landingPage-lp-creme-terra shadow-md">
+            <Card key={index} className="flex flex-col items-center p-8 space-y-5 bg-landingPage-lp-creme-terra shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-2 border-l-4 border-landingPage-lp-marrom-avela rounded-xl">
+              <div className="p-4 rounded-full bg-landingPage-lp-marrom-avela/10 text-landingPage-lp-marrom-avela">
                 <item.icon className="h-10 w-10" strokeWidth={1.5} />
               </div>
               <h3 className="text-2xl font-semibold text-landingPage-lp-marrom-avela">{item.title}</h3>
@@ -261,9 +240,9 @@ const LandingPage: React.FC = () => {
 
       {/* Testimonials Section */}
       <section className="py-24 px-8 bg-landingPage-lp-creme-terra text-center">
-        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-verde-folha-seca">O Que Nossos Clientes Dizem</h2>
+        <h2 className="text-4xl md:text-5xl font-bold mb-16 text-landingPage-lp-marrom-avela">O Que Nossos Clientes Dizem</h2>
         <div className="max-w-4xl mx-auto">
-          <Card className="p-10 bg-landingPage-lp-verde-bambu shadow-xl border-l-8 border-landingPage-lp-verde-folha-seca relative rounded-xl">
+          <Card className="p-10 bg-white shadow-xl border-l-8 border-landingPage-lp-verde-folha-seca relative rounded-xl">
             <CardContent className="space-y-6">
               <p className="text-xl md:text-2xl italic text-landingPage-lp-marrom-avela leading-relaxed">
                 "O AsasVet revolucionou a forma como gerencio minha clínica. A agenda é intuitiva, o cadastro de pacientes é completo e o suporte é impecável. Recomendo a todos os colegas!"
@@ -277,13 +256,13 @@ const LandingPage: React.FC = () => {
       </section>
 
       {/* Call to Action */}
-      <section className="py-24 px-8 bg-landingPage-lp-verde-folha-seca text-landingPage-lp-marrom-avela text-center">
+      <section className="py-24 px-8 bg-landingPage-lp-marrom-avela text-landingPage-lp-creme-terra text-center">
         <div className="max-w-4xl mx-auto space-y-8">
           <h2 className="text-4xl md:text-5xl font-bold leading-tight">Pronto para Transformar Sua Clínica?</h2>
-          <p className="text-xl text-landingPage-lp-marrom-avela/90">
+          <p className="text-xl text-landingPage-lp-creme-terra/90">
             Experimente o AsasVet e descubra uma nova era na gestão veterinária.
           </p>
-          <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-landingPage-lp-marrom-avela text-landingPage-lp-creme-terra hover:bg-landingPage-lp-marrom-avela/90 text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
+          <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-landingPage-lp-verde-folha-seca text-white hover:bg-landingPage-lp-verde-folha-seca/90 text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
             Comece Seu Teste Gratuito
           </Link>
         </div>
