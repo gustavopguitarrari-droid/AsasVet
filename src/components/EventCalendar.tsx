@@ -102,7 +102,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
-      <Card className="flex-1 lg:max-w-[400px] flex flex-col">
+      <Card className="flex-1 flex flex-col">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle>Calendário de Agendamentos</CardTitle>
         </CardHeader>
