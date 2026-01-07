@@ -118,7 +118,7 @@ const Login = () => {
               },
             },
             messages: {
-              invalid_login_credentials: 'Email ou senha inválidos',
+              'Invalid login credentials': 'Email ou senha inválidos',
             }
           }}
         />
