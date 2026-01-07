@@ -117,6 +117,9 @@ const Login = () => {
                 button_label: 'Atualizar senha',
               },
             },
+            messages: {
+              invalid_login_credentials: 'Email ou senha inválidos',
+            }
           }}
         />
         {authView === 'sign_in' && (
