@@ -8,18 +8,8 @@ import { cn } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Trash2, CheckCircle, CalendarX, Stethoscope } from "lucide-react";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle as AlertDialogTitleComponent,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import { Trash2, CheckCircle, CalendarX, Stethoscope, Search as SearchIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { TeamMember } from "@/pages/Veterinarios";
 
 export interface CalendarEvent {
@@ -37,7 +27,9 @@ interface EventCalendarProps {
   onAddEventClick: (date: Date) => void;
   onEventClick: (event: CalendarEvent) => void;
   searchTerm: string;
+  onSearchTermChange: (term: string) => void;
   veterinarians: TeamMember[];
+  headerActions: React.ReactNode;
 }
 
 // Mapeamento de cores para as categorias de eventos (já definido em globals.css)
@@ -67,7 +59,7 @@ const eventCategories = [
   { name: "Outros", value: "Outros", colorClass: "bg-event-outros" },
 ];
 
-const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick, searchTerm, veterinarians }) => {
+const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick, searchTerm, onSearchTermChange, veterinarians, headerActions }) => {
   const [selectedDay, setSelectedDay] = React.useState<Date | undefined>(new Date());
 
   const vetMap = React.useMemo(() => {
@@ -102,29 +94,43 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
-      <Card className="flex-1 lg:max-w-[400px] flex flex-col">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle>Calendário de Agendamentos</CardTitle>
-        </CardHeader>
-        <CardContent className="flex-1 p-0">
-          <Calendar
-            mode="single"
-            selected={selectedDay}
-            onSelect={setSelectedDay}
-            locale={ptBR}
-            className="w-full h-full"
-            modifiers={modifiers}
-            modifiersClassNames={modifiersClassNames}
-          />
-        </CardContent>
-      </Card>
+      <div className="flex flex-col gap-6 lg:max-w-[400px]">
+        <div className="p-4 border rounded-md bg-background shadow-md">
+          <div className="relative w-full">
+            <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Buscar agendamentos..."
+              className="pl-9 border border-input rounded-lg"
+              value={searchTerm}
+              onChange={(e) => onSearchTermChange(e.target.value)}
+            />
+          </div>
+        </div>
+        <Card className="flex-1 flex flex-col">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle>Calendário</CardTitle>
+          </CardHeader>
+          <CardContent className="flex-1 p-0">
+            <Calendar
+              mode="single"
+              selected={selectedDay}
+              onSelect={setSelectedDay}
+              locale={ptBR}
+              className="w-full h-full"
+              modifiers={modifiers}
+              modifiersClassNames={modifiersClassNames}
+            />
+          </CardContent>
+        </Card>
+      </div>
 
       <Card className="flex-1 bg-transparent">
-        <CardHeader>
+        <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <CardTitle>
             Agendamentos para{" "}
             {selectedDay ? format(selectedDay, "PPP", { locale: ptBR }) : "Nenhum dia selecionado"}
           </CardTitle>
+          {headerActions}
         </CardHeader>
         <CardContent className="bg-transparent">
           {/* Legenda de Cores */}

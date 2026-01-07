@@ -211,17 +211,14 @@ const AgendamentosMedicos = () => {
         </TabsList>
 
         <TabsContent value="agenda-geral" className="mt-4">
-          <div className="p-4 border rounded-md bg-background shadow-md mb-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="relative flex-1 w-full">
-                <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar agendamentos por título ou categoria..."
-                  className="pl-9 border border-input rounded-lg"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+          <EventCalendar
+            events={events}
+            onAddEventClick={handleOpenDialogWithDate}
+            onEventClick={handleEventClick}
+            searchTerm={searchTerm}
+            onSearchTermChange={setSearchTerm}
+            veterinarians={veterinarians}
+            headerActions={(
               <div className="flex space-x-2 shrink-0">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
@@ -278,15 +275,7 @@ const AgendamentosMedicos = () => {
                   </DialogContent>
                 </Dialog>
               </div>
-            </div>
-          </div>
-
-          <EventCalendar
-            events={events}
-            onAddEventClick={handleOpenDialogWithDate}
-            onEventClick={handleEventClick}
-            searchTerm={searchTerm}
-            veterinarians={veterinarians}
+            )}
           />
         </TabsContent>
 
