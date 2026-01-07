@@ -202,8 +202,8 @@ const AgendamentosMedicos = () => {
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
-          <TabsTrigger value="agenda-geral" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Agenda Geral</TabsTrigger>
-          <TabsTrigger value="agenda-veterinario" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Agenda por Veterinário</TabsTrigger>
+          <TabsTrigger value="agenda-geral" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Agenda Geral</TabsTrigger>
+          <TabsTrigger value="agenda-veterinario" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Agenda por Veterinário</TabsTrigger>
         </TabsList>
 
         <TabsContent value="agenda-geral" className="mt-4">
