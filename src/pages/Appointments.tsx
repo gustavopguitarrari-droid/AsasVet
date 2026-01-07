@@ -959,70 +959,73 @@ const Appointments = () => {
           </Card>
         </div>
 
-        <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-2">
-          <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "em-espera" | "em-andamento" | "finalizadas")} className="w-full md:w-auto flex-1"> {/* Adicionado flex-1 */}
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger
-                value="em-espera"
-                className="
-                  bg-appointments-tab-waiting-inactive-bg text-appointments-tab-waiting-inactive-fg
-                  data-[state=active]:bg-appointments-status-waiting-bg data-[state=active]:text-appointments-status-waiting-fg
-                "
-              >
-                Em Espera
-              </TabsTrigger>
-              <TabsTrigger
-                value="em-andamento"
-                className="
-                  bg-appointments-tab-in-progress-inactive-bg text-appointments-tab-in-progress-inactive-fg
-                  data-[state=active]:bg-appointments-status-in-progress-bg data-[state=active]:text-appointments-status-in-progress-fg
-                "
-              >
-                Em Andamento
-              </TabsTrigger>
-              <TabsTrigger
-                value="finalizadas"
-                className="
-                  bg-appointments-tab-finalized-inactive-bg text-appointments-tab-finalized-inactive-fg
-                  data-[state=active]:bg-appointments-status-completed-bg data-[state=active]:text-appointments-status-completed-fg
-                "
-              >
-                Finalizadas
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <div className="relative flex-1 w-full md:w-auto">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              placeholder="Buscar consultas..."
-              className="pl-9 border border-input rounded-lg"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-          {/* Botões movidos para acá, alinhados à direita */}
-          <div className="flex space-x-2 mt-4 md:mt-0"> {/* Adicionado margem superior para mobile */}
-            <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
-              <History className="mr-2 h-4 w-4" /> Ver Histórico
-            </Button>
-            <Dialog open={isAddAppointmentDialogOpen} onOpenChange={setIsAddAppointmentDialogOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <PlusCircle className="mr-2 h-4 w-4" /> Adicionar consulta a fila
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-4xl max-h-[60vh] overflow-y-auto p-6">
-                <DialogHeader>
-                  <DialogTitle>Incluir Nova Consulta</DialogTitle>
-                </DialogHeader>
-                <AppointmentForm
-                  onSubmit={handleAddAppointment}
-                  onCancel={() => setIsAddAppointmentDialogOpen(false)} // Passa o handler de cancelamento
-                  allClients={clients}
-                  allPets={pets}
+        <div className="p-4 border rounded-md bg-background shadow-md space-y-4 mb-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "em-espera" | "em-andamento" | "finalizadas")} className="w-full md:w-auto">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger
+                  value="em-espera"
+                  className="
+                    bg-appointments-tab-waiting-inactive-bg text-appointments-tab-waiting-inactive-fg
+                    data-[state=active]:bg-appointments-status-waiting-bg data-[state=active]:text-appointments-status-waiting-fg
+                  "
+                >
+                  Em Espera
+                </TabsTrigger>
+                <TabsTrigger
+                  value="em-andamento"
+                  className="
+                    bg-appointments-tab-in-progress-inactive-bg text-appointments-tab-in-progress-inactive-fg
+                    data-[state=active]:bg-appointments-status-in-progress-bg data-[state=active]:text-appointments-status-in-progress-fg
+                  "
+                >
+                  Em Andamento
+                </TabsTrigger>
+                <TabsTrigger
+                  value="finalizadas"
+                  className="
+                    bg-appointments-tab-finalized-inactive-bg text-appointments-tab-finalized-inactive-fg
+                    data-[state=active]:bg-appointments-status-completed-bg data-[state=active]:text-appointments-status-completed-fg
+                  "
+                >
+                  Finalizadas
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <div className="flex items-center gap-2 w-full md:w-auto flex-1 justify-end">
+              <div className="relative w-full max-w-sm">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar consultas..."
+                  className="pl-9 border border-input rounded-lg w-full"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
-              </DialogContent>
-            </Dialog>
+              </div>
+              <div className="flex space-x-2 shrink-0">
+                <Button onClick={() => setIsHistoryDialogOpen(true)} variant="default">
+                  <History className="mr-2 h-4 w-4" /> Ver Histórico
+                </Button>
+                <Dialog open={isAddAppointmentDialogOpen} onOpenChange={setIsAddAppointmentDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button>
+                      <PlusCircle className="mr-2 h-4 w-4" /> Adicionar consulta a fila
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-4xl max-h-[60vh] overflow-y-auto p-6">
+                    <DialogHeader>
+                      <DialogTitle>Incluir Nova Consulta</DialogTitle>
+                    </DialogHeader>
+                    <AppointmentForm
+                      onSubmit={handleAddAppointment}
+                      onCancel={() => setIsAddAppointmentDialogOpen(false)}
+                      allClients={clients}
+                      allPets={pets}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+            </div>
           </div>
         </div>
 
