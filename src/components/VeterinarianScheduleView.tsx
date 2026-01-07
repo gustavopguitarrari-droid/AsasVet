@@ -70,22 +70,24 @@ const VeterinarianScheduleView: React.FC<VeterinarianScheduleViewProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-end">
-        <div className="w-full max-w-sm">
-          <Select value={selectedVetId} onValueChange={setSelectedVetId}>
-            <SelectTrigger>
-              <Stethoscope className="h-4 w-4 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="Selecione um veterinário" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os Veterinários</SelectItem>
-              {veterinarians.map(vet => (
-                <SelectItem key={vet.id} value={vet.id}>
-                  {vet.first_name} {vet.last_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="p-4 border rounded-md bg-background shadow-md mb-6">
+        <div className="flex items-center justify-end">
+          <div className="w-full max-w-sm">
+            <Select value={selectedVetId} onValueChange={setSelectedVetId}>
+              <SelectTrigger>
+                <Stethoscope className="h-4 w-4 mr-2 text-muted-foreground" />
+                <SelectValue placeholder="Selecione um veterinário" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Veterinários</SelectItem>
+                {veterinarians.map(vet => (
+                  <SelectItem key={vet.id} value={vet.id}>
+                    {vet.first_name} {vet.last_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 

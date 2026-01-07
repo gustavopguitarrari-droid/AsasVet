@@ -207,46 +207,48 @@ const AgendamentosMedicos = () => {
         </TabsList>
 
         <TabsContent value="agenda-geral" className="mt-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
-            <div className="relative flex-1 w-full">
-              <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Buscar agendamentos por título ou categoria..."
-                className="pl-9 border border-input rounded-lg"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <div className="flex space-x-2 shrink-0">
-              <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
-                <Tooltip delayDuration={0}>
-                  <TooltipTrigger asChild>
-                    <Button 
-                      className="font-bold" 
-                      disabled={isAddButtonDisabled}
-                      onClick={() => setIsAddEventDialogOpen(true)}
-                    >
-                      <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
-                    </Button>
-                  </TooltipTrigger>
-                  {isAddButtonDisabled && (
-                    <TooltipContent side="bottom">
-                      {!organizationId ? "Informações da organização não disponíveis." : "Adicionando agendamento..."}
-                    </TooltipContent>
-                  )}
-                </Tooltip>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
-                  </DialogHeader>
-                  <AddEventDialog
-                    onSubmit={handleAddEvent}
-                    onCancel={() => setIsAddEventDialogOpen(false)}
-                    defaultDate={defaultDateForNewEvent}
-                    veterinarians={veterinarians}
-                  />
-                </DialogContent>
-              </Dialog>
+          <div className="p-4 border rounded-md bg-background shadow-md mb-6">
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="relative flex-1 w-full">
+                <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar agendamentos por título ou categoria..."
+                  className="pl-9 border border-input rounded-lg"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="flex space-x-2 shrink-0">
+                <Dialog open={isAddEventDialogOpen} onOpenChange={setIsAddEventDialogOpen}>
+                  <Tooltip delayDuration={0}>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        className="font-bold" 
+                        disabled={isAddButtonDisabled}
+                        onClick={() => setIsAddEventDialogOpen(true)}
+                      >
+                        <PlusCircle className="mr-2 h-4 w-4" /> Adicionar Agendamento
+                      </Button>
+                    </TooltipTrigger>
+                    {isAddButtonDisabled && (
+                      <TooltipContent side="bottom">
+                        {!organizationId ? "Informações da organização não disponíveis." : "Adicionando agendamento..."}
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Adicionar Novo Agendamento</DialogTitle>
+                    </DialogHeader>
+                    <AddEventDialog
+                      onSubmit={handleAddEvent}
+                      onCancel={() => setIsAddEventDialogOpen(false)}
+                      defaultDate={defaultDateForNewEvent}
+                      veterinarians={veterinarians}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
           </div>
 
