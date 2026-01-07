@@ -86,7 +86,7 @@ const Login = () => {
 
   return (
     <div className={cn("min-h-screen flex items-center justify-center p-4", "login-art-bg")}>
-      <div className="w-full max-w-sm z-10">
+      <div className="w-full max-w-md z-10">
         <Button asChild variant="ghost" className="absolute top-4 left-4 text-foreground font-bold hover:bg-accent/20">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
@@ -105,20 +105,22 @@ const Login = () => {
             {view === 'sign_in' ? (
               <Form {...loginForm}>
                 <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
-                  <FormField control={loginForm.control} name="email" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl><Input type="email" placeholder="seu@email.com" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  <FormField control={loginForm.control} name="password" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Senha</FormLabel>
-                      <FormControl><Input type="password" placeholder="••••••••" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField control={loginForm.control} name="email" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl><Input type="email" placeholder="seu@email.com" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={loginForm.control} name="password" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Senha</FormLabel>
+                        <FormControl><Input type="password" placeholder="••••••••" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                  </div>
                   {formError && <p className="text-sm font-medium text-destructive">{formError}</p>}
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? "Entrando..." : "Entrar"}
