@@ -93,8 +93,8 @@ const Login = () => {
           </Link>
         </Button>
         <Card className="bg-card/60 backdrop-blur-sm border border-border/20">
-          <CardHeader className="text-center p-4">
-            <CardTitle className="text-2xl">
+          <CardHeader className="text-center p-4 pb-2">
+            <CardTitle className="text-xl">
               {view === 'sign_in' ? 'Faça login para acessar seu painel.' : 'Recuperar Senha'}
             </CardTitle>
             {view === 'forgotten_password' && (
@@ -103,7 +103,7 @@ const Login = () => {
               </CardDescription>
             )}
           </CardHeader>
-          <CardContent className="p-4">
+          <CardContent className="p-4 pt-2">
             {view === 'sign_in' ? (
               <Form {...loginForm}>
                 <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-3">
