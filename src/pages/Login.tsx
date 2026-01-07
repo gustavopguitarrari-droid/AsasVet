@@ -1,139 +1,160 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { ArrowLeft, Mail, Lock } from 'lucide-react';
 import { useSession } from '@/context/SessionContext';
 import { cn } from '@/lib/utils';
-import { useColorTheme } from '@/context/ColorThemeContext';
+import { showError, showSuccess } from '@/utils/toast';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+
+const loginSchema = z.object({
+  email: z.string().email("Por favor, insira um e-mail válido."),
+  password: z.string().min(1, "A senha é obrigatória."),
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email("Por favor, insira um e-mail válido para recuperação."),
+});
+
+type LoginSchema = z.infer<typeof loginSchema>;
+type ForgotPasswordSchema = z.infer<typeof forgotPasswordSchema>;
 
 const Login = () => {
   const navigate = useNavigate();
-  const { session, isLoading } = useSession();
-  const location = useLocation();
-  const { colorTheme } = useColorTheme();
-  const [authView, setAuthView] = useState<'sign_in' | 'forgotten_password' | 'update_password'>(() => {
-    const state = location.state as { view?: 'forgotten_password' | 'update_password' };
-    return state?.view || 'sign_in';
+  const { session, isLoading: isSessionLoading } = useSession();
+  const [view, setView] = useState<'sign_in' | 'forgotten_password'>('sign_in');
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const loginForm = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: "", password: "" },
+  });
+
+  const forgotPasswordForm = useForm<ForgotPasswordSchema>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: "" },
   });
 
   useEffect(() => {
-    if (session && !isLoading) {
+    if (session && !isSessionLoading) {
       navigate('/painel');
     }
-  }, [session, isLoading, navigate]);
+  }, [session, isSessionLoading, navigate]);
 
-  const supabaseAuthTheme = (colorTheme === 'nature-vet' || colorTheme === 'pastel-blue' || colorTheme === 'sweet-lilac') ? 'light' : 'light';
+  const handleLogin = async (values: LoginSchema) => {
+    setIsSubmitting(true);
+    setFormError(null);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: values.email,
+      password: values.password,
+    });
+
+    if (error) {
+      if (error.message === 'Invalid login credentials') {
+        setFormError('Email ou senha inválidos.');
+      } else {
+        setFormError(error.message);
+      }
+    }
+    setIsSubmitting(false);
+  };
+
+  const handlePasswordReset = async (values: ForgotPasswordSchema) => {
+    setIsSubmitting(true);
+    setFormError(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(values.email, {
+      redirectTo: `${window.location.origin}/login`,
+    });
+
+    if (error) {
+      showError(`Erro ao enviar e-mail: ${error.message}`);
+    } else {
+      showSuccess("Se o e-mail estiver correto, você receberá instruções para redefinir sua senha.");
+      setView('sign_in');
+    }
+    setIsSubmitting(false);
+  };
 
   return (
-    <div className={cn(
-      "min-h-screen flex items-center justify-center p-4",
-      "login-art-bg"
-    )}>
-      <div className="w-full max-w-sm p-6 space-y-4 rounded-xl shadow-lg relative bg-card/60 backdrop-blur-sm border border-border/20 z-10 max-h-[80vh] overflow-y-auto">
+    <div className={cn("min-h-screen flex items-center justify-center p-4", "login-art-bg")}>
+      <div className="w-full max-w-sm z-10">
         <Button asChild variant="ghost" className="absolute top-4 left-4 text-foreground font-bold hover:bg-accent/20">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Link>
         </Button>
-        <Auth
-          supabaseClient={supabase}
-          providers={[]}
-          appearance={{
-            theme: ThemeSupa,
-            variables: {
-              default: {
-                colors: {
-                  brand: 'hsl(var(--primary))',
-                  brandAccent: 'hsl(var(--primary-darker))',
-                  inputBackground: 'hsl(var(--input))',
-                  inputBorder: 'hsl(var(--border))',
-                  inputText: 'hsl(var(--foreground))',
-                  messageText: 'hsl(var(--foreground))',
-                  defaultButtonBackground: 'hsl(var(--primary))',
-                  defaultButtonBackgroundHover: 'hsl(var(--primary-darker))',
-                  defaultButtonBorder: 'hsl(var(--primary))',
-                  defaultButtonText: 'hsl(var(--primary-foreground))',
-                  dividerBackground: 'hsl(var(--border))',
-                  anchorTextColor: 'hsl(var(--primary))',
-                  anchorTextHoverColor: 'hsl(var(--primary-darker))',
-                },
-              },
-              dark: {
-                colors: {
-                  brand: 'hsl(var(--primary))',
-                  brandAccent: 'hsl(var(--primary-darker))',
-                  inputBackground: 'hsl(var(--input))',
-                  inputBorder: 'hsl(var(--border))',
-                  inputText: 'hsl(var(--foreground))',
-                  messageText: 'hsl(var(--foreground))',
-                  defaultButtonBackground: 'hsl(var(--primary))',
-                  defaultButtonBackgroundHover: 'hsl(var(--primary-darker))',
-                  defaultButtonBorder: 'hsl(var(--primary))',
-                  defaultButtonText: 'hsl(var(--primary-foreground))',
-                  dividerBackground: 'hsl(var(--border))',
-                  anchorTextColor: 'hsl(var(--primary))',
-                  anchorTextHoverColor: 'hsl(var(--primary-darker))',
-                },
-              },
-            },
-          }}
-          theme={supabaseAuthTheme}
-          redirectTo={window.location.origin + '/painel'}
-          view={authView}
-          localization={{
-            variables: {
-              sign_in: {
-                email_label: 'Email',
-                password_label: 'Senha',
-                email_input_placeholder: 'Seu email',
-                password_input_placeholder: 'Sua senha',
-                button_label: 'Entrar',
-                social_provider_text: 'Entrar com {{provider}}',
-                link_text: '',
-              },
-              sign_up: {
-                link_text: '',
-              },
-              forgotten_password: {
-                email_label: 'Email',
-                password_label: 'Sua senha',
-                email_input_placeholder: 'Seu email',
-                button_label: 'Enviar instruções de recuperação',
-                link_text: 'Esqueceu sua senha?',
-              },
-              update_password: {
-                password_label: 'Nova senha',
-                password_input_placeholder: 'Sua nova senha',
-                button_label: 'Atualizar senha',
-              },
-            },
-            // A chave deve ser a string exata da mensagem de erro do servidor.
-            messages: {
-              'Invalid login credentials': 'Email ou senha inválidos.',
-            }
-          }}
-        />
-        {authView === 'sign_in' && (
-          <p className="text-center text-sm text-foreground">
-            Não tem uma conta?{' '}
-            <Button variant="link" className="p-0 h-auto font-bold text-primary hover:text-primary/80" onClick={() => navigate('/signup')}>
-              Cadastre-se
-            </Button>
-          </p>
-        )}
-        {authView === 'forgotten_password' && (
-          <p className="text-center text-sm text-foreground">
-            Lembrou da senha?{' '}
-            <Button variant="link" className="p-0 h-auto text-primary hover:text-primary/80" onClick={() => setAuthView('sign_in')}>
-              Entrar
-            </Button>
-          </p>
-        )}
+        <Card className="bg-card/60 backdrop-blur-sm border border-border/20">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">
+              {view === 'sign_in' ? 'Bem-vindo(a) de volta!' : 'Recuperar Senha'}
+            </CardTitle>
+            <CardDescription>
+              {view === 'sign_in' ? 'Faça login para acessar seu painel.' : 'Insira seu e-mail para receber as instruções.'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {view === 'sign_in' ? (
+              <Form {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                  <FormField control={loginForm.control} name="email" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl><Input type="email" placeholder="seu@email.com" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <FormField control={loginForm.control} name="password" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Senha</FormLabel>
+                      <FormControl><Input type="password" placeholder="••••••••" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  {formError && <p className="text-sm font-medium text-destructive">{formError}</p>}
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? "Entrando..." : "Entrar"}
+                  </Button>
+                  <Button variant="link" size="sm" className="w-full" type="button" onClick={() => setView('forgotten_password')}>
+                    Esqueceu sua senha?
+                  </Button>
+                </form>
+              </Form>
+            ) : (
+              <Form {...forgotPasswordForm}>
+                <form onSubmit={forgotPasswordForm.handleSubmit(handlePasswordReset)} className="space-y-4">
+                  <FormField control={forgotPasswordForm.control} name="email" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl><Input type="email" placeholder="seu@email.com" {...field} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? "Enviando..." : "Enviar Instruções"}
+                  </Button>
+                  <Button variant="link" size="sm" className="w-full" type="button" onClick={() => setView('sign_in')}>
+                    Voltar para o Login
+                  </Button>
+                </form>
+              </Form>
+            )}
+            <p className="mt-4 text-center text-sm text-foreground">
+              Não tem uma conta?{' '}
+              <Link to="/signup" className="font-bold text-primary hover:underline">
+                Cadastre-se
+              </Link>
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
