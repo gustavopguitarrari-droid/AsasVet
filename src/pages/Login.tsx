@@ -85,7 +85,7 @@ const Login = () => {
   };
 
   return (
-    <div className={cn("min-h-screen flex items-center justify-center md:justify-end p-4 md:p-16 md:pr-32", "login-art-bg")}>
+    <div className={cn("min-h-screen flex items-center justify-center md:justify-end p-4 md:p-16 md:pr-48", "login-art-bg")}>
       <div className="w-full max-w-sm z-10">
         <Button asChild variant="default" className="absolute top-4 left-4 font-bold">
           <Link to="/">
