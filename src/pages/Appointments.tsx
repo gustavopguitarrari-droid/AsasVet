@@ -961,7 +961,7 @@ const Appointments = () => {
 
         <div className="p-4 border rounded-md bg-background shadow-md space-y-4 mb-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "em-espera" | "em-andamento" | "finalizadas")} className="w-full md:w-auto">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "em-espera" | "em-andamento" | "finalizadas")} className="w-full flex-1">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger
                   value="em-espera"
@@ -992,7 +992,7 @@ const Appointments = () => {
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-            <div className="flex items-center gap-2 w-full md:w-auto flex-1 justify-end">
+            <div className="flex items-center gap-2 w-full md:w-auto shrink-0">
               <div className="relative w-full max-w-sm">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
