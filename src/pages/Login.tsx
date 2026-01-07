@@ -87,7 +87,7 @@ const Login = () => {
   return (
     <div className={cn("min-h-screen flex items-center justify-center p-4", "login-art-bg")}>
       <div className="w-full max-w-sm z-10">
-        <Button asChild variant="ghost" className="absolute top-4 left-4 text-foreground font-bold hover:bg-accent/20">
+        <Button asChild variant="secondary" className="absolute top-4 left-4 text-foreground font-bold">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Link>
