@@ -225,7 +225,7 @@ const AgendamentosMedicos = () => {
               <div className="flex space-x-2 shrink-0">
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant="destructive" disabled={events.length === 0 || clearAllEventsMutation.isPending}>
+                    <Button variant="default" disabled={events.length === 0 || clearAllEventsMutation.isPending}>
                       <Trash2 className="mr-2 h-4 w-4" />
                       {clearAllEventsMutation.isPending ? "Limpando..." : "Limpar Agenda"}
                     </Button>
