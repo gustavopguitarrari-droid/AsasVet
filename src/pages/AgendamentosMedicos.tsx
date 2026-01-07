@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, CalendarX, Trash2, Search as SearchIcon } from "lucide-react";
+import { PlusCircle, CalendarX, Trash2, Search as SearchIcon, Calendar, Stethoscope } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import AddEventDialog, { EventFormValues } from "@/components/AddEventDialog";
 import EventCalendar, { CalendarEvent } from "@/components/EventCalendar";
@@ -202,8 +202,12 @@ const AgendamentosMedicos = () => {
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
-          <TabsTrigger value="agenda-geral" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Agenda Geral</TabsTrigger>
-          <TabsTrigger value="agenda-veterinario" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Agenda por Veterinário</TabsTrigger>
+          <TabsTrigger value="agenda-geral" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
+            <Calendar className="h-4 w-4 mr-2" /> Agenda Geral
+          </TabsTrigger>
+          <TabsTrigger value="agenda-veterinario" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
+            <Stethoscope className="h-4 w-4 mr-2" /> Agenda por Veterinário
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="agenda-geral" className="mt-4">
