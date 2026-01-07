@@ -93,8 +93,8 @@ const Login = () => {
           </Link>
         </Button>
         <Card className="bg-card/60 backdrop-blur-sm border border-border/20">
-          <CardHeader className="text-center p-6 pb-2">
-            <CardTitle className="text-2xl">
+          <CardHeader className="text-center p-4 pb-2">
+            <CardTitle className="text-xl">
               {view === 'sign_in' ? 'Acesse seu Painel' : 'Recuperar Senha'}
             </CardTitle>
             {view === 'forgotten_password' && (
@@ -103,10 +103,10 @@ const Login = () => {
               </CardDescription>
             )}
           </CardHeader>
-          <CardContent className="p-6 pt-4">
+          <CardContent className="p-4 pt-2">
             {view === 'sign_in' ? (
               <Form {...loginForm}>
-                <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-3">
                   <div className="flex flex-col sm:flex-row items-end gap-4">
                     <FormField control={loginForm.control} name="email" render={({ field }) => (
                       <FormItem className="flex-1 w-full">
@@ -127,14 +127,14 @@ const Login = () => {
                     </Button>
                   </div>
                   {formError && <p className="text-sm font-medium text-destructive text-center">{formError}</p>}
-                  <Button variant="link" size="sm" className="w-full !mt-2" type="button" onClick={() => setView('forgotten_password')}>
+                  <Button variant="link" size="sm" className="w-full !mt-1" type="button" onClick={() => setView('forgotten_password')}>
                     Esqueceu sua senha?
                   </Button>
                 </form>
               </Form>
             ) : (
               <Form {...forgotPasswordForm}>
-                <form onSubmit={forgotPasswordForm.handleSubmit(handlePasswordReset)} className="space-y-4">
+                <form onSubmit={forgotPasswordForm.handleSubmit(handlePasswordReset)} className="space-y-3">
                   <div className="flex flex-col sm:flex-row items-end gap-4">
                     <FormField control={forgotPasswordForm.control} name="email" render={({ field }) => (
                       <FormItem className="flex-1 w-full">
@@ -147,13 +147,13 @@ const Login = () => {
                       {isSubmitting ? "Enviando..." : "Enviar Instruções"}
                     </Button>
                   </div>
-                  <Button variant="link" size="sm" className="w-full !mt-2" type="button" onClick={() => setView('sign_in')}>
+                  <Button variant="link" size="sm" className="w-full !mt-1" type="button" onClick={() => setView('sign_in')}>
                     Voltar para o Login
                   </Button>
                 </form>
               </Form>
             )}
-            <p className="mt-4 text-center text-sm text-foreground">
+            <p className="mt-3 text-center text-sm text-foreground">
               Não tem uma conta?{' '}
               <Link to="/signup" className="font-bold text-primary hover:underline">
                 Cadastre-se
