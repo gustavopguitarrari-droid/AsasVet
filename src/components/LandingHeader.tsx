@@ -53,3 +53,6 @@ const LandingHeader: React.FC = () => {
       </div>
     </header>
   );
+};
+
+export default LandingHeader;
