@@ -37,8 +37,6 @@ interface EventCalendarProps {
   onAddEventClick: (date: Date) => void;
   onEventClick: (event: CalendarEvent) => void;
   searchTerm: string;
-  onClearAllEvents: () => void;
-  isClearingEvents: boolean;
   veterinarians: TeamMember[];
 }
 
@@ -69,7 +67,7 @@ const eventCategories = [
   { name: "Outros", value: "Outros", colorClass: "bg-event-outros" },
 ];
 
-const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick, searchTerm, onClearAllEvents, isClearingEvents, veterinarians }) => {
+const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, onEventClick, searchTerm, veterinarians }) => {
   const [selectedDay, setSelectedDay] = React.useState<Date | undefined>(new Date());
 
   const vetMap = React.useMemo(() => {
@@ -107,31 +105,6 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
       <Card className="flex-1 lg:max-w-[600px] flex flex-col">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle>Calendário de Agendamentos</CardTitle>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="sm" disabled={events.length === 0 || isClearingEvents}>
-                <Trash2 className="mr-2 h-4 w-4" />
-                {isClearingEvents ? "Limpando..." : "Limpar Agenda"}
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitleComponent className="flex items-center">
-                  <Trash2 className="h-5 w-5 mr-2 text-destructive" /> Confirmar Limpeza da Agenda
-                </AlertDialogTitleComponent>
-                <AlertDialogDescription>
-                  Tem certeza que deseja limpar TODOS os agendamentos da sua agenda?
-                  Esta ação não pode ser desfeita e removerá permanentemente todos os seus eventos.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel disabled={isClearingEvents}>Cancelar</AlertDialogCancel>
-                <AlertDialogAction onClick={onClearAllEvents} disabled={isClearingEvents} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-                  {isClearingEvents ? "Limpando..." : "Sim, Limpar Tudo"}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
         </CardHeader>
         <CardContent className="flex-1 p-0">
           <Calendar
