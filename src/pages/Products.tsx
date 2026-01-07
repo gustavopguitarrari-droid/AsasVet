@@ -265,11 +265,11 @@ const Products = () => {
     <div className="space-y-6">
       <Tabs defaultValue="products" className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
-          <TabsTrigger value="products" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">
-            <Tag className="h-5 w-5 mr-2" /> Produtos & Serviços
+          <TabsTrigger value="products" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
+            <Tag className="h-4 w-4 mr-2" /> Produtos & Serviços
           </TabsTrigger>
-          <TabsTrigger value="stock" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">
-            <Package className="h-5 w-5 mr-2" /> Estoque
+          <TabsTrigger value="stock" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
+            <Package className="h-4 w-4 mr-2" /> Estoque
           </TabsTrigger>
         </TabsList>
 

@@ -761,11 +761,11 @@ const Cadastro = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
-          <TabsTrigger value="tutores" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">
-            <UsersIcon className="h-5 w-5 mr-2" /> Tutores
+          <TabsTrigger value="tutores" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
+            <UsersIcon className="h-4 w-4 mr-2" /> Tutores
           </TabsTrigger>
-          <TabsTrigger value="animais" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">
-            <Dog className="h-5 w-5 mr-2" /> Animais
+          <TabsTrigger value="animais" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
+            <Dog className="h-4 w-4 mr-2" /> Animais
           </TabsTrigger>
         </TabsList>
 

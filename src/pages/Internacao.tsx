@@ -808,8 +808,8 @@ const Internacao = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
-          <TabsTrigger value="pacientes-internados" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Pacientes Internados</TabsTrigger>
-          <TabsTrigger value="mapa-execucao" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Mapa de Execução</TabsTrigger>
+          <TabsTrigger value="pacientes-internados" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">Pacientes Internados</TabsTrigger>
+          <TabsTrigger value="mapa-execucao" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">Mapa de Execução</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pacientes-internados" className="mt-4 relative">
