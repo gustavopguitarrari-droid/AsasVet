@@ -266,10 +266,10 @@ const Products = () => {
       <Tabs defaultValue="products" className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
           <TabsTrigger value="products" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
-            <Tag className="h-4 w-4 mr-2" /> Produtos & Serviços
+            Produtos & Serviços
           </TabsTrigger>
           <TabsTrigger value="stock" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
-            <Package className="h-4 w-4 mr-2" /> Estoque
+            Estoque
           </TabsTrigger>
         </TabsList>
 

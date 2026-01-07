@@ -762,10 +762,10 @@ const Cadastro = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
           <TabsTrigger value="tutores" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
-            <UsersIcon className="h-4 w-4 mr-2" /> Tutores
+            Tutores
           </TabsTrigger>
           <TabsTrigger value="animais" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
-            <Dog className="h-4 w-4 mr-2" /> Animais
+            Animais
           </TabsTrigger>
         </TabsList>
 

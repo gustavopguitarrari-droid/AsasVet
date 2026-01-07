@@ -203,10 +203,10 @@ const AgendamentosMedicos = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-auto p-1">
           <TabsTrigger value="agenda-geral" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
-            <Calendar className="h-4 w-4 mr-2" /> Agenda Geral
+            Agenda Geral
           </TabsTrigger>
           <TabsTrigger value="agenda-veterinario" className="bg-primary-unselected text-primary-unselected-foreground data-[state=active]:bg-primary data-[state=active]:text-primary-foreground font-semibold">
-            <Stethoscope className="h-4 w-4 mr-2" /> Agenda por Veterinário
+            Agenda por Veterinário
           </TabsTrigger>
         </TabsList>
 
