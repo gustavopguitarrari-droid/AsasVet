@@ -86,14 +86,14 @@ const Login = () => {
 
   return (
     <div className={cn("min-h-screen flex items-center justify-center p-4", "login-art-bg")}>
-      <div className="w-full max-w-md z-10">
+      <div className="w-full max-w-sm z-10">
         <Button asChild variant="default" className="absolute top-4 left-4 font-bold">
           <Link to="/">
             <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
           </Link>
         </Button>
         <Card className="bg-card/60 backdrop-blur-sm border border-border/20">
-          <CardHeader className="text-center p-6 pb-4">
+          <CardHeader className="text-center p-4 pb-2">
             <CardTitle className="text-2xl">
               {view === 'sign_in' ? 'Acesse seu Painel' : 'Recuperar Senha'}
             </CardTitle>
@@ -101,10 +101,10 @@ const Login = () => {
               {view === 'sign_in' ? 'Bem-vindo(a) de volta!' : 'Insira seu e-mail para receber as instruções.'}
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-6 pt-2">
+          <CardContent className="p-4 pt-2">
             {view === 'sign_in' ? (
               <Form {...loginForm}>
-                <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-3">
                   <FormField control={loginForm.control} name="email" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
@@ -123,14 +123,14 @@ const Login = () => {
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? "Entrando..." : "Entrar"}
                   </Button>
-                  <Button variant="link" size="sm" className="w-full" type="button" onClick={() => setView('forgotten_password')}>
+                  <Button variant="link" size="sm" className="w-full !mt-1" type="button" onClick={() => setView('forgotten_password')}>
                     Esqueceu sua senha?
                   </Button>
                 </form>
               </Form>
             ) : (
               <Form {...forgotPasswordForm}>
-                <form onSubmit={forgotPasswordForm.handleSubmit(handlePasswordReset)} className="space-y-4">
+                <form onSubmit={forgotPasswordForm.handleSubmit(handlePasswordReset)} className="space-y-3">
                   <FormField control={forgotPasswordForm.control} name="email" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
@@ -141,13 +141,13 @@ const Login = () => {
                   <Button type="submit" className="w-full" disabled={isSubmitting}>
                     {isSubmitting ? "Enviando..." : "Enviar Instruções"}
                   </Button>
-                  <Button variant="link" size="sm" className="w-full" type="button" onClick={() => setView('sign_in')}>
+                  <Button variant="link" size="sm" className="w-full !mt-1" type="button" onClick={() => setView('sign_in')}>
                     Voltar para o Login
                   </Button>
                 </form>
               </Form>
             )}
-            <p className="mt-4 text-center text-sm text-foreground">
+            <p className="mt-3 text-center text-sm text-foreground">
               Não tem uma conta?{' '}
               <Link to="/signup" className="font-bold text-primary hover:underline">
                 Cadastre-se
