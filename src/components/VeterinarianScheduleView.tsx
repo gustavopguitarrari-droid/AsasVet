@@ -70,8 +70,7 @@ const VeterinarianScheduleView: React.FC<VeterinarianScheduleViewProps> = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h3 className="text-2xl font-bold">Agenda por Veterinário</h3>
+      <div className="flex items-center justify-end">
         <div className="w-full max-w-sm">
           <Select value={selectedVetId} onValueChange={setSelectedVetId}>
             <SelectTrigger>
