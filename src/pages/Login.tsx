@@ -98,9 +98,11 @@ const Login = () => {
             <CardTitle className="text-2xl">
               {view === 'sign_in' ? 'Acesse seu Painel' : 'Recuperar Senha'}
             </CardTitle>
-            <CardDescription>
-              {view === 'sign_in' ? 'Bem-vindo(a) de volta!' : 'Insira seu e-mail para receber as instruções.'}
-            </CardDescription>
+            {view !== 'sign_in' && (
+              <CardDescription>
+                {'Insira seu e-mail para receber as instruções.'}
+              </CardDescription>
+            )}
           </CardHeader>
           <CardContent className="p-4 pt-2">
             {view === 'sign_in' ? (
