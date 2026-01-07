@@ -104,7 +104,7 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
-      <Card className="flex-1 lg:max-w-[600px]">
+      <Card className="flex-1 lg:max-w-[600px] flex flex-col">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle>Calendário de Agendamentos</CardTitle>
           <AlertDialog>
@@ -133,13 +133,13 @@ const EventCalendar: React.FC<EventCalendarProps> = ({ events, onAddEventClick, 
             </AlertDialogContent>
           </AlertDialog>
         </CardHeader>
-        <CardContent className="flex justify-center">
+        <CardContent className="flex-1 p-0">
           <Calendar
             mode="single"
             selected={selectedDay}
             onSelect={setSelectedDay}
             locale={ptBR}
-            className="rounded-md border shadow-md w-full"
+            className="w-full h-full"
             modifiers={modifiers}
             modifiersClassNames={modifiersClassNames}
           />
