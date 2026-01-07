@@ -9,7 +9,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { ArrowLeft, Mail, Lock } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useSession } from '@/context/SessionContext';
 import { cn } from '@/lib/utils';
 import { showError, showSuccess } from '@/utils/toast';
@@ -33,6 +33,7 @@ const Login = () => {
   const [view, setView] = useState<'sign_in' | 'forgotten_password'>('sign_in');
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const loginForm = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
@@ -115,7 +116,26 @@ const Login = () => {
                   <FormField control={loginForm.control} name="password" render={({ field }) => (
                     <FormItem>
                       <FormLabel>Senha</FormLabel>
-                      <FormControl><Input type="password" placeholder="••••••••" {...field} /></FormControl>
+                      <div className="relative">
+                        <FormControl>
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            {...field}
+                            className="pr-10"
+                          />
+                        </FormControl>
+                        <div
+                          className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                          onMouseDown={() => setShowPassword(true)}
+                          onMouseUp={() => setShowPassword(false)}
+                          onMouseLeave={() => setShowPassword(false)}
+                          onTouchStart={(e) => { e.preventDefault(); setShowPassword(true); }}
+                          onTouchEnd={(e) => { e.preventDefault(); setShowPassword(false); }}
+                        >
+                          {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                        </div>
+                      </div>
                       <FormMessage />
                     </FormItem>
                   )} />
