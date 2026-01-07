@@ -95,7 +95,7 @@ const Login = () => {
         <Card className="bg-card/60 backdrop-blur-sm border border-border/20">
           <CardHeader className="text-center p-4">
             <CardTitle className="text-2xl">
-              {view === 'sign_in' ? 'Bem-vindo(a) de volta!' : 'Recuperar Senha'}
+              {view === 'sign_in' ? 'Faça login para acessar seu painel.' : 'Recuperar Senha'}
             </CardTitle>
             {view === 'forgotten_password' && (
               <CardDescription>
