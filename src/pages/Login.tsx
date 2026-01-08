@@ -36,32 +36,62 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   // State for typing animation
-  const [typedText, setTypedText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [loopNum, setLoopNum] = useState(0);
-  const textToType = "BEM-VINDO.";
+  const [typedLine1, setTypedLine1] = useState('');
+  const [typedLine2, setTypedLine2] = useState('');
+  const [typingState, setTypingState] = useState<'typing-l1' | 'typing-l2' | 'pausing' | 'deleting-l2' | 'deleting-l1'>('typing-l1');
+  const textsToType = ["BEM-VINDO.", "A GESTÃO QUE DA ASAS TE ESPERA"];
 
   useEffect(() => {
     const handleTyping = () => {
-      const currentText = isDeleting
-        ? textToType.substring(0, typedText.length - 1)
-        : textToType.substring(0, typedText.length + 1);
-
-      setTypedText(currentText);
-
-      if (!isDeleting && currentText === textToType) {
-        // Pause at the end before deleting
-        setTimeout(() => setIsDeleting(true), 2000);
-      } else if (isDeleting && currentText === '') {
-        setIsDeleting(false);
-        setLoopNum(loopNum + 1);
+      switch (typingState) {
+        case 'typing-l1':
+          if (typedLine1.length < textsToType[0].length) {
+            setTypedLine1(textsToType[0].substring(0, typedLine1.length + 1));
+          } else {
+            setTypingState('typing-l2');
+          }
+          break;
+        case 'typing-l2':
+          if (typedLine2.length < textsToType[1].length) {
+            setTypedLine2(textsToType[1].substring(0, typedLine2.length + 1));
+          } else {
+            setTypingState('pausing');
+          }
+          break;
+        case 'pausing':
+          // This state is handled by a longer timeout below
+          break;
+        case 'deleting-l2':
+          if (typedLine2.length > 0) {
+            setTypedLine2(typedLine2.substring(0, typedLine2.length - 1));
+          } else {
+            setTypingState('deleting-l1');
+          }
+          break;
+        case 'deleting-l1':
+          if (typedLine1.length > 0) {
+            setTypedLine1(typedLine1.substring(0, typedLine1.length - 1));
+          } else {
+            // Pause briefly before restarting
+            setTimeout(() => setTypingState('typing-l1'), 500);
+          }
+          break;
       }
     };
 
-    const typingTimeout = setTimeout(handleTyping, isDeleting ? 75 : 150);
+    let timeoutDuration = 150;
+    if (typingState === 'pausing') {
+      timeoutDuration = 2000; // Pause for 2 seconds
+      const timeout = setTimeout(() => setTypingState('deleting-l2'), timeoutDuration);
+      return () => clearTimeout(timeout);
+    }
+    if (typingState === 'deleting-l1' || typingState === 'deleting-l2') {
+      timeoutDuration = 75;
+    }
 
+    const typingTimeout = setTimeout(handleTyping, timeoutDuration);
     return () => clearTimeout(typingTimeout);
-  }, [typedText, isDeleting, loopNum]);
+  }, [typedLine1, typedLine2, typingState]);
 
 
   const loginForm = useForm<LoginSchema>({
@@ -126,13 +156,14 @@ const Login = () => {
             <PawPrint className="h-8 w-8 mr-2" />
             <span className="text-2xl font-bold">AsasVet</span>
         </Link>
-        <div className="text-center space-y-4 relative z-10">
+        <div className="text-center space-y-2 relative z-10">
             <h1 className="text-4xl font-bold h-12">
-              {typedText}
-              <span className="typing-cursor"></span>
+              {typedLine1}
+              {typingState === 'typing-l1' && <span className="typing-cursor"></span>}
             </h1>
-            <p className="text-lg text-white/80">
-              A gestão da sua clínica veterinária te espera.
+            <p className="text-lg text-white/80 h-8">
+              {typedLine2}
+              {typingState === 'typing-l2' && <span className="typing-cursor"></span>}
             </p>
         </div>
       </div>
