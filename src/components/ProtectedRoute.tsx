@@ -50,6 +50,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     const isTrialExpired = isAfter(new Date(), expirationDate);
 
     if (isTrialPlan && isTrialExpired) {
+      // Se o teste expirou, só permite o acesso à página de configurações
+      if (location.pathname === '/settings') {
+        return <Layout>{children}</Layout>;
+      }
+      // Para todas as outras páginas, mostra a tela de bloqueio
       console.log('ProtectedRoute: Trial expired, showing blocker.');
       return <TrialEndedBlocker />;
     }
