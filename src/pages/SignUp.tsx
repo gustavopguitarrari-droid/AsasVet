@@ -21,7 +21,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { lookupCep } from "@/utils/cepLookup";
-import PlanSelectionDialog from "@/components/PlanSelectionDialog";
 import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
@@ -56,8 +55,6 @@ const SignUp = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isPlanSelectionDialogOpen, setIsPlanSelectionDialogOpen] = useState(false);
-  const [newlyRegisteredUserId, setNewlyRegisteredUserId] = useState<string | null>(null);
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(formSchema),
@@ -142,9 +139,8 @@ const SignUp = () => {
       if (error) {
         showError(`Erro no cadastro: ${error.message}`);
       } else if (authData.user?.id) {
-        showSuccess("Cadastro realizado com sucesso! Agora, escolha seu plano.");
-        setNewlyRegisteredUserId(authData.user.id);
-        setIsPlanSelectionDialogOpen(true);
+        showSuccess("Cadastro realizado com sucesso! Você agora tem 7 dias de teste gratuito. Faça o login para começar.");
+        navigate('/login');
       } else {
         throw new Error("Não foi possível obter o ID do usuário após o cadastro.");
       }
@@ -153,11 +149,6 @@ const SignUp = () => {
     } finally {
       setIsSubmitting(false);
     }
-  };
-
-  const handlePlanSelected = () => {
-    setIsPlanSelectionDialogOpen(false);
-    navigate('/login');
   };
 
   const steps = [
@@ -267,14 +258,6 @@ const SignUp = () => {
           </p>
         </div>
       </div>
-      {newlyRegisteredUserId && (
-        <PlanSelectionDialog
-          isOpen={isPlanSelectionDialogOpen}
-          onClose={() => setIsPlanSelectionDialogOpen(false)}
-          userId={newlyRegisteredUserId}
-          onPlanSelected={handlePlanSelected}
-        />
-      )}
     </div>
   );
 };
