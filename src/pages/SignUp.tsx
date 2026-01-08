@@ -295,7 +295,7 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2 theme-nature-vet">
-      <div className="flex items-center justify-center py-12 px-4 bg-landingPage-lp-creme-terra">
+      <div className="flex items-center justify-center py-12 px-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center">
         <div className="mx-auto w-full max-w-md space-y-6">
           <div className="flex">
             <Button asChild variant="ghost">
