@@ -170,7 +170,15 @@ const SignUp = () => {
       });
 
       if (error) {
-        showError(`Erro no cadastro: ${error.message}`);
+        if (error.message.includes('User already registered')) {
+          showError('Este e-mail já está cadastrado.');
+        } else if (error.message.includes('CPF_DUPLICATE')) {
+          showError('Este CPF já está cadastrado.');
+        } else if (error.message.includes('CNPJ_DUPLICATE')) {
+          showError('Este CNPJ já está cadastrado.');
+        } else {
+          showError(`Erro no cadastro: ${error.message}`);
+        }
       } else if (authData.user) {
         setSignupSuccess(true);
       } else {
