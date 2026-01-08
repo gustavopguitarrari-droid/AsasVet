@@ -9,7 +9,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { ArrowLeft, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Mail, Lock, Eye, EyeOff, PawPrint } from 'lucide-react';
 import { useSession } from '@/context/SessionContext';
 import { cn } from '@/lib/utils';
 import { showError, showSuccess } from '@/utils/toast';
@@ -88,97 +88,107 @@ const Login = () => {
   };
 
   return (
-    <div className={cn("min-h-screen flex items-center justify-center p-4 pl-20", "login-art-bg")}>
-      <div className="w-full max-w-sm z-10">
-        <Button asChild variant="default" className="absolute top-4 left-4 font-bold">
-          <Link to="/">
-            <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
-          </Link>
-        </Button>
-        <Card className="bg-card/60 backdrop-blur-sm border border-border/20">
-          <CardHeader className="text-center p-4 pb-2">
-            <CardTitle className="text-2xl">
-              {view === 'sign_in' ? 'Acesse seu Painel' : 'Recuperar Senha'}
-            </CardTitle>
-            {view !== 'sign_in' && (
-              <CardDescription>
-                {'Insira seu e-mail para receber as instruções.'}
-              </CardDescription>
-            )}
-          </CardHeader>
-          <CardContent className="p-4 pt-2">
-            {view === 'sign_in' ? (
-              <Form {...loginForm}>
-                <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-3">
-                  <FormField control={loginForm.control} name="email" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl><Input type="email" placeholder="seu@email.com" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  <FormField control={loginForm.control} name="password" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Senha</FormLabel>
-                      <div className="relative">
-                        <FormControl>
-                          <Input
-                            type={showPassword ? "text" : "password"}
-                            placeholder="••••••••"
-                            {...field}
-                            className="pr-10"
-                          />
-                        </FormControl>
-                        <div
-                          className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
-                          onMouseDown={() => setShowPassword(true)}
-                          onMouseUp={() => setShowPassword(false)}
-                          onMouseLeave={() => setShowPassword(false)}
-                          onTouchStart={(e) => { e.preventDefault(); setShowPassword(true); }}
-                          onTouchEnd={(e) => { e.preventDefault(); setShowPassword(false); }}
-                        >
-                          {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
-                        </div>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  {formError && <p className="text-sm font-medium text-destructive text-center">{formError}</p>}
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Entrando..." : "Entrar"}
-                  </Button>
-                  <Button variant="link" size="sm" className="w-full !mt-1" type="button" onClick={() => setView('forgotten_password')}>
-                    Esqueceu sua senha?
-                  </Button>
-                </form>
-              </Form>
-            ) : (
-              <Form {...forgotPasswordForm}>
-                <form onSubmit={forgotPasswordForm.handleSubmit(handlePasswordReset)} className="space-y-3">
-                  <FormField control={forgotPasswordForm.control} name="email" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl><Input type="email" placeholder="seu@email.com" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Enviando..." : "Enviar Instruções"}
-                  </Button>
-                  <Button variant="link" size="sm" className="w-full !mt-1" type="button" onClick={() => setView('sign_in')}>
-                    Voltar para o Login
-                  </Button>
-                </form>
-              </Form>
-            )}
-            <p className="mt-3 text-center text-sm text-foreground">
-              Não tem uma conta?{' '}
-              <Link to="/signup" className="font-bold text-primary hover:underline">
-                Cadastre-se
-              </Link>
+    <div className="min-h-screen w-full lg:grid lg:grid-cols-2 theme-nature-vet">
+      <div className="hidden lg:flex relative flex-col items-center justify-end p-10 pb-20 text-white border-r-4 border-primary">
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/signup-background.png')" }} />
+        <div className="absolute inset-0 bg-black/40" />
+        
+        <Link to="/" className="absolute top-8 left-8 flex items-center text-white z-10">
+            <PawPrint className="h-8 w-8 mr-2" />
+            <span className="text-2xl font-bold">AsasVet</span>
+        </Link>
+        <div className="text-center space-y-4 relative z-10">
+            <h1 className="text-4xl font-bold">Bem-vindo de Volta!</h1>
+            <p className="text-lg text-white/80">
+              A gestão da sua clínica veterinária te espera.
             </p>
-          </CardContent>
-        </Card>
+        </div>
+      </div>
+      <div className="flex items-center justify-center py-12 px-4 bg-landingPage-lp-creme-terra">
+        <div className="mx-auto w-full max-w-md space-y-6">
+          <div className="w-full text-center">
+            <h1 className="text-3xl font-bold text-landingPage-lp-marrom-avela">
+              {view === 'sign_in' ? 'Acesse seu Painel' : 'Recuperar Senha'}
+            </h1>
+            <p className="text-landingPage-lp-marrom-avela/80">
+              {view === 'sign_in' ? 'Insira suas credenciais para continuar.' : 'Insira seu e-mail para receber as instruções.'}
+            </p>
+          </div>
+          <Card>
+            <CardContent className="p-6">
+              {view === 'sign_in' ? (
+                <Form {...loginForm}>
+                  <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-3">
+                    <FormField control={loginForm.control} name="email" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl><Input type="email" placeholder="seu@email.com" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <FormField control={loginForm.control} name="password" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Senha</FormLabel>
+                        <div className="relative">
+                          <FormControl>
+                            <Input
+                              type={showPassword ? "text" : "password"}
+                              placeholder="••••••••"
+                              {...field}
+                              className="pr-10"
+                            />
+                          </FormControl>
+                          <div
+                            className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                            onMouseDown={() => setShowPassword(true)}
+                            onMouseUp={() => setShowPassword(false)}
+                            onMouseLeave={() => setShowPassword(false)}
+                            onTouchStart={(e) => { e.preventDefault(); setShowPassword(true); }}
+                            onTouchEnd={(e) => { e.preventDefault(); setShowPassword(false); }}
+                          >
+                            {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                          </div>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    {formError && <p className="text-sm font-medium text-destructive text-center">{formError}</p>}
+                    <Button type="submit" className="w-full" disabled={isSubmitting}>
+                      {isSubmitting ? "Entrando..." : "Entrar"}
+                    </Button>
+                    <Button variant="link" size="sm" className="w-full !mt-1" type="button" onClick={() => setView('forgotten_password')}>
+                      Esqueceu sua senha?
+                    </Button>
+                  </form>
+                </Form>
+              ) : (
+                <Form {...forgotPasswordForm}>
+                  <form onSubmit={forgotPasswordForm.handleSubmit(handlePasswordReset)} className="space-y-3">
+                    <FormField control={forgotPasswordForm.control} name="email" render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email</FormLabel>
+                        <FormControl><Input type="email" placeholder="seu@email.com" {...field} /></FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )} />
+                    <Button type="submit" className="w-full" disabled={isSubmitting}>
+                      {isSubmitting ? "Enviando..." : "Enviar Instruções"}
+                    </Button>
+                    <Button variant="link" size="sm" className="w-full !mt-1" type="button" onClick={() => setView('sign_in')}>
+                      Voltar para o Login
+                    </Button>
+                  </form>
+                </Form>
+              )}
+            </CardContent>
+          </Card>
+          <p className="text-center text-sm text-landingPage-lp-marrom-avela">
+            Não tem uma conta?{' '}
+            <Link to="/signup" className="font-bold text-primary hover:underline">
+              Cadastre-se
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
