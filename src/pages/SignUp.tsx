@@ -67,6 +67,7 @@ const SignUp = () => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
 
   const formSchema = useMemo(() => createFormSchema(registrationType), [registrationType]);
 
@@ -101,7 +102,27 @@ const SignUp = () => {
     }
     
     const isValid = await form.trigger(fieldsToValidate);
-    if (isValid) {
+    
+    if (isValid && step === 1) {
+      setIsCheckingEmail(true);
+      const email = form.getValues('email');
+      
+      const { data: emailExists, error } = await supabase.rpc('email_exists', { email_to_check: email });
+
+      setIsCheckingEmail(false);
+
+      if (error) {
+          showError("Erro ao verificar o e-mail. Tente novamente.");
+          return;
+      }
+
+      if (emailExists) {
+          form.setError('email', { type: 'manual', message: 'Este e-mail já está cadastrado.' });
+          return;
+      }
+
+      setStep(step + 1);
+    } else if (isValid) {
       setStep(step + 1);
     }
   };
@@ -329,7 +350,7 @@ const SignUp = () => {
                       <div className="flex justify-between pt-4">
                         {step > 1 && <Button type="button" variant="outline" onClick={handlePrevStep}>Anterior</Button>}
                         <div className="flex-grow" />
-                        {step < 3 && <Button type="button" onClick={handleNextStep}>Próximo</Button>}
+                        {step < 3 && <Button type="button" onClick={handleNextStep} disabled={isCheckingEmail}>{isCheckingEmail ? "Verificando..." : "Próximo"}</Button>}
                         {step === 3 && <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Cadastrando..." : "Finalizar Cadastro"}</Button>}
                       </div>
                     </form>
