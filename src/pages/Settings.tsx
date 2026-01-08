@@ -40,9 +40,6 @@ const Settings = () => {
 
   return (
     <div className="space-y-6 w-full p-4">
-      <h2 className="text-3xl font-bold">Configurações</h2>
-      <p className="text-muted-foreground">Gerencie as preferências da sua conta e do aplicativo.</p>
-
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 h-auto p-1">
           <TabsTrigger value="security" disabled={isTrialExpired} className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Geral</TabsTrigger>
