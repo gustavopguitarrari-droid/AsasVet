@@ -270,6 +270,13 @@ const SignUp = () => {
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2 theme-nature-vet">
       <div className="flex items-center justify-center py-12 px-4 bg-landingPage-lp-creme-terra">
         <div className="mx-auto w-full max-w-md space-y-6">
+          <div className="flex">
+            <Button asChild variant="ghost">
+              <Link to="/">
+                <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para o Início
+              </Link>
+            </Button>
+          </div>
           {!registrationType ? (
             <Card>
               <CardHeader>
@@ -420,21 +427,6 @@ const SignUp = () => {
               Entrar
             </Link>
           </p>
-        </div>
-      </div>
-      <div className="hidden lg:flex relative flex-col items-center justify-end p-10 pb-20 text-white border-l-8 border-landingPage-lp-verde-folha-seca">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/signup-background-new.png')" }} />
-        <div className="absolute inset-0 bg-black/40" />
-        
-        <Link to="/" className="absolute top-8 left-8 flex items-center text-white z-10">
-            <PawPrint className="h-8 w-8 mr-2" />
-            <span className="text-2xl font-bold">AsasVet</span>
-        </Link>
-        <div className="text-center space-y-4 relative z-10">
-            <h1 className="text-4xl font-bold">Bem-vindo ao AsasVet</h1>
-            <p className="text-lg text-white/80">
-            A plataforma completa para dar asas à gestão da sua clínica veterinária.
-            </p>
         </div>
       </div>
     </div>
