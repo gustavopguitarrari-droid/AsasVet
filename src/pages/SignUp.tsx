@@ -268,16 +268,19 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2 theme-nature-vet">
-      <div className="hidden lg:flex flex-col items-center justify-center bg-landingPage-lp-verde-folha-seca p-10 text-landingPage-lp-creme-terra">
-        <Link to="/" className="absolute top-8 left-8 flex items-center">
-          <PawPrint className="h-8 w-8 mr-2" />
-          <span className="text-2xl font-bold">AsasVet</span>
+      <div className="hidden lg:flex relative flex-col items-center justify-center p-10 text-white">
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/signup-background.png')" }} />
+        <div className="absolute inset-0 bg-black/60" />
+        
+        <Link to="/" className="absolute top-8 left-8 flex items-center text-white z-10">
+            <PawPrint className="h-8 w-8 mr-2" />
+            <span className="text-2xl font-bold">AsasVet</span>
         </Link>
-        <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold">Bem-vindo ao AsasVet</h1>
-          <p className="text-lg text-landingPage-lp-creme-terra/80">
+        <div className="text-center space-y-4 relative z-10">
+            <h1 className="text-4xl font-bold">Bem-vindo ao AsasVet</h1>
+            <p className="text-lg text-white/80">
             A plataforma completa para dar asas à gestão da sua clínica veterinária.
-          </p>
+            </p>
         </div>
       </div>
       <div className="flex items-center justify-center py-12 px-4 bg-landingPage-lp-creme-terra">
