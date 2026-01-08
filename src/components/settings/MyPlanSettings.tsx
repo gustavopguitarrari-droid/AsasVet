@@ -1,15 +1,16 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CreditCard, Crown, CheckCircle } from "lucide-react";
+import { CreditCard, Crown, CheckCircle, Clock, AlertTriangle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useUser } from "@/context/UserContext"; // Importar useUser
-import { useMutation } from "@tanstack/react-query"; // Importar useMutation
-import { supabase } from "@/integrations/supabase/client"; // Importar supabase
-import { showError, showSuccess } from "@/utils/toast"; // Importar toasts
+import { useUser } from "@/context/UserContext";
+import { useMutation } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { showError, showSuccess } from "@/utils/toast";
+import { addDays, differenceInDays, differenceInHours, differenceInMinutes, isAfter, parseISO, isValid } from "date-fns";
 
 interface Plan {
   id: string;
@@ -51,9 +52,70 @@ const availablePlans: Plan[] = [
   },
 ];
 
+const TrialStatusBanner: React.FC<{ registrationTime: string }> = ({ registrationTime }) => {
+  const [remainingTime, setRemainingTime] = useState<string>("");
+  const [isExpired, setIsExpired] = useState(false);
+
+  useEffect(() => {
+    if (!registrationTime) return;
+
+    const registrationDate = parseISO(registrationTime);
+    if (!isValid(registrationDate)) return;
+
+    const expirationDate = addDays(registrationDate, 7);
+
+    const calculateRemaining = () => {
+      const now = new Date();
+      if (isAfter(now, expirationDate)) {
+        setRemainingTime("Expirado");
+        setIsExpired(true);
+        return false; // Stop interval
+      }
+      const days = differenceInDays(expirationDate, now);
+      const hours = differenceInHours(expirationDate, now) % 24;
+      const minutes = differenceInMinutes(expirationDate, now) % 60;
+      setRemainingTime(`${days}d ${hours}h ${minutes}m`);
+      return true; // Continue interval
+    };
+
+    if (calculateRemaining()) {
+      const intervalId = setInterval(() => {
+        if (!calculateRemaining()) {
+          clearInterval(intervalId);
+        }
+      }, 1000 * 60); // Update every minute
+
+      return () => clearInterval(intervalId);
+    }
+  }, [registrationTime]);
+
+  if (isExpired) {
+    return (
+      <div className="p-4 mb-6 rounded-lg border border-destructive bg-destructive/10 text-destructive flex items-center">
+        <AlertTriangle className="h-5 w-5 mr-3" />
+        <div>
+          <p className="font-bold">Seu período de teste gratuito expirou.</p>
+          <p className="text-sm">Escolha um plano abaixo para continuar usando todos os recursos.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 mb-6 rounded-lg border border-primary bg-primary/10 text-primary flex items-center">
+      <Clock className="h-5 w-5 mr-3" />
+      <div>
+        <p className="font-bold">Você está em um período de teste gratuito.</p>
+        <p className="text-sm">Seu acesso expira em: {remainingTime}</p>
+      </div>
+    </div>
+  );
+};
+
 const MyPlanSettings: React.FC = () => {
   const { user: appUser } = useUser();
-  const currentPlanName = appUser?.planName || "Plano Básico"; // Assume "Plano Básico" como padrão
+  const currentPlanName = appUser?.planName || "Plano Básico";
+  const isTrialPlan = appUser?.planName === 'Plano Básico' || appUser?.planName === 'Vet Domiciliar';
 
   const createStripeCheckoutSessionMutation = useMutation({
     mutationFn: async ({ priceId, userId }: { priceId: string; userId: string }) => {
@@ -74,7 +136,7 @@ const MyPlanSettings: React.FC = () => {
     },
     onSuccess: (data) => {
       if (data.url) {
-        window.location.href = data.url; // Redireciona para o checkout do Stripe
+        window.location.href = data.url;
       } else {
         showError("Não foi possível obter a URL de checkout do Stripe.");
       }
@@ -91,9 +153,8 @@ const MyPlanSettings: React.FC = () => {
       return;
     }
 
-    if (plan.name === currentPlanName) {
+    if (!isTrialPlan && plan.name === currentPlanName) {
       showSuccess("Você já está neste plano!");
-      // Aqui você pode adicionar lógica para gerenciar a assinatura existente, se houver
       return;
     }
 
@@ -108,45 +169,51 @@ const MyPlanSettings: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {isTrialPlan && appUser?.registeredTime && <TrialStatusBanner registrationTime={appUser.registeredTime} />}
         <p className="text-muted-foreground">
-          Visualize os detalhes do seu plano atual e explore opções de upgrade.
+          {isTrialPlan
+            ? "Escolha um plano para continuar após o período de teste."
+            : "Visualize os detalhes do seu plano atual e explore opções de upgrade."}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {availablePlans.map((plan) => (
-            <Card
-              key={plan.id}
-              className={cn(
-                "flex flex-col justify-between p-6 transition-all duration-200",
-                plan.name === currentPlanName ? "border-2 border-primary shadow-lg" : "border hover:border-primary hover:shadow-md"
-              )}
-            >
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold">{plan.name}</h3>
-                  <Badge className={cn("text-white", plan.badgeColorClass)}>
-                    {plan.name === currentPlanName ? "Ativo" : plan.badgeText}
-                  </Badge>
-                </div>
-                <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
-                <ul className="space-y-2 text-sm text-muted-foreground mb-6">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-center">
-                      <CheckCircle className="h-4 w-4 mr-2 text-green-500" /> {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <Button
-                variant={plan.name === currentPlanName ? "default" : "outline"}
-                className="w-full mt-6"
-                onClick={() => handlePlanAction(plan)}
-                disabled={createStripeCheckoutSessionMutation.isPending}
+          {availablePlans.map((plan) => {
+            const isCurrentPlan = !isTrialPlan && plan.name === currentPlanName;
+            return (
+              <Card
+                key={plan.id}
+                className={cn(
+                  "flex flex-col justify-between p-6 transition-all duration-200",
+                  isCurrentPlan ? "border-2 border-primary shadow-lg" : "border hover:border-primary hover:shadow-md"
+                )}
               >
-                {createStripeCheckoutSessionMutation.isPending ? "Carregando..." : (plan.name === currentPlanName ? "Plano Atual" : "Selecionar Plano")}
-              </Button>
-            </Card>
-          ))}
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold">{plan.name}</h3>
+                    <Badge className={cn("text-white", plan.badgeColorClass)}>
+                      {isCurrentPlan ? "Ativo" : plan.badgeText}
+                    </Badge>
+                  </div>
+                  <p className="text-3xl font-extrabold mb-4">{plan.price}</p>
+                  <ul className="space-y-2 text-sm text-muted-foreground mb-6">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-center">
+                        <CheckCircle className="h-4 w-4 mr-2 text-green-500" /> {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <Button
+                  variant={isCurrentPlan ? "default" : "outline"}
+                  className="w-full mt-6"
+                  onClick={() => handlePlanAction(plan)}
+                  disabled={createStripeCheckoutSessionMutation.isPending}
+                >
+                  {createStripeCheckoutSessionMutation.isPending ? "Carregando..." : (isCurrentPlan ? "Plano Atual" : "Selecionar Plano")}
+                </Button>
+              </Card>
+            );
+          })}
         </div>
 
         <p className="text-sm text-muted-foreground">

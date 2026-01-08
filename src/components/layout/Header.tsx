@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SheetTrigger } from "@/components/ui/sheet";
 import { useUser } from "@/context/UserContext";
-import { addDays, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, isAfter, parseISO, isValid } from "date-fns";
+import { addDays, isAfter, parseISO, isValid } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 
 interface HeaderProps {
@@ -21,63 +21,11 @@ interface HeaderProps {
   onMenuClick?: () => void;
 }
 
-// Novo componente para o banner do período de teste
-const TrialModeBanner: React.FC = () => {
-  const { user } = useUser();
-  const [remainingTime, setRemainingTime] = useState<string>("");
-
-  useEffect(() => {
-    if (!user?.registeredTime) return;
-
-    const registrationDate = parseISO(user.registeredTime);
-    const expirationDate = addDays(registrationDate, 7);
-
-    const intervalId = setInterval(() => {
-      const now = new Date();
-
-      if (isAfter(now, expirationDate)) {
-        setRemainingTime("Expirado");
-        clearInterval(intervalId);
-        return;
-      }
-
-      const days = differenceInDays(expirationDate, now);
-      const hours = differenceInHours(expirationDate, now) % 24;
-      const minutes = differenceInMinutes(expirationDate, now) % 60;
-      const seconds = differenceInSeconds(expirationDate, now) % 60;
-
-      setRemainingTime(`${days}d ${hours}h ${minutes}m ${seconds}s`);
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [user?.registeredTime]);
-
-  if (!remainingTime || remainingTime === "Expirado") {
-    return null;
-  }
-
-  return (
-    <Badge variant="destructive" className="bg-yellow-500 text-white hover:bg-yellow-600 hidden md:flex items-center">
-      <Clock className="h-4 w-4 mr-2" />
-      Período de teste: {remainingTime}
-    </Badge>
-  );
-};
-
 const Header: React.FC<HeaderProps> = ({ onCashierClick, onMenuClick }) => {
   const location = useLocation();
   const { pageTitle } = usePageTitle();
   const isMobile = useIsMobile();
   const { user } = useUser();
-
-  const isTrialPlan = user?.planName === 'Plano Básico' || user?.planName === 'Vet Domiciliar';
-  const registrationDate = user?.registeredTime ? parseISO(user.registeredTime) : null;
-  
-  let isTrialActive = false;
-  if (isTrialPlan && registrationDate && isValid(registrationDate)) {
-      const expirationDate = addDays(registrationDate, 7);
-      isTrialActive = !isAfter(new Date(), expirationDate);
-  }
 
   const getTitle = () => {
     if (pageTitle) {
@@ -131,7 +79,6 @@ const Header: React.FC<HeaderProps> = ({ onCashierClick, onMenuClick }) => {
         <h1 className="text-xl md:text-2xl font-semibold">{getTitle()}</h1>
       </div>
       <div className="flex items-center space-x-2">
-        {isTrialActive && <TrialModeBanner />}
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
             <Button
