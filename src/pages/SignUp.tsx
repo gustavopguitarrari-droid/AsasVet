@@ -4,7 +4,7 @@ import React, { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Mail, Lock, User as UserIcon, Phone, IdCard, Home, MapPin, CheckCircle, PawPrint, ArrowLeft } from "lucide-react";
+import { Mail, Lock, User as UserIcon, Phone, IdCard, Home, MapPin, CheckCircle, PawPrint, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,8 @@ const SignUp = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const formSchema = useMemo(() => createFormSchema(registrationType), [registrationType]);
 
@@ -322,8 +324,56 @@ const SignUp = () => {
                             )}
                           </div>
                           <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel>E-mail</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                          <FormField control={form.control} name="password" render={({ field }) => (<FormItem><FormLabel>Senha</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                          <FormField control={form.control} name="confirmPassword" render={({ field }) => (<FormItem><FormLabel>Confirmar Senha</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          <FormField control={form.control} name="password" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Senha</FormLabel>
+                              <div className="relative">
+                                <FormControl>
+                                  <Input
+                                    type={showPassword ? "text" : "password"}
+                                    {...field}
+                                    className="pr-10"
+                                  />
+                                </FormControl>
+                                <div
+                                  className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                                  onMouseDown={() => setShowPassword(true)}
+                                  onMouseUp={() => setShowPassword(false)}
+                                  onMouseLeave={() => setShowPassword(false)}
+                                  onTouchStart={(e) => { e.preventDefault(); setShowPassword(true); }}
+                                  onTouchEnd={(e) => { e.preventDefault(); setShowPassword(false); }}
+                                >
+                                  {showPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                                </div>
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
+                          <FormField control={form.control} name="confirmPassword" render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Confirmar Senha</FormLabel>
+                              <div className="relative">
+                                <FormControl>
+                                  <Input
+                                    type={showConfirmPassword ? "text" : "password"}
+                                    {...field}
+                                    className="pr-10"
+                                  />
+                                </FormControl>
+                                <div
+                                  className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                                  onMouseDown={() => setShowConfirmPassword(true)}
+                                  onMouseUp={() => setShowConfirmPassword(false)}
+                                  onMouseLeave={() => setShowConfirmPassword(false)}
+                                  onTouchStart={(e) => { e.preventDefault(); setShowConfirmPassword(true); }}
+                                  onTouchEnd={(e) => { e.preventDefault(); setShowConfirmPassword(false); }}
+                                >
+                                  {showConfirmPassword ? <EyeOff className="h-4 w-4 text-muted-foreground" /> : <Eye className="h-4 w-4 text-muted-foreground" />}
+                                </div>
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          )} />
                         </>
                       )}
                       {step === 2 && (
