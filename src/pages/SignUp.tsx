@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -23,39 +23,52 @@ import { showError, showSuccess } from "@/utils/toast";
 import { lookupCep } from "@/utils/cepLookup";
 import { cn } from "@/lib/utils";
 
-const formSchema = z.object({
-  firstName: z.string().min(1, "O nome é obrigatório."),
-  lastName: z.string().min(1, "O sobrenome é obrigatório."),
-  email: z.string().email("E-mail inválido.").min(1, "O e-mail é obrigatório."),
-  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
-  confirmPassword: z.string().min(6, "A confirmação de senha é obrigatória."),
-  phone: z.string().min(1, "O telefone é obrigatório."),
-  cpf: z.string()
-    .min(11, "O CPF deve ter 11 dígitos.")
-    .max(14, "O CPF deve ter no máximo 14 dígitos (com formatação).")
-    .transform(val => val.replace(/\D/g, '')),
-  cep: z.string()
-    .min(8, "O CEP deve ter 8 dígitos.")
-    .max(9, "O CEP deve ter no máximo 9 dígitos (com formatação).")
-    .transform(val => val.replace(/\D/g, '')),
-  street: z.string().min(1, "A rua é obrigatória."),
-  number: z.string().min(1, "O número é obrigatório."),
-  complement: z.string().optional(),
-  neighborhood: z.string().min(1, "O bairro é obrigatório."),
-  city: z.string().min(1, "A cidade é obrigatória."),
-  state: z.string().min(2, "O estado é obrigatório.").max(2, "O estado deve ter 2 letras."),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "As senhas não coincidem.",
-  path: ["confirmPassword"],
-});
+type SignUpFormValues = z.infer<ReturnType<typeof createFormSchema>>;
 
-type SignUpFormValues = z.infer<typeof formSchema>;
+const createFormSchema = (registrationType: 'cpf' | 'cnpj' | null) => {
+  const baseSchema = z.object({
+    email: z.string().email("E-mail inválido.").min(1, "O e-mail é obrigatório."),
+    password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
+    confirmPassword: z.string().min(6, "A confirmação de senha é obrigatória."),
+    phone: z.string().min(1, "O telefone é obrigatório."),
+    cep: z.string()
+      .min(8, "O CEP deve ter 8 dígitos.")
+      .max(9, "O CEP deve ter no máximo 9 dígitos (com formatação).")
+      .transform(val => val.replace(/\D/g, '')),
+    street: z.string().min(1, "A rua é obrigatória."),
+    number: z.string().min(1, "O número é obrigatório."),
+    complement: z.string().optional(),
+    neighborhood: z.string().min(1, "O bairro é obrigatório."),
+    city: z.string().min(1, "A cidade é obrigatória."),
+    state: z.string().min(2, "O estado é obrigatório.").max(2, "O estado deve ter 2 letras."),
+  });
+
+  const registrationFields = registrationType === 'cnpj'
+    ? {
+        firstName: z.string().min(1, "A razão social é obrigatória."),
+        lastName: z.string().optional(), // Nome fantasia opcional e campo escondido
+        cpf: z.string().min(14, "O CNPJ deve ter 14 dígitos.").max(18, "O CNPJ deve ter no máximo 18 dígitos.").transform(val => val.replace(/\D/g, '')),
+      }
+    : {
+        firstName: z.string().min(1, "O nome é obrigatório."),
+        lastName: z.string().min(1, "O sobrenome é obrigatório."),
+        cpf: z.string().min(11, "O CPF deve ter 11 dígitos.").max(14, "O CPF deve ter no máximo 14 dígitos.").transform(val => val.replace(/\D/g, '')),
+      };
+
+  return baseSchema.extend(registrationFields).refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
+  });
+};
 
 const SignUp = () => {
   const navigate = useNavigate();
+  const [registrationType, setRegistrationType] = useState<'cpf' | 'cnpj' | null>(null);
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+
+  const formSchema = useMemo(() => createFormSchema(registrationType), [registrationType]);
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(formSchema),
@@ -80,7 +93,9 @@ const SignUp = () => {
   const handleNextStep = async () => {
     let fieldsToValidate: (keyof SignUpFormValues)[] = [];
     if (step === 1) {
-      fieldsToValidate = ['firstName', 'lastName', 'email', 'password', 'confirmPassword'];
+      fieldsToValidate = registrationType === 'cpf'
+        ? ['firstName', 'lastName', 'email', 'password', 'confirmPassword']
+        : ['firstName', 'email', 'password', 'confirmPassword'];
     } else if (step === 2) {
       fieldsToValidate = ['phone', 'cpf'];
     }
@@ -117,15 +132,11 @@ const SignUp = () => {
   const onSubmit = async (data: SignUpFormValues) => {
     setIsSubmitting(true);
     try {
-      const { data: authData, error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          data: {
-            first_name: data.firstName,
-            last_name: data.lastName,
+      const metadata = registrationType === 'cnpj'
+        ? {
+            company_name: data.firstName, // Razão Social
+            cnpj: data.cpf,
             phone: data.phone,
-            cpf: data.cpf,
             address_cep: data.cep,
             address_street: data.street,
             address_number: data.number,
@@ -133,7 +144,28 @@ const SignUp = () => {
             address_neighborhood: data.neighborhood,
             address_city: data.city,
             address_state: data.state,
-          },
+            registration_type: 'cnpj',
+          }
+        : {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            cpf: data.cpf,
+            phone: data.phone,
+            address_cep: data.cep,
+            address_street: data.street,
+            address_number: data.number,
+            address_complement: data.complement,
+            address_neighborhood: data.neighborhood,
+            address_city: data.city,
+            address_state: data.state,
+            registration_type: 'cpf',
+          };
+
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: metadata,
         },
       });
 
@@ -153,7 +185,7 @@ const SignUp = () => {
 
   const steps = [
     { number: 1, title: "Conta" },
-    { number: 2, title: "Detalhes Pessoais" },
+    { number: 2, title: registrationType === 'cnpj' ? "Detalhes da Empresa" : "Detalhes Pessoais" },
     { number: 3, title: "Endereço" },
   ];
 
@@ -202,83 +234,102 @@ const SignUp = () => {
       </div>
       <div className="flex items-center justify-center py-12 px-4 bg-landingPage-lp-creme-terra">
         <div className="mx-auto w-full max-w-md space-y-6">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="lg:hidden">
-              <Button variant="ghost">
-                <ArrowLeft className="h-4 w-4 mr-2" /> Voltar
-              </Button>
-            </Link>
-            <div className="w-full text-center">
-              <h1 className="text-3xl font-bold text-landingPage-lp-marrom-avela">Crie sua Conta</h1>
-              <p className="text-landingPage-lp-marrom-avela/80">Preencha os campos para começar.</p>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-center space-x-4">
-            {steps.map((s) => (
-              <div key={s.number} className="flex items-center">
-                <div
-                  className={cn(
-                    "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
-                    step === s.number ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
-                    step > s.number && "bg-green-500 text-white"
-                  )}
-                >
-                  {step > s.number ? <CheckCircle className="h-5 w-5" /> : s.number}
+          {!registrationType ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Tipo de Cadastro</CardTitle>
+                <CardDescription>Selecione como você deseja se cadastrar.</CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4">
+                <Button onClick={() => setRegistrationType('cpf')} size="lg">
+                  <UserIcon className="mr-2 h-4 w-4" /> Pessoa Física (CPF)
+                </Button>
+                <Button onClick={() => setRegistrationType('cnpj')} size="lg">
+                  <Home className="mr-2 h-4 w-4" /> Pessoa Jurídica (CNPJ)
+                </Button>
+              </CardContent>
+            </Card>
+          ) : (
+            <>
+              <div className="flex items-center justify-between">
+                <Button variant="ghost" onClick={() => setRegistrationType(null)}>
+                  <ArrowLeft className="h-4 w-4 mr-2" /> Trocar tipo
+                </Button>
+                <div className="w-full text-center">
+                  <h1 className="text-3xl font-bold text-landingPage-lp-marrom-avela">Crie sua Conta</h1>
+                  <p className="text-landingPage-lp-marrom-avela/80">Preencha os campos para começar.</p>
                 </div>
-                <p className={cn("ml-2 font-medium", step === s.number ? "text-primary" : "text-muted-foreground")}>
-                  {s.title}
-                </p>
               </div>
-            ))}
-          </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  {step === 1 && (
-                    <>
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField control={form.control} name="firstName" render={({ field }) => (<FormItem><FormLabel>Nome</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="lastName" render={({ field }) => (<FormItem><FormLabel>Sobrenome</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                      </div>
-                      <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel>E-mail</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="password" render={({ field }) => (<FormItem><FormLabel>Senha</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="confirmPassword" render={({ field }) => (<FormItem><FormLabel>Confirmar Senha</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    </>
-                  )}
-                  {step === 2 && (
-                    <>
-                      <FormField control={form.control} name="phone" render={({ field }) => (<FormItem><FormLabel>Telefone</FormLabel><FormControl><Input type="tel" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="cpf" render={({ field }) => (<FormItem><FormLabel>CPF</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                    </>
-                  )}
-                  {step === 3 && (
-                    <>
-                      <FormField control={form.control} name="cep" render={({ field }) => (<FormItem><FormLabel>CEP</FormLabel><FormControl><Input {...field} onChange={handleCepChange} /></FormControl><FormMessage /></FormItem>)} />
-                      <FormField control={form.control} name="street" render={({ field }) => (<FormItem><FormLabel>Rua</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                      <div className="grid grid-cols-3 gap-4">
-                        <FormField control={form.control} name="number" render={({ field }) => (<FormItem className="col-span-1"><FormLabel>Nº</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="complement" render={({ field }) => (<FormItem className="col-span-2"><FormLabel>Complemento</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                      </div>
-                      <FormField control={form.control} name="neighborhood" render={({ field }) => (<FormItem><FormLabel>Bairro</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField control={form.control} name="city" render={({ field }) => (<FormItem><FormLabel>Cidade</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                        <FormField control={form.control} name="state" render={({ field }) => (<FormItem><FormLabel>Estado</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
-                      </div>
-                    </>
-                  )}
-                  <div className="flex justify-between pt-4">
-                    {step > 1 && <Button type="button" variant="outline" onClick={handlePrevStep}>Anterior</Button>}
-                    <div className="flex-grow" />
-                    {step < 3 && <Button type="button" onClick={handleNextStep}>Próximo</Button>}
-                    {step === 3 && <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Cadastrando..." : "Finalizar Cadastro"}</Button>}
+              <div className="flex items-center justify-center space-x-4">
+                {steps.map((s) => (
+                  <div key={s.number} className="flex items-center">
+                    <div
+                      className={cn(
+                        "flex h-8 w-8 items-center justify-center rounded-full transition-colors",
+                        step === s.number ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground",
+                        step > s.number && "bg-green-500 text-white"
+                      )}
+                    >
+                      {step > s.number ? <CheckCircle className="h-5 w-5" /> : s.number}
+                    </div>
+                    <p className={cn("ml-2 font-medium", step === s.number ? "text-primary" : "text-muted-foreground")}>
+                      {s.title}
+                    </p>
                   </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
+                ))}
+              </div>
+
+              <Card>
+                <CardContent className="p-6">
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      {step === 1 && (
+                        <>
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="firstName" render={({ field }) => (<FormItem className={cn(registrationType === 'cnpj' && 'col-span-2')}><FormLabel>{registrationType === 'cnpj' ? 'Razão Social' : 'Nome'}</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                            {registrationType === 'cpf' && (
+                              <FormField control={form.control} name="lastName" render={({ field }) => (<FormItem><FormLabel>Sobrenome</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                            )}
+                          </div>
+                          <FormField control={form.control} name="email" render={({ field }) => (<FormItem><FormLabel>E-mail</FormLabel><FormControl><Input type="email" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          <FormField control={form.control} name="password" render={({ field }) => (<FormItem><FormLabel>Senha</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          <FormField control={form.control} name="confirmPassword" render={({ field }) => (<FormItem><FormLabel>Confirmar Senha</FormLabel><FormControl><Input type="password" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        </>
+                      )}
+                      {step === 2 && (
+                        <>
+                          <FormField control={form.control} name="phone" render={({ field }) => (<FormItem><FormLabel>Telefone</FormLabel><FormControl><Input type="tel" {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          <FormField control={form.control} name="cpf" render={({ field }) => (<FormItem><FormLabel>{registrationType === 'cnpj' ? 'CNPJ' : 'CPF'}</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                        </>
+                      )}
+                      {step === 3 && (
+                        <>
+                          <FormField control={form.control} name="cep" render={({ field }) => (<FormItem><FormLabel>CEP</FormLabel><FormControl><Input {...field} onChange={handleCepChange} /></FormControl><FormMessage /></FormItem>)} />
+                          <FormField control={form.control} name="street" render={({ field }) => (<FormItem><FormLabel>Rua</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          <div className="grid grid-cols-3 gap-4">
+                            <FormField control={form.control} name="number" render={({ field }) => (<FormItem className="col-span-1"><FormLabel>Nº</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="complement" render={({ field }) => (<FormItem className="col-span-2"><FormLabel>Complemento</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          </div>
+                          <FormField control={form.control} name="neighborhood" render={({ field }) => (<FormItem><FormLabel>Bairro</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          <div className="grid grid-cols-2 gap-4">
+                            <FormField control={form.control} name="city" render={({ field }) => (<FormItem><FormLabel>Cidade</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                            <FormField control={form.control} name="state" render={({ field }) => (<FormItem><FormLabel>Estado</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>)} />
+                          </div>
+                        </>
+                      )}
+                      <div className="flex justify-between pt-4">
+                        {step > 1 && <Button type="button" variant="outline" onClick={handlePrevStep}>Anterior</Button>}
+                        <div className="flex-grow" />
+                        {step < 3 && <Button type="button" onClick={handleNextStep}>Próximo</Button>}
+                        {step === 3 && <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Cadastrando..." : "Finalizar Cadastro"}</Button>}
+                      </div>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+            </>
+          )}
           <p className="text-center text-sm text-landingPage-lp-marrom-avela">
             Já tem uma conta?{' '}
             <Link to="/login" className="font-bold text-primary hover:underline">
