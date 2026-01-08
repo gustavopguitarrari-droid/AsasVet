@@ -55,14 +55,9 @@ const createFormSchema = (registrationType: 'cpf' | 'cnpj' | null) => {
         cpf: z.string().min(11, "O CPF deve ter 11 dígitos.").max(14, "O CPF deve ter no máximo 14 dígitos.").transform(val => val.replace(/\D/g, '')),
       };
 
-  return baseSchema.extend(registrationFields).superRefine(({ confirmPassword, password }, ctx) => {
-    if (confirmPassword !== password) {
-      ctx.addIssue({
-        code: "custom",
-        message: "As senhas não coincidem.",
-        path: ["confirmPassword"],
-      });
-    }
+  return baseSchema.extend(registrationFields).refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
   });
 };
 
@@ -72,7 +67,7 @@ const SignUp = () => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
-  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -80,7 +75,7 @@ const SignUp = () => {
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(formSchema),
-    mode: 'onChange', // Valida instantaneamente ao digitar
+    mode: 'onBlur',
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -115,25 +110,39 @@ const SignUp = () => {
       return;
     }
 
+    setIsChecking(true);
+
     if (step === 1) {
-      setIsCheckingEmail(true);
       const email = form.getValues('email');
-      
       const { data: emailExists, error } = await supabase.rpc('email_exists', { email_to_check: email });
-
-      setIsCheckingEmail(false);
-
       if (error) {
-          showError("Erro ao verificar o e-mail. Tente novamente.");
-          return;
+        showError("Erro ao verificar o e-mail. Tente novamente.");
+        setIsChecking(false);
+        return;
       }
-
       if (emailExists) {
-          form.setError('email', { type: 'manual', message: 'Este e-mail já está cadastrado.' });
-          return;
+        form.setError('email', { type: 'manual', message: 'Este e-mail já está cadastrado.' });
+        setIsChecking(false);
+        return;
+      }
+    }
+
+    if (step === 2) {
+      const documentValue = form.getValues('cpf');
+      const { data: documentExists, error } = await supabase.rpc('document_exists', { document_to_check: documentValue });
+      if (error) {
+        showError("Erro ao verificar o documento. Tente novamente.");
+        setIsChecking(false);
+        return;
+      }
+      if (documentExists) {
+        form.setError('cpf', { type: 'manual', message: 'Este documento já está cadastrado.' });
+        setIsChecking(false);
+        return;
       }
     }
     
+    setIsChecking(false);
     setStep(step + 1);
   };
 
@@ -408,7 +417,7 @@ const SignUp = () => {
                       <div className="flex justify-between pt-4">
                         {step > 1 && <Button type="button" variant="outline" onClick={handlePrevStep}>Anterior</Button>}
                         <div className="flex-grow" />
-                        {step < 3 && <Button type="button" onClick={handleNextStep} disabled={isCheckingEmail}>{isCheckingEmail ? "Verificando..." : "Próximo"}</Button>}
+                        {step < 3 && <Button type="button" onClick={handleNextStep} disabled={isChecking}>{isChecking ? "Verificando..." : "Próximo"}</Button>}
                         {step === 3 && <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Cadastrando..." : "Finalizar Cadastro"}</Button>}
                       </div>
                     </form>
