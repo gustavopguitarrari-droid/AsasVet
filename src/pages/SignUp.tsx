@@ -55,6 +55,7 @@ const SignUp = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(formSchema),
@@ -138,11 +139,10 @@ const SignUp = () => {
 
       if (error) {
         showError(`Erro no cadastro: ${error.message}`);
-      } else if (authData.user?.id) {
-        showSuccess("Cadastro realizado com sucesso! Você agora tem 7 dias de teste gratuito. Faça o login para começar.");
-        navigate('/login');
+      } else if (authData.user) {
+        setSignupSuccess(true);
       } else {
-        throw new Error("Não foi possível obter o ID do usuário após o cadastro.");
+        throw new Error("Não foi possível completar o cadastro.");
       }
     } catch (err: any) {
       showError(`Erro inesperado: ${err.message}`);
@@ -156,6 +156,35 @@ const SignUp = () => {
     { number: 2, title: "Detalhes Pessoais" },
     { number: 3, title: "Endereço" },
   ];
+
+  if (signupSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-landingPage-lp-creme-terra theme-nature-vet">
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-center text-2xl">
+              <CheckCircle className="h-8 w-8 mr-3 text-green-500" />
+              Cadastro Quase Completo!
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-lg">
+              Enviamos um link de confirmação para o seu e-mail.
+            </p>
+            <p className="text-muted-foreground">
+              Por favor, verifique sua caixa de entrada e clique no link para ativar sua conta.
+            </p>
+            <p className="font-bold text-primary">
+              Confirme o e-mail para continuar.
+            </p>
+            <Button asChild className="w-full mt-4">
+              <Link to="/login">Ir para o Login</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2 theme-nature-vet">
