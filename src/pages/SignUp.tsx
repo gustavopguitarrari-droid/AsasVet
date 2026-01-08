@@ -55,14 +55,9 @@ const createFormSchema = (registrationType: 'cpf' | 'cnpj' | null) => {
         cpf: z.string().min(11, "O CPF deve ter 11 dígitos.").max(14, "O CPF deve ter no máximo 14 dígitos.").transform(val => val.replace(/\D/g, '')),
       };
 
-  return baseSchema.extend(registrationFields).superRefine(({ confirmPassword, password }, ctx) => {
-    if (confirmPassword !== password) {
-      ctx.addIssue({
-        code: "custom",
-        message: "As senhas não coincidem.",
-        path: ["confirmPassword"],
-      });
-    }
+  return baseSchema.extend(registrationFields).refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
   });
 };
 
@@ -108,9 +103,13 @@ const SignUp = () => {
       fieldsToValidate = ['phone', 'cpf'];
     }
     
-    const isValid = await form.trigger(fieldsToValidate);
-    
-    if (isValid && step === 1) {
+    const isStepValid = await form.trigger(fieldsToValidate);
+
+    if (!isStepValid) {
+      return;
+    }
+
+    if (step === 1) {
       setIsCheckingEmail(true);
       const email = form.getValues('email');
       
@@ -127,11 +126,9 @@ const SignUp = () => {
           form.setError('email', { type: 'manual', message: 'Este e-mail já está cadastrado.' });
           return;
       }
-
-      setStep(step + 1);
-    } else if (isValid) {
-      setStep(step + 1);
     }
+    
+    setStep(step + 1);
   };
 
   const handlePrevStep = () => {
