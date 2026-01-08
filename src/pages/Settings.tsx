@@ -10,16 +10,33 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import MyPlanSettings from "@/components/settings/MyPlanSettings";
 import ClinicDetailsSettings from "@/components/settings/ClinicDetailsSettings";
 import ImportDataSettings from "@/components/settings/ImportDataSettings";
+import { useUser } from "@/context/UserContext";
+import { addDays, isAfter, parseISO, isValid } from "date-fns";
 
 const Settings = () => {
   const location = useLocation();
+  const { user: appUser } = useUser();
   const [activeTab, setActiveTab] = useState("security");
 
+  // Check for trial expiration
+  let isTrialExpired = false;
+  if (appUser) {
+    const registrationDate = parseISO(appUser.registeredTime);
+    if (isValid(registrationDate)) {
+      const expirationDate = addDays(registrationDate, 7);
+      const isTrialPlan = appUser.planName === 'Plano Básico' || appUser.planName === 'Vet Domiciliar';
+      isTrialExpired = isTrialPlan && isAfter(new Date(), expirationDate);
+    }
+  }
+
   useEffect(() => {
-    if (location.state && (location.state as any).activeTab) {
+    if (isTrialExpired) {
+      // If trial is expired, force 'my-plan' tab
+      setActiveTab('my-plan');
+    } else if (location.state && (location.state as any).activeTab) {
       setActiveTab((location.state as any).activeTab);
     }
-  }, [location.state]);
+  }, [location.state, isTrialExpired]);
 
   return (
     <div className="space-y-6 w-full p-4">
@@ -28,9 +45,9 @@ const Settings = () => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 h-auto p-1">
-          <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Geral</TabsTrigger>
+          <TabsTrigger value="security" disabled={isTrialExpired} className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Geral</TabsTrigger>
           <TabsTrigger value="my-plan" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Meu Plano</TabsTrigger>
-          <TabsTrigger value="personalization" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Personalização</TabsTrigger>
+          <TabsTrigger value="personalization" disabled={isTrialExpired} className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Personalização</TabsTrigger>
         </TabsList>
 
         <TabsContent value="security" className="mt-4 space-y-6">
