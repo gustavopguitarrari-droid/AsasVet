@@ -13,6 +13,7 @@ import { useColorTheme } from "@/context/ColorThemeContext";
 import { cn } from "@/lib/utils";
 
 const colorThemes = [
+  { name: "Padrão", value: "default", colorClass: "bg-blue-950" },
   { name: "Nature Vet", value: "nature-vet", colorClass: "bg-landingPage-lp-verde-folha-seca" },
   { name: "Pastel Blue", value: "pastel-blue", colorClass: "bg-sky-300" }, // Cor de preview ajustada
   { name: "Sweet Lilac", value: "sweet-lilac", colorClass: "bg-purple-300" }, // NOVO: Tema Sweet Lilac

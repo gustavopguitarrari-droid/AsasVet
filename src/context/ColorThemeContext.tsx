@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { showError, showSuccess } from '@/utils/toast';
 
-type ColorTheme = 'nature-vet' | 'pastel-blue' | 'sweet-lilac';
+type ColorTheme = 'default' | 'nature-vet' | 'pastel-blue' | 'sweet-lilac';
 
 interface ColorThemeContextType {
   colorTheme: ColorTheme;
@@ -19,7 +19,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
   const { user, setUser } = useUser();
   const queryClient = useQueryClient();
 
-  const [colorTheme, setInternalColorTheme] = useState<ColorTheme>('nature-vet');
+  const [colorTheme, setInternalColorTheme] = useState<ColorTheme>('default');
 
   // This effect syncs the theme from the user's profile when it becomes available.
   // It only runs if the user's theme is different from the current state to avoid loops.
@@ -39,8 +39,10 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
         root.classList.remove(cls);
       }
     });
-    // Add the new theme class
-    root.classList.add(`theme-${colorTheme}`);
+    // Only add a class if it's NOT the default theme
+    if (colorTheme !== 'default') {
+      root.classList.add(`theme-${colorTheme}`);
+    }
   }, [colorTheme]);
 
   const updateColorThemeMutation = useMutation({
