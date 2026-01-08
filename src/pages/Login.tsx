@@ -132,7 +132,7 @@ const Login = () => {
               <span className="typing-cursor"></span>
             </h1>
             <p className="text-lg text-white/80">
-              A gestão da sua clínica veterinária te espera.
+              A gestão que te dá Asas te espera!
             </p>
         </div>
       </div>
