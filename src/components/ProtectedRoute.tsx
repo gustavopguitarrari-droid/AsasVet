@@ -5,7 +5,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useSession } from '@/context/SessionContext';
 import { useUser } from '@/context/UserContext';
 import Layout from './layout/Layout';
-import { differenceInDays, parseISO, isValid } from 'date-fns';
+import { addDays, isAfter, parseISO, isValid } from 'date-fns';
 import TrialEndedBlocker from './TrialEndedBlocker'; // Importar o novo componente
 
 interface ProtectedRouteProps {
@@ -45,9 +45,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   // Lógica de verificação do período de teste
   const registrationDate = parseISO(appUser.registeredTime);
   if (isValid(registrationDate)) {
-    const daysSinceRegistration = differenceInDays(new Date(), registrationDate);
+    const expirationDate = addDays(registrationDate, 7);
     const isTrialPlan = appUser.planName === 'Plano Básico' || appUser.planName === 'Vet Domiciliar';
-    const isTrialExpired = daysSinceRegistration > 7;
+    const isTrialExpired = isAfter(new Date(), expirationDate);
 
     if (isTrialPlan && isTrialExpired) {
       console.log('ProtectedRoute: Trial expired, showing blocker.');

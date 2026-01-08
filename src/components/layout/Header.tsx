@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useIsMobile } from "@/hooks/use-mobile";
 import { SheetTrigger } from "@/components/ui/sheet";
 import { useUser } from "@/context/UserContext";
-import { addDays, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, isAfter, parseISO } from "date-fns";
+import { addDays, differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds, isAfter, parseISO, isValid } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 
 interface HeaderProps {
@@ -72,7 +72,12 @@ const Header: React.FC<HeaderProps> = ({ onCashierClick, onMenuClick }) => {
 
   const isTrialPlan = user?.planName === 'Plano Básico' || user?.planName === 'Vet Domiciliar';
   const registrationDate = user?.registeredTime ? parseISO(user.registeredTime) : null;
-  const isTrialActive = isTrialPlan && registrationDate && differenceInDays(new Date(), registrationDate) <= 7;
+  
+  let isTrialActive = false;
+  if (isTrialPlan && registrationDate && isValid(registrationDate)) {
+      const expirationDate = addDays(registrationDate, 7);
+      isTrialActive = !isAfter(new Date(), expirationDate);
+  }
 
   const getTitle = () => {
     if (pageTitle) {
