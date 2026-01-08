@@ -270,7 +270,7 @@ const SignUp = () => {
     <div className="min-h-screen w-full lg:grid lg:grid-cols-2 theme-nature-vet">
       <div className="hidden lg:flex relative flex-col items-center justify-end p-10 pb-20 text-white">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/signup-background.png')" }} />
-        <div className="absolute inset-0 bg-black/60" />
+        <div className="absolute inset-0 bg-black/40" />
         
         <Link to="/" className="absolute top-8 left-8 flex items-center text-white z-10">
             <PawPrint className="h-8 w-8 mr-2" />
