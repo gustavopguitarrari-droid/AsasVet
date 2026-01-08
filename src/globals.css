@@ -664,3 +664,14 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Keyframes for typing cursor animation */
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: hsl(var(--foreground)); }
+}
+
+.typing-cursor {
+  border-right: .15em solid hsl(var(--foreground));
+  animation: blink-caret .75s step-end infinite;
+}
