@@ -51,6 +51,9 @@ const LandingPage: React.FC = () => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
   const textToType = "Muito mais que Simples. Aqui você ganha ASAS!";
+  const typingSpeed = 100;
+  const deletingSpeed = 50;
+  const pauseDelay = 1500; // 1.5 segundos de pausa
 
   useEffect(() => {
     const handleTyping = () => {
@@ -69,7 +72,14 @@ const LandingPage: React.FC = () => {
       }
     };
 
-    const typingTimeout = setTimeout(handleTyping, isDeleting ? 50 : 100);
+    let delay = isDeleting ? deletingSpeed : typingSpeed;
+
+    // Adiciona a pausa após a primeira frase
+    if (!isDeleting && typedText === "Muito mais que Simples.") {
+      delay = pauseDelay;
+    }
+
+    const typingTimeout = setTimeout(handleTyping, delay);
 
     return () => clearTimeout(typingTimeout);
   }, [typedText, isDeleting, loopNum]);
