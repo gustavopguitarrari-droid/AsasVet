@@ -1,22 +1,32 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import MyPlanSettings from "@/components/settings/MyPlanSettings";
-import ClinicDetailsSettings from "@/components/settings/ClinicDetailsSettings"; // Importar o componente renomeado
+import ClinicDetailsSettings from "@/components/settings/ClinicDetailsSettings";
 import ImportDataSettings from "@/components/settings/ImportDataSettings";
 
 const Settings = () => {
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState("security");
+
+  useEffect(() => {
+    if (location.state && (location.state as any).activeTab) {
+      setActiveTab((location.state as any).activeTab);
+    }
+  }, [location.state]);
+
   return (
-    <div className="space-y-6 w-full p-4"> {/* Alterado de max-w-full mx-auto para w-full p-4 */}
+    <div className="space-y-6 w-full p-4">
       <h2 className="text-3xl font-bold">Configurações</h2>
       <p className="text-muted-foreground">Gerencie as preferências da sua conta e do aplicativo.</p>
 
-      <Tabs defaultValue="security" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-3 h-auto p-1">
           <TabsTrigger value="security" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Geral</TabsTrigger>
           <TabsTrigger value="my-plan" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-lg py-2 font-bold">Meu Plano</TabsTrigger>
@@ -53,7 +63,6 @@ const Settings = () => {
               <Separator />
               <div className="flex items-center justify-between">
                 <Label htmlFor="session-management">Gerenciamento de Sessões</Label>
-                {/* Placeholder para um botão ou link para gerenciar sessões */}
                 <span className="text-sm text-muted-foreground">Em breve</span>
               </div>
             </CardContent>
@@ -67,7 +76,7 @@ const Settings = () => {
         </TabsContent>
 
         <TabsContent value="personalization" className="mt-4">
-          <ClinicDetailsSettings /> {/* Usar o componente renomeado */}
+          <ClinicDetailsSettings />
         </TabsContent>
       </Tabs>
     </div>

@@ -5,6 +5,8 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useSession } from '@/context/SessionContext';
 import { useUser } from '@/context/UserContext';
 import Layout from './layout/Layout';
+import { differenceInDays, parseISO, isValid } from 'date-fns';
+import TrialEndedBlocker from './TrialEndedBlocker'; // Importar o novo componente
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -17,7 +19,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   console.log('ProtectedRoute: Rendering. isLoading:', isLoading, 'session:', !!session, 'appUser:', !!appUser, 'path:', location.pathname);
 
-  // Se a sessão ainda está sendo carregada, exibe um indicador de carregamento
   if (isLoading) {
     console.log('ProtectedRoute: Displaying "Carregando sistema..."');
     return (
@@ -27,14 +28,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  // Se não há sessão (usuário não autenticado), redireciona para o login
   if (!session) {
     console.log('ProtectedRoute: No session found, redirecting to /login.');
     return <Navigate to="/login" replace />;
   }
 
-  // Se appUser ainda é null/undefined após o carregamento (ex: falha silenciosa na busca do perfil)
-  // Isso serve como uma salvaguarda adicional.
   if (!appUser) {
       console.log('ProtectedRoute: Session exists but appUser is null, displaying "Preparando perfil do usuário..."');
       return (
@@ -44,8 +42,19 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
       );
   }
 
-  // Se autenticado, renderiza o layout e o conteúdo da rota.
-  // As restrições de acesso a páginas específicas por cargo foram removidas aqui.
+  // Lógica de verificação do período de teste
+  const registrationDate = parseISO(appUser.registeredTime);
+  if (isValid(registrationDate)) {
+    const daysSinceRegistration = differenceInDays(new Date(), registrationDate);
+    const isTrialPlan = appUser.planName === 'Plano Básico' || appUser.planName === 'Vet Domiciliar';
+    const isTrialExpired = daysSinceRegistration > 7;
+
+    if (isTrialPlan && isTrialExpired) {
+      console.log('ProtectedRoute: Trial expired, showing blocker.');
+      return <TrialEndedBlocker />;
+    }
+  }
+
   return <Layout>{children}</Layout>;
 };
 
