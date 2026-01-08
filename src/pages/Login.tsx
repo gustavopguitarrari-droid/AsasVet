@@ -39,7 +39,7 @@ const Login = () => {
   const [typedText, setTypedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
-  const textToType = "Bem-vindo de volta!";
+  const textToType = "BEM-VINDO.";
 
   useEffect(() => {
     const handleTyping = () => {
