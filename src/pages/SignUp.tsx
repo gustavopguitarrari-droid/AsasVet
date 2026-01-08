@@ -55,14 +55,9 @@ const createFormSchema = (registrationType: 'cpf' | 'cnpj' | null) => {
         cpf: z.string().min(11, "O CPF deve ter 11 dígitos.").max(14, "O CPF deve ter no máximo 14 dígitos.").transform(val => val.replace(/\D/g, '')),
       };
 
-  return baseSchema.extend(registrationFields).superRefine(({ confirmPassword, password }, ctx) => {
-    if (confirmPassword !== password) {
-      ctx.addIssue({
-        code: "custom",
-        message: "As senhas não coincidem.",
-        path: ["confirmPassword"],
-      });
-    }
+  return baseSchema.extend(registrationFields).refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
   });
 };
 
@@ -80,7 +75,7 @@ const SignUp = () => {
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(formSchema),
-    mode: 'onBlur', // Valida quando o campo perde o foco
+    mode: 'onTouched', // Valida no primeiro blur, e depois em cada change
     defaultValues: {
       firstName: "",
       lastName: "",
