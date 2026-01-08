@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -47,6 +47,33 @@ const availablePlans: Plan[] = [
 ];
 
 const LandingPage: React.FC = () => {
+  const [typedText, setTypedText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [loopNum, setLoopNum] = useState(0);
+  const textToType = "Muito mais que Simples. Aqui você ganha ASAS!";
+
+  useEffect(() => {
+    const handleTyping = () => {
+      const currentText = isDeleting
+        ? textToType.substring(0, typedText.length - 1)
+        : textToType.substring(0, typedText.length + 1);
+
+      setTypedText(currentText);
+
+      if (!isDeleting && currentText === textToType) {
+        // Pausa no final antes de apagar
+        setTimeout(() => setIsDeleting(true), 3000);
+      } else if (isDeleting && currentText === '') {
+        setIsDeleting(false);
+        setLoopNum(loopNum + 1);
+      }
+    };
+
+    const typingTimeout = setTimeout(handleTyping, isDeleting ? 50 : 100);
+
+    return () => clearTimeout(typingTimeout);
+  }, [typedText, isDeleting, loopNum]);
+
   return (
     <div className="min-h-screen bg-landingPage-lp-creme-terra text-landingPage-lp-marrom-avela theme-nature-vet">
       <LandingHeader />
@@ -58,8 +85,9 @@ const LandingPage: React.FC = () => {
         </div>
         
         <div className="relative z-10 max-w-4xl mx-auto space-y-8">
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-landingPage-lp-creme-terra drop-shadow-lg animate-fade-in-down">
-            A Gestão da Sua Clínica Veterinária, Simplificada.
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight text-landingPage-lp-creme-terra drop-shadow-lg h-48 md:h-56">
+            {typedText}
+            <span className="typing-cursor"></span>
           </h1>
           <p className="text-lg md:text-2xl max-w-3xl mx-auto text-landingPage-lp-creme-terra/90 animate-fade-in-up">
             Organize consultas, prontuários e finanças em um só lugar. Mais tempo para o que realmente importa: cuidar dos animais.
