@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -70,6 +70,33 @@ const SignUp = () => {
   const [isChecking, setIsChecking] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [typedText, setTypedText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [loopNum, setLoopNum] = useState(0);
+  const textToType = "Bem-vindo ao AsasVet";
+
+  useEffect(() => {
+    const handleTyping = () => {
+      const currentText = isDeleting
+        ? textToType.substring(0, typedText.length - 1)
+        : textToType.substring(0, typedText.length + 1);
+
+      setTypedText(currentText);
+
+      if (!isDeleting && currentText === textToType) {
+        // Pause at the end before deleting
+        setTimeout(() => setIsDeleting(true), 2000);
+      } else if (isDeleting && currentText === '') {
+        setIsDeleting(false);
+        setLoopNum(loopNum + 1);
+      }
+    };
+
+    const typingTimeout = setTimeout(handleTyping, isDeleting ? 75 : 150);
+
+    return () => clearTimeout(typingTimeout);
+  }, [typedText, isDeleting, loopNum]);
 
   const formSchema = useMemo(() => createFormSchema(registrationType), [registrationType]);
 
@@ -438,7 +465,10 @@ const SignUp = () => {
             <span className="text-2xl font-bold">AsasVet</span>
         </Link>
         <div className="text-center space-y-4 relative z-10">
-            <h1 className="text-4xl font-bold">Bem-vindo ao AsasVet</h1>
+            <h1 className="text-4xl font-bold h-12">
+              {typedText}
+              <span className="typing-cursor"></span>
+            </h1>
             <p className="text-lg text-white/80">
             A plataforma completa para dar asas à gestão da sua clínica veterinária.
             </p>
