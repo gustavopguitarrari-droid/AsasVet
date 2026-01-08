@@ -106,6 +106,13 @@ const Login = () => {
       </div>
       <div className="flex items-center justify-center py-12 px-4 bg-landingPage-lp-creme-terra">
         <div className="mx-auto w-full max-w-md space-y-6">
+          <div className="flex">
+            <Button asChild variant="ghost">
+              <Link to="/">
+                <ArrowLeft className="mr-2 h-4 w-4" /> Voltar para o Início
+              </Link>
+            </Button>
+          </div>
           <div className="w-full text-center">
             <h1 className="text-3xl font-bold text-landingPage-lp-marrom-avela">
               {view === 'sign_in' ? 'Acesse seu Painel' : 'Recuperar Senha'}
