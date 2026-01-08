@@ -62,6 +62,8 @@ const Login = () => {
     if (error) {
       if (error.message === 'Invalid login credentials') {
         setFormError('Email ou senha inválidos.');
+      } else if (error.message === 'Email not confirmed') {
+        setFormError('E-mail não confirmado. Por favor, verifique sua caixa de entrada.');
       } else {
         setFormError(error.message);
       }
