@@ -22,7 +22,7 @@ const LandingHeader: React.FC = () => {
         <Link to="/login" className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "text-landingPage-lp-marrom-avela hover:text-landingPage-lp-verde-folha-seca transition-colors text-base font-medium")}>
           Login
         </Link>
-        <Link to="/signup" className={cn(buttonVariants({ variant: "default", size: "sm" }), "bg-landingPage-lp-verde-folha-seca hover:bg-landingPage-lp-verde-folha-seca/90 text-white text-base font-medium")}>
+        <Link to="/signup" className={cn(buttonVariants({ variant: "default", size: "sm" }), "bg-primary hover:bg-primary/90 text-primary-foreground text-base font-medium")}>
           Experimente Grátis
         </Link>
       </div>
