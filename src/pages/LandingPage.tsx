@@ -19,7 +19,7 @@ const LandingPage: React.FC = () => {
         </div>
         
         <div className="relative z-10 max-w-2xl space-y-6">
-          <h1 className="text-4xl md:text-6xl font-mono font-extrabold leading-tight text-landingPage-lp-creme-terra drop-shadow-lg animate-fade-in-down">
+          <h1 className="text-4xl md:text-6xl font-mono font-extrabold leading-tight text-green-900 drop-shadow-lg animate-fade-in-down">
             A gestão da sua clínica veterinária, simplificada.
           </h1>
           <p className="text-lg md:text-xl text-landingPage-lp-creme-terra/90 animate-fade-in-up">
