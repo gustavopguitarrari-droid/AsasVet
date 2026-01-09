@@ -318,7 +318,7 @@ const SignUp = () => {
             </p>
         </div>
       </div>
-      <div className="flex justify-center py-12 px-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center border-l-8 border-landingPage-lp-verde-folha-seca">
+      <div className="flex justify-center py-12 px-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center">
         <div className="mx-auto w-full max-w-md space-y-4">
           <div className="flex">
             <Button asChild variant="ghost">
