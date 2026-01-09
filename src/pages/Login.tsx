@@ -200,6 +200,12 @@ const Login = () => {
                     <Button variant="link" size="sm" className="w-full !mt-1" type="button" onClick={() => setView('forgotten_password')}>
                       Esqueceu sua senha?
                     </Button>
+                    <p className="text-center text-sm text-landingPage-lp-marrom-avela !mt-4">
+                      Não tem uma conta?{' '}
+                      <Link to="/signup" className="font-bold text-primary hover:underline">
+                        Cadastre-se
+                      </Link>
+                    </p>
                   </form>
                 </Form>
               ) : (
@@ -223,12 +229,6 @@ const Login = () => {
               )}
             </CardContent>
           </Card>
-          <p className="text-center text-sm text-landingPage-lp-marrom-avela">
-            Não tem uma conta?{' '}
-            <Link to="/signup" className="font-bold text-primary hover:underline">
-              Cadastre-se
-            </Link>
-          </p>
         </div>
       </div>
     </div>
