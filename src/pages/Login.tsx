@@ -149,9 +149,11 @@ const Login = () => {
             <h1 className="text-3xl font-bold text-landingPage-lp-marrom-avela">
               {view === 'sign_in' ? 'Acesse seu Painel' : 'Recuperar Senha'}
             </h1>
-            <p className="text-landingPage-lp-marrom-avela/80">
-              {view === 'sign_in' ? 'Insira suas credenciais para continuar.' : 'Insira seu e-mail para receber as instruções.'}
-            </p>
+            {view !== 'sign_in' && (
+              <p className="text-landingPage-lp-marrom-avela/80">
+                Insira seu e-mail para receber as instruções.
+              </p>
+            )}
           </div>
           <Card>
             <CardContent className="p-6">
