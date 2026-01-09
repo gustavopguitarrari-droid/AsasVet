@@ -117,8 +117,26 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen w-full lg:grid lg:grid-cols-5 theme-nature-vet">
-      <div className="flex items-center justify-center py-12 px-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center lg:col-span-2">
+    <div className="min-h-screen w-full lg:grid lg:grid-cols-2 theme-nature-vet">
+      <div className="hidden lg:flex relative flex-col items-center justify-end p-10 pb-20 text-white border-r-8 border-landingPage-lp-verde-folha-seca">
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/signup-background.png')" }} />
+        <div className="absolute inset-0 bg-black/40" />
+        
+        <Link to="/" className="absolute top-8 left-8 flex items-center text-white z-10">
+            <PawPrint className="h-8 w-8 mr-2" />
+            <span className="text-2xl font-bold">AsasVet</span>
+        </Link>
+        <div className="text-center space-y-4 relative z-10">
+            <h1 className="text-4xl font-bold h-12">
+              {typedText}
+              <span className="typing-cursor"></span>
+            </h1>
+            <p className="text-lg text-white/80">
+              A gestão que te dá Asas te espera!
+            </p>
+        </div>
+      </div>
+      <div className="flex items-center justify-center py-12 px-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center">
         <div className="mx-auto w-full max-w-md space-y-6">
           <div className="flex">
             <Button asChild variant="ghost">
@@ -209,24 +227,6 @@ const Login = () => {
               Cadastre-se
             </Link>
           </p>
-        </div>
-      </div>
-      <div className="hidden lg:flex relative flex-col items-center justify-end p-10 pb-20 text-white border-l-8 border-landingPage-lp-verde-folha-seca lg:col-span-3">
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/signup-background.png')" }} />
-        <div className="absolute inset-0 bg-black/40" />
-        
-        <Link to="/" className="absolute top-8 left-8 flex items-center text-white z-10">
-            <PawPrint className="h-8 w-8 mr-2" />
-            <span className="text-2xl font-bold">AsasVet</span>
-        </Link>
-        <div className="text-center space-y-4 relative z-10">
-            <h1 className="text-4xl font-bold h-12">
-              {typedText}
-              <span className="typing-cursor"></span>
-            </h1>
-            <p className="text-lg text-white/80">
-              A gestão que te dá Asas te espera!
-            </p>
         </div>
       </div>
     </div>
