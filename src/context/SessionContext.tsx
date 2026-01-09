@@ -1,10 +1,10 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useUser, User } from './UserContext';
-import { useQuery } from '@tanstack/react-query'; // Import useQuery
+import { useQuery, useQueryClient } from '@tanstack/react-query'; // Import useQueryClient
 
 // Updated UserProfile to match the extended User interface in UserContext
 interface UserProfile extends User {}
@@ -24,6 +24,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
   const [isLoadingSession, setIsLoadingSession] = useState(true); // Loading state for initial session fetch
   const [isAwaitingPasswordReset, setIsAwaitingPasswordReset] = useState(false); // NOVO: Estado para rastrear a recuperação
   const { setUser: setAppUser } = useUser();
+  const queryClient = useQueryClient(); // Obter o queryClient
 
   // Use useQuery to fetch the user profile via an Edge Function to bypass CORS issues
   const { data: profileData, isLoading: isLoadingProfile, error: profileError } = useQuery<UserProfile | null>({
@@ -99,6 +100,12 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       console.log('SessionContext: [AUTH_STATE_CHANGE] Event:', event, 'Session present:', !!currentSession, 'isMounted:', isMounted);
       if (!isMounted) return;
 
+      if (event === 'SIGNED_OUT') {
+        setAppUser(null); // Limpa o perfil do usuário no contexto da aplicação
+        queryClient.clear(); // Limpa todo o cache de dados do react-query
+        console.log('SessionContext: [SIGNED_OUT] App user and query cache cleared.');
+      }
+
       setSession(currentSession);
       const user = currentSession?.user || null;
       setSupabaseUserState(user);
@@ -123,7 +130,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       authListener.subscription.unsubscribe();
       console.log('SessionContext: [CLEANUP] Auth listener unsubscribed, component unmounted.');
     };
-  }, []);
+  }, [queryClient, setAppUser]);
 
   useEffect(() => {
     console.log('SessionContext: [PROFILE_DATA_CHANGE] profileData:', profileData, 'isLoadingProfile:', isLoadingProfile, 'profileError:', profileError);
