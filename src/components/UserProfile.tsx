@@ -13,27 +13,41 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { User as UserIcon, LogOut, Settings, UserCircle } from "lucide-react";
 import { useUser } from "@/context/UserContext";
-import { useNavigate } from "react-router-dom"; // Removed Link import
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { showError, showSuccess } from "@/utils/toast";
 
 const UserProfile = () => {
-  const { user: appUser, setUser } = useUser(); // Obter o usuário com o cargo do UserContext
+  const { user: appUser, setUser } = useUser();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
+
     if (error) {
       console.error("Erro ao deslogar:", error.message);
-      // Opcional: mostrar um toast de erro
+      if (error.message.includes("Auth session missing!")) {
+        // A sessão já foi perdida. O usuário está efetivamente deslogado.
+        // Apenas precisamos atualizar o estado da UI para refletir isso.
+        console.warn("Tentativa de logout com sessão ausente. Forçando atualização da UI.");
+        setUser(null); // Limpa o usuário do UserContext
+        queryClient.clear(); // Limpa o cache do react-query
+        navigate('/login', { replace: true }); // Navega para o login
+        showSuccess("Você foi desconectado.");
+      } else {
+        showError(`Erro ao deslogar: ${error.message}`);
+      }
     } else {
-      console.log("Usuário deslogado!");
-      // O SessionContext já lida com setUser(null) e o redirecionamento para /login
+      // Em caso de sucesso, o listener onAuthStateChange no SessionContext cuidará de tudo.
+      showSuccess("Você foi desconectado com sucesso.");
     }
   };
 
-  if (!appUser) { // Usar appUser aqui
+  if (!appUser) {
     return (
-      <Button variant="ghost" onClick={() => navigate("/login")} className="rounded-lg"> {/* Adicionado rounded-lg */}
+      <Button variant="ghost" onClick={() => navigate("/login")} className="rounded-lg">
         Login
       </Button>
     );
@@ -59,7 +73,7 @@ const UserProfile = () => {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 rounded-lg shadow-md" align="end"> {/* Adicionado rounded-lg e shadow-md */}
+      <DropdownMenuContent className="w-56 rounded-lg shadow-md" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{appUser.name}</p>
@@ -86,7 +100,7 @@ const UserProfile = () => {
           </DropdownMenuItem>
         )}
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className="flex items-center rounded-md"> {/* Adicionado rounded-md */}
+        <DropdownMenuItem onClick={handleLogout} className="flex items-center rounded-md">
           <LogOut className="mr-2 h-4 w-4" />
           Sair
         </DropdownMenuItem>
