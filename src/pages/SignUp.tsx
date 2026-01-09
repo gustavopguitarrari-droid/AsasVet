@@ -174,7 +174,12 @@ const SignUp = () => {
   };
 
   const handlePrevStep = () => {
-    setStep(step - 1);
+    if (step > 1) {
+      setStep(step - 1);
+    } else {
+      setRegistrationType(null);
+      form.reset();
+    }
   };
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -452,7 +457,7 @@ const SignUp = () => {
                         </>
                       )}
                       <div className="flex justify-between pt-4">
-                        {step > 1 && <Button type="button" variant="outline" onClick={handlePrevStep}>Anterior</Button>}
+                        <Button type="button" variant="outline" onClick={handlePrevStep}>Anterior</Button>
                         <div className="flex-grow" />
                         {step < 3 && <Button type="button" onClick={handleNextStep} disabled={isChecking}>{isChecking ? "Verificando..." : "Próximo"}</Button>}
                         {step === 3 && <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Cadastrando..." : "Finalizar Cadastro"}</Button>}
