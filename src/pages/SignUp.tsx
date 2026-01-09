@@ -313,8 +313,8 @@ const SignUp = () => {
               {typedText}
               <span className="typing-cursor"></span>
             </h1>
-            <p className="text-lg text-white/80">
-            A plataforma completa para dar asas à gestão da sua clínica veterinária.
+            <p className="text-lg text-white/80 animate-fade-in-up">
+              Vamos começar o seu cadastro?
             </p>
         </div>
       </div>
