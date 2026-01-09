@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Lock, Eye, EyeOff, PawPrint, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useSession } from '@/context/SessionContext';
 
 const resetPasswordSchema = z.object({
   password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres."),
@@ -29,27 +30,14 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isRecoveryTokenValid, setIsRecoveryTokenValid] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  
+  // NOVO: Usa o contexto da sessão para verificar o estado de recuperação
+  const { isLoading: isSessionLoading, isAwaitingPasswordReset } = useSession();
 
   const form = useForm<ResetPasswordSchema>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: { password: "", confirmPassword: "" },
   });
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setIsRecoveryTokenValid(true);
-        showSuccess("Você pode definir sua nova senha agora.");
-      }
-      setIsLoading(false);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
 
   const handleResetPassword = async (values: ResetPasswordSchema) => {
     setIsSubmitting(true);
@@ -69,7 +57,7 @@ const ResetPassword = () => {
     setIsSubmitting(false);
   };
 
-  if (isLoading) {
+  if (isSessionLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center p-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center theme-nature-vet">
         <p>Verificando link de recuperação...</p>
@@ -77,7 +65,7 @@ const ResetPassword = () => {
     );
   }
 
-  if (!isRecoveryTokenValid) {
+  if (!isAwaitingPasswordReset) {
     return (
       <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center theme-nature-vet">
         <Card className="w-full max-w-md text-center">

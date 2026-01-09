@@ -13,6 +13,7 @@ interface SessionContextType {
   session: Session | null;
   user: SupabaseUser | null;
   isLoading: boolean;
+  isAwaitingPasswordReset: boolean; // NOVO: Adicionado para rastrear o estado de recuperação
 }
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
@@ -21,6 +22,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
   const [session, setSession] = useState<Session | null>(null);
   const [supabaseUser, setSupabaseUserState] = useState<SupabaseUser | null>(null); // Renamed to avoid conflict with appUser
   const [isLoadingSession, setIsLoadingSession] = useState(true); // Loading state for initial session fetch
+  const [isAwaitingPasswordReset, setIsAwaitingPasswordReset] = useState(false); // NOVO: Estado para rastrear a recuperação
   const { setUser: setAppUser } = useUser();
 
   // Use useQuery to fetch the user profile via an Edge Function to bypass CORS issues
@@ -98,7 +100,14 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       if (!isMounted) return;
 
       setSession(currentSession);
-      setSupabaseUserState(currentSession?.user || null);
+      const user = currentSession?.user || null;
+      setSupabaseUserState(user);
+
+      // NOVO: Verifica se o usuário está em um fluxo de recuperação de senha
+      const amr = user?.amr;
+      const isRecovery = amr?.some(entry => entry.method === 'recovery') ?? false;
+      setIsAwaitingPasswordReset(isRecovery);
+      console.log('SessionContext: AMR check. Is recovery flow?', isRecovery);
 
       if (isMounted) {
         setIsLoadingSession(false);
@@ -131,7 +140,7 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
   console.log('SessionContext: Render. Current isLoading:', isLoading, 'Session:', !!session, 'SupabaseUser:', !!supabaseUser, 'AppUser (profileData):', !!profileData);
 
   return (
-    <SessionContext.Provider value={{ session, user: supabaseUser, isLoading }}>
+    <SessionContext.Provider value={{ session, user: supabaseUser, isLoading, isAwaitingPasswordReset }}>
       {children}
     </SessionContext.Provider>
   );

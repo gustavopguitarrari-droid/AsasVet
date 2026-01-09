@@ -13,7 +13,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { session, isLoading } = useSession();
+  const { session, isLoading, isAwaitingPasswordReset } = useSession();
   const { user: appUser } = useUser();
   const location = useLocation();
 
@@ -31,6 +31,12 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   if (!session) {
     console.log('ProtectedRoute: No session found, redirecting to /login.');
     return <Navigate to="/login" replace />;
+  }
+
+  // NOVO: Se o usuário estiver em um fluxo de recuperação de senha, force-o para a página de redefinição.
+  if (isAwaitingPasswordReset) {
+    console.log('ProtectedRoute: User is in password recovery state. Redirecting to /reset-password.');
+    return <Navigate to="/reset-password" replace />;
   }
 
   if (!appUser) {
