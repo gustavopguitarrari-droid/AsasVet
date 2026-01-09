@@ -9,7 +9,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Lock, Eye, EyeOff, PawPrint, ArrowLeft } from 'lucide-react';
+import { Lock, Eye, EyeOff, PawPrint, ArrowLeft, AlertTriangle } from 'lucide-react';
 import { showError, showSuccess } from '@/utils/toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
@@ -29,6 +29,8 @@ const ResetPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isRecoveryTokenValid, setIsRecoveryTokenValid] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const form = useForm<ResetPasswordSchema>({
     resolver: zodResolver(resetPasswordSchema),
@@ -38,8 +40,10 @@ const ResetPassword = () => {
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
+        setIsRecoveryTokenValid(true);
         showSuccess("Você pode definir sua nova senha agora.");
       }
+      setIsLoading(false);
     });
 
     return () => {
@@ -64,6 +68,37 @@ const ResetPassword = () => {
     }
     setIsSubmitting(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center theme-nature-vet">
+        <p>Verificando link de recuperação...</p>
+      </div>
+    );
+  }
+
+  if (!isRecoveryTokenValid) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center theme-nature-vet">
+        <Card className="w-full max-w-md text-center">
+          <CardHeader>
+            <CardTitle className="flex items-center justify-center text-2xl">
+              <AlertTriangle className="h-8 w-8 mr-3 text-destructive" />
+              Link Inválido
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground">
+              Este link de redefinição de senha é inválido ou já expirou.
+            </p>
+            <Button asChild className="w-full mt-4">
+              <Link to="/login">Voltar para o Login</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center p-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center theme-nature-vet">
