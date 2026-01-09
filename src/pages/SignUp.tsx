@@ -370,9 +370,9 @@ const SignUp = () => {
               </div>
 
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4">
                   <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
                       {step === 1 && (
                         <>
                           <div className="grid grid-cols-2 gap-4">
