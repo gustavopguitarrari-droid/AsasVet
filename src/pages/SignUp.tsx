@@ -294,8 +294,8 @@ const SignUp = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col theme-nature-vet">
-      <div className="relative flex flex-col items-center justify-center p-8 text-white flex-shrink-0 lg:h-[40vh]">
+    <div className="min-h-screen w-full lg:grid lg:grid-cols-2 theme-nature-vet">
+      <div className="hidden lg:flex relative flex-col items-center justify-end p-10 pb-20 text-white">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/signup-background-new.png')" }} />
         <div className="absolute inset-0 bg-black/40" />
         
@@ -313,7 +313,7 @@ const SignUp = () => {
             </p>
         </div>
       </div>
-      <div className="flex-1 flex items-center justify-center py-12 px-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center border-t-8 border-landingPage-lp-verde-folha-seca overflow-y-auto">
+      <div className="flex items-center justify-center py-12 px-4 bg-[url('/images/login-right-bg.png')] bg-cover bg-center border-l-8 border-landingPage-lp-verde-folha-seca">
         <div className="mx-auto w-full max-w-md space-y-6">
           <div className="flex">
             <Button asChild variant="ghost">
