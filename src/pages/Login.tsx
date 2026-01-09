@@ -145,18 +145,18 @@ const Login = () => {
               </Link>
             </Button>
           </div>
-          <div className="w-full text-center">
-            <h1 className="text-3xl font-bold text-landingPage-lp-marrom-avela">
-              {view === 'sign_in' ? 'Acesse seu Painel' : 'Recuperar Senha'}
-            </h1>
-            {view !== 'sign_in' && (
-              <p className="text-landingPage-lp-marrom-avela/80">
-                Insira seu e-mail para receber as instruções.
-              </p>
-            )}
-          </div>
           <Card>
-            <CardContent className="p-6">
+            <CardHeader className="text-center">
+              <CardTitle className="text-3xl font-bold text-landingPage-lp-marrom-avela">
+                {view === 'sign_in' ? 'Acesse seu Painel' : 'Recuperar Senha'}
+              </CardTitle>
+              {view !== 'sign_in' && (
+                <CardDescription className="text-landingPage-lp-marrom-avela/80">
+                  Insira seu e-mail para receber as instruções.
+                </CardDescription>
+              )}
+            </CardHeader>
+            <CardContent className="p-6 pt-0">
               {view === 'sign_in' ? (
                 <Form {...loginForm}>
                   <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-3">
