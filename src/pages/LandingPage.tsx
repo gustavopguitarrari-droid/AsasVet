@@ -54,7 +54,7 @@ const LandingPage: React.FC = () => {
             <span className="text-white">{typedAsas}</span>
             <span className="typing-cursor text-white"></span>
           </h1>
-          <div className="mt-8 animate-fade-in-up">
+          <div className="mt-12 animate-fade-in-up">
             <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-primary hover:bg-primary/90 text-primary-foreground text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
               Experimente Grátis
             </Link>
