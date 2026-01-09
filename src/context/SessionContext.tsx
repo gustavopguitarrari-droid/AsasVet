@@ -38,10 +38,8 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
         throw new Error("Sessão inválida. Tente fazer login novamente.");
       }
 
-      // Invoke the edge function, explicitly passing the Authorization header
-      const { data: profileDataFromFunction, error } = await supabase.functions.invoke('get-profile', {
-        headers: { Authorization: `Bearer ${session.access_token}` }
-      });
+      // Invoke the edge function. The user's auth token is automatically included.
+      const { data: profileDataFromFunction, error } = await supabase.functions.invoke('get-profile');
 
       if (error) {
         console.error('SessionContext: [useQuery] Error invoking get-profile function:', error);

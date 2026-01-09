@@ -13,37 +13,29 @@ serve(async (req) => {
   }
 
   try {
-    // Create a Supabase client with the service role key
-    const supabaseAdmin = createClient(
+    // Create a Supabase client with the ANON key.
+    // The user's auth token will be forwarded from the request headers.
+    const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
 
-    // Get the authorization header from the request
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Unauthorized: No Authorization header' }), {
-        status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      })
-    }
-
-    // Extract the token
-    const token = authHeader.replace('Bearer ', '')
-    
-    // Get the user from the token
-    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
+    // The getUser() call will now validate the token and return the user object
+    // based on the forwarded Authorization header.
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser()
 
     if (authError || !user) {
-      console.error('Auth error:', authError?.message)
+      console.error('Auth error in get-profile function:', authError?.message)
       return new Response(JSON.stringify({ error: 'Unauthorized: Invalid token' }), {
         status: 401,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
 
-    // Fetch the user's profile from the profiles table
-    const { data: profile, error: profileError } = await supabaseAdmin
+    // Fetch the user's profile from the profiles table.
+    // This will now be subject to RLS policies.
+    const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
       .select('*')
       .eq('id', user.id)
@@ -51,13 +43,13 @@ serve(async (req) => {
 
     if (profileError) {
       // Handle case where profile might not exist yet without throwing a 500
-      if (profileError.code === 'PGRST116') {
+      if (profileError.code === 'PGRST116') { // 'PGRST116' means no rows found
         return new Response(JSON.stringify(null), {
-          status: 200, // It's not an error, just no profile found
+          status: 200, // Not an error, just no profile
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
-      console.error('Profile fetch error:', profileError.message)
+      console.error('Profile fetch error in get-profile function:', profileError.message)
       throw profileError
     }
 
@@ -68,7 +60,7 @@ serve(async (req) => {
     })
 
   } catch (error) {
-    console.error('Unhandled error:', error.message)
+    console.error('Unhandled error in get-profile function:', error.message)
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
