@@ -347,7 +347,6 @@ const SignUp = () => {
               <div className="flex items-center justify-center">
                 <div className="w-full text-center">
                   <h1 className="text-3xl font-bold text-landingPage-lp-marrom-avela">Crie sua Conta</h1>
-                  <p className="text-landingPage-lp-marrom-avela/80">Preencha os campos para começar.</p>
                 </div>
               </div>
 
