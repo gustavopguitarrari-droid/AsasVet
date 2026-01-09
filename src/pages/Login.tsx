@@ -159,7 +159,7 @@ const Login = () => {
             <CardContent className="p-6 pt-0">
               {view === 'sign_in' ? (
                 <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-3">
+                  <form key="login-form" onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-3">
                     <FormField control={loginForm.control} name="email" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Email</FormLabel>
@@ -210,7 +210,7 @@ const Login = () => {
                 </Form>
               ) : (
                 <Form {...forgotPasswordForm}>
-                  <form onSubmit={forgotPasswordForm.handleSubmit(handlePasswordReset)} className="space-y-3">
+                  <form key="forgot-password-form" onSubmit={forgotPasswordForm.handleSubmit(handlePasswordReset)} className="space-y-3">
                     <FormField control={forgotPasswordForm.control} name="email" render={({ field }) => (
                       <FormItem>
                         <FormLabel>Email</FormLabel>
