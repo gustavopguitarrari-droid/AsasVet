@@ -51,8 +51,8 @@ const LandingPage: React.FC = () => {
         <div className="relative z-10 max-w-2xl space-y-6">
           <h1 className="text-4xl md:text-6xl font-mono font-extrabold leading-tight text-green-900 drop-shadow-lg animate-fade-in-down">
             Muito mais que simples, aqui você ganha{' '}
-            <span className="text-white">{typedAsas}</span>
-            <span className="typing-cursor text-white"></span>
+            <span className="text-golden">{typedAsas}</span>
+            <span className="typing-cursor text-golden"></span>
           </h1>
           <div className="mt-32 animate-fade-in-up">
             <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-primary hover:bg-primary/90 text-primary-foreground text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
