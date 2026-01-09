@@ -65,7 +65,7 @@ export const ColorThemeProvider = ({ children }: { children: ReactNode }) => {
         ...prevUser!,
         colorTheme: data.color_theme || undefined,
       }));
-      queryClient.invalidateQueries({ queryKey: ['profiles', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['profile', user?.id] });
       showSuccess("Tema de cor atualizado com sucesso!");
     },
     onError: (error) => {
