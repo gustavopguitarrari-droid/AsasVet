@@ -15,7 +15,7 @@ const LandingPage: React.FC = () => {
       {/* Hero Section */}
       <main id="hero" className="relative flex-1 flex items-center justify-center md:justify-end text-center md:text-right p-8 md:p-16 overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/vet-landing-bg-2.png')" }}>
-          <div className="absolute inset-0 bg-landingPage-lp-marrom-avela opacity-50"></div>
+          {/* A div de overlay foi removida para mostrar a imagem original */}
         </div>
         
         <div className="relative z-10 max-w-2xl space-y-6">
