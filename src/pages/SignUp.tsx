@@ -73,30 +73,45 @@ const SignUp = () => {
 
   const [typedText, setTypedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const [loopNum, setLoopNum] = useState(0);
   const textToType = "Bem-vindo ao AsasVet";
+  const typingSpeed = 150;
+  const deletingSpeed = 75;
+  const pauseDelay = 2000;
 
   useEffect(() => {
     const handleTyping = () => {
-      const currentText = isDeleting
-        ? textToType.substring(0, typedText.length - 1)
-        : textToType.substring(0, typedText.length + 1);
+      setTypedText(current => {
+        const isFullText = current === textToType;
+        const isEmptyText = current === '';
 
-      setTypedText(currentText);
-
-      if (!isDeleting && currentText === textToType) {
-        // Pause at the end before deleting
-        setTimeout(() => setIsDeleting(true), 2000);
-      } else if (isDeleting && currentText === '') {
-        setIsDeleting(false);
-        setLoopNum(loopNum + 1);
-      }
+        if (isDeleting) {
+          if (isEmptyText) {
+            setIsDeleting(false);
+            return textToType.substring(0, 1);
+          }
+          return textToType.substring(0, current.length - 1);
+        } else {
+          if (isFullText) {
+            return current;
+          }
+          return textToType.substring(0, current.length + 1);
+        }
+      });
     };
 
-    const typingTimeout = setTimeout(handleTyping, isDeleting ? 75 : 150);
+    const typingInterval = setInterval(handleTyping, isDeleting ? deletingSpeed : typingSpeed);
 
-    return () => clearTimeout(typingTimeout);
-  }, [typedText, isDeleting, loopNum]);
+    return () => clearInterval(typingInterval);
+  }, [isDeleting, textToType]);
+
+  useEffect(() => {
+    if (!isDeleting && typedText === textToType) {
+      const timeoutId = setTimeout(() => {
+        setIsDeleting(true);
+      }, pauseDelay);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [typedText, isDeleting, textToType]);
 
   const formSchema = useMemo(() => createFormSchema(registrationType), [registrationType]);
 

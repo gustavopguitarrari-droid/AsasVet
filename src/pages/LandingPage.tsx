@@ -11,32 +11,45 @@ const LandingPage: React.FC = () => {
   // Lógica da animação de digitação
   const [typedAsas, setTypedAsas] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
-  const [loopNum, setLoopNum] = useState(0);
   const wordToType = "ASAS";
   const typingSpeed = 200;
   const deletingSpeed = 150;
-  const delay = 3000;
+  const pauseDelay = 3000;
 
   useEffect(() => {
     const handleTyping = () => {
-      const currentText = isDeleting
-        ? wordToType.substring(0, typedAsas.length - 1)
-        : wordToType.substring(0, typedAsas.length + 1);
+      setTypedAsas(current => {
+        const isFullText = current === wordToType;
+        const isEmptyText = current === '';
 
-      setTypedAsas(currentText);
-
-      if (!isDeleting && currentText === wordToType) {
-        setTimeout(() => setIsDeleting(true), delay);
-      } else if (isDeleting && currentText === '') {
-        setIsDeleting(false);
-        setLoopNum(loopNum + 1);
-      }
+        if (isDeleting) {
+          if (isEmptyText) {
+            setIsDeleting(false);
+            return wordToType.substring(0, 1);
+          }
+          return wordToType.substring(0, current.length - 1);
+        } else {
+          if (isFullText) {
+            return current;
+          }
+          return wordToType.substring(0, current.length + 1);
+        }
+      });
     };
 
-    const typingTimeout = setTimeout(handleTyping, isDeleting ? deletingSpeed : typingSpeed);
+    const typingInterval = setInterval(handleTyping, isDeleting ? deletingSpeed : typingSpeed);
 
-    return () => clearTimeout(typingTimeout);
-  }, [typedAsas, isDeleting, loopNum]);
+    return () => clearInterval(typingInterval);
+  }, [isDeleting, wordToType]);
+
+  useEffect(() => {
+    if (!isDeleting && typedAsas === wordToType) {
+      const timeoutId = setTimeout(() => {
+        setIsDeleting(true);
+      }, pauseDelay);
+      return () => clearTimeout(timeoutId);
+    }
+  }, [typedAsas, isDeleting, wordToType]);
 
   return (
     <div className="min-h-screen bg-landingPage-lp-creme-terra text-landingPage-lp-marrom-avela theme-nature-vet flex flex-col">
