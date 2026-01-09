@@ -23,7 +23,7 @@ const LandingHeader: React.FC = () => {
           Login
         </Link>
         <Link to="/signup" className={cn(buttonVariants({ variant: "default", size: "default" }), "bg-landingPage-lp-verde-folha-seca hover:bg-landingPage-lp-verde-folha-seca/90 text-white text-lg font-medium")}>
-          Cadastre-se
+          Experimente Grátis
         </Link>
       </div>
     </header>

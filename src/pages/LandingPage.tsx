@@ -27,7 +27,7 @@ const LandingPage: React.FC = () => {
           </p>
           <div className="mt-10 animate-fade-in-up">
             <Link to="/signup" className={cn(buttonVariants({ size: "lg" }), "bg-landingPage-lp-verde-folha-seca hover:bg-landingPage-lp-verde-folha-seca/90 text-white text-xl px-10 py-6 rounded-full shadow-xl transition-all duration-300 ease-in-out hover:scale-105")}>
-              Crie sua Conta Grátis
+              Experimente Grátis
             </Link>
           </div>
         </div>
