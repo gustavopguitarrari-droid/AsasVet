@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { buttonVariants } from '@/components/ui/button';
 import { PawPrint } from 'lucide-react';
@@ -8,6 +8,36 @@ import { cn } from '@/lib/utils';
 import LandingHeader from '@/components/LandingHeader';
 
 const LandingPage: React.FC = () => {
+  // Lógica da animação de digitação
+  const [typedAsas, setTypedAsas] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [loopNum, setLoopNum] = useState(0);
+  const wordToType = "ASAS";
+  const typingSpeed = 200;
+  const deletingSpeed = 150;
+  const delay = 3000;
+
+  useEffect(() => {
+    const handleTyping = () => {
+      const currentText = isDeleting
+        ? wordToType.substring(0, typedAsas.length - 1)
+        : wordToType.substring(0, typedAsas.length + 1);
+
+      setTypedAsas(currentText);
+
+      if (!isDeleting && currentText === wordToType) {
+        setTimeout(() => setIsDeleting(true), delay);
+      } else if (isDeleting && currentText === '') {
+        setIsDeleting(false);
+        setLoopNum(loopNum + 1);
+      }
+    };
+
+    const typingTimeout = setTimeout(handleTyping, isDeleting ? deletingSpeed : typingSpeed);
+
+    return () => clearTimeout(typingTimeout);
+  }, [typedAsas, isDeleting, loopNum]);
+
   return (
     <div className="min-h-screen bg-landingPage-lp-creme-terra text-landingPage-lp-marrom-avela theme-nature-vet flex flex-col">
       <LandingHeader />
@@ -19,8 +49,10 @@ const LandingPage: React.FC = () => {
         </div>
         
         <div className="relative z-10 max-w-2xl space-y-6">
-          <h1 className="text-4xl md:text-6xl font-mono font-extrabold leading-tight text-green-900 drop-shadow-lg animate-fade-in-down">
-            A gestão da sua clínica veterinária, simplificada.
+          <h1 className="text-4xl md:text-6xl font-mono font-extrabold leading-tight text-green-900 drop-shadow-lg animate-fade-in-down h-24 md:h-32">
+            Muito mais que simples, aqui você ganha{' '}
+            <span className="text-white">{typedAsas}</span>
+            <span className="typing-cursor text-white"></span>
           </h1>
           <p className="text-lg md:text-xl text-landingPage-lp-creme-terra/90 animate-fade-in-up">
             Organize consultas, prontuários e finanças em um só lugar. Mais tempo para o que realmente importa: cuidar dos animais.

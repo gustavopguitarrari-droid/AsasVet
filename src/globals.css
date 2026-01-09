@@ -668,10 +668,10 @@
 /* Keyframes for typing cursor animation */
 @keyframes blink-caret {
   from, to { border-color: transparent }
-  50% { border-color: hsl(var(--foreground)); }
+  50% { border-color: currentColor; }
 }
 
 .typing-cursor {
-  border-right: .15em solid hsl(var(--foreground));
+  border-right: .15em solid currentColor;
   animation: blink-caret .75s step-end infinite;
 }
