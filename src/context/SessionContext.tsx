@@ -33,8 +33,15 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       if (!supabaseUser?.id) return null;
       console.log('SessionContext: [useQuery] Invoking get-profile function for user ID:', supabaseUser.id);
       
-      // Invoke the edge function
-      const { data: profileDataFromFunction, error } = await supabase.functions.invoke('get-profile');
+      if (!session?.access_token) {
+        console.error('SessionContext: [useQuery] Attempted to fetch profile but no access token was available.');
+        throw new Error("Sessão inválida. Tente fazer login novamente.");
+      }
+
+      // Invoke the edge function, explicitly passing the Authorization header
+      const { data: profileDataFromFunction, error } = await supabase.functions.invoke('get-profile', {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      });
 
       if (error) {
         console.error('SessionContext: [useQuery] Error invoking get-profile function:', error);
