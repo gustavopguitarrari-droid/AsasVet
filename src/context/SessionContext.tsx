@@ -104,8 +104,8 @@ export const SessionContextProvider = ({ children }: { children: ReactNode }) =>
       setSupabaseUserState(user);
 
       // NOVO: Verifica se o usuário está em um fluxo de recuperação de senha
-      const amr = user?.amr;
-      const isRecovery = amr?.some(entry => entry.method === 'recovery') ?? false;
+      const amr = (user as any)?.amr;
+      const isRecovery = amr?.some((entry: { method: string }) => entry.method === 'recovery') ?? false;
       setIsAwaitingPasswordReset(isRecovery);
       console.log('SessionContext: AMR check. Is recovery flow?', isRecovery);
 

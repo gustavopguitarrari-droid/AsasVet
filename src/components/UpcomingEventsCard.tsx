@@ -72,14 +72,14 @@ const UpcomingEventsCard: React.FC<UpcomingEventsCardProps> = ({ className }) =>
       if (!organizationId) return [];
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name')
+        .select('id, first_name, last_name, email, role')
         .eq('organization_id', organizationId)
         .in('role', ['Veterinário', 'Administrador']);
       if (error) {
         console.error("Erro ao buscar veterinários para o card 'Próximos Eventos':", error);
         throw error;
       }
-      return data;
+      return data as TeamMember[];
     },
     enabled: !!organizationId,
   });
